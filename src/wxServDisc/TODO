@@ -1,0 +1,5 @@
+
+
+- calling flush() regularly?
+- registering several queries on _one_ mdnsd? - seems not to work...bug in mdnsd
+- maybe steal from mdns-scan or jdns...
