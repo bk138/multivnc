@@ -4,7 +4,8 @@
 
 
 SUBDIRS = \
-	wxServDisc
+	wxServDisc\
+	libvncclient
 
 
 AM_CPPFLAGS = \
@@ -36,7 +37,7 @@ multivnc_LDFLAGS =
 
 multivnc_LDADD = \
 	wxServDisc/libwxservdisc.a \
-	$(LIBVNCSERVER_LIBS) \
+        libvncclient/.libs/libvncclient.a \
 	$(WX_LIBS)
 
 

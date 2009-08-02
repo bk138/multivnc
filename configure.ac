@@ -83,6 +83,7 @@ AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_HEADER_STDC
 AC_PROG_RANLIB
+AC_PROG_LIBTOOL
 
 
 
@@ -108,5 +109,6 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 src/wxServDisc/Makefile
+src/libvncclient/Makefile
 po/Makefile.in
 ])
