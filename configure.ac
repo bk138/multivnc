@@ -1,12 +1,13 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl Created by Anjuta application wizard.
 
-AC_INIT(multivnc, 0.1)
-
-
+AC_INIT(multivnc, 0.1, http://sourceforge.net/projects/multivnc)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
-AM_MAINTAINER_MODE
+dnl this one needs a prefix
+AX_PREFIX_CONFIG_H([src/rfb/rfbconfig.h], LibVNCServer)
+
+
+
 
 AC_CANONICAL_HOST
 case $host_os in
@@ -65,9 +66,6 @@ WX_CXXFLAGS="`$WXCONFIG --cxxflags`"
 WX_LIBS="`$WXCONFIG --libs`"
 WX_RESCOMP="`$WXCONFIG --rescomp`"
 
-dnl LIBVNCSERVER_LIBS=" -lvncclient -lnsl -lpthread -lz -ljpeg"
-LIBVNCSERVER_LIBS=""
-
  
 AC_SUBST(WX_CPPFLAGS)
 AC_SUBST(WX_CXXFLAGS)
@@ -85,6 +83,9 @@ AC_HEADER_STDC
 AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
+AC_SUBST(MULTIVNC_CFLAGS)
+AC_SUBST(MULTIVNC_LIBS)
+
 
 
 dnl ***************************************************************************
@@ -97,14 +98,115 @@ AM_GLIB_GNU_GETTEXT
 IT_PROG_INTLTOOL([0.35.0])
 
 
+dnl ***************************************************************************
+dnl libvncclient stuff, copied over from their configure.ac
+dnl ***************************************************************************
+
+AC_ARG_WITH(jpeg,
+[  --without-jpeg          disable support for jpeg]
+[  --with-jpeg=DIR         use jpeg include/library files in DIR],,)
+
+if test "x$with_jpeg" != "xno"; then
+	if test ! -z "$with_jpeg" -a "x$with_jpeg" != "xyes"; then
+		# add user supplied directory to flags:
+		saved_CPPFLAGS="$CPPFLAGS"
+		saved_LDFLAGS="$LDFLAGS"
+		CPPFLAGS="$CPPFLAGS -I$with_jpeg/include"
+		LDFLAGS="$LDFLAGS -L$with_jpeg/lib"
+		if test "x$ld_minus_R" = "xno"; then
+			:
+		elif test "x$GCC" = "xyes"; then
+			# this is not complete... in general a rat's nest.
+			LDFLAGS="$LDFLAGS -Xlinker -R$with_jpeg/lib"
+		else
+			LDFLAGS="$LDFLAGS -R$with_jpeg/lib"
+		fi
+	fi
+	AC_CHECK_HEADER(jpeglib.h, HAVE_JPEGLIB_H="true")
+	if test "x$HAVE_JPEGLIB_H" = "xtrue"; then
+		AC_CHECK_LIB(jpeg, jpeg_CreateCompress, , HAVE_JPEGLIB_H="")
+	fi
+	if test ! -z "$with_jpeg" -a "x$with_jpeg" != "xyes"; then
+		if test "x$HAVE_JPEGLIB_H" != "xtrue"; then
+			# restore old flags on failure:
+			CPPFLAGS="$saved_CPPFLAGS"
+			LDFLAGS="$saved_LDFLAGS"
+		fi
+	fi
+	if test "$build_x11vnc" = "yes"; then
+		if test "x$HAVE_JPEGLIB_H" != "xtrue"; then
+			AC_MSG_WARN([
+==========================================================================
+*** The libjpeg compression library was not found. ***
+This may lead to reduced performance, especially over slow links.
+If libjpeg is in a non-standard location use --with-jpeg=DIR to
+indicate the header file is in DIR/include/jpeglib.h and the library
+in DIR/lib/libjpeg.a.  A copy of libjpeg may be obtained from:
+ftp://ftp.uu.net/graphics/jpeg/
+==========================================================================
+])
+			sleep 5
+		fi
+	fi
+fi
+
+AM_CONDITIONAL(HAVE_LIBJPEG, test ! -z "$HAVE_JPEGLIB_H")
 
 
 
+AC_ARG_WITH(libz,
+[  --without-libz          disable support for deflate],,)
+AC_ARG_WITH(zlib,
+[  --without-zlib          disable support for deflate]
+[  --with-zlib=DIR         use zlib include/library files in DIR],,)
 
-AC_SUBST(MULTIVNC_CFLAGS)
-AC_SUBST(MULTIVNC_LIBS)
+if test "x$with_zlib" != "xno" -a "x$with_libz" != "xno"; then
+	if test ! -z "$with_zlib" -a "x$with_zlib" != "xyes"; then
+		saved_CPPFLAGS="$CPPFLAGS"
+		saved_LDFLAGS="$LDFLAGS"
+		CPPFLAGS="$CPPFLAGS -I$with_zlib/include"
+		LDFLAGS="$LDFLAGS -L$with_zlib/lib"
+		if test "x$ld_minus_R" = "xno"; then
+			:
+		elif test "x$GCC" = "xyes"; then
+			LDFLAGS="$LDFLAGS -Xlinker -R$with_zlib/lib"
+		else
+			LDFLAGS="$LDFLAGS -R$with_zlib/lib"
+		fi
+	fi
+	AC_CHECK_HEADER(zlib.h, HAVE_ZLIB_H="true")
+	if test "x$HAVE_ZLIB_H" = "xtrue"; then
+		AC_CHECK_LIB(z, deflate, , HAVE_ZLIB_H="")
+	fi
+	if test ! -z "$with_zlib" -a "x$with_zlib" != "xyes"; then
+		if test "x$HAVE_ZLIB_H" != "xtrue"; then
+			CPPFLAGS="$saved_CPPFLAGS"
+			LDFLAGS="$saved_LDFLAGS"
+		fi
+	fi
+	if test "$build_x11vnc" = "yes"; then
+		if test "x$HAVE_ZLIB_H" != "xtrue"; then
+			AC_MSG_WARN([
+==========================================================================
+*** The libz compression library was not found. ***
+This may lead to reduced performance, especially over slow links.
+If libz is in a non-standard location use --with-zlib=DIR to indicate the
+header file is in DIR/include/zlib.h and the library in DIR/lib/libz.a.
+A copy of libz may be obtained from: http://www.gzip.org/zlib/
+==========================================================================
+])
+			sleep 5
+		fi
+	fi
+fi
 
 
+AM_CONDITIONAL(HAVE_LIBZ, test ! -z "$HAVE_ZLIB_H")
+
+
+# ***************************************************************************
+# finally
+# ***************************************************************************
 AC_OUTPUT([
 Makefile
 src/Makefile
