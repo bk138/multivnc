@@ -200,8 +200,41 @@ A copy of libz may be obtained from: http://www.gzip.org/zlib/
 	fi
 fi
 
-
 AM_CONDITIONAL(HAVE_LIBZ, test ! -z "$HAVE_ZLIB_H")
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_C_BIGENDIAN
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_HEADER_SYS_WAIT
+AC_TYPE_SOCKLEN_T
+AC_CREATE_STDINT_H(src/rfb/rfbint.h)
+AC_CACHE_CHECK([for in_addr_t],
+        vnc_cv_inaddrt, [
+                AC_TRY_COMPILE([#include <sys/types.h>
+			        #include <netinet/in.h>],
+                        [in_addr_t foo; return 0;],
+                                        [inaddrt=yes],
+                                        [inaddrt=no]),
+        ])
+AH_TEMPLATE(NEED_INADDR_T, [Need a typedef for in_addr_t])
+if test $inaddrt = no ; then
+  AC_DEFINE(NEED_INADDR_T)
+fi
+
+# Checks for library functions.
+AC_FUNC_MEMCMP
+AC_FUNC_STAT
+AC_FUNC_STRFTIME
+AC_FUNC_VPRINTF
+AC_FUNC_FORK
+AC_CHECK_LIB(nsl,gethostbyname)
+AC_CHECK_LIB(socket,socket)
+
+
 
 
 # ***************************************************************************
