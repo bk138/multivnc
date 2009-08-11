@@ -17,7 +17,11 @@ to compile:
 if crosscompiling with MinGW:
 
 
-./autogen.sh --build=<your build system type> --host=i586-mingw32msvc --with-wx-config=<your win32 wx-config> --with-zlib=<path to where zlib include and lib dirs are>
+./autogen.sh --build=<your build system type> --host=i586-mingw32msvc \
+	     --with-wx-config=<your win32 wx-config> \
+	     --with-zlib=<path to where zlib include and lib dirs are> \
+	     --with-jepg=<path to where jpeglib include and lib dirs are> 
+
 
 then
 
