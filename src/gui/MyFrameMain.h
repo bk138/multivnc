@@ -7,7 +7,7 @@
 
 #include "FrameMain.h"
 #include "../wxServDisc/wxServDisc.h"
-
+#include "../VNCConn.h"
 
 
 
@@ -17,10 +17,11 @@ class MyFrameMain: public FrameMain
   // main service scanner
   wxServDisc* servscan;
 
-  // to temporarily store these
-  wxString hostname;
-  wxString addr;
-  wxString port;
+  // these are used by spawn_conn()
+  wxString sc_hostname;
+  wxString sc_addr;
+  wxString sc_port;
+
 
   // gui layout stuff
   bool show_toolbar;
@@ -31,12 +32,14 @@ class MyFrameMain: public FrameMain
 
   void splitwinlayout();
 
-  bool spawn_client();
-  void kill_client();
-  void on_client_term(wxString& cmd, int status); // callback if client exits on its own
-
-
-
+  bool spawn_conn();
+  void terminate_conn();
+ 
+  // private handlers
+  void onVNCConnDisconnectNotify(wxCommandEvent& event);
+  void onSDNotify(wxCommandEvent& event);
+  
+  static char* getpasswd(rfbClient* client);
 
   
 protected:
@@ -51,12 +54,10 @@ public:
 
   
   // handlers
-  void onSDNotify(wxCommandEvent& event);
   void listbox_services_select(wxCommandEvent &event); 
   void listbox_services_dclick(wxCommandEvent &event); 
   void listbox_bookmarks_select(wxCommandEvent &event); 
   void listbox_bookmarks_dclick(wxCommandEvent &event); 
-
 
   void machine_connect(wxCommandEvent &event);
   void machine_disconnect(wxCommandEvent &event);
@@ -68,7 +69,6 @@ public:
   void view_togglebookmarks(wxCommandEvent &event);
   void view_togglestatistics(wxCommandEvent &event);
   void view_togglefullscreen(wxCommandEvent &event);
-
 
   void bookmarks(wxCommandEvent &event);
 

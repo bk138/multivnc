@@ -24,6 +24,8 @@ bin_PROGRAMS = multivnc
 multivnc_SOURCES = \
 	MultiVNCApp.cpp   \
 	MultiVNCApp.h   \
+	VNCConn.cpp   \
+	VNCConn.h   \
 	dfltcfg.h \
 	gui/FrameMain.cpp \
 	gui/FrameMain.h \

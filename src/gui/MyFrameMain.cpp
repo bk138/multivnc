@@ -10,16 +10,17 @@
 #include "../MultiVNCApp.h"
 
 
-#define DFLTPORT _T("5900")
+
+
+//FIXME
+VNCConn *c;
 
 
 
-
-
-
-// map recv of wxServDiscNOTIFY to list update method
+// map recv of cusotm events to handler methods
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
-  EVT_COMMAND  (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
+  EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
 END_EVENT_TABLE()
 
 
@@ -95,7 +96,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
 MyFrameMain::~MyFrameMain()
 {
-  kill_client();
+  terminate_conn();
 
 }
 
@@ -108,23 +109,70 @@ MyFrameMain::~MyFrameMain()
 
 
 
-
-
-// client stuff
-bool MyFrameMain::spawn_client()
+// handlers
+void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 {
-  SetStatusText(_("Connecting to ") + addr + _T(":") + port + _T("..."));
+  fprintf(stderr, "disconnect recvd!\n");
+
+  wxLogStatus( _("Connection terminated."));
+  wxLogMessage( _("Connection terminated."));
+     
+  // "end connection"
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+}
+
+
+
+void MyFrameMain::onSDNotify(wxCommandEvent& event)
+{
+    if(event.GetEventObject() == servscan)
+      {
+	wxArrayString items; 
+	
+	// length of qeury plus leading dot
+	size_t qlen =  servscan->getQuery().Len() + 1;
+	
+	vector<wxSDEntry> entries = servscan->getResults();
+	vector<wxSDEntry>::const_iterator it; 
+	for(it=entries.begin(); it != entries.end(); it++)
+	  items.Add(it->name.Mid(0, it->name.Len() - qlen));
+	
+	list_box_services->Set(items, 0);
+      }
+}
+
+
+
+
+char* MyFrameMain::getpasswd(rfbClient* client)
+{
+  wxString s = wxGetPasswordFromUser(_("Enter password:"),
+				     _("Password required!"));
+  return strdup(s.char_str());
+}
+
+
+// connection initiation and shutdown
+bool MyFrameMain::spawn_conn()
+{
+  wxLogStatus(_("Connecting to ") + sc_addr + _T(":") + sc_port + _T("..."));
   wxBusyCursor busy;
 
-  // handle %a and %p
-  //wxString cmd = client_cmd_template;
-  //cmd.Replace(_T("%a"), addr);
-  //cmd.Replace(_T("%p"), port);
-  
+  c = new VNCConn(this);
+  if(!c->Init(sc_addr + _T(":") + sc_port, getpasswd))
+    {
+      wxLogStatus( _("Connection failed."));
+      wxArrayString log = c->getLog();
+      // show last 3 log strings
+      for(int i = log.GetCount() - 3; i < log.GetCount(); ++i)
+	wxLogMessage(log[i]);
 
+      wxLogError(c->getErr());
+
+      return false;
+    }
  
-
-  SetStatusText(_("Connected to ") + addr + _T(":") + port);
+  wxLogStatus(_("Connected to ") + sc_addr + _T(":") + sc_port);
 
 
   // "end connection"
@@ -134,41 +182,20 @@ bool MyFrameMain::spawn_client()
 }
 
 
-void MyFrameMain::kill_client()
+void MyFrameMain::terminate_conn()
 {
-
+  if(c)
+    c->Shutdown();
+  delete c;
+  c = 0;
 	  
   // "end connection"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
 
+  wxLogStatus( _("Connection terminated."));
 }
 
 
-void MyFrameMain::on_client_term(wxString& cmd, int status)
-{
- 
-
-   if(status == 0) 
-    SetStatusText(_("Client terminated gracefully."));
-   else
-     if(status == -1 || status == 1)
-       {
-	 SetStatusText( _("Connection failed."));
-	 wxLogError( _("Connection failed."));
-       }
-    else
-      {
-	SetStatusText(_("Error running client."));
-	wxLogError(_("Error running '%s'."), cmd.c_str());
-      }
-   
-
-   
-   
-   // "end connection"
-   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Edit")))->FindItemByPosition(3)->Enable(false);
-   
-}
 
 
 
@@ -278,10 +305,11 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 {
   wxString s = wxGetTextFromUser(_("Enter host to connect to:"),
 				 _("Connect to specific host"));
+				
   if(s != wxEmptyString)
     {
       wxIPV4address host_addr;
-	    
+      
       // get host part and port part
       wxString host_name, host_port;
       host_name = s.BeforeFirst(_T(':'));
@@ -291,36 +319,33 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
       if(! host_addr.Hostname(host_name))
 	{
 	  wxLogError(_("Invalid hostname or IP address."));
+	  sc_addr = sc_hostname = sc_port = wxEmptyString; 
 	  return;
 	}
       else
 #ifdef __WIN32__
-	addr = host_addr.Hostname(); // wxwidgets bug, ah well ...
+	sc_addr = host_addr.Hostname(); // wxwidgets bug, ah well ...
 #else
-        addr = host_addr.IPAddress();
+        sc_addr = host_addr.IPAddress();
 #endif
-
-
-
-      
+  
       
       // and handle port
       if(host_addr.Service(host_port))
-	port = wxString() << host_addr.Service();
+	sc_port = wxString() << host_addr.Service();
       else
-	port = DFLTPORT;
-
-
-      spawn_client();
+	sc_port = wxEmptyString;
+      
+      spawn_conn();
     }
 }
 
 
 
+
 void MyFrameMain::machine_disconnect(wxCommandEvent &event)
 {
-  kill_client();  
-  SetStatusText( _("Connection terminated."));
+  terminate_conn();
 }
 
 
@@ -347,8 +372,11 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
 
 void MyFrameMain::machine_exit(wxCommandEvent &event)
 {
+  terminate_conn();
   Close(true);
 }
+
+
 
 
 void MyFrameMain::view_toggletoolbar(wxCommandEvent &event)
@@ -470,24 +498,6 @@ void MyFrameMain::help_contents(wxCommandEvent &e)
 
 
 
-void MyFrameMain::onSDNotify(wxCommandEvent& event)
-{
-    if(event.GetEventObject() == servscan)
-      {
-	wxArrayString items; 
-	
-	// length of qeury plus leading dot
-	size_t qlen =  servscan->getQuery().Len() + 1;
-	
-	vector<wxSDEntry> entries = servscan->getResults();
-	vector<wxSDEntry>::const_iterator it; 
-	for(it=entries.begin(); it != entries.end(); it++)
-	  items.Add(it->name.Mid(0, it->name.Len() - qlen));
-	
-	list_box_services->Set(items, 0);
-      }
-}
-
 
 
 void MyFrameMain::listbox_services_select(wxCommandEvent &event)
@@ -499,7 +509,7 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
   if(sel < 0) // seems this happens when we update the list
     return;
 
-  SetStatusText(_("Looking up host address..."));
+  wxLogStatus(_("Looking up host address..."));
 
 
   // lookup hostname and port
@@ -515,18 +525,18 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
     if(timeout <= 0)
       {
 	wxLogError(_("Timeout looking up hostname."));
-	SetStatusText(_("Timeout looking up hostname."));
-	hostname = addr = port = wxEmptyString;
+	wxLogStatus(_("Timeout looking up hostname."));
+	sc_hostname = sc_addr = sc_port = wxEmptyString;
 	return;
       }
-    hostname = namescan.getResults().at(0).name;
-    port = wxString() << namescan.getResults().at(0).port;
+    sc_hostname = namescan.getResults().at(0).name;
+    sc_port = wxString() << namescan.getResults().at(0).port;
   }
 
   
   // lookup ip address
   {
-    wxServDisc addrscan(0, hostname, QTYPE_A);
+    wxServDisc addrscan(0, sc_hostname, QTYPE_A);
   
     timeout = 3000;
     while(!addrscan.getResultCount() && timeout > 0)
@@ -537,21 +547,21 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
     if(timeout <= 0)
       {
 	wxLogError(_("Timeout looking up IP address."));
-	SetStatusText(_("Timeout looking up IP address."));
-	hostname = addr = port = wxEmptyString;
+	wxLogStatus(_("Timeout looking up IP address."));
+	sc_hostname = sc_addr = sc_port = wxEmptyString;
 	return;
       }
-    addr = addrscan.getResults().at(0).ip;
+    sc_addr = addrscan.getResults().at(0).ip;
   }
 
-  SetStatusText(hostname + wxT(" (") + addr + wxT(":") + port + wxT(")"));
+  wxLogStatus(sc_hostname + wxT(" (") + sc_addr + wxT(":") + sc_port + wxT(")"));
 }
 
 
 void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
 {
   listbox_services_select(event); // get the actual values
-  spawn_client();
+  spawn_conn();
 } 
  
 
