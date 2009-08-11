@@ -104,8 +104,6 @@ void VNCConn::SendDisconnectNotify()
 
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
-
-  fprintf(stderr, "disconnect sent!\n");
 }
 
 

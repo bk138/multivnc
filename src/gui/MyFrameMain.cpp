@@ -112,11 +112,15 @@ MyFrameMain::~MyFrameMain()
 // handlers
 void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 {
-  fprintf(stderr, "disconnect recvd!\n");
-
   wxLogStatus( _("Connection terminated."));
-  wxLogMessage( _("Connection terminated."));
-     
+ 
+  wxArrayString log = c->getLog();
+  // show last 3 log strings
+  for(int i = log.GetCount() - 3; i < log.GetCount(); ++i)
+    wxLogMessage(log[i]);
+
+  wxLogMessage( _("Connection terminated.")); 
+    
   // "end connection"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
 }
