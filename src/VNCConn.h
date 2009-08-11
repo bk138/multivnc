@@ -52,7 +52,8 @@ public:
   // get error string
   const wxString& getErr() const { const wxString& ref = err; return ref; };
   // get gloabl log string
-  const wxArrayString& getLog() const { const wxArrayString& ref = log; return ref; };
+  static const wxArrayString& getLog() { const wxArrayString& ref = log; return ref; };
+
 
 };
 
