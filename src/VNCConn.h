@@ -18,7 +18,7 @@ class VNCConn: public wxObject
 {
   friend class VNCThread;
   void *vncthread;
-  wxCriticalSection vncthread_CS;    // protects the vncthread pointer
+  wxCriticalSection mutex_vncthread;    // protects the vncthread pointer
 
   void *parent;
 
@@ -26,8 +26,13 @@ class VNCConn: public wxObject
 
   // per-connection error string
   wxString err;
-  // global libvcnclient log
+  
+  // global libvcnclient log stuff
+  // there's no per-connection log since we cannot find out which client
+  // called the logger function :-(
   static wxArrayString log;
+  static wxCriticalSection mutex_log;
+
  
   void SendDisconnectNotify();
 

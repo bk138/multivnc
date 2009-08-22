@@ -19,6 +19,7 @@ VNCConn *c;
 
 // map recv of cusotm events to handler methods
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
+  EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
 END_EVENT_TABLE()
@@ -87,6 +88,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
 
 
+  // theres no log window at startup
+  logwindow = 0;
+
   // finally, our mdns service scanner
   servscan = new wxServDisc(this, wxT("_rfb._tcp.local."), QTYPE_PTR);
 }
@@ -110,13 +114,19 @@ MyFrameMain::~MyFrameMain()
 
 
 // handlers
+
+void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
+{
+  logwindow = 0;
+}
+
 void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 {
   wxLogStatus( _("Connection terminated."));
  
-  wxArrayString log = c->getLog();
-  // show last 3 log strings
-  for(int i = log.GetCount() - 3; i < log.GetCount(); ++i)
+  wxArrayString log = VNCConn::getLog();
+  // show last 5 log strings
+  for(int i = log.GetCount() >= 5 ? log.GetCount()-5 : 0; i < log.GetCount(); ++i)
     wxLogMessage(log[i]);
 
   wxLogMessage( _("Connection terminated.")); 
@@ -166,9 +176,9 @@ bool MyFrameMain::spawn_conn()
   if(!c->Init(sc_addr + _T(":") + sc_port, getpasswd))
     {
       wxLogStatus( _("Connection failed."));
-      wxArrayString log = c->getLog();
-      // show last 3 log strings
-      for(int i = log.GetCount() - 3; i < log.GetCount(); ++i)
+      wxArrayString log = VNCConn::getLog();
+      // show last 5 log strings
+      for(int i = log.GetCount() >= 5 ? log.GetCount() - 5 : 0; i < log.GetCount(); ++i)
 	wxLogMessage(log[i]);
 
       wxLogError(c->getErr());
@@ -352,6 +362,19 @@ void MyFrameMain::machine_disconnect(wxCommandEvent &event)
   terminate_conn();
 }
 
+
+
+
+void MyFrameMain::machine_showlog(wxCommandEvent &event)
+{
+  if(!logwindow)
+    {
+      logwindow = new MyFrameLog(this, wxID_ANY, _("Detailed VNC Log"));
+      logwindow->Show();
+    }
+  else
+    logwindow->Raise();
+}
 
 
 

@@ -4,7 +4,6 @@
 #include "wx/thread.h"
 #include "wx/intl.h"
 
-
 #include "VNCConn.h"
 
 
@@ -91,11 +90,6 @@ void VNCThread::OnExit()
 
 
 
-wxArrayString VNCConn::log;
-
-
-
-
 void VNCConn::SendDisconnectNotify()
 {
   // new NOTIFY event, we got no window id
@@ -167,6 +161,11 @@ void VNCConn::got_selection(rfbClient *cl, const char *text, int len)
 
 
 
+// there's no per-connection log since we cannot find out which client
+// called the logger function :-(
+wxArrayString VNCConn::log;
+wxCriticalSection VNCConn::mutex_log;
+
 void VNCConn::logger(const char *format, ...)
 {
   FILE* logfile;
@@ -179,6 +178,9 @@ void VNCConn::logger(const char *format, ...)
   if(!rfbEnableClientLogging)
     return;
 
+  // since we're accessing some global things here from different threads
+  wxCriticalSectionLocker lock(mutex_log);
+
   // delete logfile on program startup
   static bool firstrun = 1;
   if(firstrun)
@@ -189,15 +191,14 @@ void VNCConn::logger(const char *format, ...)
 
   logfile=fopen(logfile_str.char_str(),"a");
 
-
   time(&log_clock);
   wxStrftime(timebuf, WXSIZEOF(timebuf), _T("%d/%m/%Y %X "), localtime(&log_clock));
 
   // global log string array
   va_start(args, format);
-  wxString msg;
-  msg.PrintfV(wx_format, args);
-  log.Add( wxString(timebuf) + msg);
+  char msg[1024];
+  vsnprintf(msg, 1024, format, args);
+  log.Add( wxString(timebuf) + wxString(msg, wxConvUTF8));
   va_end(args);
 
   // global log file
@@ -285,7 +286,7 @@ bool VNCConn::Shutdown()
 
   if(tp)
     {
-      wxCriticalSectionLocker lock(vncthread_CS);
+      wxCriticalSectionLocker lock(mutex_vncthread);
       tp->Delete();
       tp = 0;
     }

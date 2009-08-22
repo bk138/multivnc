@@ -31,6 +31,10 @@ multivnc_SOURCES = \
 	gui/FrameMain.h \
 	gui/MyFrameMain.cpp \
 	gui/MyFrameMain.h \
+	gui/FrameLog.cpp \
+	gui/FrameLog.h \
+	gui/MyFrameLog.cpp \
+	gui/MyFrameLog.h \
 	gui/MyDialogSettings.cpp \
 	gui/MyDialogSettings.h 
 

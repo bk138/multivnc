@@ -6,6 +6,7 @@
 
 
 #include "FrameMain.h"
+#include "MyFrameLog.h"
 #include "../wxServDisc/wxServDisc.h"
 #include "../VNCConn.h"
 
@@ -16,6 +17,10 @@ class MyFrameMain: public FrameMain
 {
   // main service scanner
   wxServDisc* servscan;
+
+  // log window
+  MyFrameLog* logwindow;
+
 
   // these are used by spawn_conn()
   wxString sc_hostname;
@@ -36,8 +41,10 @@ class MyFrameMain: public FrameMain
   void terminate_conn();
  
   // private handlers
+  void onMyFrameLogCloseNotify(wxCommandEvent& event);
   void onVNCConnDisconnectNotify(wxCommandEvent& event);
   void onSDNotify(wxCommandEvent& event);
+
   
   static char* getpasswd(rfbClient* client);
 
@@ -62,6 +69,7 @@ public:
   void machine_connect(wxCommandEvent &event);
   void machine_disconnect(wxCommandEvent &event);
   void machine_preferences(wxCommandEvent &event);
+  void machine_showlog(wxCommandEvent &event);
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);
