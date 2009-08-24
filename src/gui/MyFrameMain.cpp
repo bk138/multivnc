@@ -17,7 +17,7 @@ VNCConn *c;
 
 
 
-// map recv of cusotm events to handler methods
+// map recv of custom events to handler methods
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
@@ -125,8 +125,8 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
   wxLogStatus( _("Connection terminated."));
  
   wxArrayString log = VNCConn::getLog();
-  // show last 5 log strings
-  for(int i = log.GetCount() >= 5 ? log.GetCount()-5 : 0; i < log.GetCount(); ++i)
+  // show last 3 log strings
+  for(int i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
     wxLogMessage(log[i]);
 
   wxLogMessage( _("Connection terminated.")); 
@@ -177,8 +177,8 @@ bool MyFrameMain::spawn_conn()
     {
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
-      // show last 5 log strings
-      for(int i = log.GetCount() >= 5 ? log.GetCount() - 5 : 0; i < log.GetCount(); ++i)
+      // show last 3 log strings
+      for(int i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
 	wxLogMessage(log[i]);
 
       wxLogError(c->getErr());
