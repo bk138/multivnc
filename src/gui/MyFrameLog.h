@@ -11,13 +11,21 @@
 // make available custom close event
 DECLARE_EVENT_TYPE(MyFrameLogCloseNOTIFY, -1)
 
+
 class MyFrameLog: public FrameLog
 {
   friend class LogThread;
   void *logthread;
 
-  void SendCloseNotify();
+  size_t lines_printed;
 
+  void SendCloseNotify();
+  void SendUpdateNotify();
+
+  void onUpdate(wxCommandEvent &event);
+
+protected:
+  DECLARE_EVENT_TABLE();
   
 public:
   MyFrameLog(wxWindow* parent, int id, const wxString& title, 
