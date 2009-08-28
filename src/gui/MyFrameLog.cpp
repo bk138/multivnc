@@ -1,7 +1,9 @@
 
+#include "MyFrameLog.h"
+
 #include "wx/thread.h"
 #include "VNCConn.h"
-#include "MyFrameLog.h"
+
 
 
 
