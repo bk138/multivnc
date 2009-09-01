@@ -28,21 +28,9 @@ AM_CONDITIONAL(MINGW, [ test "$HOST_IS_WINDOWS" = "yes" ])
 AM_CONDITIONAL(DARWIN, [ test "$HOST_IS_DARWIN" = "yes" ])
 
 
-dnl Check if we have enabled debug support.
-AC_MSG_CHECKING(whether to enable debugging)
-AC_ARG_ENABLE(debug, [  --enable-debug          enable debug build [[default=no]]],, enable_debug="no")
-if test "x$enable_debug" = "xyes"; then
-	CPPFLAGS="$CPPFLAGS -DDEBUG"
-	WXCONFIG="wx-config --debug"	
-	AC_MSG_RESULT(yes)
-else
-	WXCONFIG="wx-config"	
-	AC_MSG_RESULT(no)
-fi
-
-
-
-AC_ARG_WITH(wx-config,
+dnl default for wx-config
+WXCONFIG="wx-config"
+AC_ARG_WITH(wx-config, 
 [[  --with-wx-config=FILE
     Use the given path to wx-config when determining
     wxWidgets configuration; defaults to "wx-config"]],
@@ -51,6 +39,22 @@ AC_ARG_WITH(wx-config,
         WXCONFIG=$withval
     fi
 ])
+
+
+
+dnl Check if we have enabled debug support.
+AC_MSG_CHECKING(whether to enable debugging)
+AC_ARG_ENABLE(debug, [  --enable-debug          enable debug build [[default=no]]],, enable_debug="no")
+if test "x$enable_debug" = "xyes"; then
+dnl	CPPFLAGS="$CPPFLAGS -DDEBUG"
+	WXCONFIG="$WXCONFIG --debug=yes"	
+	AC_MSG_RESULT(yes)
+else
+	WXCONFIG="$WXCONFIG --debug=no"	
+	AC_MSG_RESULT(no)
+fi
+
+
 AC_MSG_CHECKING([wxWidgets version])
 if wxversion=`$WXCONFIG --version`; then
     AC_MSG_RESULT([$wxversion])
@@ -72,6 +76,7 @@ if test "$HOST_IS_DARWIN" = "yes"; then
      AC_MSG_RESULT([no])
    fi
 fi
+
 
 
 dnl gdb under windows does backtraces only with stabs format?
