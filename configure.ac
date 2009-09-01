@@ -72,6 +72,13 @@ if test "$HOST_IS_DARWIN" = "yes"; then
      AC_MSG_RESULT([no])
    fi
 fi
+
+
+dnl gdb under windows does backtraces only with stabs format?
+if test "$HOST_IS_WINDOWS" = "yes"; then
+   CFLAGS="$CFLAGS -gstabs+"
+   CXXFLAGS="$CXXFLAGS -gstabs+"
+fi
  
 WX_CPPFLAGS="`$WXCONFIG --cppflags`"
 WX_CXXFLAGS="`$WXCONFIG --cxxflags`"
