@@ -29,7 +29,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include <iostream>
+#include "wx/log.h"
 
 #ifdef __WIN32__
 // mingw socket includes
@@ -42,7 +42,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
-
 
 
 #include "wxServDisc.h"
@@ -61,7 +60,6 @@ DEFINE_EVENT_TYPE(wxServDiscNOTIFY)
 
 
 
-using namespace std;
 
 
 
@@ -105,6 +103,7 @@ ScanThread::ScanThread(const wxString& what, int type, wxServDisc *parent)
 }
 
 
+
 void* ScanThread::Entry()
 {
   mdnsd d;
@@ -131,9 +130,31 @@ void* ScanThread::Entry()
   while(!TestDestroy() && !exit)
     {
       tv = mdnsd_sleep(d);
-      FD_ZERO(&fds);
-      FD_SET(s,&fds);
-      select(s+1,&fds,0,0,tv);
+    
+      long secs = tv->tv_sec == 0 ? 1 : tv->tv_sec; // so that the while loop beneath gets executed once
+      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i secs"), p, secs);
+
+
+      // we split the one select() call into several ones every second
+      // to be able to catch TestDestroy()...
+      int datatoread = 0;
+      while(secs && !TestDestroy() && !datatoread)
+	{
+	  // the select call leaves tv undefined, so re-set
+	  tv->tv_sec = 1;
+	  tv->tv_usec = 0;
+
+	  FD_ZERO(&fds);
+	  FD_SET(s,&fds);
+      
+	  datatoread = select(s+1,&fds,0,0,tv); // returns 0 if timeout expired
+	  
+	  if(!datatoread)
+	    --secs;
+	}
+      
+      wxLogDebug(wxT("wxServDisc %p: scanthread woke up, reason: incoming data(%i), timeout(%i), deletion(%i)"),
+		 p, datatoread, !secs, TestDestroy() );
 
       // receive
       if(FD_ISSET(s,&fds))
@@ -153,10 +174,6 @@ void* ScanThread::Entry()
 
   mdnsd_shutdown(d);
   mdnsd_free(d);
-
-#ifdef DEBUG
-  cerr << "scanthread querying " << w.char_str() << " Entry() end.";
-#endif
 
   return NULL;
 }
@@ -272,15 +289,14 @@ int ScanThread::ans(mdnsda a, void *arg)
 
   moi->p->SendNotify();
     
-#ifdef DEBUG
-  cerr << "--->" << endl;
-  cerr << "key is: " << key.char_str() << endl; 
-  cerr << moi->p->results[key].name.char_str() << endl;
-  cerr << inet_ntoa((in_addr&) moi->p->results[key].ip) << endl;
-  cerr << moi->p->results[key].port << endl;
-  cerr << "<---" << endl;
-#endif
-
+  
+  wxLogDebug(wxT("wxServDisc %p: got answer:"), moi->p);
+  wxLogDebug(wxT("wxServDisc %p:    key:  %s"), moi->p, key.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    name: %s"), moi->p, moi->p->results[key].name.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    ip:   %s"), moi->p, moi->p->results[key].ip.c_str());
+  wxLogDebug(wxT("wxServDisc %p:    port: %u"), moi->p, moi->p->results[key].port);
+  wxLogDebug(wxT("wxServDisc %p: answer end"), moi->p);
+  
   return 1;
 }
 
@@ -371,7 +387,8 @@ SOCKET ScanThread::msock() const
 
 void ScanThread::OnExit()
 {
- 
+  wxLogDebug(wxT("wxServDisc %p: scanthread querying '%s' exiting"), p, w.c_str());
+  p->scanthread = 0;
 }
 
 
@@ -389,8 +406,12 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 {
   // save our caller
   parent = p;
+
   // save query
   query = what;
+
+  wxLogDebug(wxT(""));
+  wxLogDebug(wxT("wxServDisc %p: about to query '%s'"), this, query.c_str());
 
   ScanThread *st_ptr = new ScanThread(what, type, this);
 
@@ -408,19 +429,23 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 
 wxServDisc::~wxServDisc()
 {
+  wxLogDebug(wxT("wxServDisc %p: before scanthread delete"), this);
   static_cast<ScanThread*>(scanthread)->Delete();
-#ifdef DEBUG
-  cerr << "wxservdisc destroyed, query was " << query.char_str() << endl; 
-#endif
+  // wait for deletion to finish
+  while(scanthread)
+    wxMilliSleep(100);
+
+  wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s'"), this, query.c_str());
+  wxLogDebug(wxT("")); 
 }
 
 
 
 
 
-vector<wxSDEntry> wxServDisc::getResults() const
+std::vector<wxSDEntry> wxServDisc::getResults() const
 {
-  vector<wxSDEntry> resvec;
+  std::vector<wxSDEntry> resvec;
 
   wxSDMap::const_iterator it;
   for(it = results.begin(); it != results.end(); it++)
@@ -442,12 +467,15 @@ size_t wxServDisc::getResultCount() const
 
 void wxServDisc::SendNotify()
 {
-  // new NOTIFY event, we got no window id
-  wxCommandEvent event(wxServDiscNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-
-  // Send it
-  wxPostEvent((wxEvtHandler*)parent, event);
+  if(parent)
+    {
+      // new NOTIFY event, we got no window id
+      wxCommandEvent event(wxServDiscNOTIFY, wxID_ANY);
+      event.SetEventObject(this); // set sender
+      
+      // Send it
+      wxPostEvent((wxEvtHandler*)parent, event);
+    }
 }
 
 
