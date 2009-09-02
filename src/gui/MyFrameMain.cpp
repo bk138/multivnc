@@ -101,7 +101,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 MyFrameMain::~MyFrameMain()
 {
   terminate_conn();
-
+  delete servscan;
 }
 
 
