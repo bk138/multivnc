@@ -42,6 +42,7 @@ class MyFrameMain: public FrameMain
  
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
+  void onVNCConnUpdateNotify(wxCommandEvent& event);
   void onVNCConnDisconnectNotify(wxCommandEvent& event);
   void onSDNotify(wxCommandEvent& event);
 

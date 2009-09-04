@@ -6,23 +6,32 @@
 #include "wx/event.h"
 #include "wx/string.h"
 #include "wx/arrstr.h"
+#include "wx/bitmap.h"
+#include "wx/rawbmp.h"
 #include <rfb/rfbclient.h>
 
 
 
-// make available custom disconnect event
+// make available custom events
 DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
+DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 
 
 class VNCConn: public wxObject
 {
   friend class VNCThread;
   void *vncthread;
-  wxCriticalSection mutex_vncthread;    // protects the vncthread pointer
 
   void *parent;
 
   rfbClient* cl;
+
+  // complete framebuffer
+  wxBitmap* framebuffer;
+  wxAlphaPixelData* fb_data;
+  // changes of last update
+  wxRect updated_region;
+
 
   // per-connection error string
   wxString err;
@@ -35,10 +44,12 @@ class VNCConn: public wxObject
 
  
   void SendDisconnectNotify();
+  void SendUpdateNotify(); // also sets clientdata ptr to &updated_region
+
 
   //callbacks
+  static rfbBool alloc_framebuffer(rfbClient* client);
   static void got_update(rfbClient* cl,int x,int y,int w,int h);
-  static rfbBool resize(rfbClient* client);
   static void kbd_leds(rfbClient* cl, int value, int pad);
   static void textchat(rfbClient* cl, int value, char *text);
   static void got_selection(rfbClient *cl, const char *text, int len);
@@ -53,6 +64,7 @@ public:
   bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*));
   bool Shutdown();
  
+  wxBitmap getFrameBufferRegion(const wxRect region) const;
 
   // get error string
   const wxString& getErr() const { const wxString& ref = err; return ref; };

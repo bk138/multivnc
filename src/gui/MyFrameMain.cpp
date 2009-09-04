@@ -21,6 +21,7 @@ VNCConn *c;
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnUpdateNOTIFY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
 END_EVENT_TABLE()
 
@@ -119,6 +120,26 @@ void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 {
   logwindow = 0;
 }
+
+
+void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
+{
+  wxRect* region = static_cast<wxRect*>(event.GetClientData());
+
+  wxLogStatus( _("got update for %i %i - %i %i!"), region->x, region->y, region->width, region->height);
+  wxBitmap sub = c->getFrameBufferRegion(*region);
+
+   // save a picture only if the last is older than 5 seconds 
+  static time_t t=0,t1;
+  t1=time(NULL);
+  if(t1-t>5)
+    t=t1;
+  else
+    return;
+
+  sub.SaveFile(wxT("sub-dump.bmp"), wxBITMAP_TYPE_BMP);
+}
+
 
 void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 {
