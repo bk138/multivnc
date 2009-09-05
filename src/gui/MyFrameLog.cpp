@@ -151,15 +151,13 @@ void MyFrameLog::onUpdate(wxCommandEvent& event)
 
 void MyFrameLog::log_saveas(wxCommandEvent &event)
 {
-  wxString filename = wxFileSelector(_("Save log as..."), _T(""), _T("saved_log.txt"), _T(""),
-				     _T("*.*"), wxFD_SAVE);
-  if(wxFileExists(filename))
-    if(wxMessageBox(_("File already exists. Overwrite it?"), _("Overwrite?"), wxYES_NO|wxICON_QUESTION, this) == wxNO)
-      return;
-
-  wxBusyCursor busy;
-
-  text_ctrl_log->SaveFile(filename);
+  wxString filename = wxFileSelector(_("Save log as..."), wxEmptyString, wxT("saved_log.txt"), 
+				     wxT(".txt"), _("Text files (*.txt)|*.txt"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+  if(! filename.empty())
+    {
+      wxBusyCursor busy;
+      text_ctrl_log->SaveFile(filename);
+    }
 }
  
 
