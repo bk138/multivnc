@@ -37,6 +37,9 @@ public:
   // thread execution starts here
   virtual wxThread::ExitCode Entry();
 
+  // called when the thread exits - whether it terminates normally or is
+  // stopped with Delete() (but not when it is Kill()ed!)
+  virtual void OnExit();
 };
 
 
@@ -58,6 +61,13 @@ wxThread::ExitCode LogThread::Entry()
     }
 }
 
+
+
+void LogThread::OnExit()
+{
+  // cause wxThreads delete themselves after completion
+  p->logthread = 0;
+}
 
 
 
@@ -95,7 +105,14 @@ MyFrameLog::MyFrameLog(wxWindow* parent, int id, const wxString& title, const wx
 
 MyFrameLog::~MyFrameLog()
 {
-  static_cast<LogThread*>(logthread)->Delete();
+  if(logthread)
+    {
+      static_cast<LogThread*>(logthread)->Delete();
+      // wait for deletion to finish
+      while(logthread)
+	wxMilliSleep(100);
+    }
+
   SendCloseNotify();
 }
 
