@@ -552,4 +552,21 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect rect) const
 
 
 
+int VNCConn::getFrameBufferWidth() const
+{
+  if(cl)
+    return cl->width;
+  else 
+    return 0;
+}
+
+
+int VNCConn::getFrameBufferHeight() const
+{
+  if(cl)
+    return cl->height;
+  else 
+    return 0;
+}
+
 

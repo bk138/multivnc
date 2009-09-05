@@ -65,6 +65,8 @@ public:
   bool Shutdown();
  
   wxBitmap getFrameBufferRegion(const wxRect region) const;
+  int getFrameBufferWidth() const;
+  int getFrameBufferHeight() const;
 
   // get error string
   const wxString& getErr() const { const wxString& ref = err; return ref; };
