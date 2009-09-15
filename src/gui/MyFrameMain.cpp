@@ -12,9 +12,6 @@
 
 
 
-//FIXME
-VNCConn *c;
-
 
 
 // map recv of custom events to handler methods
@@ -30,8 +27,6 @@ END_EVENT_TABLE()
 
 using namespace std;
  
-
-
 
 
 
@@ -101,7 +96,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
 MyFrameMain::~MyFrameMain()
 {
-  terminate_conn();
+  for(int i=0; i < connections.size(); ++i)
+    terminate_conn(i);
+
   delete servscan;
 }
 
@@ -124,56 +121,82 @@ void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 
 void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
 {
-  wxRect* region = static_cast<wxRect*>(event.GetClientData());
+  // only process currently selected connection
+  VNCConn* c = connections.at(notebook_connections->GetSelection());
+  if(c == event.GetEventObject())
+    {
+      wxRect* region = static_cast<wxRect*>(event.GetClientData());
+      
+      wxLogStatus( _("got update for %i %i - %i %i!"), region->x, region->y, region->width, region->height);
+      wxBitmap sub = c->getFrameBufferRegion(*region);
+      
+      // save a picture only if the last is older than 5 seconds 
+      static time_t t=0,t1;
+      t1=time(NULL);
+      if(t1-t>5)
+	t=t1;
+      else
+	return;
 
-  wxLogStatus( _("got update for %i %i - %i %i!"), region->x, region->y, region->width, region->height);
-  wxBitmap sub = c->getFrameBufferRegion(*region);
-
-   // save a picture only if the last is older than 5 seconds 
-  static time_t t=0,t1;
-  t1=time(NULL);
-  if(t1-t>5)
-    t=t1;
-  else
-    return;
-
-  sub.SaveFile(wxT("sub-dump.bmp"), wxBITMAP_TYPE_BMP);
+      sub.SaveFile(wxT("sub-dump.bmp"), wxBITMAP_TYPE_BMP);
+    }
 }
 
 
 void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 {
-  wxLogStatus( _("Connection terminated."));
+  // get sender
+  VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
+
+  wxLogStatus( _("Connection to %s:%s terminated."), c->getServerName().c_str(), c->getServerPort().c_str());
  
   wxArrayString log = VNCConn::getLog();
   // show last 3 log strings
   for(int i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
     wxLogMessage(log[i]);
-
-  wxLogMessage( _("Connection terminated.")); 
+  wxLogMessage( _("Connection to %s:%s terminated."), c->getServerName().c_str(), c->getServerPort().c_str() );
     
+  
+  // find index of this connection
+  vector<VNCConn*>::iterator it = connections.begin();
+  int index = 0;
+  while(it != connections.end() && *it != c)
+    {
+      ++it;
+      ++index;
+    }
+
+  if(index < connections.size())
+    {
+      delete c;
+      connections.erase(connections.begin() + index);
+
+      notebook_connections->DeletePage(index);
+    }
+
   // "end connection"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+  if(connections.size() == 0) // nothing to end
+    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
 }
 
 
 
 void MyFrameMain::onSDNotify(wxCommandEvent& event)
 {
-    if(event.GetEventObject() == servscan)
-      {
-	wxArrayString items; 
-	
-	// length of qeury plus leading dot
-	size_t qlen =  servscan->getQuery().Len() + 1;
-	
-	vector<wxSDEntry> entries = servscan->getResults();
-	vector<wxSDEntry>::const_iterator it; 
-	for(it=entries.begin(); it != entries.end(); it++)
-	  items.Add(it->name.Mid(0, it->name.Len() - qlen));
-	
-	list_box_services->Set(items, 0);
-      }
+  if(event.GetEventObject() == servscan)
+    {
+      wxArrayString items; 
+      
+      // length of qeury plus leading dot
+      size_t qlen =  servscan->getQuery().Len() + 1;
+      
+      vector<wxSDEntry> entries = servscan->getResults();
+      vector<wxSDEntry>::const_iterator it; 
+      for(it=entries.begin(); it != entries.end(); it++)
+	items.Add(it->name.Mid(0, it->name.Len() - qlen));
+      
+      list_box_services->Set(items, 0);
+    }
 }
 
 
@@ -188,13 +211,14 @@ char* MyFrameMain::getpasswd(rfbClient* client)
 
 
 // connection initiation and shutdown
-bool MyFrameMain::spawn_conn()
+bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 {
-  wxLogStatus(_("Connecting to ") + sc_addr + _T(":") + sc_port + _T("..."));
+  wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + _T("..."));
   wxBusyCursor busy;
+  
 
-  c = new VNCConn(this);
-  if(!c->Init(sc_addr + _T(":") + sc_port, getpasswd))
+  VNCConn* c = new VNCConn(this);
+  if(!c->Init(addr + wxT(":") + port, getpasswd))
     {
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
@@ -204,10 +228,18 @@ bool MyFrameMain::spawn_conn()
 
       wxLogError(c->getErr());
 
+      delete c;
+
       return false;
     }
+  
+  connections.push_back(c);
+
+  wxScrolledWindow* canvas = new wxScrolledWindow(notebook_connections);
+  notebook_connections->AddPage(canvas, hostname, true);
+
  
-  wxLogStatus(_("Connected to ") + sc_addr + _T(":") + sc_port);
+  wxLogStatus(_("Connected to ") + hostname + _T(":") + port);
 
 
   // "end connection"
@@ -217,15 +249,21 @@ bool MyFrameMain::spawn_conn()
 }
 
 
-void MyFrameMain::terminate_conn()
+void MyFrameMain::terminate_conn(size_t which)
 {
-  if(c)
-    c->Shutdown();
-  delete c;
-  c = 0;
+  VNCConn* c = connections.at(which);
+  if(c != 0)
+    {
+      delete c;
+      connections.erase(connections.begin() + which);
+
+      notebook_connections->DeletePage(which);
+    }
+
 	  
   // "end connection"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+  if(connections.size() == 0) // nothing to end
+    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
 
   wxLogStatus( _("Connection terminated."));
 }
@@ -344,17 +382,16 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
   if(s != wxEmptyString)
     {
       wxIPV4address host_addr;
-      
-      // get host part and port part
-      wxString host_name, host_port;
-      host_name = s.BeforeFirst(_T(':'));
-      host_port = s.AfterFirst(_T(':'));
-      
+
+      wxString sc_hostname, sc_port, sc_addr;      
+
+      // get host part 
+      sc_hostname = s.BeforeFirst(wxT(':'));
+
       // look up name
-      if(! host_addr.Hostname(host_name))
+      if(! host_addr.Hostname(sc_hostname))
 	{
 	  wxLogError(_("Invalid hostname or IP address."));
-	  sc_addr = sc_hostname = sc_port = wxEmptyString; 
 	  return;
 	}
       else
@@ -363,15 +400,14 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 #else
         sc_addr = host_addr.IPAddress();
 #endif
-  
       
-      // and handle port
-      if(host_addr.Service(host_port))
+      // and lookup port description part (sth. like 'vnc' can also be given)
+      if(host_addr.Service( s.AfterFirst(wxT(':')) ))
 	sc_port = wxString() << host_addr.Service();
       else
 	sc_port = wxEmptyString;
-      
-      spawn_conn();
+
+      spawn_conn(sc_hostname, sc_addr, sc_port);
     }
 }
 
@@ -380,7 +416,8 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
 void MyFrameMain::machine_disconnect(wxCommandEvent &event)
 {
-  terminate_conn();
+  // terminate connection thats currently selected
+  terminate_conn(notebook_connections->GetSelection());
 }
 
 
@@ -417,10 +454,29 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
 }
 
 
+void MyFrameMain::machine_screenshot(wxCommandEvent &event)
+{
+  /* if(c)
+    {
+      wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
+      wxBitmap shot = c->getFrameBufferRegion(rect);
+      wxString filename = wxFileSelector(_("Save screenshot..."), wxEmptyString, wxT("MultiVNC-Screenshot.png"), 
+					 wxT(".png"), wxT("*.png"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+      if(!filename.empty())
+	{
+	  wxBusyCursor busy;
+	  shot.SaveFile(filename, wxBITMAP_TYPE_PNG);
+	}
+	}
+  */
+}
+
+
+
 
 void MyFrameMain::machine_exit(wxCommandEvent &event)
 {
-  terminate_conn();
   Close(true);
 }
 
@@ -558,7 +614,7 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
     return;
 
   wxLogStatus(_("Looking up host address..."));
-
+ 
 
   // lookup hostname and port
   {
@@ -574,17 +630,17 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
       {
 	wxLogError(_("Timeout looking up hostname."));
 	wxLogStatus(_("Timeout looking up hostname."));
-	sc_hostname = sc_addr = sc_port = wxEmptyString;
+	services_hostname = services_addr = services_port = wxEmptyString;
 	return;
       }
-    sc_hostname = namescan.getResults().at(0).name;
-    sc_port = wxString() << namescan.getResults().at(0).port;
+    services_hostname = namescan.getResults().at(0).name;
+    services_port = wxString() << namescan.getResults().at(0).port;
   }
 
   
   // lookup ip address
   {
-    wxServDisc addrscan(0, sc_hostname, QTYPE_A);
+    wxServDisc addrscan(0, services_hostname, QTYPE_A);
   
     timeout = 3000;
     while(!addrscan.getResultCount() && timeout > 0)
@@ -596,20 +652,20 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
       {
 	wxLogError(_("Timeout looking up IP address."));
 	wxLogStatus(_("Timeout looking up IP address."));
-	sc_hostname = sc_addr = sc_port = wxEmptyString;
+	services_hostname = services_addr = services_port = wxEmptyString;
 	return;
       }
-    sc_addr = addrscan.getResults().at(0).ip;
+    services_addr = addrscan.getResults().at(0).ip;
   }
 
-  wxLogStatus(sc_hostname + wxT(" (") + sc_addr + wxT(":") + sc_port + wxT(")"));
+  wxLogStatus(services_hostname + wxT(" (") + services_addr + wxT(":") + services_port + wxT(")"));
 }
 
 
 void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
 {
   listbox_services_select(event); // get the actual values
-  spawn_conn();
+  spawn_conn(services_hostname, services_addr, services_port);
 } 
  
 

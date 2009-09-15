@@ -4,7 +4,7 @@
 #define MYFRAMEMAIN_H
 
 
-
+#include <vector>
 #include "FrameMain.h"
 #include "MyFrameLog.h"
 #include "../wxServDisc/wxServDisc.h"
@@ -18,15 +18,11 @@ class MyFrameMain: public FrameMain
   // main service scanner
   wxServDisc* servscan;
 
-  // log window
-  MyFrameLog* logwindow;
+  // array of connections
+  std::vector<VNCConn*> connections;
 
-
-  // these are used by spawn_conn()
-  wxString sc_hostname;
-  wxString sc_addr;
-  wxString sc_port;
-
+  // listbox_services_select() stores values here for listbox_services_dclick()
+  wxString services_hostname, services_addr, services_port;
 
   // gui layout stuff
   bool show_toolbar;
@@ -35,10 +31,13 @@ class MyFrameMain: public FrameMain
   bool show_stats;
   bool show_fullscreen;
 
+  // log window
+  MyFrameLog* logwindow;
+
   void splitwinlayout();
 
-  bool spawn_conn();
-  void terminate_conn();
+  bool spawn_conn(wxString& hostname, wxString& addr, wxString& port);
+  void terminate_conn(size_t which);
  
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
@@ -71,6 +70,7 @@ public:
   void machine_disconnect(wxCommandEvent &event);
   void machine_preferences(wxCommandEvent &event);
   void machine_showlog(wxCommandEvent &event);
+  void machine_screenshot(wxCommandEvent &event);
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);
