@@ -475,9 +475,9 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect rect) const
   if(t1 - t0 > 5)
     {
       t0 = t1;
-      wxString fbdump(wxT("fb-dump.bmp"));
-      wxLogDebug(wxT("VNCConn %p: saving raw framebuffer to '%s'"), this, fbdump.c_str());
+      wxString fbdump( wxT("fb-dump-") + wxString(cl->serverHost, wxConvUTF8) + wxT(".bmp"));
       framebuffer->SaveFile(fbdump, wxBITMAP_TYPE_BMP);
+      wxLogDebug(wxT("VNCConn %p: saved raw framebuffer to '%s'"), this, fbdump.c_str());
     }
 #endif
 
