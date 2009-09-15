@@ -357,15 +357,19 @@ void VNCConn::logger(const char *format, ...)
 */
 
 
-bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*))
+bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int compresslevel, int quality)
 {
   Shutdown();
 
-  int argc = 2;
+  int argc = 6;
   char* argv[argc];
   argv[0] = strdup("VNCConn");
   argv[1] = strdup(host.mb_str());
-
+  argv[2] = strdup("-compress");
+  argv[3] = strdup((wxString() << compresslevel).mb_str());
+  argv[4] = strdup("-quality");
+  argv[5] = strdup((wxString() << quality).mb_str());
+  
    
   // this takes (int bitsPerSample,int samplesPerPixel, int bytesPerPixel) 
   // 5,3,2 and 8,3,4 seem possible

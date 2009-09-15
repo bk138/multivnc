@@ -61,7 +61,7 @@ public:
   VNCConn(void *parent);
   ~VNCConn(); 
 
-  bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*));
+  bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int compresslevel = 1, int quality = 5);
   bool Shutdown();
  
   wxBitmap getFrameBufferRegion(const wxRect& region) const;
