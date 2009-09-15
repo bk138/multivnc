@@ -227,7 +227,7 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
 	  fb_it.Red() = 0;
 	  fb_it.Green() = 0;
 	  fb_it.Blue() = 0;
-	  fb_it.Alpha() = 0;
+	  fb_it.Alpha() = 255; // 255 is opaque
 	}
       
       fb_it = rowStart;
@@ -482,13 +482,6 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect rect) const
     }
 #endif
 
-
-
-#ifdef __WIN32__
-  /* 
-     windows stores DIB data in BGRA, not RGBA.
-     and: DIBs store data from bottom to top :-(
-  */
   
   // don't use getsubbitmap() here, instead
   // copy directly from framebuffer into a new bitmap,
@@ -508,8 +501,11 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect rect) const
     }
   wxAlphaPixelData::Iterator fbsub_it(fbsub_data);
 
-  // and move iterator to the last row
+#ifdef __WIN32__
+  // windows DIBs store data from bottom to top :-(
+  // so move iterator to the last row
   fbsub_it.OffsetY(fbsub_data, rect.height - 1);
+#endif
 
 
   for( int y = 0; y < rect.height; ++y )
@@ -519,35 +515,34 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect rect) const
 
       for( int x = 0; x < rect.width; ++x, ++region_it, ++fbsub_it )
 	{
+#ifdef __WIN32__
+	  // windows stores DIB data in BGRA, not RGBA.
 	  region_it.Red() = fbsub_it.Blue();
+	  region_it.Blue() = fbsub_it.Red();
+#else
+	  region_it.Red() = fbsub_it.Red();
+	  region_it.Blue() = fbsub_it.Blue();
+#endif	  
 	  region_it.Green() = fbsub_it.Green();	  
-	  region_it.Blue() = fbsub_it.Red();	  
-	  region_it.Alpha() = fbsub_it.Alpha();	  
+	  region_it.Alpha() = 255; // 255 is opaque, libvncclient always sets this byte to 0
 	}
       
       // this goes downwards
       region_it = region_it_rowStart;
       region_it.OffsetY(region_data, 1);
 
-      // this goes upwards
+     
       fbsub_it = fbsub_it_rowStart;
-      fbsub_it.OffsetY(fbsub_data, - 1);
+#ifdef __WIN32__
+      // this goes upwards
+      fbsub_it.OffsetY(fbsub_data, -1);
+#else
+      // this goes downwards as well
+      fbsub_it.OffsetY(fbsub_data, 1);
+#endif
     }
 
   return region;
-
-#else
-  // RGBA top to bottom, as we like it...
-  return framebuffer->GetSubBitmap(rect);
-
-
-  // getsubbitmap makes a copy.
-  // maybe find a way that just links the existing fb data into a new wxBitmap
-  /*
-  wxBitmap ret(rect.width, rect.height, cl->format.bitsPerPixel); 
-  conn->framebuffer->GetRawData(*conn->fb_data, cl->format.bitsPerPixel);
-  */
-#endif
  
 }
 
