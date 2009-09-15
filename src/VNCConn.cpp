@@ -165,14 +165,20 @@ void VNCConn::SendDisconnectNotify()
 
 
 
-void VNCConn::SendUpdateNotify()
+void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
 {
   // new NOTIFY event, we got no window id
   wxCommandEvent event(VNCConnUpdateNOTIFY, wxID_ANY);
   event.SetEventObject(this); // set sender
 
   // set info about what was updated
-  event.SetClientData(&updated_region);
+  wxRect* rect = new wxRect(x, y, w, h);
+  event.SetClientData(rect);
+  wxLogDebug(wxT("VNCConn %p: SendUpdateNotify(%i,%i,%i,%i)"), this,
+	     rect->x,
+	     rect->y,
+	     rect->width,
+	     rect->height);
 
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
@@ -258,12 +264,7 @@ void VNCConn::got_update(rfbClient* client,int x,int y,int w,int h)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
  
-  conn->updated_region.x = x;
-  conn->updated_region.y = y;
-  conn->updated_region.width = w;
-  conn->updated_region.height = h;
-
-  conn->SendUpdateNotify();
+  conn->SendUpdateNotify(x, y, w, h);
 }
 
 
@@ -426,7 +427,6 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*))
 
 bool VNCConn::Shutdown()
 {
-
   wxLogDebug(wxT("VNCConn %p: Shutdown()"), this);
 
   if(vncthread)
@@ -464,10 +464,7 @@ bool VNCConn::Shutdown()
 
 
 
-// its important to note that we need to pass a wxRect _copy_
-// as updated_region can be changed by the vncthread 
-// during execution of this function
-wxBitmap VNCConn::getFrameBufferRegion(const wxRect rect) const
+wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
 #ifdef __WXDEBUG__
   // save a picture only if the last is older than 5 seconds 

@@ -29,8 +29,6 @@ class VNCConn: public wxObject
   // complete framebuffer
   wxBitmap* framebuffer;
   wxAlphaPixelData* fb_data;
-  // changes of last update
-  wxRect updated_region;
 
 
   // per-connection error string
@@ -44,7 +42,9 @@ class VNCConn: public wxObject
 
  
   void SendDisconnectNotify();
-  void SendUpdateNotify(); // also sets clientdata ptr to &updated_region
+  // NB: this sets the event's clientdata ptr a newly created wRect 
+  // which MUST be freed by its receiver!!!
+  void SendUpdateNotify(int x, int y, int w, int h);
 
 
   //callbacks
@@ -64,7 +64,7 @@ public:
   bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*));
   bool Shutdown();
  
-  wxBitmap getFrameBufferRegion(const wxRect region) const;
+  wxBitmap getFrameBufferRegion(const wxRect& region) const;
   int getFrameBufferWidth() const;
   int getFrameBufferHeight() const;
 
