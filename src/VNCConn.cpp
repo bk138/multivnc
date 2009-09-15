@@ -3,6 +3,7 @@
 #include "wx/intl.h"
 #include "wx/log.h"
 #include "wx/thread.h"
+#include "wx/socket.h"
 
 #include "VNCConn.h"
 
@@ -475,7 +476,7 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect rect) const
   if(t1 - t0 > 5)
     {
       t0 = t1;
-      wxString fbdump( wxT("fb-dump-") + wxString(cl->serverHost, wxConvUTF8) + wxT(".bmp"));
+      wxString fbdump( wxT("fb-dump-") + getServerName() + wxT(":") + getServerPort() + wxT(".bmp"));
       framebuffer->SaveFile(fbdump, wxBITMAP_TYPE_BMP);
       wxLogDebug(wxT("VNCConn %p: saved raw framebuffer to '%s'"), this, fbdump.c_str());
     }
@@ -570,3 +571,34 @@ int VNCConn::getFrameBufferHeight() const
 }
 
 
+const wxString VNCConn::getServerName() const
+{
+  if(cl)
+    {
+      wxIPV4address a;
+      a.Hostname(wxString(cl->serverHost, wxConvUTF8));
+      return a.Hostname();
+    }
+  else
+    return wxEmptyString;
+}
+
+const wxString VNCConn::getServerAddr() const
+{
+  if(cl)
+    {
+      wxIPV4address a;
+      a.Hostname(wxString(cl->serverHost, wxConvUTF8));
+      return a.IPAddress();
+    }
+  else
+    return wxEmptyString;
+}
+
+const wxString VNCConn::getServerPort() const
+{
+  if(cl)
+    return wxString() << cl->serverPort;
+  else
+    return wxEmptyString;
+}
