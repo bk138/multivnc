@@ -10,7 +10,155 @@
 #include "../MultiVNCApp.h"
 
 
+using namespace std;
 
+
+
+/********************************************
+
+  VNCCanvas class
+
+********************************************/
+	
+// define a scrollable canvas for drawing onto
+class VNCCanvas: public wxScrolledWindow
+{
+  VNCConn* conn;
+  wxRect framebuffer_rect;
+
+
+  void onPaint(wxPaintEvent &event);
+  void onMouseMove(wxMouseEvent &event);
+
+protected:
+  DECLARE_EVENT_TABLE()
+
+public:
+  VNCCanvas(wxWindow* parent, VNCConn* c);
+
+  void drawRegion(wxRect& rect);
+
+};
+	
+
+
+BEGIN_EVENT_TABLE(VNCCanvas, wxScrolledWindow)
+    EVT_PAINT  (VNCCanvas::onPaint)
+    EVT_MOTION (VNCCanvas::onMouseMove)
+END_EVENT_TABLE();
+
+#define VNCCANVAS_SCROLL_RATE 10
+
+/*
+  constructor/destructor
+*/
+
+VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
+  wxScrolledWindow(parent)
+{
+  conn = c;
+  framebuffer_rect.x = 0;
+  framebuffer_rect.y = 0;
+  framebuffer_rect.width = c->getFrameBufferWidth();
+  framebuffer_rect.height = c->getFrameBufferHeight();
+
+  SetVirtualSize(framebuffer_rect.width, framebuffer_rect.height);
+  SetScrollRate(VNCCANVAS_SCROLL_RATE, VNCCANVAS_SCROLL_RATE);
+}
+
+
+
+/*
+  private members
+*/
+
+void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
+{
+  wxPaintDC dc(this);
+
+  // find out where the window is scrolled to
+  static int rx, ry;                    
+  GetViewStart(&rx, &ry);
+  rx *= VNCCANVAS_SCROLL_RATE;
+  ry *= VNCCANVAS_SCROLL_RATE;
+
+  
+  // get the update rect list
+  wxRegionIterator upd(GetUpdateRegion()); 
+  while(upd)
+    {
+      wxRect viewport_rect(upd.GetRect());
+     
+      wxLogDebug(wxT("VNCCanvas %p: got repaint event: on screen (%i,%i,%i,%i)"),
+		 this,
+		 viewport_rect.x,
+		 viewport_rect.y,
+		 viewport_rect.width,
+		 viewport_rect.height);
+
+      wxRect fromframebuffer_rect = viewport_rect;
+      fromframebuffer_rect.x += rx;
+      fromframebuffer_rect.y += ry;
+      fromframebuffer_rect.Intersect(framebuffer_rect);
+      
+      wxLogDebug(wxT("VNCCanvas %p: got repaint event: in framebuffer (%i,%i,%i,%i)"),
+		 this,
+		 fromframebuffer_rect.x,
+		 fromframebuffer_rect.y,
+		 fromframebuffer_rect.width,
+		 fromframebuffer_rect.height);
+      
+      if(! fromframebuffer_rect.IsEmpty())
+	{
+      	  wxBitmap region = conn->getFrameBufferRegion(fromframebuffer_rect);
+	  dc.DrawBitmap(region, viewport_rect.x, viewport_rect.y);
+	}
+
+      ++upd;
+    }
+}
+
+
+
+void VNCCanvas::onMouseMove(wxMouseEvent &event)
+{
+  wxClientDC dc(this);
+  PrepareDC(dc);
+
+  wxPoint pos = event.GetPosition();
+  long x = dc.DeviceToLogicalX( pos.x );
+  long y = dc.DeviceToLogicalY( pos.y );
+  
+  // dc.DrawBitmap(cursorbmp, pos.x, pos.y);
+
+  wxLogDebug(wxT("VNCCanvas %p: mouse position: %d,%d"), this, (int)x, (int)y);
+}
+
+
+
+
+/*
+  public members
+*/
+void VNCCanvas::drawRegion(wxRect& rect)
+{
+  wxClientDC dc(this);
+  DoPrepareDC(dc); // this adjusts coordinates when window is scrolled
+  wxBitmap region = conn->getFrameBufferRegion(rect);
+  dc.DrawBitmap(region, rect.x, rect.y);
+}
+
+
+
+
+
+
+
+/********************************************
+
+  MyFrameMain class
+
+********************************************/
 
 
 
@@ -23,16 +171,9 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
 END_EVENT_TABLE()
 
 
-
-
-using namespace std;
- 
-
-
-
-
-
-
+/*
+  constructor/destructor
+*/
 
 MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title, 
 			 const wxPoint& pos,
@@ -51,7 +192,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   splitwin_main->SetMinimumPaneSize(150);
   splitwin_left->SetMinimumPaneSize(75);
   splitwin_leftlower->SetMinimumPaneSize(75);
-
 
 
   /*
@@ -104,11 +244,11 @@ MyFrameMain::~MyFrameMain()
 
 
 
+
+
 /*
-  private functions
-
+  private members
 */
-
 
 
 // handlers
@@ -119,28 +259,30 @@ void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 }
 
 
+
+
 void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
 {
   // only process currently selected connection
   VNCConn* c = connections.at(notebook_connections->GetSelection());
   if(c == event.GetEventObject())
     {
-      wxRect* region = static_cast<wxRect*>(event.GetClientData());
-      
-      wxLogStatus( _("got update for %i %i - %i %i!"), region->x, region->y, region->width, region->height);
-      wxBitmap sub = c->getFrameBufferRegion(*region);
-      
-      // save a picture only if the last is older than 5 seconds 
-      static time_t t=0,t1;
-      t1=time(NULL);
-      if(t1-t>5)
-	t=t1;
-      else
-	return;
+      wxRect* rect = static_cast<wxRect*>(event.GetClientData());
 
-      sub.SaveFile(wxT("sub-dump.bmp"), wxBITMAP_TYPE_BMP);
+      wxLogDebug(wxT("active page got upd (%i,%i,%i,%i)"),
+		 rect->x,
+		 rect->y,
+		 rect->width,
+		 rect->height);
+
+      VNCCanvas* canvas = static_cast<VNCCanvas*>(notebook_connections->GetCurrentPage());
+      canvas->drawRegion(*rect);
+      
+      // avoid memleaks!
+      delete rect;
     }
 }
+
 
 
 void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
@@ -187,7 +329,7 @@ void MyFrameMain::onSDNotify(wxCommandEvent& event)
     {
       wxArrayString items; 
       
-      // length of qeury plus leading dot
+      // length of query plus leading dot
       size_t qlen =  servscan->getQuery().Len() + 1;
       
       vector<wxSDEntry> entries = servscan->getResults();
@@ -235,10 +377,9 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
   
   connections.push_back(c);
 
-  wxScrolledWindow* canvas = new wxScrolledWindow(notebook_connections);
+  VNCCanvas* canvas = new VNCCanvas(notebook_connections, c);
   notebook_connections->AddPage(canvas, hostname, true);
 
- 
   wxLogStatus(_("Connected to ") + hostname + _T(":") + port);
 
 
@@ -251,6 +392,9 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 
 void MyFrameMain::terminate_conn(size_t which)
 {
+  if(which == wxNOT_FOUND)
+    return;
+
   VNCConn* c = connections.at(which);
   if(c != 0)
     {
@@ -366,12 +510,12 @@ void MyFrameMain::splitwinlayout()
 
 
 
+
+
+
 /*
-  handler functions
+  public members
 */
-
-
-
 
 
 void MyFrameMain::machine_connect(wxCommandEvent &event)
@@ -593,11 +737,6 @@ void MyFrameMain::help_contents(wxCommandEvent &e)
 {
   wxLogMessage(_("Select a host in the list to get more information, double click to connect.\n\nWhen in Remote Control Only Mode, move the pointer over the right screen edge to control the remote desktop."));
 }
-
-
-
-
-
 
 
 
