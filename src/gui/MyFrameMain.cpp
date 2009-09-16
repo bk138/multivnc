@@ -189,9 +189,10 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
 
   show_fullscreen = false;
+  SetMinSize(wxSize(512, 384));
   splitwin_main->SetMinimumPaneSize(150);
-  splitwin_left->SetMinimumPaneSize(75);
-  splitwin_leftlower->SetMinimumPaneSize(75);
+  splitwin_left->SetMinimumPaneSize(140);
+  splitwin_leftlower->SetMinimumPaneSize(70);
 
 
   /*
