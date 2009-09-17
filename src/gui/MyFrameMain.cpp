@@ -379,7 +379,7 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
   connections.push_back(c);
 
   VNCCanvas* canvas = new VNCCanvas(notebook_connections, c);
-  notebook_connections->AddPage(canvas, hostname, true);
+  notebook_connections->AddPage(canvas, c->getDesktopName(), true);
 
   wxLogStatus(_("Connected to ") + hostname + _T(":") + port);
 

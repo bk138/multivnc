@@ -567,6 +567,16 @@ int VNCConn::getFrameBufferHeight() const
 }
 
 
+
+const wxString VNCConn::getDesktopName() const
+{
+  if(cl)
+    return wxString(cl->desktopName, wxConvUTF8);
+  else
+    return wxEmptyString;
+}
+
+
 const wxString VNCConn::getServerName() const
 {
   if(cl)

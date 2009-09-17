@@ -68,6 +68,7 @@ public:
   int getFrameBufferWidth() const;
   int getFrameBufferHeight() const;
 
+  const wxString getDesktopName() const;
   const wxString getServerName() const;
   const wxString getServerAddr() const;
   const wxString getServerPort() const;
