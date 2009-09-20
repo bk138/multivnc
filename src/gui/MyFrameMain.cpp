@@ -203,6 +203,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   */
   // "discconnect"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+  // "screenshot"
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
 
   if(show_toolbar)
      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
@@ -317,9 +319,14 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
       notebook_connections->DeletePage(index);
     }
 
-  // "end connection"
+
   if(connections.size() == 0) // nothing to end
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+    {
+      // "end connection"
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+      // "screenshot"
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
+    }
 }
 
 
@@ -386,6 +393,8 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 
   // "end connection"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(true);
+  // "screenshot"
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(true);
   
   return true;
 }
@@ -406,9 +415,14 @@ void MyFrameMain::terminate_conn(size_t which)
     }
 
 	  
-  // "end connection"
+
   if(connections.size() == 0) // nothing to end
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+    {
+      // "end connection"
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+      // "screenshot"
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
+    }
 
   wxLogStatus( _("Connection terminated."));
 }
@@ -601,20 +615,25 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
 
 void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 {
-  /* if(c)
+  if(connections.size())
     {
-      wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
-      wxBitmap shot = c->getFrameBufferRegion(rect);
-      wxString filename = wxFileSelector(_("Save screenshot..."), wxEmptyString, wxT("MultiVNC-Screenshot.png"), 
-					 wxT(".png"), wxT("*.png"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+      VNCConn* c = connections.at(notebook_connections->GetSelection());
 
+      wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
+      wxBitmap screenshot = c->getFrameBufferRegion(rect);
+      wxString filename = wxFileSelector(_("Save screenshot..."), 
+					 wxEmptyString,
+					 c->getDesktopName() + wxT("-Screenshot.png"), 
+					 wxT(".png"), 
+					 _("PNG files|*.png"), 
+					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+      
       if(!filename.empty())
 	{
 	  wxBusyCursor busy;
-	  shot.SaveFile(filename, wxBITMAP_TYPE_PNG);
+    	  screenshot.SaveFile(filename, wxBITMAP_TYPE_PNG);
 	}
-	}
-  */
+    }
 }
 
 
