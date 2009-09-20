@@ -1,5 +1,6 @@
 
 #include <cstdarg>
+#include <csignal>
 #include "wx/intl.h"
 #include "wx/log.h"
 #include "wx/thread.h"
@@ -68,6 +69,17 @@ wxThread::ExitCode VNCThread::Entry()
 {
   int i;
 
+#ifdef __WXGTK__
+  // this signal is generated when we pop up a file dialog wwith wxGTK
+  // we need to block it here cause it interrupts the select() call
+  // in WaitForMessage()
+  sigset_t            newsigs;
+  sigset_t            oldsigs;
+  sigemptyset(&newsigs);
+  sigemptyset(&oldsigs);
+  sigaddset(&newsigs, SIGRTMIN-1);
+#endif
+
   while(! TestDestroy()) 
     {
       /* wxLogDebug( "VNCThread::Entry(): sleeping\n");
@@ -80,7 +92,16 @@ wxThread::ExitCode VNCThread::Entry()
       //handleEvent(cl, &e);
       //else 
       {
+#ifdef __WXGTK__
+	sigprocmask(SIG_BLOCK, &newsigs, &oldsigs);
+#endif
+
 	i=WaitForMessage(p->cl, 500);
+
+#ifdef __WXGTK__
+	sigprocmask(SIG_SETMASK, &oldsigs, NULL);
+#endif
+
 	if(i<0)
 	  {
 	    wxLogDebug(wxT("VNCConn %p: vncthread waitforMessage() failed"), p);
