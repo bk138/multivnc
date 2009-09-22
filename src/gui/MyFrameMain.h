@@ -7,8 +7,8 @@
 #include <vector>
 #include "FrameMain.h"
 #include "MyFrameLog.h"
-#include "../wxServDisc/wxServDisc.h"
-#include "../VNCConn.h"
+#include "wxServDisc/wxServDisc.h"
+#include "VNCConn.h"
 
 
 

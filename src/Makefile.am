@@ -1,6 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-## Created by Anjuta
 
 
 SUBDIRS = \
@@ -35,6 +34,8 @@ multivnc_SOURCES = \
 	gui/FrameLog.h \
 	gui/MyFrameLog.cpp \
 	gui/MyFrameLog.h \
+	gui/VNCCanvas.cpp \
+	gui/VNCCanvas.h \
 	gui/MyDialogSettings.cpp \
 	gui/MyDialogSettings.h 
 
