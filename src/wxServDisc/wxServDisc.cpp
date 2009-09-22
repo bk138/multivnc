@@ -25,11 +25,12 @@
 #include "wx/object.h"
 #include "wx/thread.h"
 #include "wx/intl.h"
+#include "wx/log.h"
 
 #include <fcntl.h>
-#include <errno.h>
-#include <string.h>
-#include "wx/log.h"
+#include <cerrno>
+#include <csignal>
+
 
 #ifdef __WIN32__
 // mingw socket includes
@@ -127,34 +128,56 @@ void* ScanThread::Entry()
   // register query(w,t) at mdnsd d, submit our address for callback ans()
   mdnsd_query(d, w.char_str(), t, ans, this);
 
+
+#ifdef __WXGTK__
+  // this signal is generated when we pop up a file dialog wwith wxGTK
+  // we need to block it here cause it interrupts the select() call
+  sigset_t            newsigs;
+  sigset_t            oldsigs;
+  sigemptyset(&newsigs);
+  sigemptyset(&oldsigs);
+  sigaddset(&newsigs, SIGRTMIN-1);
+#endif
+
+
   while(!TestDestroy() && !exit)
     {
       tv = mdnsd_sleep(d);
     
-      long secs = tv->tv_sec == 0 ? 1 : tv->tv_sec; // so that the while loop beneath gets executed once
-      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i secs"), p, secs);
+      long msecs = tv->tv_sec == 0 ? 100 : tv->tv_sec*1000; // so that the while loop beneath gets executed once
+      wxLogDebug(wxT("wxServDisc %p: scanthread waiting for data, timeout %i seconds"), p, tv->tv_sec);
 
 
-      // we split the one select() call into several ones every second
+      // we split the one select() call into several ones every 100ms
       // to be able to catch TestDestroy()...
       int datatoread = 0;
-      while(secs && !TestDestroy() && !datatoread)
+      while(msecs > 0 && !TestDestroy() && !datatoread)
 	{
 	  // the select call leaves tv undefined, so re-set
-	  tv->tv_sec = 1;
-	  tv->tv_usec = 0;
+	  tv->tv_sec = 0;
+	  tv->tv_usec = 100000; // 100 ms
 
 	  FD_ZERO(&fds);
 	  FD_SET(s,&fds);
-      
+
+
+#ifdef __WXGTK__
+	  sigprocmask(SIG_BLOCK, &newsigs, &oldsigs);
+#endif
 	  datatoread = select(s+1,&fds,0,0,tv); // returns 0 if timeout expired
-	  
-	  if(!datatoread)
-	    --secs;
+
+#ifdef __WXGTK__
+	  sigprocmask(SIG_SETMASK, &oldsigs, NULL);
+#endif
+
+	  if(!datatoread) // this is a timeout
+	    msecs-=100;
+	  if(datatoread == -1)
+	    break;
 	}
       
-      wxLogDebug(wxT("wxServDisc %p: scanthread woke up, reason: incoming data(%i), timeout(%i), deletion(%i)"),
-		 p, datatoread, !secs, TestDestroy() );
+      wxLogDebug(wxT("wxServDisc %p: scanthread woke up, reason: incoming data(%i), timeout(%i), error(%i), deletion(%i)"),
+		 p, datatoread>0, msecs<=0, datatoread==-1, TestDestroy() );
 
       // receive
       if(FD_ISSET(s,&fds))
@@ -330,7 +353,7 @@ SOCKET ScanThread::msock() const
 	if(WSAStartup(wVersionRequested, &wsaData) != 0)
 	{
 		WSACleanup();
-		printf("Failed to start winsock\r\n");
+		wxLogError(wxT("Failed to start winsock"));
 		return 0;
 	}
 #endif
