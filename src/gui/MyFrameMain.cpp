@@ -43,10 +43,16 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   show_fullscreen = false;
   SetMinSize(wxSize(512, 384));
-  splitwin_main->SetMinimumPaneSize(150);
+  splitwin_main->SetMinimumPaneSize(160);
   splitwin_left->SetMinimumPaneSize(140);
   splitwin_leftlower->SetMinimumPaneSize(70);
-
+#ifdef __WIN32__
+  // otherwise the widgets inside the frame aren't expanded.
+  // is this a bug?!?
+  int x,y;
+  GetSize(&x, &y);
+  SetSize(x+1, y+1);
+#endif
 
   /*
     setup menu items for a the frame
@@ -78,6 +84,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(2)->Check();
   if(show_stats)
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
+
 
 
   // theres no log window at startup
@@ -474,9 +481,15 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 
       wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
       wxBitmap screenshot = c->getFrameBufferRegion(rect);
+      
+      wxString desktopname =  c->getDesktopName();
+#ifdef __WIN32__
+      // windows doesn't like ':'s
+      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
       wxString filename = wxFileSelector(_("Save screenshot..."), 
 					 wxEmptyString,
-					 c->getDesktopName() + wxT("-Screenshot.png"), 
+					 desktopname + wxT("-Screenshot.png"), 
 					 wxT(".png"), 
 					 _("PNG files|*.png"), 
 					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
