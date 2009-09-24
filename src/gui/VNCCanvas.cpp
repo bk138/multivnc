@@ -89,18 +89,13 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
   if(event.Entering())
     SetFocus();
 
-#ifdef __WXDEBUG__
   wxClientDC dc(this);
   PrepareDC(dc);
 
-  long x = dc.DeviceToLogicalX( event.GetX() );
-  long y = dc.DeviceToLogicalY( event.GetY() );
+  event.m_x = dc.DeviceToLogicalX(event.m_x);
+  event.m_y = dc.DeviceToLogicalY(event.m_y);
   
-  wxLogDebug(wxT("VNCCanvas %p: mouse event at (%d,%d), button %d"), this, (int)x, (int)y, event.GetButton());
-#endif
-
-  
-  //wxPostEvent((wxEvtHandler*)conn, event);
+  conn->sendPointerEvent(event);
 }
 
 

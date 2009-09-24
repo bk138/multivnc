@@ -489,6 +489,32 @@ bool VNCConn::Shutdown()
 
 
 
+
+bool VNCConn::sendPointerEvent(wxMouseEvent &event)
+{
+  int buttonmask = 0;
+
+  if(event.LeftIsDown())
+    buttonmask |= rfbButton1Mask;
+
+  if(event.MiddleIsDown())
+    buttonmask |= rfbButton2Mask;
+  
+  if(event.RightIsDown())
+    buttonmask |= rfbButton3Mask;
+
+  if(event.GetWheelRotation() > 0)
+    buttonmask |= rfbWheelUpMask;
+
+  if(event.GetWheelRotation() < 0)
+    buttonmask |= rfbWheelDownMask;
+
+  wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
+
+  return SendPointerEvent(cl, event.m_x, event.m_y, buttonmask);
+}
+
+
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
 #ifdef __WXDEBUG__

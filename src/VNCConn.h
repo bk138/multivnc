@@ -63,6 +63,8 @@ public:
 
   bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int compresslevel = 1, int quality = 5);
   bool Shutdown();
+
+  bool sendPointerEvent(wxMouseEvent &event);
  
   wxBitmap getFrameBufferRegion(const wxRect& region) const;
   int getFrameBufferWidth() const;
