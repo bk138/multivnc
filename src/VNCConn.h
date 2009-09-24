@@ -68,10 +68,10 @@ public:
   int getFrameBufferWidth() const;
   int getFrameBufferHeight() const;
 
-  const wxString getDesktopName() const;
-  const wxString getServerName() const;
-  const wxString getServerAddr() const;
-  const wxString getServerPort() const;
+  wxString getDesktopName() const;
+  wxString getServerName() const;
+  wxString getServerAddr() const;
+  wxString getServerPort() const;
  
   // get error string
   const wxString& getErr() const { const wxString& ref = err; return ref; };

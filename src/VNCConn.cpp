@@ -509,25 +509,32 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
   // copy directly from framebuffer into a new bitmap,
   // saving one complete copy iteration
   wxBitmap region(rect.width, rect.height, cl->format.bitsPerPixel);
-
   wxAlphaPixelData region_data(region);
   wxAlphaPixelData::Iterator region_it(region_data);
+#ifdef __WIN32__
+  // windows DIBs store data from bottom to top :-(
+  // so move iterator to the last row
+  region_it.OffsetY(region_data, rect.height-1);
+#endif
+
 
 
   // get an wxAlphaPixelData from the framebuffer representing the subregion we want
+#ifdef __WIN32__
+  // windows DIBs store data from bottom to top, so sub-bitmap access like here
+  // is mirrored as well...
+  wxRect mirrorrect = rect;
+  mirrorrect.y = framebuffer->GetHeight() - rect.y - rect.height;
+  wxAlphaPixelData fbsub_data(*framebuffer, mirrorrect);
+#else
   wxAlphaPixelData fbsub_data(*framebuffer, rect);
+#endif
   if ( ! fbsub_data )
     {
       wxLogDebug(wxT("Failed to gain raw access to fb_sub data!"));
       return region;
     }
   wxAlphaPixelData::Iterator fbsub_it(fbsub_data);
-
-#ifdef __WIN32__
-  // windows DIBs store data from bottom to top :-(
-  // so move iterator to the last row
-  fbsub_it.OffsetY(fbsub_data, rect.height - 1);
-#endif
 
 
   for( int y = 0; y < rect.height; ++y )
@@ -551,17 +558,14 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
       
       // this goes downwards
       region_it = region_it_rowStart;
+#ifdef __WIN32__
+      region_it.OffsetY(region_data, -1);
+#else
       region_it.OffsetY(region_data, 1);
-
+#endif
      
       fbsub_it = fbsub_it_rowStart;
-#ifdef __WIN32__
-      // this goes upwards
-      fbsub_it.OffsetY(fbsub_data, -1);
-#else
-      // this goes downwards as well
       fbsub_it.OffsetY(fbsub_data, 1);
-#endif
     }
 
   return region;
@@ -589,7 +593,7 @@ int VNCConn::getFrameBufferHeight() const
 
 
 
-const wxString VNCConn::getDesktopName() const
+wxString VNCConn::getDesktopName() const
 {
   if(cl)
     return wxString(cl->desktopName, wxConvUTF8);
@@ -598,7 +602,7 @@ const wxString VNCConn::getDesktopName() const
 }
 
 
-const wxString VNCConn::getServerName() const
+wxString VNCConn::getServerName() const
 {
   if(cl)
     {
@@ -610,7 +614,7 @@ const wxString VNCConn::getServerName() const
     return wxEmptyString;
 }
 
-const wxString VNCConn::getServerAddr() const
+wxString VNCConn::getServerAddr() const
 {
   if(cl)
     {
@@ -622,7 +626,7 @@ const wxString VNCConn::getServerAddr() const
     return wxEmptyString;
 }
 
-const wxString VNCConn::getServerPort() const
+wxString VNCConn::getServerPort() const
 {
   if(cl)
     return wxString() << cl->serverPort;
