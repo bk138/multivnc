@@ -1,7 +1,8 @@
 
 
 #include "VNCCanvas.h"
-
+#include "res/vnccursor.xbm"
+#include "res/vnccursor-mask.xbm"
 
 BEGIN_EVENT_TABLE(VNCCanvas, wxScrolledWindow)
     EVT_PAINT  (VNCCanvas::onPaint)
@@ -28,6 +29,15 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
   SetVirtualSize(framebuffer_rect.width, framebuffer_rect.height);
   SetScrollRate(VNCCANVAS_SCROLL_RATE, VNCCANVAS_SCROLL_RATE);
+
+  // this kinda cursor creation works everywhere
+  wxBitmap vnccursor_bitmap(vnccursor_bits, 16, 16);
+  wxBitmap vnccursor_mask_bitmap(vnccursor_mask, 16, 16);
+  vnccursor_bitmap.SetMask(new wxMask(vnccursor_mask_bitmap));
+  wxImage vnccursor_image = vnccursor_bitmap.ConvertToImage();
+  vnccursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 8);
+  vnccursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 8);
+  SetCursor(wxCursor(vnccursor_image));
 }
 
 
