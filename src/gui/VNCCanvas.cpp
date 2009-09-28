@@ -7,7 +7,9 @@
 BEGIN_EVENT_TABLE(VNCCanvas, wxScrolledWindow)
     EVT_PAINT  (VNCCanvas::onPaint)
     EVT_MOUSE_EVENTS (VNCCanvas::onMouseAction)
-    EVT_CHAR (VNCCanvas::onKeyAction)
+    EVT_KEY_DOWN (VNCCanvas::onKeyDown)
+    EVT_KEY_UP (VNCCanvas::onKeyUp)
+    EVT_CHAR (VNCCanvas::onChar)
 END_EVENT_TABLE();
 
 #define VNCCANVAS_SCROLL_RATE 10
@@ -109,17 +111,22 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
 }
 
 
-void VNCCanvas::onKeyAction(wxKeyEvent &event)
+void VNCCanvas::onKeyDown(wxKeyEvent &event)
 {
-#ifdef __WXDEBUG__
-  wxChar c = event.GetUnicodeKey();
-
-  wxLogDebug(wxT("VNCCanvas %p: got char: %c"), this, c);
-#endif
-
-  //wxPostEvent((wxEvtHandler*)conn, event);
+  conn->sendKeyEvent(event, true, false);
 }
 
+
+void VNCCanvas::onKeyUp(wxKeyEvent &event)
+{
+  conn->sendKeyEvent(event, false, false);
+}
+
+
+void VNCCanvas::onChar(wxKeyEvent &event)
+{
+  conn->sendKeyEvent(event, true, true);
+}
 
 
 

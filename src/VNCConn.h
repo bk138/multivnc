@@ -65,6 +65,7 @@ public:
   bool Shutdown();
 
   bool sendPointerEvent(wxMouseEvent &event);
+  bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
  
   wxBitmap getFrameBufferRegion(const wxRect& region) const;
   int getFrameBufferWidth() const;

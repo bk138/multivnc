@@ -23,7 +23,9 @@ class VNCCanvas: public wxScrolledWindow
 
   void onPaint(wxPaintEvent &event);
   void onMouseAction(wxMouseEvent &event);
-  void onKeyAction(wxKeyEvent &event);
+  void onKeyDown(wxKeyEvent &event);
+  void onKeyUp(wxKeyEvent &event);
+  void onChar(wxKeyEvent &event);
 
 
 protected:

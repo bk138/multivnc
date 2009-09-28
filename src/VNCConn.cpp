@@ -515,6 +515,127 @@ bool VNCConn::sendPointerEvent(wxMouseEvent &event)
 }
 
 
+
+bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
+{
+  rfbKeySym k = 0;
+
+  if(isChar)
+    {
+      // get tranlated char
+      k = event.GetUnicodeKey();
+
+      wxLogDebug(wxT("VNCConn %p: sending CHAR key event"), this);
+      wxLogDebug(wxT("VNCConn %p:         wxkeycode:      %d"), this, event.GetKeyCode());
+      wxLogDebug(wxT("VNCConn %p:         wxkeycode char: %c"), this, event.GetKeyCode());
+      wxLogDebug(wxT("VNCConn %p:         unicode:        %d"), this, event.GetUnicodeKey());
+      wxLogDebug(wxT("VNCConn %p:         unicode char:   %c"), this, event.GetUnicodeKey()); 
+      wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x %s"), this, k, down ? wxT("down") : wxT("up"));
+
+      // down, then up
+      SendKeyEvent(cl, k, true);
+      SendKeyEvent(cl, k, false);
+      return true;
+    }
+  else
+    {
+      // lookup k
+      switch(event.GetKeyCode()) 
+	{
+	case WXK_BACK: k = XK_BackSpace; break;
+	case WXK_TAB: k = XK_Tab; break;
+	case WXK_CLEAR: k = XK_Clear; break;
+	case WXK_RETURN: k = XK_Return; break;
+	case WXK_PAUSE: k = XK_Pause; break;
+	case WXK_ESCAPE: k = XK_Escape; break;
+	case WXK_SPACE: k = XK_space; break;
+	case WXK_DELETE: k = XK_Delete; break;
+	case WXK_NUMPAD0: k = XK_KP_0; break;
+	case WXK_NUMPAD1: k = XK_KP_1; break;
+	case WXK_NUMPAD2: k = XK_KP_2; break;
+	case WXK_NUMPAD3: k = XK_KP_3; break;
+	case WXK_NUMPAD4: k = XK_KP_4; break;
+	case WXK_NUMPAD5: k = XK_KP_5; break;
+	case WXK_NUMPAD6: k = XK_KP_6; break;
+	case WXK_NUMPAD7: k = XK_KP_7; break;
+	case WXK_NUMPAD8: k = XK_KP_8; break;
+	case WXK_NUMPAD9: k = XK_KP_9; break;
+	case WXK_NUMPAD_DECIMAL: k = XK_KP_Decimal; break;
+	case WXK_NUMPAD_DIVIDE: k = XK_KP_Divide; break;
+	case WXK_NUMPAD_MULTIPLY: k = XK_KP_Multiply; break;
+	case WXK_NUMPAD_SUBTRACT: k = XK_KP_Subtract; break;
+	case WXK_NUMPAD_ADD: k = XK_KP_Add; break;
+	case WXK_NUMPAD_ENTER: k = XK_KP_Enter; break;
+	case WXK_NUMPAD_EQUAL: k = XK_KP_Equal; break;
+	case WXK_UP: k = XK_Up; break;
+	case WXK_DOWN: k = XK_Down; break;
+	case WXK_RIGHT: k = XK_Right; break;
+	case WXK_LEFT: k = XK_Left; break;
+	case WXK_INSERT: k = XK_Insert; break;
+	case WXK_HOME: k = XK_Home; break;
+	case WXK_END: k = XK_End; break;
+	case WXK_PAGEUP: k = XK_Page_Up; break;
+	case WXK_PAGEDOWN: k = XK_Page_Down; break;
+	case WXK_F1: k = XK_F1; break;
+	case WXK_F2: k = XK_F2; break;
+	case WXK_F3: k = XK_F3; break;
+	case WXK_F4: k = XK_F4; break;
+	case WXK_F5: k = XK_F5; break;
+	case WXK_F6: k = XK_F6; break;
+	case WXK_F7: k = XK_F7; break;
+	case WXK_F8: k = XK_F8; break;
+	case WXK_F9: k = XK_F9; break;
+	case WXK_F10: k = XK_F10; break;
+	case WXK_F11: k = XK_F11; break;
+	case WXK_F12: k = XK_F12; break;
+	case WXK_F13: k = XK_F13; break;
+	case WXK_F14: k = XK_F14; break;
+	case WXK_F15: k = XK_F15; break;
+	case WXK_NUMLOCK: k = XK_Num_Lock; break;
+	case WXK_CAPITAL: k = XK_Caps_Lock; break;
+	case WXK_SCROLL: k = XK_Scroll_Lock; break;
+	  //case WXK_RSHIFT: k = XK_Shift_R; break;
+	case WXK_SHIFT: k = XK_Shift_L; break;
+	  //case WXK_RCTRL: k = XK_Control_R; break;
+	case WXK_CONTROL: k = XK_Control_L; break;
+	  //    case WXK_RALT: k = XK_Alt_R; break;
+	case WXK_ALT: k = XK_Alt_L; break;
+	  // case WXK_RMETA: k = XK_Meta_R; break;
+	  // case WXK_META: k = XK_Meta_L; break;
+	case WXK_WINDOWS_LEFT: k = XK_Super_L; break;	
+	case WXK_WINDOWS_RIGHT: k = XK_Super_R; break;	
+	  //case WXK_COMPOSE: k = XK_Compose; break;
+	  //case WXK_MODE: k = XK_Mode_switch; break;
+	case WXK_HELP: k = XK_Help; break;
+	case WXK_PRINT: k = XK_Print; break;
+	  //case WXK_SYSREQ: k = XK_Sys_Req; break;
+	case WXK_CANCEL: k = XK_Break; break;
+	default: break;
+	}
+
+      if(k)
+	{
+	  wxLogDebug(wxT("VNCConn %p: sending key %s event:"), this, down ? wxT("down") : wxT("up"));
+	  wxLogDebug(wxT("VNCConn %p:         wxkeycode:      %d"), this, event.GetKeyCode());
+	  wxLogDebug(wxT("VNCConn %p:         wxkeycode char: %c"), this, event.GetKeyCode());
+	  wxLogDebug(wxT("VNCConn %p:         unicode:        %d"), this, event.GetUnicodeKey());
+	  wxLogDebug(wxT("VNCConn %p:         unicode char:   %c"), this, event.GetUnicodeKey()); 
+	  wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x %s"), this, k, down ? wxT("down") : wxT("up"));
+
+	  return SendKeyEvent(cl, k, down);
+	}
+      else
+	// nothing of the above?
+	// then propagate this event through the EVT_CHAR handler
+	event.Skip(); 
+    }
+
+  wxLogDebug(wxT("VNCConn %p: no matching keysym found"), this);
+  return false;
+}
+
+
+
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
 #ifdef __WXDEBUG__
