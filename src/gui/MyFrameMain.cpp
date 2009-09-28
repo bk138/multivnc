@@ -34,25 +34,24 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 			 long style):
   FrameMain(parent, id, title, pos, size, style)	
 {
+  int x,y;
   // get default config object, created on demand if not exist
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_SHOWTOOLBAR, &show_toolbar, V_SHOWTOOLBAR);
   pConfig->Read(K_SHOWDISCOVERED, &show_discovered, V_SHOWDISCOVERED);
   pConfig->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
+  pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
+  pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
+
 
   show_fullscreen = false;
-  SetMinSize(wxSize(512, 384));
+  SetMinSize(wxSize(640, 480));
   splitwin_main->SetMinimumPaneSize(160);
-  splitwin_left->SetMinimumPaneSize(140);
-  splitwin_leftlower->SetMinimumPaneSize(70);
-#ifdef __WIN32__
-  // otherwise the widgets inside the frame aren't expanded.
-  // is this a bug?!?
-  int x,y;
-  GetSize(&x, &y);
-  SetSize(x+1, y+1);
-#endif
+  splitwin_left->SetMinimumPaneSize(250);
+  splitwin_leftlower->SetMinimumPaneSize(120);
+
+  SetSize(x, y);
 
   /*
     setup menu items for a the frame
@@ -101,6 +100,12 @@ MyFrameMain::~MyFrameMain()
 {
   for(int i=0; i < connections.size(); ++i)
     terminate_conn(i);
+
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  int x,y;
+  GetSize(&x, &y);
+  pConfig->Write(K_SIZE_X, x);
+  pConfig->Write(K_SIZE_Y, y);
 
   delete servscan;
 }

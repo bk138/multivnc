@@ -64,10 +64,10 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     list_box_services = new wxListBox(splitwin_left_pane_1, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_services_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
     const wxString *list_box_bookmarks_choices = NULL;
     list_box_bookmarks = new wxListBox(splitwin_leftlower_pane_1, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_bookmarks_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
-    label_1 = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("FPS:"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-    text_ctrl_1 = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, _("123"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-    label_2 = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Lat:"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-    text_ctrl_2 = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, _("456"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    label_fps = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Updates/s:"));
+    text_ctrl_fps = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, _("123"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    label_latency = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Latency:"));
+    text_ctrl_latency = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, _("456"), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     notebook_connections = new wxNotebook(splitwin_main_pane_2, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
 
     set_properties();
@@ -239,7 +239,7 @@ void FrameMain::set_properties()
     wxIcon _icon;
     _icon.CopyFromBitmap(wxICON(icon));
     SetIcon(_icon);
-    SetSize(wxSize(800, 600));
+    SetSize(wxSize(985, 766));
     int frame_main_statusbar_widths[] = { -1, 3 };
     frame_main_statusbar->SetStatusWidths(2, frame_main_statusbar_widths);
     const wxString frame_main_statusbar_fields[] = {
@@ -263,22 +263,18 @@ void FrameMain::do_layout()
     wxBoxSizer* sizer_2 = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_leftlower = new wxBoxSizer(wxHORIZONTAL);
     wxStaticBoxSizer* sizer_3 = new wxStaticBoxSizer(sizer_3_staticbox, wxVERTICAL);
-    wxBoxSizer* sizer_5 = new wxBoxSizer(wxHORIZONTAL);
-    wxBoxSizer* sizer_4 = new wxBoxSizer(wxHORIZONTAL);
     wxStaticBoxSizer* sizer_bookmarks = new wxStaticBoxSizer(sizer_bookmarks_staticbox, wxHORIZONTAL);
     wxStaticBoxSizer* sizer_services = new wxStaticBoxSizer(sizer_services_staticbox, wxHORIZONTAL);
     sizer_services->Add(list_box_services, 1, wxALL|wxEXPAND, 3);
     splitwin_left_pane_1->SetSizer(sizer_services);
     sizer_bookmarks->Add(list_box_bookmarks, 1, wxALL|wxEXPAND, 3);
     splitwin_leftlower_pane_1->SetSizer(sizer_bookmarks);
-    sizer_4->Add(label_1, 5, wxALL|wxEXPAND, 3);
-    sizer_4->Add(text_ctrl_1, 0, wxALL|wxADJUST_MINSIZE, 3);
-    sizer_3->Add(sizer_4, 1, wxEXPAND, 0);
-    sizer_5->Add(label_2, 5, wxALL, 3);
-    sizer_5->Add(text_ctrl_2, 0, wxALL|wxADJUST_MINSIZE, 3);
-    sizer_3->Add(sizer_5, 1, wxEXPAND, 0);
+    sizer_3->Add(label_fps, 0, wxALL|wxEXPAND, 3);
+    sizer_3->Add(text_ctrl_fps, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_3->Add(label_latency, 0, wxALL, 3);
+    sizer_3->Add(text_ctrl_latency, 0, wxALL|wxADJUST_MINSIZE, 3);
     splitwin_leftlower_pane_2->SetSizer(sizer_3);
-    splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2);
+    splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2, 201);
     sizer_leftlower->Add(splitwin_leftlower, 1, wxALL|wxEXPAND, 3);
     splitwin_left_pane_2->SetSizer(sizer_leftlower);
     splitwin_left->SplitHorizontally(splitwin_left_pane_1, splitwin_left_pane_2);
@@ -286,7 +282,7 @@ void FrameMain::do_layout()
     splitwin_main_pane_1->SetSizer(sizer_2);
     sizer_notebook->Add(notebook_connections, 1, wxALL|wxEXPAND, 3);
     splitwin_main_pane_2->SetSizer(sizer_notebook);
-    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 75);
+    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 148);
     sizer_splitwinmain->Add(splitwin_main, 1, wxALL|wxEXPAND, 3);
     panel_top->SetSizer(sizer_splitwinmain);
     sizer_top->Add(panel_top, 1, wxEXPAND, 0);

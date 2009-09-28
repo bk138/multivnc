@@ -51,10 +51,10 @@ protected:
     wxPanel* splitwin_left_pane_1;
     wxListBox* list_box_bookmarks;
     wxPanel* splitwin_leftlower_pane_1;
-    wxStaticText* label_1;
-    wxTextCtrl* text_ctrl_1;
-    wxStaticText* label_2;
-    wxTextCtrl* text_ctrl_2;
+    wxStaticText* label_fps;
+    wxTextCtrl* text_ctrl_fps;
+    wxStaticText* label_latency;
+    wxTextCtrl* text_ctrl_latency;
     wxPanel* splitwin_leftlower_pane_2;
     wxSplitterWindow* splitwin_leftlower;
     wxPanel* splitwin_left_pane_2;

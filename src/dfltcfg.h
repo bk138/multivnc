@@ -15,6 +15,10 @@
 #define V_SHOWBOOKMARKS true
 #define K_SHOWSTATS _T("ShowStats")
 #define V_SHOWSTATS false
+#define K_SIZE_X _T("SizeX")
+#define V_SIZE_X 800
+#define K_SIZE_Y _T("SizeY")
+#define V_SIZE_Y 600
 
 
 #endif // CONFIG_H
