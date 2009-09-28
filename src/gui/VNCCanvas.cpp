@@ -21,7 +21,7 @@ END_EVENT_TABLE();
 */
 
 VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
-  wxScrolledWindow(parent)
+  wxScrolledWindow(parent, -1, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL | wxWANTS_CHARS)
 {
   conn = c;
   framebuffer_rect.x = 0;
@@ -31,6 +31,7 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
   SetVirtualSize(framebuffer_rect.width, framebuffer_rect.height);
   SetScrollRate(VNCCANVAS_SCROLL_RATE, VNCCANVAS_SCROLL_RATE);
+ 
 
   // this kinda cursor creation works everywhere
   wxBitmap vnccursor_bitmap(vnccursor_bits, 16, 16);
@@ -93,6 +94,9 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
       ++upd;
     }
 }
+
+
+
 
 
 

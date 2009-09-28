@@ -530,7 +530,8 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
       wxLogDebug(wxT("VNCConn %p:         wxkeycode char: %c"), this, event.GetKeyCode());
       wxLogDebug(wxT("VNCConn %p:         unicode:        %d"), this, event.GetUnicodeKey());
       wxLogDebug(wxT("VNCConn %p:         unicode char:   %c"), this, event.GetUnicodeKey()); 
-      wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x %s"), this, k, down ? wxT("down") : wxT("up"));
+      wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x down"), this, k);
+      wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x  up"), this, k);
 
       // down, then up
       SendKeyEvent(cl, k, true);
@@ -625,9 +626,12 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 	  return SendKeyEvent(cl, k, down);
 	}
       else
-	// nothing of the above?
-	// then propagate this event through the EVT_CHAR handler
-	event.Skip(); 
+	{
+	  // nothing of the above?
+	  // then propagate this event through the EVT_CHAR handler
+	  event.Skip();
+	  return false;
+	}
     }
 
   wxLogDebug(wxT("VNCConn %p: no matching keysym found"), this);
