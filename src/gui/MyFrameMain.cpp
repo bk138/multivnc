@@ -621,7 +621,7 @@ void MyFrameMain::help_about(wxCommandEvent &event)
 
 void MyFrameMain::help_contents(wxCommandEvent &e)
 {
-  wxLogMessage(_("Select a host in the list to get more information, double click to connect.\n\nWhen in Remote Control Only Mode, move the pointer over the right screen edge to control the remote desktop."));
+  wxLogMessage(_("If there VNC servers advertising themselves via ZeroConf, you can select a host in the 'Available Servers' list. Otherwise, use the 'Connect' button or menu item."));
 }
 
 
