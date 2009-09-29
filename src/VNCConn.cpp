@@ -82,40 +82,30 @@ wxThread::ExitCode VNCThread::Entry()
 
   while(! TestDestroy()) 
     {
-      /* wxLogDebug( "VNCThread::Entry(): sleeping\n");
-	      
-	 wxSleep(1);
-
-	 wxLogDebug( "VNCThread::Entry(): back again\n");*/
-
-      // if(got some input  event)
-      //handleEvent(cl, &e);
-      //else 
-      {
 #ifdef __WXGTK__
-	sigprocmask(SIG_BLOCK, &newsigs, &oldsigs);
+      sigprocmask(SIG_BLOCK, &newsigs, &oldsigs);
 #endif
 
-	i=WaitForMessage(p->cl, 500);
+      i=WaitForMessage(p->cl, 500);
 
 #ifdef __WXGTK__
-	sigprocmask(SIG_SETMASK, &oldsigs, NULL);
+      sigprocmask(SIG_SETMASK, &oldsigs, NULL);
 #endif
 
-	if(i<0)
+      if(i<0)
+	{
+	  wxLogDebug(wxT("VNCConn %p: vncthread waitforMessage() failed"), p);
+	  p->SendDisconnectNotify();
+	  return 0;
+	}
+      if(i)
+	if(!HandleRFBServerMessage(p->cl))
 	  {
-	    wxLogDebug(wxT("VNCConn %p: vncthread waitforMessage() failed"), p);
+	    wxLogDebug(wxT("VNCConn %p: vncthread HandleRFBServerMessage() failed"), p);
 	    p->SendDisconnectNotify();
 	    return 0;
 	  }
-	if(i)
-	  if(!HandleRFBServerMessage(p->cl))
-	    {
-	      wxLogDebug(wxT("VNCConn %p: vncthread HandleRFBServerMessage() failed"), p);
-	      p->SendDisconnectNotify();
-	      return 0;
-	    }
-      }
+     
     }
 }
 
