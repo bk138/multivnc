@@ -104,7 +104,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
 MyFrameMain::~MyFrameMain()
 {
-  for(int i=0; i < connections.size(); ++i)
+  for(int i = connections.size()-1; i >= 0; --i)
     terminate_conn(i);
 
   wxConfigBase *pConfig = wxConfigBase::Get();
