@@ -3,12 +3,13 @@
 #ifndef VNCCONN_H
 #define VNCCONN_H
 
-#include "wx/event.h"
-#include "wx/string.h"
-#include "wx/arrstr.h"
-#include "wx/bitmap.h"
-#include "wx/rawbmp.h"
-#include <rfb/rfbclient.h>
+#include <wx/event.h>
+#include <wx/string.h>
+#include <wx/arrstr.h>
+#include <wx/bitmap.h>
+#include <wx/rawbmp.h>
+#include <wx/timer.h>
+#include "rfb/rfbclient.h"
 
 
 
@@ -17,7 +18,7 @@ DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 
 
-class VNCConn: public wxObject
+class VNCConn: public wxEvtHandler
 {
   friend class VNCThread;
   void *vncthread;
@@ -29,6 +30,17 @@ class VNCConn: public wxObject
   // complete framebuffer
   wxBitmap* framebuffer;
   wxAlphaPixelData* fb_data;
+
+  // statistics
+  bool do_stats;
+  int updates_count;
+  wxTimer updates_count_timer; // a timer to reset draw_count periodically
+  void onUpdatesCountTimer(wxTimerEvent& event);
+  wxPoint pointer_pos;
+  wxStopWatch pointer_stopwatch;
+  // string arrays to store values over time
+  wxArrayString updates;
+  wxArrayString latencies;
 
 
   // per-connection error string
@@ -56,6 +68,9 @@ class VNCConn: public wxObject
   static void logger(const char *format, ...);
 
 
+protected:
+  DECLARE_EVENT_TABLE();
+
 
 public:
   VNCConn(void *parent);
@@ -66,7 +81,15 @@ public:
 
   bool sendPointerEvent(wxMouseEvent &event);
   bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
- 
+  
+  // toggle statistics, default is off
+  void doStats(bool yesno);
+  // this clears internal statistics
+  void resetStats();
+  // get stats, in format "timestamp, value"
+  const wxArrayString& getUpdateStats() const { const wxArrayString& ref = updates; return ref; };
+  const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
+
   wxBitmap getFrameBufferRegion(const wxRect& region) const;
   int getFrameBufferWidth() const;
   int getFrameBufferHeight() const;

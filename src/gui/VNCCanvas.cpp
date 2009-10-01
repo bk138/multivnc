@@ -110,7 +110,7 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
 
   event.m_x = dc.DeviceToLogicalX(event.m_x);
   event.m_y = dc.DeviceToLogicalY(event.m_y);
-  
+
   conn->sendPointerEvent(event);
 }
 
@@ -134,16 +134,23 @@ void VNCCanvas::onChar(wxKeyEvent &event)
 
 
 
+
 /*
   public members
 */
 
 void VNCCanvas::drawRegion(wxRect& rect)
 {
+  wxLogDebug(wxT("VNCCanvas %p: drawing region (%i,%i,%i,%i)"),
+	     this,
+	     rect.x,
+	     rect.y,
+	     rect.width,
+	     rect.height);
+
   wxClientDC dc(this);
   DoPrepareDC(dc); // this adjusts coordinates when window is scrolled
   wxBitmap region = conn->getFrameBufferRegion(rect);
   dc.DrawBitmap(region, rect.x, rect.y);
 }
-
 

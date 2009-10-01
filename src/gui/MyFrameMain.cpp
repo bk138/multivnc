@@ -10,9 +10,10 @@
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
+#define STATS_TIMER_INTERVAL 50
+
 
 using namespace std;
-
 
 
 // map recv of custom events to handler methods
@@ -21,6 +22,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
   EVT_COMMAND (wxID_ANY, VNCConnUpdateNOTIFY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
+  EVT_TIMER   (wxID_ANY, MyFrameMain::onStatsTimer)
 END_EVENT_TABLE()
 
 
@@ -82,12 +84,16 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   if(show_bookmarks)
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(2)->Check();
   if(show_stats)
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
-
+    {
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
+      stats_timer.Start(STATS_TIMER_INTERVAL);
+    }
 
 
   // theres no log window at startup
   logwindow = 0;
+
+  stats_timer.SetOwner(this);
 
   // finally, our mdns service scanner
   servscan = new wxServDisc(this, wxT("_rfb._tcp.local."), QTYPE_PTR);
@@ -136,18 +142,9 @@ void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
   if(c == event.GetEventObject())
     {
       wxRect* rect = static_cast<wxRect*>(event.GetClientData());
-
-      wxLogDebug(wxT("active page got upd (%i,%i,%i,%i)"),
-		 rect->x,
-		 rect->y,
-		 rect->width,
-		 rect->height);
-
       VNCCanvas* canvas = static_cast<VNCCanvas*>(notebook_connections->GetCurrentPage());
       canvas->drawRegion(*rect);
-      
-      // avoid memleaks!
-      delete rect;
+      delete rect; // avoid memleaks!
     }
 }
 
@@ -216,6 +213,23 @@ void MyFrameMain::onSDNotify(wxCommandEvent& event)
 
 
 
+void MyFrameMain::onStatsTimer(wxTimerEvent& event)
+{
+  if(connections.size())
+    {
+      VNCConn* c = connections.at(notebook_connections->GetSelection());
+
+      text_ctrl_fps->Clear();
+      text_ctrl_latency->Clear();
+      
+      if( ! c->getUpdateStats().IsEmpty() )
+	*text_ctrl_fps << c->getUpdateStats().Last().AfterFirst(wxT(','));
+      if( ! c->getLatencyStats().IsEmpty() )
+	*text_ctrl_latency << c->getLatencyStats().Last().AfterFirst(wxT(','));
+    }
+}
+
+
 
 char* MyFrameMain::getpasswd(rfbClient* client)
 {
@@ -250,11 +264,13 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
   
   connections.push_back(c);
 
+  if(show_stats)
+    c->doStats(true);
+
   VNCCanvas* canvas = new VNCCanvas(notebook_connections, c);
   notebook_connections->AddPage(canvas, c->getDesktopName(), true);
 
   wxLogStatus(_("Connected to ") + hostname + _T(":") + port);
-
 
   // "end connection"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(true);
@@ -278,8 +294,6 @@ void MyFrameMain::terminate_conn(size_t which)
 
       notebook_connections->DeletePage(which);
     }
-
-	  
 
   if(connections.size() == 0) // nothing to end
     {
@@ -396,6 +410,9 @@ void MyFrameMain::splitwinlayout()
 /*
   public members
 */
+
+
+
 
 
 void MyFrameMain::machine_connect(wxCommandEvent &event)
@@ -578,6 +595,18 @@ void MyFrameMain::view_togglebookmarks(wxCommandEvent &event)
 void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
 {
   show_stats = !show_stats;
+
+  if(show_stats)
+    stats_timer.Start(STATS_TIMER_INTERVAL);
+  else
+    stats_timer.Stop();
+
+  text_ctrl_fps->Clear();
+  text_ctrl_latency->Clear();
+
+  // for now, toggle all VNCConn instances
+  for(int i=0; i < connections.size(); ++i)
+    connections.at(i)->doStats(show_stats);
 
   splitwinlayout();
 

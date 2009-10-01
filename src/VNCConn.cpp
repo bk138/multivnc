@@ -32,6 +32,7 @@ DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
 
 
 
+
 /********************************************
 
   internal worker thread class
@@ -129,6 +130,12 @@ void VNCThread::OnExit()
 
 ********************************************/
 
+BEGIN_EVENT_TABLE(VNCConn, wxEvtHandler)
+    EVT_TIMER (wxID_ANY, VNCConn::onUpdatesCountTimer)
+END_EVENT_TABLE();
+
+
+
 /*
   constructor/destructor
 */
@@ -145,6 +152,11 @@ VNCConn::VNCConn(void* p)
   fb_data = 0;
 
   rfbClientLog = rfbClientErr = logger;
+
+  // statistics stuff
+  do_stats = false;
+  updates_count = 0;
+  updates_count_timer.SetOwner(this);
 }
 
 
@@ -193,9 +205,31 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
 
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
+
+  if(do_stats)
+    {
+      // updates/s
+      ++updates_count;
+  
+      // pointer latency
+      // well, this is not neccessarily correct, but wtf
+      if(rect->Contains(pointer_pos))
+	{
+	  latencies.Add(wxNow() + wxT(", ") + wxString() << (int)pointer_stopwatch.Time());
+	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointer_stopwatch.Time());
+	}
+    }
 }
 
 
+void VNCConn::onUpdatesCountTimer(wxTimerEvent& event)
+{
+  if(do_stats)
+    {
+      updates.Add(wxNow() + wxT(", ") + wxString() << updates_count);
+      updates_count = 0;
+    }
+}
 
 
 
@@ -370,7 +404,9 @@ void VNCConn::logger(const char *format, ...)
 
 bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int compresslevel, int quality)
 {
+  // clean up before doing new connection
   Shutdown();
+  resetStats();
 
   int argc = 6;
   char* argv[argc];
@@ -433,7 +469,8 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
       Shutdown();
       return false;
     }
-   
+
+
   return true;
 }
 
@@ -498,6 +535,14 @@ bool VNCConn::sendPointerEvent(wxMouseEvent &event)
 
   if(event.GetWheelRotation() < 0)
     buttonmask |= rfbWheelDownMask;
+
+
+  if(do_stats)
+    {
+      pointer_pos.x = event.m_x;
+      pointer_pos.y = event.m_y;
+      pointer_stopwatch.Start();
+    }
 
   wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
 
@@ -630,6 +675,28 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 
 
 
+
+
+void VNCConn::doStats(bool yesno)
+{
+  do_stats = yesno;
+  if(do_stats)
+    updates_count_timer.Start(1000);
+  else
+    updates_count_timer.Stop();
+}
+
+
+void VNCConn::resetStats()
+{
+  latencies.Clear();
+  updates.Clear();
+}
+
+
+
+
+
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
 #ifdef __WXDEBUG__
@@ -731,6 +798,7 @@ int VNCConn::getFrameBufferHeight() const
   else 
     return 0;
 }
+
 
 
 

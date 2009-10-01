@@ -34,6 +34,10 @@ class MyFrameMain: public FrameMain
   // log window
   MyFrameLog* logwindow;
 
+  // timer to update stats win
+  wxTimer stats_timer;
+  void onStatsTimer(wxTimerEvent& event);
+
   void splitwinlayout();
 
   bool spawn_conn(wxString& hostname, wxString& addr, wxString& port);
