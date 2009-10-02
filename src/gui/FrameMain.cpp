@@ -31,6 +31,10 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_1->Append(wxID_FILE, _("Show &Log"), _("Show detailed log."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_PREFERENCES, wxEmptyString, _("Change preferences."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_SAVE, _("Take Screenshot"), wxEmptyString, wxITEM_NORMAL);
+    wxMenu* wxglade_tmp_menu_1_sub = new wxMenu();
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD, _("Save Framebuffer Update Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LAT, _("Save Pointer Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1->Append(wxID_ANY, _("Statistics"), wxglade_tmp_menu_1_sub, wxEmptyString);
     wxglade_tmp_menu_1->AppendSeparator();
     wxglade_tmp_menu_1->Append(wxID_EXIT, wxEmptyString, _("Exit MultiVNC."), wxITEM_NORMAL);
     frame_main_menubar->Append(wxglade_tmp_menu_1, _("&Machine"));
@@ -83,6 +87,8 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_FILE, FrameMain::machine_showlog)
     EVT_MENU(wxID_PREFERENCES, FrameMain::machine_preferences)
     EVT_MENU(wxID_SAVE, FrameMain::machine_screenshot)
+    EVT_MENU(ID_STATS_SAVE_UPD, FrameMain::machine_save_stats_upd)
+    EVT_MENU(ID_STATS_SAVE_LAT, FrameMain::machine_save_stats_lat)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
     EVT_MENU(ID_TOOLBAR, FrameMain::view_toggletoolbar)
     EVT_MENU(ID_DISCOVERED, FrameMain::view_togglediscovered)
@@ -135,6 +141,20 @@ void FrameMain::machine_screenshot(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::machine_screenshot) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_save_stats_upd(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_save_stats_lat(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_lat) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 

@@ -74,6 +74,8 @@ public:
     virtual void machine_showlog(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_preferences(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_screenshot(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_save_stats_upd(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_save_stats_lat(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_exit(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_toggletoolbar(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglediscovered(wxCommandEvent &event); // wxGlade: <event_handler>

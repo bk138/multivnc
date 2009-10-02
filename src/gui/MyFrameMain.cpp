@@ -1,6 +1,8 @@
 
-#include "wx/aboutdlg.h"
-#include "wx/socket.h"
+#include <fstream>
+#include <wx/aboutdlg.h>
+#include <wx/socket.h>
+
 
 #include "res/about.png.h"
 
@@ -65,6 +67,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
   // "screenshot"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
+  // stats
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
 
   if(show_toolbar)
      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
@@ -239,6 +244,21 @@ char* MyFrameMain::getpasswd(rfbClient* client)
 }
 
 
+
+bool MyFrameMain::saveArrayString(wxArrayString& arrstr, wxString& path)
+{
+  ofstream ostream(path.char_str());
+  if(! ostream)
+    return false;
+
+  for(int i=0; i < arrstr.GetCount(); ++i)
+    ostream << arrstr[i].char_str() << endl;
+
+  return true;
+}
+
+
+
 // connection initiation and shutdown
 bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 {
@@ -276,6 +296,9 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(true);
   // "screenshot"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(true);
+  // stats
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(0)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(1)->Enable(true);
   
   return true;
 }
@@ -301,6 +324,9 @@ void MyFrameMain::terminate_conn(size_t which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
       // "screenshot"
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
+      // stats
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
     }
 
   wxLogStatus( _("Connection terminated."));
@@ -520,6 +546,79 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 	{
 	  wxBusyCursor busy;
     	  screenshot.SaveFile(filename, wxBITMAP_TYPE_PNG);
+	}
+    }
+}
+
+
+
+void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
+{
+  if(connections.size())
+    {
+      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      
+      if(c->getUpdateStats().IsEmpty())
+	{
+	  wxLogMessage(_("Nothing to save!"));
+	  return;
+	}
+
+      wxString desktopname =  c->getDesktopName();
+#ifdef __WIN32__
+      // windows doesn't like ':'s
+      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
+
+      wxString filename = wxFileSelector(_("Save framebuffer update statistics..."), 
+					 wxEmptyString,
+					 desktopname + wxT("-FramebufferUpdate-Stats.txt"), 
+					 wxT(".txt"), 
+					 _("TXT files|*.txt"), 
+					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+      
+      if(!filename.empty())
+	{
+	  wxBusyCursor busy;
+	  if(! saveArrayString(const_cast<wxArrayString&>(c->getUpdateStats()), filename))
+	    wxLogError(_("Could not save file!"));
+	}
+    }
+}
+
+
+
+
+void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
+{
+  if(connections.size())
+    {
+      VNCConn* c = connections.at(notebook_connections->GetSelection());
+
+      if(c->getLatencyStats().IsEmpty())
+	{
+	  wxLogMessage(_("Nothing to save!"));
+	  return;
+	}
+
+      wxString desktopname =  c->getDesktopName();
+#ifdef __WIN32__
+      // windows doesn't like ':'s
+      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
+
+      wxString filename = wxFileSelector(_("Save pointer latency statistics..."), 
+					 wxEmptyString,
+					 desktopname + wxT("-PointerLatency-Stats.txt"), 
+					 wxT(".txt"), 
+					 _("TXT files|*.txt"), 
+					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+      
+      if(!filename.empty())
+	{
+	  wxBusyCursor busy;
+	  if(! saveArrayString(const_cast<wxArrayString&>(c->getLatencyStats()), filename))
+	    wxLogError(_("Could not save file!"));
 	}
     }
 }

@@ -42,7 +42,7 @@ class MyFrameMain: public FrameMain
 
   bool spawn_conn(wxString& hostname, wxString& addr, wxString& port);
   void terminate_conn(size_t which);
- 
+  
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
   void onVNCConnUpdateNotify(wxCommandEvent& event);
@@ -52,6 +52,8 @@ class MyFrameMain: public FrameMain
   
   static char* getpasswd(rfbClient* client);
 
+  bool saveArrayString(wxArrayString& arrstr, wxString& path);
+ 
   
 protected:
   DECLARE_EVENT_TABLE();
@@ -75,6 +77,8 @@ public:
   void machine_preferences(wxCommandEvent &event);
   void machine_showlog(wxCommandEvent &event);
   void machine_screenshot(wxCommandEvent &event);
+  void machine_save_stats_upd(wxCommandEvent &event); 
+  void machine_save_stats_lat(wxCommandEvent &event); 
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);
