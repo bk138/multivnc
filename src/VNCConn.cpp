@@ -215,7 +215,10 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
       // well, this is not neccessarily correct, but wtf
       if(rect->Contains(pointer_pos))
 	{
-	  latencies.Add(wxNow() + wxT(", ") + wxString() << (int)pointer_stopwatch.Time());
+	  latencies.Add((wxString() << (int)conn_stopwatch.Time()) + 
+			wxT(", ") + 
+			(wxString() << (int)pointer_stopwatch.Time()));
+
 	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointer_stopwatch.Time());
 	}
     }
@@ -226,7 +229,9 @@ void VNCConn::onUpdatesCountTimer(wxTimerEvent& event)
 {
   if(do_stats)
     {
-      updates.Add(wxNow() + wxT(", ") + wxString() << updates_count);
+      updates.Add((wxString() << (int)conn_stopwatch.Time())
+		  + wxT(", ") +
+		  (wxString() << updates_count));
       updates_count = 0;
     }
 }
@@ -470,6 +475,7 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
       return false;
     }
 
+  conn_stopwatch.Start();
 
   return true;
 }
@@ -480,6 +486,8 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
 bool VNCConn::Shutdown()
 {
   wxLogDebug(wxT("VNCConn %p: Shutdown()"), this);
+
+  conn_stopwatch.Pause();
 
   if(vncthread)
     {

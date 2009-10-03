@@ -27,6 +27,9 @@ class VNCConn: public wxEvtHandler
 
   rfbClient* cl;
 
+  // this counts the ms since Init()
+  wxStopWatch conn_stopwatch;
+
   // complete framebuffer
   wxBitmap* framebuffer;
   wxAlphaPixelData* fb_data;

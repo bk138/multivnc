@@ -572,7 +572,7 @@ void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
 
       wxString filename = wxFileSelector(_("Save framebuffer update statistics..."), 
 					 wxEmptyString,
-					 desktopname + wxT("-FramebufferUpdate-Stats.txt"), 
+					 desktopname + wxT("-FramebufferUpdate-Stats-") + wxNow() + wxT(".txt"), 
 					 wxT(".txt"), 
 					 _("TXT files|*.txt"), 
 					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
@@ -609,7 +609,7 @@ void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
 
       wxString filename = wxFileSelector(_("Save pointer latency statistics..."), 
 					 wxEmptyString,
-					 desktopname + wxT("-PointerLatency-Stats.txt"), 
+					 desktopname + wxT("-PointerLatency-Stats-") + wxNow() + wxT(".txt"), 
 					 wxT(".txt"), 
 					 _("TXT files|*.txt"), 
 					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
