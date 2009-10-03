@@ -1,73 +1,6 @@
 
 #include "MyFrameLog.h"
-
-#include "wx/thread.h"
 #include "VNCConn.h"
-
-
-
-
-DEFINE_EVENT_TYPE(MyFrameLogCloseNOTIFY)
-
-// this is used internally as we cannot update the 
-// txtctrl from another thread without crashing
-DECLARE_EVENT_TYPE(MyFrameLogUpdateNOTIFY, -1)
-DEFINE_EVENT_TYPE(MyFrameLogUpdateNOTIFY)
-
-
-// map recv of custom events to handler methods
-BEGIN_EVENT_TABLE(MyFrameLog, FrameLog)
-  EVT_COMMAND (wxID_ANY, MyFrameLogUpdateNOTIFY, MyFrameLog::onUpdate)
-END_EVENT_TABLE()
-
-
-/********************************************
-
-  internal worker thread class
-
-********************************************/
-
-class LogThread : public wxThread
-{
-  MyFrameLog *p;    // our parent object
- 
-public:
-  LogThread(MyFrameLog *parent);
-  
-  // thread execution starts here
-  virtual wxThread::ExitCode Entry();
-
-  // called when the thread exits - whether it terminates normally or is
-  // stopped with Delete() (but not when it is Kill()ed!)
-  virtual void OnExit();
-};
-
-
-LogThread::LogThread(MyFrameLog *parent)
-  : wxThread()
-{
-  p = parent;
-}
-
-
-wxThread::ExitCode LogThread::Entry()
-{
-  while(! TestDestroy()) 
-    {
-      if(p->lines_printed < VNCConn::getLog().GetCount())
-	p->SendUpdateNotify();
-
-      wxSleep(1);
-    }
-}
-
-
-
-void LogThread::OnExit()
-{
-  // cause wxThreads delete themselves after completion
-  p->logthread = 0;
-}
 
 
 
@@ -76,6 +9,17 @@ void LogThread::OnExit()
   MyFrameLog class
 
 ********************************************/
+
+#define UPDATE_TIMER_INTERVAL 100
+
+DEFINE_EVENT_TYPE(MyFrameLogCloseNOTIFY)
+
+
+BEGIN_EVENT_TABLE(MyFrameLog, FrameLog)
+    EVT_TIMER (wxID_ANY, MyFrameLog::onUpdateTimer)
+END_EVENT_TABLE();
+
+
 
 /*
   constructor/destructor
@@ -86,33 +30,13 @@ MyFrameLog::MyFrameLog(wxWindow* parent, int id, const wxString& title, const wx
 {
   lines_printed = 0;
 
-  // this is like our main loop
-  LogThread *tp = new LogThread(this);
-  // save it for later on
-  logthread = tp;
-  
-  if( tp->Create() != wxTHREAD_NO_ERROR )
-    {
-      wxLogError(_("Could not create log window!"));
-      // this seems ok, as it emits a close event, which in turn
-      // destroys the just created log window, well well well...
-      Close();
-    }
-  else
-    tp->Run();
+  update_timer.SetOwner(this);
+  update_timer.Start(UPDATE_TIMER_INTERVAL);
 }
 
 
 MyFrameLog::~MyFrameLog()
 {
-  if(logthread)
-    {
-      static_cast<LogThread*>(logthread)->Delete();
-      // wait for deletion to finish
-      while(logthread)
-	wxMilliSleep(100);
-    }
-
   SendCloseNotify();
 }
 
@@ -134,18 +58,9 @@ void MyFrameLog::SendCloseNotify()
 }
 
 
-void MyFrameLog::SendUpdateNotify()
-{
-  // new NOTIFY event, we got no window id
-  wxCommandEvent event(MyFrameLogUpdateNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-
-  // Send it
-  wxPostEvent((wxEvtHandler*)this, event);
-}
 
 
-void MyFrameLog::onUpdate(wxCommandEvent& event)
+void MyFrameLog::onUpdateTimer(wxTimerEvent& event)
 {
   wxArrayString log = VNCConn::getLog();
 
@@ -155,9 +70,6 @@ void MyFrameLog::onUpdate(wxCommandEvent& event)
       ++lines_printed;
     }
 }
-
-
-
 
 
 

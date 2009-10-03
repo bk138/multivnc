@@ -4,8 +4,8 @@
 #define MYFRAMELOG_H
 
 
+#include <wx/timer.h>
 #include "FrameLog.h"
-
 
 
 // make available custom close event
@@ -14,15 +14,12 @@ DECLARE_EVENT_TYPE(MyFrameLogCloseNOTIFY, -1)
 
 class MyFrameLog: public FrameLog
 {
-  friend class LogThread;
-  void *logthread;
-
   size_t lines_printed;
 
-  void SendCloseNotify();
-  void SendUpdateNotify();
+  wxTimer update_timer;
+  void onUpdateTimer(wxTimerEvent& event);
 
-  void onUpdate(wxCommandEvent &event);
+  void SendCloseNotify();
 
 protected:
   DECLARE_EVENT_TABLE();
