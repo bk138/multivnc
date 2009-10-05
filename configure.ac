@@ -46,7 +46,7 @@ dnl Check if we have enabled debug support.
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE(debug, [  --enable-debug          enable debug build [[default=no]]],, enable_debug="no")
 if test "x$enable_debug" = "xyes"; then
-dnl	CPPFLAGS="$CPPFLAGS -DDEBUG"
+	CXXFLAGS="$CXXFLAGS -Wall -Wextra"
 	WXCONFIG="$WXCONFIG --debug=yes"	
 	AC_MSG_RESULT(yes)
 else
