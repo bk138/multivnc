@@ -294,6 +294,9 @@ bool MyFrameMain::saveArrayString(wxArrayString& arrstr, wxString& path)
 // connection initiation and shutdown
 bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 {
+  if(port.IsEmpty())
+    port = wxT("5900");
+
   wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + _T("..."));
   wxBusyCursor busy;
 
