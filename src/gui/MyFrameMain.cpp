@@ -874,3 +874,35 @@ void MyFrameMain::listbox_bookmarks_select(wxCommandEvent &event)
 void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 {
 }
+
+
+bool MyFrameMain::cmdline_connect(wxString& hostarg)
+{
+  wxIPV4address host_addr;
+
+  wxString sc_hostname, sc_port, sc_addr;      
+  
+  // get host part 
+  sc_hostname = hostarg.BeforeFirst(wxT(':'));
+  
+  // look up name
+  if(! host_addr.Hostname(sc_hostname))
+    {
+      wxLogError(_("Invalid host '%s' given on command line, exiting!"), hostarg.c_str());
+      return false;
+    }
+  else
+#ifdef __WIN32__
+    sc_addr = host_addr.Hostname(); // wxwidgets bug, ah well ...
+#else
+    sc_addr = host_addr.IPAddress();
+#endif
+      
+    // and lookup port description part (sth. like 'vnc' can also be given)
+    if(host_addr.Service( hostarg.AfterFirst(wxT(':')) ))
+      sc_port = wxString() << host_addr.Service();
+    else
+      sc_port = wxEmptyString;
+    
+    return spawn_conn(sc_hostname, sc_addr, sc_port);
+}

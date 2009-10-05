@@ -37,9 +37,20 @@ bool MultiVNCApp::OnInit()
   cout << COPYRIGHT << ".\n";
   cout << "MultiVNC is free software, licensed unter the GPL.\n\n";
 
+
   // wx stuff
   wxInitAllImageHandlers();
+
+  // the main frame
   MyFrameMain* frame_main = new MyFrameMain(NULL, wxID_ANY, wxEmptyString);
+
+  for(int i=1; i < wxApp::argc; ++i)
+    {
+      wxString arg(wxApp::argv[i]);
+      if(! frame_main->cmdline_connect(arg))
+	return false;
+    }
+
   SetTopWindow(frame_main);
   frame_main->Show();
 
