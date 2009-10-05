@@ -21,6 +21,7 @@
 // define our new notify events!
 DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
+DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
 
 // pixelformat defaults
 // seems 8,3,4 and 5,3,2 are possible with rfbGetClient()
@@ -225,6 +226,25 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
 }
 
 
+void VNCConn::SendFBResizeNotify() 
+{
+  wxLogDebug(wxT("VNCConn %p: SendFBResizeNotify() (%i, %i)"), 
+	     this,
+	     getFrameBufferWidth(),
+	     getFrameBufferHeight());
+
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnFBResizeNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+
+
+
 void VNCConn::onUpdatesCountTimer(wxTimerEvent& event)
 {
   if(do_stats)
@@ -243,6 +263,8 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
   // get VNCConn object belonging to this client
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
 
+  wxLogDebug(wxT("VNCConn %p: alloc'ing framebuffer w:%i, h:%i"), conn, client->width, client->height);
+
   // assert 32bpp, as requested with GetClient() in Init()
   if(client->format.bitsPerPixel != 32)
     {
@@ -250,6 +272,9 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
       return false;
     }
 
+  // ensure that we get the whole framebuffer in case of a resize!
+  client->updateRect.x = client->updateRect.y = 0;
+  client->updateRect.w = client->width; client->updateRect.h = client->height;
 
   // setup framebuffer
   if(conn->framebuffer)
@@ -272,6 +297,7 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
       return false;
     }
 
+ 
   // zero it out
   wxAlphaPixelData::Iterator fb_it(*conn->fb_data);
   for ( int y = 0; y < client->height; ++y )
@@ -302,7 +328,10 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
   if ( client->height > 1 )
     client->frameBuffer -= (client->height - 1)* -conn->fb_data->m_stride;
 #endif
-  
+ 
+  // notify our parent
+  conn->SendFBResizeNotify();
+ 
   return client->frameBuffer ? TRUE : FALSE;
 }
 

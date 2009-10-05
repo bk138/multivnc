@@ -16,6 +16,7 @@
 // make available custom events
 DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
+DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
 
 
 class VNCConn: public wxEvtHandler
@@ -61,6 +62,7 @@ class VNCConn: public wxEvtHandler
   // NB: this sets the event's clientdata ptr a newly created wRect 
   // which MUST be freed by its receiver!!!
   void SendUpdateNotify(int x, int y, int w, int h);
+  void SendFBResizeNotify();
 
 
   //callbacks
