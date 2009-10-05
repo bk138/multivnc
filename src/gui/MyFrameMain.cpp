@@ -109,14 +109,46 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
 MyFrameMain::~MyFrameMain()
 {
-  for(int i = connections.size()-1; i >= 0; --i)
-    terminate_conn(i);
-
   wxConfigBase *pConfig = wxConfigBase::Get();
   int x,y;
   GetSize(&x, &y);
   pConfig->Write(K_SIZE_X, x);
   pConfig->Write(K_SIZE_Y, y);
+
+  bool save_stats;
+  pConfig->Read(K_STATSAUTOSAVE, &save_stats, V_STATSAUTOSAVE);  
+  if(save_stats)
+    {
+      for(int i = connections.size()-1; i >= 0; --i)
+	{
+	  VNCConn* c = connections.at(i);
+	  wxString desktopname =  c->getDesktopName();
+#ifdef __WIN32__
+	  // windows doesn't like ':'s
+	  desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
+
+	  if(! c->getUpdateStats().IsEmpty())
+	    {
+	      wxString filename = desktopname + wxT("-FramebufferUpdate-Stats-") + wxNow() + wxT(".txt");
+	      if(! saveArrayString(const_cast<wxArrayString&>(c->getUpdateStats()), filename))
+		wxLogError(_("Could not autosave framebuffer update statistics!"));
+	    }
+	  
+	  if(! c->getLatencyStats().IsEmpty())
+	    {
+	      wxString filename = desktopname + wxT("-PointerLatency-Stats-") + wxNow() + wxT(".txt");
+	      if(! saveArrayString(const_cast<wxArrayString&>(c->getLatencyStats()), filename))
+		wxLogError(_("Could not autosave pointer latency statistics!"));
+	    }
+
+	  
+	}
+    }
+ 
+
+  for(int i = connections.size()-1; i >= 0; --i)
+    terminate_conn(i);
 
   delete servscan;
 }
@@ -264,10 +296,16 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 {
   wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + _T("..."));
   wxBusyCursor busy;
-  
+
+  // get connection settings
+  int compresslevel, quality;
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
+  pConfig->Read(K_QUALITY, &quality, V_QUALITY);
+
 
   VNCConn* c = new VNCConn(this);
-  if(!c->Init(addr + wxT(":") + port, getpasswd))
+  if(!c->Init(addr + wxT(":") + port, getpasswd, compresslevel, quality))
     {
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
@@ -512,11 +550,12 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
   if(dialog_settings.ShowModal() == wxID_OK)
     {
       wxConfigBase *pConfig = wxConfigBase::Get();      
+      pConfig->Write(K_COMPRESSLEVEL, dialog_settings.getCompressLevel());
+      pConfig->Write(K_QUALITY, dialog_settings.getQuality());
+      pConfig->Write(K_STATSAUTOSAVE, dialog_settings.getStatsAutosave());
+      pConfig->Write(K_LOGSAVETOFILE, dialog_settings.getLogSavetofile());
 
-      
-      //pConfig->Write(K_CUSTOMVIEWER, dialog_settings.getViewer());
-
-      //read_config();
+      VNCConn::doLogfile(dialog_settings.getLogSavetofile());
     }
 }
 

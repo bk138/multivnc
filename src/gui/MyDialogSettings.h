@@ -3,35 +3,24 @@
 #ifndef MYDIALOGSETTINGS_H
 #define MYDIALOGSETTINGS_H
 
-#include "wx/wxprec.h"
-#ifndef WX_PRECOMP
-#include "wx/wx.h"
-#endif
 
-#include "wx/propdlg.h"
+#include "DialogSettings.h"
 
 
-class MyDialogSettings: public wxPropertySheetDialog
+class MyDialogSettings: public DialogSettings
 {
-  wxRadioBox *clientChoice;
-  wxTextCtrl *customClientRConly;
-  wxTextCtrl *customClientViewer;
-
-
-  wxPanel* CreateClientSettingsPage(wxWindow* parent);
 
 public:
  
-
- 
-  
   MyDialogSettings(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
-
 
   ~MyDialogSettings();
   
-   
- 
+  int getCompressLevel() const { return slider_compresslevel->GetValue(); };
+  int getQuality() const { return slider_quality->GetValue(); };
+  bool getStatsAutosave() const { return checkbox_stats_save->GetValue(); };
+  bool getLogSavetofile() const { return checkbox_logfile->GetValue(); };
+  
 };
 
 

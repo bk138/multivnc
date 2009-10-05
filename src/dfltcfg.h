@@ -6,7 +6,7 @@
 #define CONFIG_H
 
 
-// client stuff
+// gui stuff
 #define K_SHOWTOOLBAR _T("ShowToolbar")
 #define V_SHOWTOOLBAR true
 #define K_SHOWDISCOVERED _T("ShowZeroConf")
@@ -19,6 +19,21 @@
 #define V_SIZE_X 800
 #define K_SIZE_Y _T("SizeY")
 #define V_SIZE_Y 600
+
+// connection settings
+#define K_COMPRESSLEVEL wxT("CompressLevel")
+#define V_COMPRESSLEVEL 1
+#define K_QUALITY wxT("Quality")
+#define V_QUALITY 5
+
+// logging
+#define K_LOGSAVETOFILE wxT("LogFile")
+#define V_LOGSAVETOFILE false
+
+// stats settings
+#define K_STATSAUTOSAVE wxT("StatsAutosave")
+#define V_STATSAUTOSAVE false
+
 
 
 #endif // CONFIG_H

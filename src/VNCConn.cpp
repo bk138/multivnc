@@ -345,6 +345,7 @@ void VNCConn::got_selection(rfbClient *cl, const char *text, int len)
 // called the logger function :-(
 wxArrayString VNCConn::log;
 wxCriticalSection VNCConn::mutex_log;
+bool VNCConn::do_logfile;
 
 void VNCConn::logger(const char *format, ...)
 {
@@ -361,16 +362,6 @@ void VNCConn::logger(const char *format, ...)
   // since we're accessing some global things here from different threads
   wxCriticalSectionLocker lock(mutex_log);
 
-  // delete logfile on program startup
-  static bool firstrun = 1;
-  if(firstrun)
-    {
-      remove(logfile_str.char_str());
-      firstrun = 0;
-    }
-
-  logfile=fopen(logfile_str.char_str(),"a");
-
   time(&log_clock);
   wxStrftime(timebuf, WXSIZEOF(timebuf), _T("%d/%m/%Y %X "), localtime(&log_clock));
 
@@ -382,19 +373,31 @@ void VNCConn::logger(const char *format, ...)
   va_end(args);
 
   // global log file
-  va_start(args, format);
-  fprintf(logfile, wxString(timebuf).mb_str());
-  vfprintf(logfile, format, args);
-  va_end(args);
+  if(do_logfile)
+    {
+      // delete logfile on program startup
+      static bool firstrun = 1;
+      if(firstrun)
+	{
+	  remove(logfile_str.char_str());
+	  firstrun = 0;
+	}
+      
+      logfile=fopen(logfile_str.char_str(),"a");    
+      
+      va_start(args, format);
+      fprintf(logfile, wxString(timebuf).mb_str());
+      vfprintf(logfile, format, args);
+      va_end(args);
+
+      fclose(logfile);
+    }
  
   // and stderr
   va_start(args, format);
   fprintf(stderr, wxString(timebuf).mb_str());
   vfprintf(stderr, format, args);
   va_end(args);
-  
-  
-  fclose(logfile);
 }
 
 
@@ -413,6 +416,7 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
   Shutdown();
   resetStats();
 
+  
   int argc = 6;
   char* argv[argc];
   argv[0] = strdup("VNCConn");

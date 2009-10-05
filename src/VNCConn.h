@@ -54,6 +54,7 @@ class VNCConn: public wxEvtHandler
   // called the logger function :-(
   static wxArrayString log;
   static wxCriticalSection mutex_log;
+  static bool do_logfile;
 
  
   void SendDisconnectNotify();
@@ -79,7 +80,8 @@ public:
   VNCConn(void *parent);
   ~VNCConn(); 
 
-  bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int compresslevel = 1, int quality = 5);
+  bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), 
+	    int compresslevel = 1, int quality = 5);
   bool Shutdown();
 
   bool sendPointerEvent(wxMouseEvent &event);
@@ -104,9 +106,9 @@ public:
  
   // get error string
   const wxString& getErr() const { const wxString& ref = err; return ref; };
-  // get gloabl log string
+  // get global log string
   static const wxArrayString& getLog() { const wxArrayString& ref = log; return ref; };
-
+  static void doLogfile(bool yesno) { do_logfile = yesno; };
 
 };
 
