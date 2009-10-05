@@ -446,7 +446,7 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
   if(! rfbInitClient(cl, &argc, argv))
     {
       cl = 0; //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
-      err.Printf(_("Failure connecting to server!"));
+      err.Printf(_("Failure connecting to server at %s!"),  host.c_str());
       Shutdown();
       return false;
     }
