@@ -41,11 +41,12 @@ class MyFrameMain: public FrameMain
   void splitwinlayout();
 
   bool spawn_conn(wxString& hostname, wxString& addr, wxString& port);
-  void terminate_conn(size_t which);
+  void terminate_conn(int which);
   
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
   void onVNCConnUpdateNotify(wxCommandEvent& event);
+  void onVNCConnFBResizeNotify(wxCommandEvent& event);
   void onVNCConnDisconnectNotify(wxCommandEvent& event);
   void onSDNotify(wxCommandEvent& event);
 

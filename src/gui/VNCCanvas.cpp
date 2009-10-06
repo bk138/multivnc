@@ -26,13 +26,10 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
   conn = c;
   framebuffer_rect.x = 0;
   framebuffer_rect.y = 0;
-  framebuffer_rect.width = c->getFrameBufferWidth();
-  framebuffer_rect.height = c->getFrameBufferHeight();
-
-  SetVirtualSize(framebuffer_rect.width, framebuffer_rect.height);
+  adjustSize(); // this sets width and height of both the rect and the canvas according to conn
+ 
   SetScrollRate(VNCCANVAS_SCROLL_RATE, VNCCANVAS_SCROLL_RATE);
  
-
   // this kinda cursor creation works everywhere
   wxBitmap vnccursor_bitmap(vnccursor_bits, 16, 16);
   wxBitmap vnccursor_mask_bitmap(vnccursor_mask, 16, 16);
@@ -154,3 +151,21 @@ void VNCCanvas::drawRegion(wxRect& rect)
   dc.DrawBitmap(region, rect.x, rect.y);
 }
 
+
+
+void VNCCanvas::adjustSize()
+{
+  wxLogDebug(wxT("VNCCanvas %p: adjusting size to (%i, %i)"),
+	     this,
+	     conn->getFrameBufferWidth(),
+	     conn->getFrameBufferHeight());
+
+  ClearBackground();
+  Refresh();
+
+  framebuffer_rect.width = conn->getFrameBufferWidth();
+  framebuffer_rect.height = conn->getFrameBufferHeight();
+
+  SetSize(framebuffer_rect.width, framebuffer_rect.height);
+  SetVirtualSize(framebuffer_rect.width, framebuffer_rect.height);
+}

@@ -23,6 +23,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
   EVT_COMMAND (wxID_ANY, VNCConnUpdateNOTIFY, MyFrameMain::onVNCConnUpdateNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnFBResizeNOTIFY, MyFrameMain::onVNCConnFBResizeNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_TIMER   (wxID_ANY, MyFrameMain::onStatsTimer)
 END_EVENT_TABLE()
@@ -187,6 +188,19 @@ void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
 
 
 
+void MyFrameMain::onVNCConnFBResizeNotify(wxCommandEvent& event)
+{
+  // only process currently selected connection
+  VNCConn* c = connections.at(notebook_connections->GetSelection());
+  if(c == event.GetEventObject())
+    {
+      VNCCanvas* canvas = static_cast<VNCCanvas*>(notebook_connections->GetCurrentPage());
+      canvas->adjustSize();
+    }
+}
+
+
+
 void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 {
   // get sender
@@ -196,14 +210,14 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
  
   wxArrayString log = VNCConn::getLog();
   // show last 3 log strings
-  for(int i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
+  for(size_t i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
     wxLogMessage(log[i]);
   wxLogMessage( _("Connection to %s:%s terminated."), c->getServerName().c_str(), c->getServerPort().c_str() );
     
   
   // find index of this connection
   vector<VNCConn*>::iterator it = connections.begin();
-  int index = 0;
+  size_t index = 0;
   while(it != connections.end() && *it != c)
     {
       ++it;
@@ -283,7 +297,7 @@ bool MyFrameMain::saveArrayString(wxArrayString& arrstr, wxString& path)
   if(! ostream)
     return false;
 
-  for(int i=0; i < arrstr.GetCount(); ++i)
+  for(size_t i=0; i < arrstr.GetCount(); ++i)
     ostream << arrstr[i].char_str() << endl;
 
   return true;
@@ -313,7 +327,7 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
       // show last 3 log strings
-      for(int i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
+      for(size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
 	wxLogMessage(log[i]);
 
       wxLogError(c->getErr());
@@ -345,7 +359,7 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 }
 
 
-void MyFrameMain::terminate_conn(size_t which)
+void MyFrameMain::terminate_conn(int which)
 {
   if(which == wxNOT_FOUND)
     return;
@@ -746,7 +760,7 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
   text_ctrl_latency->Clear();
 
   // for now, toggle all VNCConn instances
-  for(int i=0; i < connections.size(); ++i)
+  for(size_t i=0; i < connections.size(); ++i)
     connections.at(i)->doStats(show_stats);
 
   splitwinlayout();

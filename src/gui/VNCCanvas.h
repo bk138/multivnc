@@ -35,7 +35,7 @@ public:
   VNCCanvas(wxWindow* parent, VNCConn* c);
 
   void drawRegion(wxRect& rect);
-
+  void adjustSize(); // this sets width and height of both framebuffer_rect and the canvas itself according to conn
 };
 	
 
