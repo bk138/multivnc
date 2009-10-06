@@ -109,6 +109,7 @@ wxThread::ExitCode VNCThread::Entry()
 	  }
      
     }
+  return 0;
 }
 
 
@@ -516,7 +517,7 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
 
 
 
-bool VNCConn::Shutdown()
+void VNCConn::Shutdown()
 {
   wxLogDebug(wxT("VNCConn %p: Shutdown()"), this);
 

@@ -84,7 +84,7 @@ public:
 
   bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), 
 	    int compresslevel = 1, int quality = 5);
-  bool Shutdown();
+  void Shutdown();
 
   bool sendPointerEvent(wxMouseEvent &event);
   bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
