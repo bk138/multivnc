@@ -1,10 +1,11 @@
 
 #include <cstdarg>
 #include <csignal>
-#include "wx/intl.h"
-#include "wx/log.h"
-#include "wx/thread.h"
-#include "wx/socket.h"
+#include <wx/intl.h>
+#include <wx/log.h>
+#include <wx/thread.h>
+#include <wx/socket.h>
+
 
 #include "VNCConn.h"
 
@@ -22,6 +23,7 @@
 DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
+DEFINE_EVENT_TYPE(VNCConnCuttextNOTIFY) 
 
 // pixelformat defaults
 // seems 8,3,4 and 5,3,2 are possible with rfbGetClient()
@@ -244,6 +246,16 @@ void VNCConn::SendFBResizeNotify()
 
 
 
+void VNCConn::SendCuttextNotify()
+{
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnCuttextNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
 
 
 void VNCConn::onUpdatesCountTimer(wxTimerEvent& event)
@@ -364,9 +376,15 @@ void VNCConn::textchat(rfbClient* cl, int value, char *text)
 }
 
 
-void VNCConn::got_selection(rfbClient *cl, const char *text, int len)
+void VNCConn::got_cuttext(rfbClient *cl, const char *text, int len)
 {
-  VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID); 
+  VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
+
+  wxLogDebug(wxT("VNCConn %p: got cuttext: '%s'"), conn, wxString(text, wxConvUTF8).c_str());
+
+  wxCriticalSectionLocker lock(conn->mutex_cuttext); // since cuttext can also be set from the main thread
+  conn->cuttext = wxString(text, wxConvUTF8);
+  conn->SendCuttextNotify();
 }
 
 
@@ -446,7 +464,6 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
   Shutdown();
   resetStats();
 
-  
   int argc = 6;
   char* argv[argc];
   argv[0] = strdup("VNCConn");
@@ -469,7 +486,7 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
   cl->GetPassword = getpasswdfunc;
   cl->HandleKeyboardLedState = kbd_leds;
   cl->HandleTextChat = textchat;
-  cl->GotXCutText = got_selection;
+  cl->GotXCutText = got_cuttext;
 
   cl->canHandleNewFBSize = TRUE;
   
@@ -578,6 +595,11 @@ bool VNCConn::sendPointerEvent(wxMouseEvent &event)
   if(event.GetWheelRotation() < 0)
     buttonmask |= rfbWheelDownMask;
 
+  if(event.Entering() && ! cuttext.IsEmpty())
+    {
+      wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), this, cuttext.c_str());
+      SendClientCutText(cl, cuttext.char_str(), cuttext.Length());
+    }
 
   if(do_stats)
     {

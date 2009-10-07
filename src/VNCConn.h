@@ -17,7 +17,7 @@
 DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
-
+DECLARE_EVENT_TYPE(VNCConnCuttextNOTIFY, -1) 
 
 class VNCConn: public wxEvtHandler
 {
@@ -34,6 +34,10 @@ class VNCConn: public wxEvtHandler
   // complete framebuffer
   wxBitmap* framebuffer;
   wxAlphaPixelData* fb_data;
+
+  // this contains cuttext we received or should send
+  wxString cuttext;
+  wxCriticalSection mutex_cuttext;
 
   // statistics
   bool do_stats;
@@ -57,12 +61,13 @@ class VNCConn: public wxEvtHandler
   static wxCriticalSection mutex_log;
   static bool do_logfile;
 
- 
+  // event dispatchers
   void SendDisconnectNotify();
   // NB: this sets the event's clientdata ptr a newly created wRect 
   // which MUST be freed by its receiver!!!
   void SendUpdateNotify(int x, int y, int w, int h);
   void SendFBResizeNotify();
+  void SendCuttextNotify();
 
 
   //callbacks
@@ -70,7 +75,7 @@ class VNCConn: public wxEvtHandler
   static void got_update(rfbClient* cl,int x,int y,int w,int h);
   static void kbd_leds(rfbClient* cl, int value, int pad);
   static void textchat(rfbClient* cl, int value, char *text);
-  static void got_selection(rfbClient *cl, const char *text, int len);
+  static void got_cuttext(rfbClient *cl, const char *text, int len);
   static void logger(const char *format, ...);
 
 
@@ -96,6 +101,10 @@ public:
   // get stats, in format "timestamp, value"
   const wxArrayString& getUpdateStats() const { const wxArrayString& ref = updates; return ref; };
   const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
+
+  // cuttext
+  const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
+  void setCuttext(const wxString& text) { wxCriticalSectionLocker lock(mutex_cuttext); cuttext = text; };
 
   wxBitmap getFrameBufferRegion(const wxRect& region) const;
   int getFrameBufferWidth() const;
