@@ -1,24 +1,379 @@
-2007-12-28  Johannes Schmid,,,  <jhs@idefix>
+------------------------------------------------------------------------
+r70 | bk138 | 2009-10-07 16:34:03 +0200 (Mi, 07. Okt 2009) | 2 lines
 
-	reviewed by: <delete if not using a buddy>
+implement VNCConn cuttext support.
 
-	* project.anjuta:
+------------------------------------------------------------------------
+r69 | bk138 | 2009-10-06 18:54:54 +0200 (Di, 06. Okt 2009) | 4 lines
 
-2007-12-23  Johannes Schmid,,,  <jhs@idefix>
+framebuffer resize functionality for main frame and canvas.
 
-	reviewed by: <delete if not using a buddy>
+also fix some warnings in MyFrameMain.cpp.
 
-	* src/Makefile.am.tpl:
+------------------------------------------------------------------------
+r68 | bk138 | 2009-10-06 02:00:35 +0200 (Di, 06. Okt 2009) | 2 lines
 
-2007-12-23  Johannes Schmid,,,  <jhs@idefix>
+silence warnings.
 
-	reviewed by: <delete if not using a buddy>
+------------------------------------------------------------------------
+r67 | bk138 | 2009-10-06 01:53:24 +0200 (Di, 06. Okt 2009) | 2 lines
 
-	* src/Makefile.am.tpl:
+exclude unused parameters in compiler warnings.
 
-There is no reference pot file in this directory.
-Make sure you are running status.pl in a po directory.
-...... Aborting.
-There is no reference pot file in this directory.
-Make sure you are running status.pl in a po directory.
-...... Aborting.
+------------------------------------------------------------------------
+r66 | bk138 | 2009-10-06 01:24:41 +0200 (Di, 06. Okt 2009) | 2 lines
+
+add -Wall and -Wextra to CXXFLAGS in debug build.
+
+------------------------------------------------------------------------
+r65 | bk138 | 2009-10-06 00:14:13 +0200 (Di, 06. Okt 2009) | 2 lines
+
+framebuffer resize support in VNCConn.
+
+------------------------------------------------------------------------
+r64 | bk138 | 2009-10-05 21:12:04 +0200 (Mo, 05. Okt 2009) | 2 lines
+
+fill in port if empty.
+
+------------------------------------------------------------------------
+r63 | bk138 | 2009-10-05 21:11:39 +0200 (Mo, 05. Okt 2009) | 2 lines
+
+VNCConn: be a bit more talkative in error case.
+
+------------------------------------------------------------------------
+r62 | bk138 | 2009-10-05 21:02:37 +0200 (Mo, 05. Okt 2009) | 2 lines
+
+add functionality to specify host(s) on commandline.
+
+------------------------------------------------------------------------
+r61 | bk138 | 2009-10-05 16:38:31 +0200 (Mo, 05. Okt 2009) | 2 lines
+
+implement settings dialog and some settings.
+
+------------------------------------------------------------------------
+r60 | bk138 | 2009-10-03 18:07:04 +0200 (Sa, 03. Okt 2009) | 4 lines
+
+greatly simplify log frame.
+
+we now use a timer instead of a thread.
+
+------------------------------------------------------------------------
+r59 | bk138 | 2009-10-03 17:02:58 +0200 (Sa, 03. Okt 2009) | 2 lines
+
+use miliseconds since Init() in stats instead of wxNow().
+
+------------------------------------------------------------------------
+r58 | bk138 | 2009-10-02 17:44:26 +0200 (Fr, 02. Okt 2009) | 2 lines
+
+add functionality to save statistics.
+
+------------------------------------------------------------------------
+r57 | bk138 | 2009-10-02 17:18:09 +0200 (Fr, 02. Okt 2009) | 2 lines
+
+update to newest libvnclient from git master.
+
+------------------------------------------------------------------------
+r56 | bk138 | 2009-10-01 22:30:49 +0200 (Do, 01. Okt 2009) | 5 lines
+
+delete all connections on frame destroy.
+
+terminate_conn resizes the connection vector!
+
+
+------------------------------------------------------------------------
+r55 | bk138 | 2009-10-01 22:12:35 +0200 (Do, 01. Okt 2009) | 2 lines
+
+first stab at statistics for VNC connections.
+
+------------------------------------------------------------------------
+r54 | bk138 | 2009-09-29 21:49:38 +0200 (Di, 29. Sep 2009) | 2 lines
+
+minor gui tweak: better label.
+
+------------------------------------------------------------------------
+r53 | bk138 | 2009-09-29 15:53:34 +0200 (Di, 29. Sep 2009) | 2 lines
+
+remove unused code.
+
+------------------------------------------------------------------------
+r52 | bk138 | 2009-09-28 19:14:11 +0200 (Mo, 28. Sep 2009) | 2 lines
+
+fix keyboard input for windows.
+
+------------------------------------------------------------------------
+r51 | bk138 | 2009-09-28 17:48:05 +0200 (Mo, 28. Sep 2009) | 2 lines
+
+some gui tweaks, remember window size.
+
+------------------------------------------------------------------------
+r50 | bk138 | 2009-09-28 16:45:38 +0200 (Mo, 28. Sep 2009) | 2 lines
+
+update help text.
+
+------------------------------------------------------------------------
+r49 | bk138 | 2009-09-28 16:36:16 +0200 (Mo, 28. Sep 2009) | 2 lines
+
+implement keyboard input.
+
+------------------------------------------------------------------------
+r48 | bk138 | 2009-09-25 21:08:54 +0200 (Fr, 25. Sep 2009) | 2 lines
+
+further tweaking of VNC cursor.
+
+------------------------------------------------------------------------
+r47 | bk138 | 2009-09-25 14:51:28 +0200 (Fr, 25. Sep 2009) | 2 lines
+
+implement VNC-style cursor.
+
+------------------------------------------------------------------------
+r46 | bk138 | 2009-09-24 21:34:14 +0200 (Do, 24. Sep 2009) | 2 lines
+
+implement mouse input.
+
+------------------------------------------------------------------------
+r45 | bk138 | 2009-09-24 16:55:53 +0200 (Do, 24. Sep 2009) | 4 lines
+
+fix getFrameBufferRegion() for windows.
+
+btw, make some getters return non-const strings.
+
+------------------------------------------------------------------------
+r44 | bk138 | 2009-09-23 14:59:20 +0200 (Mi, 23. Sep 2009) | 2 lines
+
+some misc and layout fixes for windows.
+
+------------------------------------------------------------------------
+r43 | bk138 | 2009-09-23 01:26:54 +0200 (Mi, 23. Sep 2009) | 2 lines
+
+split out VNCCanvas class into seperate files.
+
+------------------------------------------------------------------------
+r42 | bk138 | 2009-09-23 01:11:06 +0200 (Mi, 23. Sep 2009) | 2 lines
+
+change to no-timestamp-mode of wxglade.
+
+------------------------------------------------------------------------
+r41 | bk138 | 2009-09-22 17:16:54 +0200 (Di, 22. Sep 2009) | 2 lines
+
+sync withg wxServDisc svn. MDNS lookups are now fast again.
+
+------------------------------------------------------------------------
+r40 | bk138 | 2009-09-20 19:27:56 +0200 (So, 20. Sep 2009) | 2 lines
+
+':' is not allowed in windows filenames.
+
+------------------------------------------------------------------------
+r39 | bk138 | 2009-09-20 17:03:10 +0200 (So, 20. Sep 2009) | 5 lines
+
+work around an issue with wxFileSelector.
+
+this would cause a signal to be generated, which in turn would
+make the WaitforMessage() call fail.
+
+------------------------------------------------------------------------
+r38 | bk138 | 2009-09-20 16:58:12 +0200 (So, 20. Sep 2009) | 2 lines
+
+implement screenshot function.
+
+------------------------------------------------------------------------
+r37 | bk138 | 2009-09-17 16:51:04 +0200 (Do, 17. Sep 2009) | 2 lines
+
+use remote desktop name instead of hostname.
+
+------------------------------------------------------------------------
+r36 | bk138 | 2009-09-16 18:22:14 +0200 (Mi, 16. Sep 2009) | 2 lines
+
+some layout fixes.
+
+------------------------------------------------------------------------
+r35 | bk138 | 2009-09-16 17:36:16 +0200 (Mi, 16. Sep 2009) | 4 lines
+
+ladies and gentleman: we have something to see!
+
+implement viewer only functionality.
+
+------------------------------------------------------------------------
+r34 | bk138 | 2009-09-15 23:36:17 +0200 (Di, 15. Sep 2009) | 2 lines
+
+add support to specify compresslevel and quality.
+
+------------------------------------------------------------------------
+r33 | bk138 | 2009-09-15 22:05:57 +0200 (Di, 15. Sep 2009) | 5 lines
+
+fix thinko with update notifies.
+
+before, it would only return the last updated region, 
+which obviously is not really what we want...
+
+------------------------------------------------------------------------
+r32 | bk138 | 2009-09-15 20:29:27 +0200 (Di, 15. Sep 2009) | 7 lines
+
+use custom bitmap copy instead of GetSubBitmap().
+
+even on non-windows platforms we have to adjust the alpha
+channel to fully opaque, as libvncclient always sets this 
+to zero and therefore fully transparent, i.e. invisible on
+a wxDC.
+
+------------------------------------------------------------------------
+r31 | bk138 | 2009-09-15 17:51:44 +0200 (Di, 15. Sep 2009) | 2 lines
+
+implement handling of multiple connections.
+
+------------------------------------------------------------------------
+r30 | bk138 | 2009-09-15 17:32:04 +0200 (Di, 15. Sep 2009) | 2 lines
+
+implement getters for server hostname, address and port.
+
+------------------------------------------------------------------------
+r29 | bk138 | 2009-09-15 15:33:46 +0200 (Di, 15. Sep 2009) | 2 lines
+
+make framebuffer dump names host specific.
+
+------------------------------------------------------------------------
+r28 | bk138 | 2009-09-05 19:33:05 +0200 (Sa, 05. Sep 2009) | 2 lines
+
+wait for thread deletion to finish.
+
+------------------------------------------------------------------------
+r27 | bk138 | 2009-09-05 19:28:47 +0200 (Sa, 05. Sep 2009) | 2 lines
+
+simplify save dialog: use wx builtin overwrite prompt.
+
+------------------------------------------------------------------------
+r26 | bk138 | 2009-09-05 18:59:55 +0200 (Sa, 05. Sep 2009) | 2 lines
+
+implement getters for width and height.
+
+------------------------------------------------------------------------
+r25 | bk138 | 2009-09-04 18:57:36 +0200 (Fr, 04. Sep 2009) | 2 lines
+
+implement framebuffer update with proper notification of the main app.
+
+------------------------------------------------------------------------
+r24 | bk138 | 2009-09-02 21:35:06 +0200 (Mi, 02. Sep 2009) | 2 lines
+
+delete service scanner on exit.
+
+------------------------------------------------------------------------
+r23 | bk138 | 2009-09-02 21:31:42 +0200 (Mi, 02. Sep 2009) | 5 lines
+
+add updated wxServDisc module from http://sourceforge.net/projects/wxservdisc
+
+this includes better debug output and some object deletion fixes.
+
+
+------------------------------------------------------------------------
+r22 | bk138 | 2009-09-01 17:22:47 +0200 (Di, 01. Sep 2009) | 2 lines
+
+add another top panel to get rid of grey border under windows.
+
+------------------------------------------------------------------------
+r21 | bk138 | 2009-09-01 14:52:00 +0200 (Di, 01. Sep 2009) | 2 lines
+
+rework debug config a bit so that it applies to a user given wx-config too.
+
+------------------------------------------------------------------------
+r20 | bk138 | 2009-09-01 13:31:36 +0200 (Di, 01. Sep 2009) | 5 lines
+
+change to use stabs debugger format when compiling for windows.
+
+seems gdb under windows mingw only does backtraces with stabs...
+
+
+------------------------------------------------------------------------
+r18 | bk138 | 2009-08-29 15:38:52 +0200 (Sa, 29. Aug 2009) | 2 lines
+
+stat() returns 0 on success! should fix bogus IsUnixSocket() return values.
+
+------------------------------------------------------------------------
+r17 | bk138 | 2009-08-28 15:37:27 +0200 (Fr, 28. Aug 2009) | 2 lines
+
+set button id's properly plus some changes to display properly under win32.
+
+------------------------------------------------------------------------
+r16 | bk138 | 2009-08-28 15:07:13 +0200 (Fr, 28. Aug 2009) | 2 lines
+
+change order of includes. darn windows...
+
+------------------------------------------------------------------------
+r15 | bk138 | 2009-08-27 18:29:42 +0200 (Do, 27. Aug 2009) | 2 lines
+
+add support for doing debug builds.
+
+------------------------------------------------------------------------
+r14 | bk138 | 2009-08-24 16:53:40 +0200 (Mo, 24. Aug 2009) | 5 lines
+
+don't update the gui grom another thread.
+
+we instead post an update event to ourselves. should fix those
+segfaults..
+
+------------------------------------------------------------------------
+r13 | bk138 | 2009-08-24 16:52:06 +0200 (Mo, 24. Aug 2009) | 4 lines
+
+change user info back to 3 lines as this fits into the messagebox.
+
+otherwise the user would have to scroll down to see what happened.
+
+------------------------------------------------------------------------
+r12 | bk138 | 2009-08-22 18:10:57 +0200 (Sa, 22. Aug 2009) | 2 lines
+
+implement proper logging support.
+
+------------------------------------------------------------------------
+r11 | bk138 | 2009-08-11 22:53:00 +0200 (Di, 11. Aug 2009) | 2 lines
+
+make VNCConn::getlog() static.
+
+------------------------------------------------------------------------
+r10 | bk138 | 2009-08-11 22:27:38 +0200 (Di, 11. Aug 2009) | 2 lines
+
+remove debug output, be more verbose when connection terminates.
+
+------------------------------------------------------------------------
+r9 | bk138 | 2009-08-11 22:15:22 +0200 (Di, 11. Aug 2009) | 2 lines
+
+implement starting/stopping VNC connection. nothing to see yet.
+
+------------------------------------------------------------------------
+r8 | bk138 | 2009-08-11 19:21:27 +0200 (Di, 11. Aug 2009) | 2 lines
+
+add jpeglib hints to README.
+
+------------------------------------------------------------------------
+r7 | bk138 | 2009-08-11 18:19:52 +0200 (Di, 11. Aug 2009) | 2 lines
+
+add some hints how to compile to README.
+
+------------------------------------------------------------------------
+r6 | bk138 | 2009-08-06 15:05:17 +0200 (Do, 06. Aug 2009) | 2 lines
+
+mingw32 compile fixes.
+
+------------------------------------------------------------------------
+r5 | bk138 | 2009-08-06 15:03:10 +0200 (Do, 06. Aug 2009) | 2 lines
+
+add some missing checks and macros.
+
+------------------------------------------------------------------------
+r4 | bk138 | 2009-08-04 16:40:32 +0200 (Di, 04. Aug 2009) | 2 lines
+
+properly include libvncclient into build system.
+
+------------------------------------------------------------------------
+r3 | bk138 | 2009-08-02 20:44:18 +0200 (So, 02. Aug 2009) | 2 lines
+
+add libvncclient to source tree.
+
+------------------------------------------------------------------------
+r2 | bk138 | 2009-08-01 18:49:03 +0200 (Sa, 01. Aug 2009) | 2 lines
+
+some cleanup.
+
+------------------------------------------------------------------------
+r1 | bk138 | 2009-08-01 18:38:53 +0200 (Sa, 01. Aug 2009) | 2 lines
+
+initial commit. the gui without noteworthy functionality.
+
+------------------------------------------------------------------------
