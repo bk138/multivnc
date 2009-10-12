@@ -8,18 +8,17 @@
 #include <wx/log.h>
 #include "VNCConn.h"
 
-	
+
+
 /*
-  a scrollable canvas that displays a VNCConn's framebuffer
+  canvas that displays a VNCConn's framebuffer
   and submits mouse and key events.
 
 */
-
-class VNCCanvas: public wxScrolledWindow
+class VNCCanvas: public wxPanel
 {
   VNCConn* conn;
-  wxRect framebuffer_rect;
-
+  //wxRect framebuffer_rect;
 
   void onPaint(wxPaintEvent &event);
   void onMouseAction(wxMouseEvent &event);
@@ -36,6 +35,27 @@ public:
 
   void drawRegion(wxRect& rect);
   void adjustSize(); // this sets width and height of both framebuffer_rect and the canvas itself according to conn
+};
+	
+
+
+
+/*
+  a scrollable container for a VNCCanvas that centers the
+  canvas in itself and takes care of deletion of its assigned 
+  VNCCanvas
+*/
+class VNCCanvasContainer: public wxScrolledWindow
+{
+  VNCCanvas* canvas;
+
+public:
+  VNCCanvasContainer(wxWindow* parent);
+  ~VNCCanvasContainer();
+
+  void setCanvas(VNCCanvas* c);
+  VNCCanvas* getCanvas() const;
+
 };
 	
 

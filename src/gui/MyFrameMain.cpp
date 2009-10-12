@@ -2,7 +2,7 @@
 #include <fstream>
 #include <wx/aboutdlg.h>
 #include <wx/socket.h>
-
+#include <wx/clipbrd.h>
 
 #include "res/about.png.h"
 
@@ -24,6 +24,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
   EVT_COMMAND (wxID_ANY, VNCConnUpdateNOTIFY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnFBResizeNOTIFY, MyFrameMain::onVNCConnFBResizeNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnCuttextNOTIFY, MyFrameMain::onVNCConnCuttextNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_TIMER   (wxID_ANY, MyFrameMain::onStatsTimer)
 END_EVENT_TABLE()
@@ -95,6 +96,16 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       stats_timer.Start(STATS_TIMER_INTERVAL);
     }
 
+  // setup clipboard
+#ifdef __WXGTK__
+  // always use middle mouse button paste
+  if (wxTheClipboard->Open())
+    {
+      wxTheClipboard->UsePrimarySelection(true);
+      wxTheClipboard->Close();
+    }
+#endif  
+  
 
   // theres no log window at startup
   logwindow = 0;
@@ -180,7 +191,7 @@ void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
   if(c == event.GetEventObject())
     {
       wxRect* rect = static_cast<wxRect*>(event.GetClientData());
-      VNCCanvas* canvas = static_cast<VNCCanvas*>(notebook_connections->GetCurrentPage());
+      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
       canvas->drawRegion(*rect);
       delete rect; // avoid memleaks!
     }
@@ -194,10 +205,26 @@ void MyFrameMain::onVNCConnFBResizeNotify(wxCommandEvent& event)
   VNCConn* c = connections.at(notebook_connections->GetSelection());
   if(c == event.GetEventObject())
     {
-      VNCCanvas* canvas = static_cast<VNCCanvas*>(notebook_connections->GetCurrentPage());
+      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
       canvas->adjustSize();
     }
 }
+
+
+
+void MyFrameMain::onVNCConnCuttextNotify(wxCommandEvent& event)
+{ 
+  if (wxTheClipboard->Open())
+    {
+      // get sender
+      VNCConn* c = (VNCConn*)event.GetEventObject();
+      // these data objects are held by the clipboard, so do not delete them in the app.
+      wxTheClipboard->SetData(new wxTextDataObject(c->getCuttext()));
+      wxTheClipboard->Close();
+    }
+}
+
+
 
 
 
@@ -342,8 +369,10 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
   if(show_stats)
     c->doStats(true);
 
-  VNCCanvas* canvas = new VNCCanvas(notebook_connections, c);
-  notebook_connections->AddPage(canvas, c->getDesktopName(), true);
+  VNCCanvasContainer* container = new VNCCanvasContainer(notebook_connections);
+  VNCCanvas* canvas = new VNCCanvas(container, c);
+  container->setCanvas(canvas);
+  notebook_connections->AddPage(container, c->getDesktopName(), true);
 
   wxLogStatus(_("Connected to ") + hostname + _T(":") + port);
 

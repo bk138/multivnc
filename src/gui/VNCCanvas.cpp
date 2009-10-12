@@ -1,18 +1,29 @@
 
 
+#include <wx/sizer.h>
+#include <wx/clipbrd.h>
+#include <wx/dataobj.h>
 #include "VNCCanvas.h"
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 
-BEGIN_EVENT_TABLE(VNCCanvas, wxScrolledWindow)
+
+
+
+/********************************************
+
+  VNCCanvas class
+
+********************************************/
+
+
+BEGIN_EVENT_TABLE(VNCCanvas, wxPanel)
     EVT_PAINT  (VNCCanvas::onPaint)
     EVT_MOUSE_EVENTS (VNCCanvas::onMouseAction)
     EVT_KEY_DOWN (VNCCanvas::onKeyDown)
     EVT_KEY_UP (VNCCanvas::onKeyUp)
     EVT_CHAR (VNCCanvas::onChar)
 END_EVENT_TABLE();
-
-#define VNCCANVAS_SCROLL_RATE 10
 
 
 
@@ -21,14 +32,10 @@ END_EVENT_TABLE();
 */
 
 VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
-  wxScrolledWindow(parent, -1, wxDefaultPosition, wxDefaultSize, wxHSCROLL | wxVSCROLL | wxWANTS_CHARS)
+  wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS)
 {
   conn = c;
-  framebuffer_rect.x = 0;
-  framebuffer_rect.y = 0;
-  adjustSize(); // this sets width and height of both the rect and the canvas according to conn
- 
-  SetScrollRate(VNCCANVAS_SCROLL_RATE, VNCCANVAS_SCROLL_RATE);
+  adjustSize(); 
  
   // this kinda cursor creation works everywhere
   wxBitmap vnccursor_bitmap(vnccursor_bits, 16, 16);
@@ -50,44 +57,23 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 {
   wxPaintDC dc(this);
 
-  // find out where the window is scrolled to
-  static int rx, ry;                    
-  GetViewStart(&rx, &ry);
-  rx *= VNCCANVAS_SCROLL_RATE;
-  ry *= VNCCANVAS_SCROLL_RATE;
-
-  
   // get the update rect list
   wxRegionIterator upd(GetUpdateRegion()); 
   while(upd)
     {
-      wxRect viewport_rect(upd.GetRect());
+      wxRect update_rect(upd.GetRect());
      
-      wxLogDebug(wxT("VNCCanvas %p: got repaint event: on screen (%i,%i,%i,%i)"),
+      wxLogDebug(wxT("VNCCanvas %p: got repaint event: (%i,%i,%i,%i)"),
 		 this,
-		 viewport_rect.x,
-		 viewport_rect.y,
-		 viewport_rect.width,
-		 viewport_rect.height);
-
-      wxRect fromframebuffer_rect = viewport_rect;
-      fromframebuffer_rect.x += rx;
-      fromframebuffer_rect.y += ry;
-      fromframebuffer_rect.Intersect(framebuffer_rect);
+		 update_rect.x,
+		 update_rect.y,
+		 update_rect.width,
+		 update_rect.height);
       
-      wxLogDebug(wxT("VNCCanvas %p: got repaint event: in framebuffer (%i,%i,%i,%i)"),
-		 this,
-		 fromframebuffer_rect.x,
-		 fromframebuffer_rect.y,
-		 fromframebuffer_rect.width,
-		 fromframebuffer_rect.height);
-      
-      if(! fromframebuffer_rect.IsEmpty())
-	{
-      	  wxBitmap region = conn->getFrameBufferRegion(fromframebuffer_rect);
-	  dc.DrawBitmap(region, viewport_rect.x, viewport_rect.y);
-	}
-
+    
+      wxBitmap region = conn->getFrameBufferRegion(update_rect);
+      dc.DrawBitmap(region, update_rect.x, update_rect.y);
+	
       ++upd;
     }
 }
@@ -100,13 +86,23 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 void VNCCanvas::onMouseAction(wxMouseEvent &event)
 {
   if(event.Entering())
-    SetFocus();
-
-  wxClientDC dc(this);
-  PrepareDC(dc);
-
-  event.m_x = dc.DeviceToLogicalX(event.m_x);
-  event.m_y = dc.DeviceToLogicalY(event.m_y);
+    {
+      SetFocus();
+      
+      // read clipboard and set VNCConn cuttext accordingly
+      if (wxTheClipboard->Open())
+	{
+	  if(wxTheClipboard->IsSupported(wxDF_TEXT))
+	    {
+	      wxTextDataObject data;
+	      wxTheClipboard->GetData(data);
+	      wxString text = data.GetText();
+	      wxLogDebug(wxT("VNCCanvas %p: setting cuttext: '%s'"), this, text.c_str());
+	      conn->setCuttext(text);
+	    }
+	  wxTheClipboard->Close();
+	}
+    }
 
   conn->sendPointerEvent(event);
 }
@@ -146,7 +142,6 @@ void VNCCanvas::drawRegion(wxRect& rect)
 	     rect.height);
 
   wxClientDC dc(this);
-  DoPrepareDC(dc); // this adjusts coordinates when window is scrolled
   wxBitmap region = conn->getFrameBufferRegion(rect);
   dc.DrawBitmap(region, rect.x, rect.y);
 }
@@ -160,12 +155,62 @@ void VNCCanvas::adjustSize()
 	     conn->getFrameBufferWidth(),
 	     conn->getFrameBufferHeight());
 
-  ClearBackground();
-  Refresh();
+  // SetSize() isn't enough...
+  SetInitialSize(wxSize(conn->getFrameBufferWidth(), conn->getFrameBufferHeight()));
 
-  framebuffer_rect.width = conn->getFrameBufferWidth();
-  framebuffer_rect.height = conn->getFrameBufferHeight();
+  CentreOnParent();
+}
 
-  SetSize(framebuffer_rect.width, framebuffer_rect.height);
-  SetVirtualSize(framebuffer_rect.width, framebuffer_rect.height);
+
+
+
+
+
+/********************************************
+
+  VNCCanvasContainer class
+
+********************************************/
+
+#define VNCCANVASCONTAINER_SCROLL_RATE 10
+
+
+/*
+  constructor/destructor
+ */
+
+VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
+  wxScrolledWindow(parent)
+{
+  canvas = 0;
+  SetScrollRate(VNCCANVASCONTAINER_SCROLL_RATE, VNCCANVASCONTAINER_SCROLL_RATE);
+  SetSizer(new wxBoxSizer(wxHORIZONTAL));
+}
+
+
+
+
+VNCCanvasContainer::~VNCCanvasContainer()
+{
+  if(canvas)
+    delete canvas;
+}
+
+
+
+
+void VNCCanvasContainer::setCanvas(VNCCanvas* c)
+{
+  canvas = c;
+
+  wxBoxSizer* sizer_vert = new wxBoxSizer(wxVERTICAL);
+  sizer_vert->Add(c, 3, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+  GetSizer()->Add(sizer_vert, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+}
+
+
+
+VNCCanvas* VNCCanvasContainer::getCanvas() const
+{
+  return canvas;
 }
