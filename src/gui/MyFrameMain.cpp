@@ -839,7 +839,7 @@ void MyFrameMain::help_about(wxCommandEvent &event)
 
 void MyFrameMain::help_contents(wxCommandEvent &e)
 {
-  wxLogMessage(_("If there VNC servers advertising themselves via ZeroConf, you can select a host in the 'Available Servers' list. Otherwise, use the 'Connect' button or menu item."));
+  wxLogMessage(_("If there are VNC servers advertising themselves via ZeroConf, you can select a host in the 'Available VNC Servers' list. Otherwise, use the 'Connect' button or menu item."));
 }
 
 
