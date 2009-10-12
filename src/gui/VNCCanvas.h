@@ -18,7 +18,6 @@
 class VNCCanvas: public wxPanel
 {
   VNCConn* conn;
-  //wxRect framebuffer_rect;
 
   void onPaint(wxPaintEvent &event);
   void onMouseAction(wxMouseEvent &event);
@@ -34,7 +33,7 @@ public:
   VNCCanvas(wxWindow* parent, VNCConn* c);
 
   void drawRegion(wxRect& rect);
-  void adjustSize(); // this sets width and height of both framebuffer_rect and the canvas itself according to conn
+  void adjustSize(); 
 };
 	
 
