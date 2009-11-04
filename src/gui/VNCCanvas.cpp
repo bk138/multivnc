@@ -55,6 +55,9 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
 void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 {
+  if(GetSize().GetWidth() == 0 || GetSize().GetHeight() == 0)
+    return;
+
   wxPaintDC dc(this);
 
   // get the update rect list
