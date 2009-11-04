@@ -87,8 +87,24 @@ public:
   VNCConn(void *parent);
   ~VNCConn(); 
 
-  bool Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), 
-	    int compresslevel = 1, int quality = 5);
+  /*
+    to make a connection, call
+    Setup(), then
+    Listen() (optional), then
+    Init(), then
+    Shutdown, then
+    Cleanup()
+    
+    NB: If Init() fails, you have to call Setup() again!
+
+    The semantic counterparts are:
+       Setup() <-> Cleanup()
+       Init()  <-> Shutdown()
+  */
+  bool Setup(char* (*getpasswdfunc)(rfbClient*));
+  void Cleanup();
+  bool Listen();
+  bool Init(const wxString& host, int compresslevel = 1, int quality = 5);
   void Shutdown();
 
   bool sendPointerEvent(wxMouseEvent &event);

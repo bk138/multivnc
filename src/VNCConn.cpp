@@ -169,6 +169,7 @@ VNCConn::VNCConn(void* p)
 VNCConn::~VNCConn()
 {
   Shutdown();
+  Cleanup();
 }
 
 
@@ -457,11 +458,66 @@ void VNCConn::logger(const char *format, ...)
   public members
 */
 
-
-bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int compresslevel, int quality)
+bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
 {
-  // clean up before doing new connection
-  Shutdown();
+  wxLogDebug(wxT("VNCConn %p: Setup()"), this);
+
+  if(cl) // already set up
+    {
+      wxLogDebug(wxT("VNCConn %p: Setup already done. Call Cleanup() first!"), this);
+      return false;
+    }
+
+  // this takes (int bitsPerSample,int samplesPerPixel, int bytesPerPixel) 
+  // 5,3,2 and 8,3,4 seem possible
+  cl=rfbGetClient(BITSPERSAMPLE, SAMPLESPERPIXEL, BYTESPERPIXEL);
+ 
+  rfbClientSetClientData(cl, VNCCONN_OBJ_ID, this); 
+ 
+  // callbacks
+  cl->MallocFrameBuffer = alloc_framebuffer;
+  cl->GotFrameBufferUpdate = got_update;
+  cl->GetPassword = getpasswdfunc;
+  cl->HandleKeyboardLedState = kbd_leds;
+  cl->HandleTextChat = textchat;
+  cl->GotXCutText = got_cuttext;
+
+  cl->canHandleNewFBSize = TRUE;
+  
+  return true;
+}
+
+
+void VNCConn::Cleanup()
+{
+  if(cl)
+    {
+      wxLogDebug(wxT( "VNCConn %p: Cleanup() before client cleanup"), this);
+      rfbClientCleanup(cl);
+      cl = 0;
+      wxLogDebug(wxT( "VNCConn %p: Cleanup() after client cleanup"), this);
+    }
+}
+
+
+bool VNCConn::Listen()
+{
+  //return listenForIncomingConnectionsNoFork(cl, -1);
+  return true;
+}
+
+
+bool VNCConn::Init(const wxString& host, int compresslevel, int quality)
+{
+  wxLogDebug(wxT("VNCConn %p: Init()"), this);
+
+  if(fb_data || framebuffer || vncthread)
+    {
+      wxLogDebug(wxT("VNCConn %p: Init() already done. Call Shutdown() first!"), this);
+      return false;
+    }
+
+  // reset stats before doing new connection
   resetStats();
 
   int argc = 6;
@@ -473,27 +529,12 @@ bool VNCConn::Init(const wxString& host, char* (*getpasswdfunc)(rfbClient*), int
   argv[4] = strdup("-quality");
   argv[5] = strdup((wxString() << quality).mb_str());
   
-   
-  // this takes (int bitsPerSample,int samplesPerPixel, int bytesPerPixel) 
-  // 5,3,2 and 8,3,4 seem possible
-  cl=rfbGetClient(BITSPERSAMPLE, SAMPLESPERPIXEL, BYTESPERPIXEL);
-
-  rfbClientSetClientData(cl, VNCCONN_OBJ_ID, this); 
-  
-  // callbacks
-  cl->MallocFrameBuffer = alloc_framebuffer;
-  cl->GotFrameBufferUpdate = got_update;
-  cl->GetPassword = getpasswdfunc;
-  cl->HandleKeyboardLedState = kbd_leds;
-  cl->HandleTextChat = textchat;
-  cl->GotXCutText = got_cuttext;
-
-  cl->canHandleNewFBSize = TRUE;
   
   if(! rfbInitClient(cl, &argc, argv))
     {
       cl = 0; //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
       err.Printf(_("Failure connecting to server at %s!"),  host.c_str());
+      wxLogDebug(wxT("VNCConn %p: Init() failed. Cleanup by library."), this);
       Shutdown();
       return false;
     }
@@ -554,10 +595,12 @@ void VNCConn::Shutdown()
   
   if(cl)
     {
-      wxLogDebug(wxT( "VNCConn %p: Shutdown() before client cleanup"), this);
-      rfbClientCleanup(cl);
-      cl = 0;
-      wxLogDebug(wxT( "VNCConn %p: Shutdown() after client cleanup"), this);
+      wxLogDebug(wxT( "VNCConn %p: Shutdown() closing connection"), this);
+#ifdef __WIN32__
+      closesocket(cl->sock);
+#else
+      close(cl->sock);
+#endif
     }
 
   if(fb_data)

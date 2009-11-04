@@ -349,7 +349,8 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
 
 
   VNCConn* c = new VNCConn(this);
-  if(!c->Init(addr + wxT(":") + port, getpasswd, compresslevel, quality))
+  c->Setup(getpasswd);
+  if(!c->Init(addr + wxT(":") + port, compresslevel, quality))
     {
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
