@@ -70,6 +70,7 @@ protected:
 
 public:
     virtual void machine_connect(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_listen(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_disconnect(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_showlog(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_preferences(wxCommandEvent &event); // wxGlade: <event_handler>

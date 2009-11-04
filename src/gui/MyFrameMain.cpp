@@ -26,6 +26,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnFBResizeNOTIFY, MyFrameMain::onVNCConnFBResizeNotify)
   EVT_COMMAND (wxID_ANY, VNCConnCuttextNOTIFY, MyFrameMain::onVNCConnCuttextNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
   EVT_TIMER   (wxID_ANY, MyFrameMain::onStatsTimer)
 END_EVENT_TABLE()
 
@@ -65,13 +66,13 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     it skips '&' characters,  but GTK uses '_' for accelerators and 
     these are not trimmed...
   */
-  // "discconnect"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+  // "disconnect"
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(false);
   // "screenshot"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
   // stats
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
 
   if(show_toolbar)
      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
@@ -263,12 +264,39 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
   if(connections.size() == 0) // nothing to end
     {
       // "end connection"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(false);
       // "screenshot"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
     }
 }
 
+
+
+
+void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
+{ 
+  wxLogStatus(_("Incoming Connection."));
+
+  // get sender
+  VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
+
+  // get connection settings
+  int compresslevel, quality;
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
+  pConfig->Read(K_QUALITY, &quality, V_QUALITY);
+
+  if(!c->Init(wxEmptyString, compresslevel, quality))
+    {
+      wxLogStatus( _("Connection failed."));
+      wxArrayString log = VNCConn::getLog();
+      // show last 3 log strings
+      for(size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
+	wxLogMessage(log[i]);
+      
+      wxLogError(c->getErr());
+    }
+}
 
 
 void MyFrameMain::onSDNotify(wxCommandEvent& event)
@@ -333,13 +361,13 @@ bool MyFrameMain::saveArrayString(wxArrayString& arrstr, wxString& path)
 
 
 // connection initiation and shutdown
-bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
+bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxString port)
 {
+  wxBusyCursor busy;
+  
   if(port.IsEmpty())
     port = wxT("5900");
 
-  wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + _T("..."));
-  wxBusyCursor busy;
 
   // get connection settings
   int compresslevel, quality;
@@ -347,22 +375,34 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
 
-
   VNCConn* c = new VNCConn(this);
   c->Setup(getpasswd);
-  if(!c->Init(addr + wxT(":") + port, compresslevel, quality))
+
+  if(listen)
     {
-      wxLogStatus( _("Connection failed."));
-      wxArrayString log = VNCConn::getLog();
-      // show last 3 log strings
-      for(size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
-	wxLogMessage(log[i]);
-
-      wxLogError(c->getErr());
-
-      delete c;
-
-      return false;
+      wxLogStatus(_("Listening on port ") + port + wxT(" ..."));
+      if(!c->Listen(wxAtoi(port)))
+	{
+	  wxLogError(c->getErr());
+	  delete c;
+	  return false;
+	}
+    }
+  else // normal init without previous listen
+    {
+      wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
+      if(!c->Init(addr + wxT(":") + port, compresslevel, quality))
+	{
+	  wxLogStatus( _("Connection failed."));
+	  wxArrayString log = VNCConn::getLog();
+	  // show last 3 log strings
+	  for(size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
+	    wxLogMessage(log[i]);
+	  
+	  wxLogError(c->getErr());
+	  delete c;
+	  return false;
+	}
     }
   
   connections.push_back(c);
@@ -373,17 +413,19 @@ bool MyFrameMain::spawn_conn(wxString& hostname, wxString& addr, wxString& port)
   VNCCanvasContainer* container = new VNCCanvasContainer(notebook_connections);
   VNCCanvas* canvas = new VNCCanvas(container, c);
   container->setCanvas(canvas);
-  notebook_connections->AddPage(container, c->getDesktopName(), true);
+  if(listen)
+    notebook_connections->AddPage(container, _("Listening on port ") + port, true);    
+  else
+    notebook_connections->AddPage(container, c->getDesktopName(), true);
 
-  wxLogStatus(_("Connected to ") + hostname + _T(":") + port);
 
   // "end connection"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(true);
   // "screenshot"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(true);
   // stats
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(0)->Enable(true);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(1)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(true);
   
   return true;
 }
@@ -406,12 +448,12 @@ void MyFrameMain::terminate_conn(int which)
   if(connections.size() == 0) // nothing to end
     {
       // "end connection"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(1)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(false);
       // "screenshot"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(4)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
       // stats
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
     }
 
   wxLogStatus( _("Connection terminated."));
@@ -559,10 +601,16 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
       else
 	sc_port = wxEmptyString;
 
-      spawn_conn(sc_hostname, sc_addr, sc_port);
+      spawn_conn(false, sc_hostname, sc_addr, sc_port);
     }
 }
 
+
+
+void MyFrameMain::machine_listen(wxCommandEvent &event)
+{
+  spawn_conn(true, wxEmptyString, wxEmptyString, wxString() << LISTEN_PORT_OFFSET + connections.size());
+}
 
 
 
@@ -909,7 +957,7 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
 void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
 {
   listbox_services_select(event); // get the actual values
-  spawn_conn(services_hostname, services_addr, services_port);
+  spawn_conn(false, services_hostname, services_addr, services_port);
 } 
  
 
@@ -951,5 +999,5 @@ bool MyFrameMain::cmdline_connect(wxString& hostarg)
     else
       sc_port = wxEmptyString;
     
-    return spawn_conn(sc_hostname, sc_addr, sc_port);
+    return spawn_conn(false, sc_hostname, sc_addr, sc_port);
 }

@@ -14,6 +14,7 @@
 
 
 // make available custom events
+DECLARE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
@@ -62,6 +63,7 @@ class VNCConn: public wxEvtHandler
   static bool do_logfile;
 
   // event dispatchers
+  void SendIncomingConnectionNotify();
   void SendDisconnectNotify();
   // NB: this sets the event's clientdata ptr a newly created wRect 
   // which MUST be freed by its receiver!!!
@@ -103,7 +105,7 @@ public:
   */
   bool Setup(char* (*getpasswdfunc)(rfbClient*));
   void Cleanup();
-  bool Listen();
+  bool Listen(int port);
   bool Init(const wxString& host, int compresslevel = 1, int quality = 5);
   void Shutdown();
 

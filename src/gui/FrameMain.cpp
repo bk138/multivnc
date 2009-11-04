@@ -27,6 +27,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     frame_main_menubar = new wxMenuBar();
     wxMenu* wxglade_tmp_menu_1 = new wxMenu();
     wxglade_tmp_menu_1->Append(wxID_YES, _("&Connect..."), _("Connect to a specific host."), wxITEM_NORMAL);
+    wxglade_tmp_menu_1->Append(wxID_REDO, _("&Listen"), _("Listen for an incoming connection."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_STOP, _("&Disconnect"), _("Terminate connection."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_FILE, _("Show &Log"), _("Show detailed log."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_PREFERENCES, wxEmptyString, _("Change preferences."), wxITEM_NORMAL);
@@ -83,6 +84,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
 BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     // begin wxGlade: FrameMain::event_table
     EVT_MENU(wxID_YES, FrameMain::machine_connect)
+    EVT_MENU(wxID_REDO, FrameMain::machine_listen)
     EVT_MENU(wxID_STOP, FrameMain::machine_disconnect)
     EVT_MENU(wxID_FILE, FrameMain::machine_showlog)
     EVT_MENU(wxID_PREFERENCES, FrameMain::machine_preferences)
@@ -113,6 +115,13 @@ void FrameMain::machine_connect(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::machine_connect) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_listen(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_listen) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 

@@ -20,6 +20,7 @@
 
 
 // define our new notify events!
+DEFINE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
@@ -45,9 +46,10 @@ DEFINE_EVENT_TYPE(VNCConnCuttextNOTIFY)
 class VNCThread : public wxThread
 {
   VNCConn *p;    // our parent object
+  bool listenMode;
  
 public:
-  VNCThread(VNCConn *parent);
+  VNCThread(VNCConn *parent, bool listen);
   
   // thread execution starts here
   virtual wxThread::ExitCode Entry();
@@ -61,10 +63,11 @@ public:
 
 
 
-VNCThread::VNCThread(VNCConn *parent)
+VNCThread::VNCThread(VNCConn *parent, bool listen)
   : wxThread()
 {
   p = parent;
+  listenMode = listen;
 }
 
 
@@ -90,25 +93,39 @@ wxThread::ExitCode VNCThread::Entry()
       sigprocmask(SIG_BLOCK, &newsigs, &oldsigs);
 #endif
 
-      i=WaitForMessage(p->cl, 500);
+      if(listenMode)
+	i=listenForIncomingConnectionsNoFork(p->cl, 500);
+      else
+	i=WaitForMessage(p->cl, 500);
 
 #ifdef __WXGTK__
       sigprocmask(SIG_SETMASK, &oldsigs, NULL);
 #endif
-
-      if(i<0)
+      
+      if(listenMode)
 	{
-	  wxLogDebug(wxT("VNCConn %p: vncthread waitforMessage() failed"), p);
-	  p->SendDisconnectNotify();
-	  return 0;
+	  if(i)
+	    {
+	      p->SendIncomingConnectionNotify();
+	      return 0;
+	    }
 	}
-      if(i)
-	if(!HandleRFBServerMessage(p->cl))
-	  {
-	    wxLogDebug(wxT("VNCConn %p: vncthread HandleRFBServerMessage() failed"), p);
-	    p->SendDisconnectNotify();
-	    return 0;
-	  }
+      else
+	{
+	  if(i<0)
+	    {
+	      wxLogDebug(wxT("VNCConn %p: vncthread waitforMessage() failed"), p);
+	      p->SendDisconnectNotify();
+	      return 0;
+	    }
+	  if(i)
+	    if(!HandleRFBServerMessage(p->cl))
+	      {
+		wxLogDebug(wxT("VNCConn %p: vncthread HandleRFBServerMessage() failed"), p);
+		p->SendDisconnectNotify();
+		return 0;
+	      }
+	}
      
     }
   return 0;
@@ -120,7 +137,7 @@ void VNCThread::OnExit()
 {
   // cause wxThreads delete themselves after completion
   p->vncthread = 0;
-  wxLogDebug(wxT("VNCConn %p: vncthread exiting"), p);
+  wxLogDebug(wxT("VNCConn %p: %s vncthread exiting"), p, listenMode ? wxT("listening") : wxT(""));
 }
 
 
@@ -178,6 +195,18 @@ VNCConn::~VNCConn()
   private members
 */
 
+void VNCConn::SendIncomingConnectionNotify() 
+{
+  wxLogDebug(wxT("VNCConn %p: SendIncomingConnectionNotify()"), this);
+
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnIncomingConnectionNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
 
 void VNCConn::SendDisconnectNotify() 
 {
@@ -190,7 +219,6 @@ void VNCConn::SendDisconnectNotify()
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
 }
-
 
 
 void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
@@ -490,6 +518,8 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
 
 void VNCConn::Cleanup()
 {
+  wxLogDebug(wxT( "VNCConn %p: Cleanup()"), this);
+
   if(cl)
     {
       wxLogDebug(wxT( "VNCConn %p: Cleanup() before client cleanup"), this);
@@ -500,9 +530,30 @@ void VNCConn::Cleanup()
 }
 
 
-bool VNCConn::Listen()
+bool VNCConn::Listen(int port)
 {
-  //return listenForIncomingConnectionsNoFork(cl, -1);
+  wxLogDebug(wxT("VNCConn %p: Listen() port %d"), this, port);
+
+  cl->listenPort = port;
+  
+  VNCThread *tp = new VNCThread(this, true);
+  // save it for later on
+  vncthread = tp;
+  
+  if( tp->Create() != wxTHREAD_NO_ERROR )
+    {
+      err.Printf(_("Could not create VNC listener thread!"));
+      Shutdown();
+      return false;
+    }
+
+  if( tp->Run() != wxTHREAD_NO_ERROR )
+    {
+      err.Printf(_("Could not start VNC listener thread!")); 
+      Shutdown();
+      return false;
+    }
+
   return true;
 }
 
@@ -549,7 +600,7 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality)
   
 
   // this is like our main loop
-  VNCThread *tp = new VNCThread(this);
+  VNCThread *tp = new VNCThread(this, false);
   // save it for later on
   vncthread = tp;
   
@@ -601,6 +652,9 @@ void VNCConn::Shutdown()
 #else
       close(cl->sock);
 #endif
+      // in case we called listen, canceled that, and nwo want to connect to some
+      // host via Init()
+      cl->listenSpecified = FALSE;
     }
 
   if(fb_data)
@@ -922,9 +976,14 @@ wxString VNCConn::getServerName() const
 {
   if(cl)
     {
-      wxIPV4address a;
-      a.Hostname(wxString(cl->serverHost, wxConvUTF8));
-      return a.Hostname();
+      if(cl->listenSpecified)
+	return wxString(wxT("listening"));
+      else
+	{
+	  wxIPV4address a;
+	  a.Hostname(wxString(cl->serverHost, wxConvUTF8));
+	  return a.Hostname();
+	}
     }
   else
     return wxEmptyString;
@@ -935,7 +994,8 @@ wxString VNCConn::getServerAddr() const
   if(cl)
     {
       wxIPV4address a;
-      a.Hostname(wxString(cl->serverHost, wxConvUTF8));
+      if(!cl->listenSpecified)
+	a.Hostname(wxString(cl->serverHost, wxConvUTF8));
       return a.IPAddress();
     }
   else
@@ -945,7 +1005,10 @@ wxString VNCConn::getServerAddr() const
 wxString VNCConn::getServerPort() const
 {
   if(cl)
-    return wxString() << cl->serverPort;
+    if(cl->listenSpecified)
+      return wxString() << cl->listenPort;
+    else
+      return wxString() << cl->serverPort;
   else
     return wxEmptyString;
 }
