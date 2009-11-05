@@ -113,6 +113,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   stats_timer.SetOwner(this);
 
+  // no listening connections
+  nr_reverse = 0;
+
   // finally, our mdns service scanner
   servscan = new wxServDisc(this, wxT("_rfb._tcp.local."), QTYPE_PTR);
 }
@@ -439,6 +442,8 @@ void MyFrameMain::terminate_conn(int which)
   VNCConn* c = connections.at(which);
   if(c != 0)
     {
+      if(c->isReverse())
+	--nr_reverse;
       delete c;
       connections.erase(connections.begin() + which);
 
@@ -609,7 +614,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
 void MyFrameMain::machine_listen(wxCommandEvent &event)
 {
-  spawn_conn(true, wxEmptyString, wxEmptyString, wxString() << LISTEN_PORT_OFFSET + connections.size());
+  spawn_conn(true, wxEmptyString, wxEmptyString, wxString() << LISTEN_PORT_OFFSET + nr_reverse++);
 }
 
 

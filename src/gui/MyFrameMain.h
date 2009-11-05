@@ -20,6 +20,8 @@ class MyFrameMain: public FrameMain
 
   // array of connections
   std::vector<VNCConn*> connections;
+  // number of reverse VNC (listen) connections
+  size_t nr_reverse;
 
   // listbox_services_select() stores values here for listbox_services_dclick()
   wxString services_hostname, services_addr, services_port;

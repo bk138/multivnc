@@ -109,6 +109,8 @@ public:
   bool Init(const wxString& host, int compresslevel = 1, int quality = 5);
   void Shutdown();
 
+  bool isReverse() const { return cl ? cl->listenSpecified : false; };
+
   bool sendPointerEvent(wxMouseEvent &event);
   bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
   
