@@ -354,7 +354,7 @@ SOCKET ScanThread::msock() const
 	{
 		WSACleanup();
 		wxLogError(wxT("Failed to start winsock"));
-		return 0;
+		return -1;
 	}
 #endif
 
@@ -365,7 +365,7 @@ SOCKET ScanThread::msock() const
 #else
         if((s = socket(AF_INET,SOCK_DGRAM, IPPROTO_UDP)) < 0)
 #endif
-	return 0;
+	return -1;
 	
 
         // set to reuse address
@@ -379,7 +379,7 @@ SOCKET ScanThread::msock() const
 #else
 		close(s);
 #endif 
-                return 0;
+                return -1;
         }
 
   	// Set the multicast ttl
