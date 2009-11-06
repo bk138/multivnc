@@ -119,7 +119,7 @@ void* ScanThread::Entry()
 
   d = mdnsd_new(1,1000);
 
-  if((s = msock()) == 0) 
+  if((s = msock()) < 0) 
     { 
       p->err.Printf(_("Can't create socket: %s\n"), strerror(errno));
       exit = true;
@@ -325,82 +325,77 @@ int ScanThread::ans(mdnsda a, void *arg)
 
 
 
-// create a multicast 224.0.0.251:5353 socket, windows or unix style
+// create a multicast 224.0.0.251:5353 socket,
+// aproppriate for receiving and sending,
+// windows or unix style
 SOCKET ScanThread::msock() const
 {
-	SOCKET s;
-	int flag = 1;
-	char ttl = 255; // Used to set multicast TTL
-	int ittl = 255;
+  SOCKET s;
+  int flag = 1;
+  int ttl = 255; // multicast TTL, must be 255 for zeroconf!
 
-	// this is our local address
-	struct sockaddr_in addrLocal;
-        memset(&addrLocal, '\0', sizeof(addrLocal));
-	addrLocal.sin_family = AF_INET;
-	addrLocal.sin_port = htons(5353);
-        addrLocal.sin_addr.s_addr = 0;	
+  // this is our local address
+  struct sockaddr_in addrLocal;
+  memset(&addrLocal, 0, sizeof(addrLocal));
+  addrLocal.sin_family = AF_INET;
+  addrLocal.sin_port = htons(5353);
+  addrLocal.sin_addr.s_addr = htonl(INADDR_ANY);	
 
-	// and this the multicast destination
-	struct ip_mreq	ipmr;
-	ipmr.imr_multiaddr.s_addr = inet_addr("224.0.0.251");
-	ipmr.imr_interface.s_addr = htonl(INADDR_ANY);
+  // and this the multicast destination
+  struct ip_mreq	ipmr;
+  ipmr.imr_multiaddr.s_addr = inet_addr("224.0.0.251");
+  ipmr.imr_interface.s_addr = htonl(INADDR_ANY);
 
 #ifdef __WIN32__
-	// winsock startup
-	WORD			wVersionRequested;
-	WSADATA			wsaData;
-	wVersionRequested = MAKEWORD(2, 2);
-	if(WSAStartup(wVersionRequested, &wsaData) != 0)
-	{
-		WSACleanup();
-		wxLogError(wxT("Failed to start winsock"));
-		return -1;
-	}
+  // winsock startup
+  WORD		wVersionRequested;
+  WSADATA	wsaData;
+  wVersionRequested = MAKEWORD(2, 2);
+  if(WSAStartup(wVersionRequested, &wsaData) != 0)
+    {
+      WSACleanup();
+      wxLogError(wxT("Failed to start winsock"));
+      return -1;
+    }
 #endif
 
 
-	// Create a new socket
-#ifdef __WIN32__
-	if((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
-#else
-        if((s = socket(AF_INET,SOCK_DGRAM, IPPROTO_UDP)) < 0)
-#endif
-	return -1;
-	
+  // Create a new socket
+  if((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
+    return -1;
 
-        // set to reuse address
-	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
+  // set to reuse address
+  setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
 
-	// Bind socket to port, returns 0 on success
- 	if(bind(s, (struct sockaddr*) &addrLocal, sizeof(addrLocal))) 
-	{ 
+  // Bind socket to port, returns 0 on success
+  if(bind(s, (struct sockaddr*) &addrLocal, sizeof(addrLocal))) 
+    { 
 #ifdef __WIN32__
-		closesocket(s);
+      closesocket(s);
 #else
-		close(s);
+      close(s);
 #endif 
-                return -1;
-        }
+      return -1;
+    }
 
-  	// Set the multicast ttl
-	setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
-        setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ittl, sizeof(ittl));
+  // Set the multicast ttl
+  setsockopt(s, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl));
 
-	// Add socket to be a member of the multicast group
-	setsockopt(s, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&ipmr, sizeof(ipmr));
+  // Add socket to be a member of the multicast group
+  setsockopt(s, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&ipmr, sizeof(ipmr));
 	
-	// set to nonblock
+  // set to nonblock
 #ifdef __WIN32__
-	unsigned long block=1;
-	ioctlsocket(s, FIONBIO, &block);
+  unsigned long block=1;
+  ioctlsocket(s, FIONBIO, &block);
 #else
-	flag =  fcntl(s, F_GETFL, 0);
-        flag |= O_NONBLOCK;
-        fcntl(s, F_SETFL, flag);
+  flag =  fcntl(s, F_GETFL, 0);
+  flag |= O_NONBLOCK;
+  fcntl(s, F_SETFL, flag);
 #endif
 	
-	// whooaa, that's it
-	return s;
+  // whooaa, that's it
+  return s;
 }
 
 
