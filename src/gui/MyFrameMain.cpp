@@ -299,6 +299,20 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
       
       wxLogError(c->getErr());
     }
+  else
+    {
+      // find index of this connection
+      vector<VNCConn*>::iterator it = connections.begin();
+      size_t index = 0;
+      while(it != connections.end() && *it != c)
+	{
+	  ++it;
+	  ++index;
+	}
+
+      if(index < connections.size())
+	notebook_connections->SetPageText(index, c->getDesktopName() + _(" (Reverse Connection)"));
+    }
 }
 
 
