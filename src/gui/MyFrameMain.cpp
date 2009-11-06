@@ -205,11 +205,21 @@ void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
 
 void MyFrameMain::onVNCConnFBResizeNotify(wxCommandEvent& event)
 {
-  // only process currently selected connection
-  VNCConn* c = connections.at(notebook_connections->GetSelection());
-  if(c == event.GetEventObject())
+  // get sender
+  VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
+
+  // find index of this connection
+  vector<VNCConn*>::iterator it = connections.begin();
+  size_t index = 0;
+  while(it != connections.end() && *it != c)
     {
-      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
+      ++it;
+      ++index;
+    }
+
+  if(index < connections.size()) // found
+    {
+      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetPage(index))->getCanvas();
       canvas->adjustSize();
     }
 }
