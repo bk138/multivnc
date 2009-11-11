@@ -162,6 +162,7 @@ void VNCCanvas::adjustSize()
   SetInitialSize(wxSize(conn->getFrameBufferWidth(), conn->getFrameBufferHeight()));
 
   CentreOnParent();
+  GetParent()->Layout();
 }
 
 
