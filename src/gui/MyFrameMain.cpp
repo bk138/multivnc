@@ -688,6 +688,8 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
       VNCConn* c = connections.at(notebook_connections->GetSelection());
 
       wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
+      if(rect.IsEmpty())
+	return;
       wxBitmap screenshot = c->getFrameBufferRegion(rect);
       
       wxString desktopname =  c->getDesktopName();
