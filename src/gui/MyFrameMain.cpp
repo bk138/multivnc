@@ -264,24 +264,7 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
     }
 
   if(index < connections.size())
-    {
-      if(c->isReverse())
-	listen_ports.erase(wxAtoi(c->getServerPort()));
-	
-      delete c;
-      connections.erase(connections.begin() + index);
-
-      notebook_connections->DeletePage(index);
-    }
-
-
-  if(connections.size() == 0) // nothing to end
-    {
-      // "end connection"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(false);
-      // "screenshot"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
-    }
+    terminate_conn(index);
 }
 
 
