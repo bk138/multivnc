@@ -113,8 +113,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   stats_timer.SetOwner(this);
 
-  // no listening connections
-  nr_reverse = 0;
 
   // finally, our mdns service scanner
   servscan = new wxServDisc(this, wxT("_rfb._tcp.local."), QTYPE_PTR);
@@ -267,6 +265,9 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 
   if(index < connections.size())
     {
+      if(c->isReverse())
+	listen_ports.erase(wxAtoi(c->getServerPort()));
+	
       delete c;
       connections.erase(connections.begin() + index);
 
@@ -467,7 +468,7 @@ void MyFrameMain::terminate_conn(int which)
   if(c != 0)
     {
       if(c->isReverse())
-	--nr_reverse;
+	listen_ports.erase(wxAtoi(c->getServerPort()));
       delete c;
       connections.erase(connections.begin() + which);
 
@@ -638,7 +639,20 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
 void MyFrameMain::machine_listen(wxCommandEvent &event)
 {
-  spawn_conn(true, wxEmptyString, wxEmptyString, wxString() << LISTEN_PORT_OFFSET + nr_reverse++);
+  // find a free port
+  set<int>::iterator it;
+  bool foundfree = false;
+  int port = LISTEN_PORT_OFFSET;
+  while(!foundfree)
+    {
+      if(listen_ports.find(port) == listen_ports.end()) // not in set
+	foundfree = true;
+      else
+	++port;
+    }
+
+  listen_ports.insert(port);
+  spawn_conn(true, wxEmptyString, wxEmptyString, wxString() << port);
 }
 
 

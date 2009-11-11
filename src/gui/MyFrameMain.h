@@ -5,6 +5,7 @@
 
 
 #include <vector>
+#include <set>
 #include "FrameMain.h"
 #include "MyFrameLog.h"
 #include "wxServDisc/wxServDisc.h"
@@ -20,8 +21,8 @@ class MyFrameMain: public FrameMain
 
   // array of connections
   std::vector<VNCConn*> connections;
-  // number of reverse VNC (listen) connections
-  size_t nr_reverse;
+  // set of reverse VNC (listen) connection's port numbers
+  std::set<int> listen_ports;
 
   // listbox_services_select() stores values here for listbox_services_dclick()
   wxString services_hostname, services_addr, services_port;
