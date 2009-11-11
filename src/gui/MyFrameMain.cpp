@@ -100,11 +100,12 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // setup clipboard
 #ifdef __WXGTK__
   // always use middle mouse button paste
-  if (wxTheClipboard->Open())
+  if(wxTheClipboard->IsOpened() || wxTheClipboard->Open())
     {
       wxTheClipboard->UsePrimarySelection(true);
       wxTheClipboard->Close();
     }
+
 #endif  
   
 
@@ -226,7 +227,7 @@ void MyFrameMain::onVNCConnFBResizeNotify(wxCommandEvent& event)
 
 void MyFrameMain::onVNCConnCuttextNotify(wxCommandEvent& event)
 { 
-  if (wxTheClipboard->Open())
+  if(wxTheClipboard->IsOpened() || wxTheClipboard->Open()) 
     {
       // get sender
       VNCConn* c = (VNCConn*)event.GetEventObject();

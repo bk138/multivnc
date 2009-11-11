@@ -93,7 +93,7 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
       SetFocus();
       
       // read clipboard and set VNCConn cuttext accordingly
-      if (wxTheClipboard->Open())
+      if(wxTheClipboard->IsOpened() || wxTheClipboard->Open()) 
 	{
 	  if(wxTheClipboard->IsSupported(wxDF_TEXT))
 	    {
