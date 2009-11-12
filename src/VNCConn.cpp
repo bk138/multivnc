@@ -104,6 +104,12 @@ wxThread::ExitCode VNCThread::Entry()
       
       if(listenMode)
 	{
+	  if(i<0)
+	    {
+	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), p);
+	      p->SendDisconnectNotify();
+	      return 0;
+	    }
 	  if(i)
 	    {
 	      p->SendIncomingConnectionNotify();
@@ -409,10 +415,10 @@ void VNCConn::got_cuttext(rfbClient *cl, const char *text, int len)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
 
-  wxLogDebug(wxT("VNCConn %p: got cuttext: '%s'"), conn, wxString(text, wxConvUTF8).c_str());
+  wxLogDebug(wxT("VNCConn %p: got cuttext: '%s'"), conn, wxString(text, wxCSConv(wxT("iso-8859-1"))).c_str());
 
   wxCriticalSectionLocker lock(conn->mutex_cuttext); // since cuttext can also be set from the main thread
-  conn->cuttext = wxString(text, wxConvUTF8);
+  conn->cuttext = wxString(text, wxCSConv(wxT("iso-8859-1")));
   conn->SendCuttextNotify();
 }
 
@@ -694,8 +700,16 @@ bool VNCConn::sendPointerEvent(wxMouseEvent &event)
 
   if(event.Entering() && ! cuttext.IsEmpty())
     {
-      wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), this, cuttext.c_str());
-      SendClientCutText(cl, cuttext.char_str(), cuttext.Length());
+      // if encoding fails, a NULL pointer is returned!
+      if(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))))
+	{
+	  wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), this, cuttext.c_str());
+	  char* encoded_text = strdup(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
+	  SendClientCutText(cl, encoded_text, strlen(encoded_text));
+	  free(encoded_text);	  
+	}
+      else
+	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
     }
 
   if(do_stats)
