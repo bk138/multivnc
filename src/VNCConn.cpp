@@ -732,17 +732,30 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 
   if(isChar)
     {
+      wxLogDebug(wxT("VNCConn %p: got CHAR key event"), this);
+      wxLogDebug(wxT("VNCConn %p:     wxkeycode:      %d"), this, event.GetKeyCode());
+      wxLogDebug(wxT("VNCConn %p:     wxkeycode char: %c"), this, event.GetKeyCode());
+      wxLogDebug(wxT("VNCConn %p:     unicode:        %d"), this, event.GetUnicodeKey());
+      wxLogDebug(wxT("VNCConn %p:     unicode char:   %c"), this, event.GetUnicodeKey()); 
+
       // get tranlated char
-      k = event.GetUnicodeKey();
+      k = event.GetKeyCode();
+      // if we got ne keycode, try unicodekey
+      if(k==0) 
+	k = event.GetUnicodeKey();
 
-      wxLogDebug(wxT("VNCConn %p: sending CHAR key event"), this);
-      wxLogDebug(wxT("VNCConn %p:         wxkeycode:      %d"), this, event.GetKeyCode());
-      wxLogDebug(wxT("VNCConn %p:         wxkeycode char: %c"), this, event.GetKeyCode());
-      wxLogDebug(wxT("VNCConn %p:         unicode:        %d"), this, event.GetUnicodeKey());
-      wxLogDebug(wxT("VNCConn %p:         unicode char:   %c"), this, event.GetUnicodeKey()); 
-      wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x down"), this, k);
-      wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x  up"), this, k);
+      // if wxwidgets translates a key combination into a
+      // value below 32, revert this here.
+      // we dont't send ASCII 0x03, but ctrl and then a 'c'!
+      if(k <= 32)
+	{
+	  k += 96;
+	  wxLogDebug(wxT("VNCConn %p: translating key to: %d"), this, k);
+	}
 
+      wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x down"), this, k);
+      wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x  up"), this, k);
+      
       // down, then up
       SendKeyEvent(cl, k, true);
       SendKeyEvent(cl, k, false);
@@ -826,12 +839,12 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 
       if(k)
 	{
-	  wxLogDebug(wxT("VNCConn %p: sending key %s event:"), this, down ? wxT("down") : wxT("up"));
-	  wxLogDebug(wxT("VNCConn %p:         wxkeycode:      %d"), this, event.GetKeyCode());
-	  wxLogDebug(wxT("VNCConn %p:         wxkeycode char: %c"), this, event.GetKeyCode());
-	  wxLogDebug(wxT("VNCConn %p:         unicode:        %d"), this, event.GetUnicodeKey());
-	  wxLogDebug(wxT("VNCConn %p:         unicode char:   %c"), this, event.GetUnicodeKey()); 
-	  wxLogDebug(wxT("VNCConn %p:         rfbkeysym:      0x%.3x %s"), this, k, down ? wxT("down") : wxT("up"));
+	  wxLogDebug(wxT("VNCConn %p: got key %s event:"), this, down ? wxT("down") : wxT("up"));
+	  wxLogDebug(wxT("VNCConn %p:     wxkeycode:      %d"), this, event.GetKeyCode());
+	  wxLogDebug(wxT("VNCConn %p:     wxkeycode char: %c"), this, event.GetKeyCode());
+	  wxLogDebug(wxT("VNCConn %p:     unicode:        %d"), this, event.GetUnicodeKey());
+	  wxLogDebug(wxT("VNCConn %p:     unicode char:   %c"), this, event.GetUnicodeKey()); 
+	  wxLogDebug(wxT("VNCConn %p: sending rfbkeysym:  0x%.3x %s"), this, k, down ? wxT("down") : wxT("up"));
 
 	  return SendKeyEvent(cl, k, down);
 	}
