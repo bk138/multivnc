@@ -4,6 +4,7 @@
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include "VNCCanvas.h"
+#include "MultiVNCApp.h"
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 
@@ -92,8 +93,9 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
     {
       SetFocus();
       
-      // read clipboard and set VNCConn cuttext accordingly
-      if(wxTheClipboard->IsOpened() || wxTheClipboard->Open()) 
+      wxCriticalSectionLocker lock(wxGetApp().mutex_theclipboard); 
+      
+      if(wxTheClipboard->Open()) 
 	{
 	  if(wxTheClipboard->IsSupported(wxDF_TEXT))
 	    {

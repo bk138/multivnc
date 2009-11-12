@@ -22,6 +22,9 @@ public:
   bool OnInit();
   int  OnExit();
   bool setLocale(int language);
+
+  // application-wide mutex protecting wxTheClipboard
+  wxCriticalSection mutex_theclipboard;
 };
 
 
