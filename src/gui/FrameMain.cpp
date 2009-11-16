@@ -49,6 +49,9 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     frame_main_menubar->Append(wxglade_tmp_menu_2, _("&View"));
     wxMenu* wxglade_tmp_menu_3 = new wxMenu();
     wxglade_tmp_menu_3->Append(wxID_ADD, _("&Add Bookmark"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_3->AppendSeparator();
+    wxglade_tmp_menu_3->Append(wxID_EDIT, _("&Edit Bookmark"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_3->Append(wxID_DELETE, _("&Delete Bookmark"), wxEmptyString, wxITEM_NORMAL);
     frame_main_menubar->Append(wxglade_tmp_menu_3, _("&Bookmarks"));
     wxMenu* wxglade_tmp_menu_4 = new wxMenu();
     wxglade_tmp_menu_4->Append(wxID_HELP, _("&Contents"), _("Show Help."), wxITEM_NORMAL);
@@ -98,6 +101,8 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(ID_STATISTICS, FrameMain::view_togglestatistics)
     EVT_MENU(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
     EVT_MENU(wxID_ADD, FrameMain::bookmarks_add)
+    EVT_MENU(wxID_EDIT, FrameMain::bookmarks_edit)
+    EVT_MENU(wxID_DELETE, FrameMain::bookmarks_delete)
     EVT_MENU(wxID_HELP, FrameMain::help_contents)
     EVT_MENU(wxID_ABOUT, FrameMain::help_about)
     EVT_TOOL(wxID_CANCEL, FrameMain::machine_disconnect)
@@ -213,6 +218,20 @@ void FrameMain::bookmarks_add(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::bookmarks_add) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::bookmarks_edit(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::bookmarks_edit) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::bookmarks_delete(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::bookmarks_delete) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 

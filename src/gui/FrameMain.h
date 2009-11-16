@@ -84,6 +84,8 @@ public:
     virtual void view_togglestatistics(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglefullscreen(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_add(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void bookmarks_edit(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void bookmarks_delete(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void help_contents(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void help_about(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_services_dclick(wxCommandEvent &event); // wxGlade: <event_handler>
