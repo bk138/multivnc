@@ -2,6 +2,8 @@ MultiVNC 0.2 -
 	* Listen mode (Reverse VNC) implemented. Via tabs it is
 	  possible to listen for and serve multiple incoming
 	  connections.
+	* Clipboard data is now properly encoded.
+	* Fix bug with canvas centering.
 
 
 MultiVNC 0.1 - "In the beginning"
