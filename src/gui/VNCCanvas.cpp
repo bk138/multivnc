@@ -24,6 +24,7 @@ BEGIN_EVENT_TABLE(VNCCanvas, wxPanel)
     EVT_KEY_DOWN (VNCCanvas::onKeyDown)
     EVT_KEY_UP (VNCCanvas::onKeyUp)
     EVT_CHAR (VNCCanvas::onChar)
+    EVT_KILL_FOCUS(VNCCanvas::onFocusLoss)
 END_EVENT_TABLE();
 
 
@@ -130,7 +131,19 @@ void VNCCanvas::onChar(wxKeyEvent &event)
   conn->sendKeyEvent(event, true, true);
 }
 
+void VNCCanvas::onFocusLoss(wxFocusEvent &event)
+{
+  wxLogDebug(wxT("VNCCanvas %p: lost focus, upping key modifiers"), this);
+  
+  wxKeyEvent key_event;
 
+  key_event.m_keyCode = WXK_SHIFT;
+  conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_ALT;
+  conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_CONTROL;
+  conn->sendKeyEvent(key_event, false, false);
+}
 
 
 /*

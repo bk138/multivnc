@@ -24,7 +24,7 @@ class VNCCanvas: public wxPanel
   void onKeyDown(wxKeyEvent &event);
   void onKeyUp(wxKeyEvent &event);
   void onChar(wxKeyEvent &event);
-
+  void onFocusLoss(wxFocusEvent &event);
 
 protected:
   DECLARE_EVENT_TABLE();
