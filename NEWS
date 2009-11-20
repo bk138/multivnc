@@ -1,11 +1,17 @@
+MultiVNC 0.2 - 
+	* Listen mode (Reverse VNC) implemented. Via tabs it is
+	  possible to listen for and serve multiple incoming
+	  connections.
+
+
 MultiVNC 0.1 - "In the beginning"
-	* a usable tight-enabled vncviewer with the following special features:
-	* supports server framebuffer resize
-	* supports several connections with one viewer using tabs 
-	* supports simple, logable statistics
-	* supports discovery of VNC servers advertising themselves via
-	  ZeroConf 
-	* runs under UNIX and Windows 
+	* a usable tight-enabled vncviewer with the following special
+	  features:
+	*  supports server framebuffer resize supports
+	* several connections with one viewer using tabs supports
+	* simple, loggable statistics supports discovery of VNC servers
+	  advertising themselves via ZeroConf runs under UNIX and
+	  Windows
 	
 
 	
