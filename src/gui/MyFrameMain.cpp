@@ -460,10 +460,12 @@ void MyFrameMain::terminate_conn(int which)
     {
       if(c->isReverse())
 	listen_ports.erase(wxAtoi(c->getServerPort()));
-      delete c;
+    
       connections.erase(connections.begin() + which);
 
       notebook_connections->DeletePage(which);
+
+      delete c;
     }
 
   if(connections.size() == 0) // nothing to end

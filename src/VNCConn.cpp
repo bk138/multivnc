@@ -193,6 +193,7 @@ VNCConn::~VNCConn()
 {
   Shutdown();
   Cleanup();
+  wxLogDebug(wxT("VNCConn %p: I'm dead!"), this);
 }
 
 
