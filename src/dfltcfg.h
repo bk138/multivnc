@@ -34,6 +34,9 @@
 #define K_STATSAUTOSAVE wxT("StatsAutosave")
 #define V_STATSAUTOSAVE false
 
+//bookmarks
+#define G_BOOKMARKS wxT("/Bookmarks")
+#define K_BOOKMARKS_NAME wxT("Name")
 
 
 #endif // CONFIG_H

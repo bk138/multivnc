@@ -95,7 +95,9 @@ public:
   void view_togglestatistics(wxCommandEvent &event);
   void view_togglefullscreen(wxCommandEvent &event);
 
-  void bookmarks(wxCommandEvent &event);
+  void bookmarks_add(wxCommandEvent &event); 
+  void bookmarks_edit(wxCommandEvent &event); 
+  void bookmarks_delete(wxCommandEvent &event);
 
   void help_about(wxCommandEvent &event);
   void help_contents(wxCommandEvent &event);

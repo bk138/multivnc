@@ -73,6 +73,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // stats
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
+  // bookmarks
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
+  
 
   if(show_toolbar)
      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
@@ -440,6 +443,8 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   // stats
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(true);
+  // bookmarks
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
   
   return true;
 }
@@ -470,6 +475,8 @@ void MyFrameMain::terminate_conn(int which)
       // stats
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
+      // bookmarks
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
     }
 
   wxLogStatus( _("Connection terminated."));
@@ -896,6 +903,43 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
   if(show_fullscreen)
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(5)->Check();
 }
+
+
+
+
+
+void MyFrameMain::bookmarks_add(wxCommandEvent &event)
+{
+  wxString name = wxGetTextFromUser(_("Enter bookmark name:"),
+				 _("Saving bookmark"));
+				
+  if(name != wxEmptyString)
+    {
+      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      wxConfigBase *cfg = wxConfigBase::Get();
+      cfg->SetPath(G_BOOKMARKS);
+      cfg->Write(K_BOOKMARKS_NAME, name);
+
+      
+      cfg->SetPath(wxT("/"));
+    }
+}
+
+
+
+void MyFrameMain::bookmarks_edit(wxCommandEvent &event)
+{
+
+}
+
+
+
+void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
+{
+
+}
+
+
 
 
 
