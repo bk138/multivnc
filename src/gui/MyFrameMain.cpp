@@ -603,6 +603,22 @@ void MyFrameMain::splitwinlayout()
     splitwin_left->SetSashPosition(h * 0.9);
 
   splitwin_leftlower->SetSashPosition(h * 0.75);
+  
+  
+  // finally if not shown, disable menu items
+  if(!show_bookmarks)
+    {
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(false);
+    }  
+  else
+    {
+      if(list_box_bookmarks->GetSelection() >= 0)
+	{
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(true);
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(true);
+	}
+    }
 }
 
 
