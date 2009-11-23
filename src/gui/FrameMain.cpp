@@ -69,9 +69,9 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     frame_main_toolbar->AddTool(wxID_SAVE, _("Take Screenshot"), (bitmapFromMem(screenshot_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->Realize();
     const wxString *list_box_services_choices = NULL;
-    list_box_services = new wxListBox(splitwin_left_pane_1, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_services_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
+    list_box_services = new wxListBox(splitwin_left_pane_1, ID_LISTBOX_SERVICES, wxDefaultPosition, wxDefaultSize, 0, list_box_services_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
     const wxString *list_box_bookmarks_choices = NULL;
-    list_box_bookmarks = new wxListBox(splitwin_leftlower_pane_1, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, list_box_bookmarks_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
+    list_box_bookmarks = new wxListBox(splitwin_leftlower_pane_1, ID_LISTBOX_BOOKMARKS, wxDefaultPosition, wxDefaultSize, 0, list_box_bookmarks_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
     label_fps = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Updates/s:"));
     text_ctrl_fps = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     label_latency = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Latency (ms):"));
@@ -108,10 +108,10 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_TOOL(wxID_CANCEL, FrameMain::machine_disconnect)
     EVT_TOOL(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
     EVT_TOOL(wxID_SAVE, FrameMain::machine_screenshot)
-    EVT_LISTBOX_DCLICK(wxID_ANY, FrameMain::listbox_services_dclick)
-    EVT_LISTBOX(wxID_ANY, FrameMain::listbox_services_select)
-    EVT_LISTBOX_DCLICK(wxID_ANY, FrameMain::listbox_bookmarks_dclick)
-    EVT_LISTBOX(wxID_ANY, FrameMain::listbox_bookmarks_select)
+    EVT_LISTBOX_DCLICK(ID_LISTBOX_SERVICES, FrameMain::listbox_services_dclick)
+    EVT_LISTBOX(ID_LISTBOX_SERVICES, FrameMain::listbox_services_select)
+    EVT_LISTBOX_DCLICK(ID_LISTBOX_BOOKMARKS, FrameMain::listbox_bookmarks_dclick)
+    EVT_LISTBOX(ID_LISTBOX_BOOKMARKS, FrameMain::listbox_bookmarks_select)
     // end wxGlade
 END_EVENT_TABLE();
 

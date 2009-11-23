@@ -75,6 +75,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(false);
   
 
   if(show_toolbar)
@@ -89,6 +91,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   
   splitwinlayout();
+
+  loadbookmarks();
 
   if(show_discovered)
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(1)->Check();
@@ -381,10 +385,14 @@ bool MyFrameMain::saveArrayString(wxArrayString& arrstr, wxString& path)
 bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxString port)
 {
   wxBusyCursor busy;
-  
-  if(port.IsEmpty())
-    port = wxT("5900");
+  wxIPV4address host_addr;
 
+  // port can also be something like 'vnc', so look it up...
+  if(host_addr.Service(port))
+    port = wxString() << host_addr.Service();
+  else
+    port = wxT("5900");
+  
 
   // get connection settings
   int compresslevel, quality;
@@ -407,6 +415,24 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
     }
   else // normal init without previous listen
     {
+      // look up addr if it's not given
+      if(addr.IsEmpty())
+	{
+	  if(! host_addr.Hostname(hostname))
+	    {
+	      wxLogError(_("Invalid hostname or IP address."));
+	      delete c;
+	      return false;
+	    }
+	  else
+#ifdef __WIN32__
+	  addr = host_addr.Hostname(); // wxwidgets bug, ah well ...
+#else
+	  addr = host_addr.IPAddress();
+#endif
+	}
+
+
       wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
       if(!c->Init(addr + wxT(":") + port, compresslevel, quality))
 	{
@@ -581,6 +607,75 @@ void MyFrameMain::splitwinlayout()
 
 
 
+bool MyFrameMain::loadbookmarks()
+{
+  wxConfigBase *cfg = wxConfigBase::Get();
+
+  wxArrayString bookmarknames;
+
+  // enumeration variables
+  wxString str; 
+  long dummy;
+
+  // first, get all bookmark names
+  cfg->SetPath(G_BOOKMARKS);
+  bool cont = cfg->GetFirstGroup(str, dummy);
+  while(cont) 
+    {
+      bookmarknames.Add(str);
+      cont = cfg->GetNextGroup(str, dummy);
+    }
+
+
+  // clean up
+  bookmarks.Clear();
+  wxMenu* bm_menu = frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")));
+  for(int i = bm_menu->GetMenuItemCount()-1; i > 3; --i)
+    bm_menu->Destroy(bm_menu->FindItemByPosition(i));
+  bm_menu->AppendSeparator();
+
+
+  // then read in each bookmark value pair
+  for(size_t i=0; i < bookmarknames.GetCount(); ++i)
+    {
+      wxString host, port;
+
+      cfg->SetPath(G_BOOKMARKS + bookmarknames[i]);
+
+      if(!cfg->Read(K_BOOKMARKS_HOST, &host))
+	{
+	  wxLogError(_("Error reading hostname of bookmark '%s'!"), bookmarknames[i].c_str());
+	  cfg->SetPath(wxT("/"));
+	  return false;
+	}
+
+      if(!cfg->Read(K_BOOKMARKS_PORT, &port))
+	{
+	  wxLogError(_("Error reading port of bookmark '%s'!"), bookmarknames[i].c_str());
+	  cfg->SetPath(wxT("/"));
+	  return false;
+	}
+
+      // all fine, add it
+      bookmarks.Add(host + wxT(":") + port);
+
+      // and add to bookmarks menu
+      int id = NewControlId();
+      wxString* index_str = new wxString; // pack i into a wxObject, we use wxString here
+      *index_str << i;
+      bm_menu->Append(id, bookmarknames[i]);
+      bm_menu->SetHelpString(id, wxT("Bookmark ") + host + wxT(":") + port);
+      Connect(id, wxEVT_COMMAND_MENU_SELECTED, 
+	      wxCommandEventHandler(FrameMain::listbox_bookmarks_dclick), (wxObject*)index_str);
+    }
+  
+  cfg->SetPath(wxT("/"));
+
+  list_box_bookmarks->Set(bookmarknames, 0);
+
+  return true;
+}
+
 
 
 
@@ -599,35 +694,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 				 _("Connect to specific host"));
 				
   if(s != wxEmptyString)
-    {
-      wxIPV4address host_addr;
-
-      wxString sc_hostname, sc_port, sc_addr;      
-
-      // get host part 
-      sc_hostname = s.BeforeFirst(wxT(':'));
-
-      // look up name
-      if(! host_addr.Hostname(sc_hostname))
-	{
-	  wxLogError(_("Invalid hostname or IP address."));
-	  return;
-	}
-      else
-#ifdef __WIN32__
-	sc_addr = host_addr.Hostname(); // wxwidgets bug, ah well ...
-#else
-        sc_addr = host_addr.IPAddress();
-#endif
-      
-      // and lookup port description part (sth. like 'vnc' can also be given)
-      if(host_addr.Service( s.AfterFirst(wxT(':')) ))
-	sc_port = wxString() << host_addr.Service();
-      else
-	sc_port = wxEmptyString;
-
-      spawn_conn(false, sc_hostname, sc_addr, sc_port);
-    }
+    spawn_conn(false, s.BeforeFirst(wxT(':')), wxEmptyString, s.AfterFirst(wxT(':')));
 }
 
 
@@ -913,17 +980,29 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 {
   wxString name = wxGetTextFromUser(_("Enter bookmark name:"),
-				 _("Saving bookmark"));
+				    _("Saving bookmark"));
 				
   if(name != wxEmptyString)
     {
       VNCConn* c = connections.at(notebook_connections->GetSelection());
       wxConfigBase *cfg = wxConfigBase::Get();
-      cfg->SetPath(G_BOOKMARKS);
-      cfg->Write(K_BOOKMARKS_NAME, name);
-
       
+      if(cfg->Exists(G_BOOKMARKS + name))
+	{
+	  wxLogError(_("A bookmark with this name already exists!"));
+	  return;
+	}
+
+      cfg->SetPath(G_BOOKMARKS + name);
+
+      cfg->Write(K_BOOKMARKS_HOST, c->getServerName());
+      cfg->Write(K_BOOKMARKS_PORT, c->getServerPort());
+
+      //reset path
       cfg->SetPath(wxT("/"));
+
+      // and load into listbox
+      loadbookmarks();
     }
 }
 
@@ -931,14 +1010,49 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 
 void MyFrameMain::bookmarks_edit(wxCommandEvent &event)
 {
+  wxString sel = list_box_bookmarks->GetStringSelection();
 
+  if(sel.IsEmpty())
+    {
+      wxLogError(_("No bookmark selected!"));
+      return;
+    }
+
+  wxString newname = wxGetTextFromUser(_("New bookmark name:"),
+				       _("Edit bookmark")); 
+  
+  if(newname.IsEmpty())
+    return;
+    
+  wxConfigBase *cfg = wxConfigBase::Get();
+
+  cfg->SetPath(G_BOOKMARKS);
+  cfg->RenameGroup(sel, newname);
+  //reset path
+  cfg->SetPath(wxT("/"));
+  
+  // and load into listbox
+  loadbookmarks();
 }
 
 
 
 void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
 {
+  wxString sel = list_box_bookmarks->GetStringSelection();
+  
+  if(sel.IsEmpty())
+    {
+      wxLogError(_("No bookmark selected!"));
+      return;
+    }
 
+  wxConfigBase *cfg = wxConfigBase::Get();
+  if(!cfg->DeleteGroup(G_BOOKMARKS + sel))
+    wxLogError(_("No bookmark with this name!"));
+
+  // and re-read
+  loadbookmarks();
 }
 
 
@@ -1038,43 +1152,44 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
 } 
  
 
+
 void MyFrameMain::listbox_bookmarks_select(wxCommandEvent &event)
 {
+  int sel = event.GetInt();
+
+  if(sel < 0) //nothing selected
+    {
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(false);
+      
+      return;
+    }
+  else
+    {
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(true);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(true);
+     
+      wxLogStatus(_("Bookmark ") + bookmarks[sel]);
+    }
 }
 
 
 void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 {
+  int sel = event.GetInt();
+
+  if(sel < 0) // nothing selected
+    return;
+
+  // this gets set by Connect() in loadbookmarks(), in this case sel is always 0
+  if(event.m_callbackUserData)
+    sel = wxAtoi(*(wxString*)event.m_callbackUserData);
+      
+  spawn_conn(false, bookmarks[sel].BeforeFirst(wxT(':')), wxEmptyString, bookmarks[sel].AfterFirst(wxT(':')));
 }
 
 
 bool MyFrameMain::cmdline_connect(wxString& hostarg)
 {
-  wxIPV4address host_addr;
-
-  wxString sc_hostname, sc_port, sc_addr;      
-  
-  // get host part 
-  sc_hostname = hostarg.BeforeFirst(wxT(':'));
-  
-  // look up name
-  if(! host_addr.Hostname(sc_hostname))
-    {
-      wxLogError(_("Invalid host '%s' given on command line, exiting!"), hostarg.c_str());
-      return false;
-    }
-  else
-#ifdef __WIN32__
-    sc_addr = host_addr.Hostname(); // wxwidgets bug, ah well ...
-#else
-    sc_addr = host_addr.IPAddress();
-#endif
-      
-    // and lookup port description part (sth. like 'vnc' can also be given)
-    if(host_addr.Service( hostarg.AfterFirst(wxT(':')) ))
-      sc_port = wxString() << host_addr.Service();
-    else
-      sc_port = wxEmptyString;
-    
-    return spawn_conn(false, sc_hostname, sc_addr, sc_port);
+  return spawn_conn(false, hostarg.BeforeFirst(wxT(':')), wxEmptyString, hostarg.AfterFirst(wxT(':')));
 }

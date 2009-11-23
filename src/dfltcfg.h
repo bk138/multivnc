@@ -35,8 +35,9 @@
 #define V_STATSAUTOSAVE false
 
 //bookmarks
-#define G_BOOKMARKS wxT("/Bookmarks")
-#define K_BOOKMARKS_NAME wxT("Name")
+#define G_BOOKMARKS wxT("/Bookmarks/")
+#define K_BOOKMARKS_HOST wxT("Host")
+#define K_BOOKMARKS_PORT wxT("Port")
 
 
 #endif // CONFIG_H

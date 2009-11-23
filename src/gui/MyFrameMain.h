@@ -43,7 +43,11 @@ class MyFrameMain: public FrameMain
 
   void splitwinlayout();
 
-  bool spawn_conn(bool listen, wxString hostname, wxString addr, wxString port);
+  // array of bookmark strings
+  wxArrayString bookmarks;
+  bool loadbookmarks();
+
+  bool spawn_conn(bool listen, wxString host, wxString addr, wxString port);
   void terminate_conn(int which);
   
   // private handlers

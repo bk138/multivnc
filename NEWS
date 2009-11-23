@@ -2,6 +2,7 @@ MultiVNC 0.2 -
 	* Listen mode (Reverse VNC) implemented. Via tabs it is
 	  possible to listen for and serve multiple incoming
 	  connections.
+        * Bookmarks are working now.
 	* Clipboard data is now properly encoded.
 	* Fix bug with canvas centering.
 
