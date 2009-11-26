@@ -174,6 +174,25 @@ MyFrameMain::~MyFrameMain()
     terminate_conn(i);
 
   delete servscan;
+
+
+  // since we use the userData parameter in Connect() in loadbookmarks()
+  // in a nonstandard way, we have to have this workaround here, otherwise
+  // the library would segfault while trying to delete the m_callbackUserData 
+  // member of m_dynamicEvents
+  if (m_dynamicEvents)
+    for ( wxList::iterator it = m_dynamicEvents->begin(),
+	    end = m_dynamicEvents->end();
+	  it != end;
+	  ++it )
+      {
+#if WXWIN_COMPATIBILITY_EVENT_TYPES
+	wxEventTableEntry *entry = (wxEventTableEntry*)*it;
+#else 
+	wxDynamicEventTableEntry *entry = (wxDynamicEventTableEntry*)*it;
+#endif 
+	entry->m_callbackUserData = 0;
+      }
 }
 
 
@@ -683,7 +702,7 @@ bool MyFrameMain::loadbookmarks()
       bm_menu->SetHelpString(id, wxT("Bookmark ") + host + wxT(":") + port);
       Connect(id, wxEVT_COMMAND_MENU_SELECTED, 
 	      wxCommandEventHandler(FrameMain::listbox_bookmarks_dclick), (wxObject*)index_str);
-    }
+     }
   
   cfg->SetPath(wxT("/"));
 
