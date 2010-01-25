@@ -1,0 +1,2 @@
+?package(multivnc):needs="X11" section="Applications/Network/Communication"\
+  title="multivnc" command="/usr/bin/multivnc"
