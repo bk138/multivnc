@@ -3,16 +3,24 @@
 
 SUBDIRS = src po
 
-multivncdocdir = ${prefix}/doc/multivnc
+multivncdocdir = ${datadir}/doc/multivnc
 multivncdoc_DATA = \
 	README\
-	COPYING\
 	AUTHORS\
 	ChangeLog\
-	INSTALL\
 	NEWS
 
-EXTRA_DIST = $(multivncdoc_DATA)
+Applicationsdir = $(datadir)/applications/
+Applications_DATA = src/multivnc.desktop
+
+pixmapdir = $(datadir)/pixmaps
+pixmap_DATA = src/gui/res/multivnc.xpm
+
+
+EXTRA_DIST = $(multivncdoc_DATA) \
+             $(Applications_DATA) \
+             $(pixmap_DATA)
+
 
 # Copy all the spec files. Of cource, only one is actually used.
 dist-hook:

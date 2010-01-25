@@ -15,7 +15,7 @@
 #include "bitmapFromMem.h"
 #ifndef ICON_XPM
 #define ICON_XPM
-#include "res/icon.xpm"
+#include "res/multivnc.xpm"
 #endif
 #include "res/connect.png.h"
 #include "res/disconnect.png.h"

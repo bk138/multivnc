@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Exec=multivnc
+Icon=multivnc
+Name=MultiVNC
+Type=Application
+Comment=A multicast enabled VNC viewer
+Terminal=false
+StartupNotify=false
+Categories=Application;Network;
+
