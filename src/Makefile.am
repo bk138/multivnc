@@ -39,7 +39,15 @@ multivnc_SOURCES = \
 	gui/DialogSettings.cpp \
 	gui/DialogSettings.h \
 	gui/MyDialogSettings.cpp \
-	gui/MyDialogSettings.h 
+	gui/MyDialogSettings.h \
+	gui/res/about.png.h \
+	gui/res/connect.png.h \
+	gui/res/disconnect.png.h \
+	gui/res/fullscreen.png.h \
+	gui/res/screenshot.png.h \
+	gui/res/multivnc.xpm \
+	gui/res/vnccursor-mask.xbm \
+	gui/res/vnccursor.xbm
 
 
 multivnc_LDFLAGS = 
