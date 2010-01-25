@@ -46,7 +46,7 @@ multivnc_LDFLAGS =
 
 multivnc_LDADD = \
 	wxServDisc/libwxservdisc.a \
-        libvncclient/.libs/libvncclient.a \
+        libvncclient/libvncclient.a \
 	$(WX_LIBS)
 
 
