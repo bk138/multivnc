@@ -190,8 +190,17 @@ rfbClient* rfbGetClient(int bitsPerSample,int samplesPerPixel,
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
   client->tlsSession = NULL;
 #endif
+
   client->sock = -1;
   client->listenSock = -1;
+  client->multicastSock = -1;
+
+  client->maxMulticastTimeouts = 100;
+  client->multicastLastWholeUpd = -1;
+  client->multicastLastPartialUpd = -1;
+
+  client->clientAuthSchemes = NULL;
+
   return client;
 }
 
@@ -264,6 +273,9 @@ rfbBool rfbInitClient(rfbClient* client,int* argc,char** argv) {
 	break;
       } else if (strcmp(argv[i], "-play") == 0) {
 	client->serverPort = -1;
+	j++;
+      } else if (strcmp(argv[i], "-multicast") == 0) {
+	client->canHandleMulticastVNC = TRUE;
 	j++;
       } else if (i+1<*argc && strcmp(argv[i], "-encodings") == 0) {
 	client->appData.encodingsString = argv[i+1];
@@ -339,7 +351,85 @@ void rfbClientCleanup(rfbClient* client) {
     close(client->sock);
   if (client->listenSock >= 0)
     close(client->listenSock);
+  if (client->multicastSock >= 0)
+    close(client->multicastSock);
   free(client->desktopName);
   free(client->serverHost);
+  if (client->clientAuthSchemes)
+    free(client->clientAuthSchemes);
   free(client);
+}
+
+
+
+rfbBool rfbProcessServerMessage(rfbClient* client, int usec_timeout)
+{
+  int r;
+
+  if(client->multicastSock >= 0 && !client->multicastDisabled) 
+    {
+      /* first, analyse multicast loss ratio and act accordingly */
+      double lossrate = client->multicastLost/(double)(client->multicastRcvd+client->multicastLost);
+      if(client->multicastLost > 100) 
+	{
+	  if(lossrate > 0.5) 
+	    {
+	    rfbClientLog("MulticastVNC: loss ratio > 0.5, falling back to unicast\n");
+	    client->multicastDisabled = TRUE;
+	    SendFramebufferUpdateRequest(client, 0, 0, client->width, client->height, FALSE);
+	    }
+	  else if(lossrate > 0.2) 
+	    {
+	      rfbClientLog("MulticastVNC: loss ratio > 0.2, requesting a full unicast framebuffer update\n");
+	      SendFramebufferUpdateRequest(client, 0, 0, client->width, client->height, FALSE);
+	      client->multicastLost -= client->multicastLost/10;
+	    }
+      }
+  }
+
+  if(client->multicastSock >= 0 && !client->multicastDisabled) 
+    { 
+      struct timeval now;
+      gettimeofday(&now, NULL);
+      if(((now.tv_sec - client->multicastRequestTimestamp.tv_sec)*1000
+	  +(now.tv_usec - client->multicastRequestTimestamp.tv_usec)/1000)
+	 > client->multicastUpdInterval) 
+	{
+	  client->multicastRequestTimestamp = now;
+	  SendMulticastFramebufferUpdateRequest(client, TRUE);
+	}
+
+      r = WaitForMessage(client, 2*client->multicastUpdInterval*1000);
+    }
+  else
+    r = WaitForMessage(client, usec_timeout); 
+
+
+  if(r<0)  /* error while waiting */
+    return FALSE;
+  
+  if(r==0) /* timeout */
+    {
+      if(client->multicastSock >= 0 &&
+	 !client->multicastDisabled &&
+	 client->multicastRcvd > 0)
+	{
+	  client->multicastTimeouts++;
+#ifdef MULTICAST_DEBUG
+	  rfbClientLog("MulticastVNC DEBUG:   timeout, now %d!\n", client->multicastTimeouts);
+#endif
+	  if(client->multicastTimeouts > client->maxMulticastTimeouts)
+	    {
+	      rfbClientLog("MulticastVNC: too many timeouts (%d), falling back to unicast\n", client->multicastTimeouts);
+	      client->multicastDisabled = TRUE;
+	      SendFramebufferUpdateRequest(client, 0, 0, client->width, client->height, FALSE);
+	    }
+	}
+      return TRUE; 
+    }
+  
+  /* there are messages */
+  if(client->serverMsgMulticast)
+    client->multicastTimeouts = 0;
+  return HandleRFBServerMessage(client);
 }

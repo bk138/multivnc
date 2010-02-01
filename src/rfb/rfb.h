@@ -44,8 +44,10 @@ extern "C"
 #endif
 
 #ifdef __MINGW32__
+#define WINVER 0x0501
 #undef SOCKET
-#include <winsock2.h>
+#undef socklen_t
+#include <ws2tcpip.h>
 #endif
 
 #ifdef LIBVNCSERVER_HAVE_LIBPTHREAD
@@ -110,6 +112,11 @@ extern "C"
 #define rfbInitServer rfbInitServerWithoutPthreadsAndZRLE
 #endif
 #endif
+
+/* region stuff */
+struct sraRegion;
+typedef struct sraRegion* sraRegionPtr;
+
 
 struct _rfbClientRec;
 struct _rfbScreenInfo;
@@ -352,6 +359,34 @@ typedef struct _rfbScreenInfo
 
     /* command line authorization of file transfers */
     rfbBool permitFileTransfer;
+
+    
+    /* multicast stuff */
+    rfbBool multicastVNC;
+    char*   multicastAddr;
+    int     multicastPort;
+    char    multicastTTL;
+    SOCKET  multicastSock;
+    struct sockaddr_storage multicastSockAddr;
+    /*
+     * the constraints for MULTICAT_UPDATE_BUF_SIZE are the same as for UPDATE_BUF_SIZE 
+     * (see comment there), additionally, it _must_ fit into a UDP packet
+     */
+#define MULTICAST_UPDATE_BUF_SIZE 60000
+    char multicastUpdateBuf[MULTICAST_UPDATE_BUF_SIZE];
+    int  mcublen;
+    uint16_t multicastWholeUpdId;
+    uint32_t multicastPartialUpdId;
+#define MULTICAST_MAX_CONCURRENT_PIXELFORMATS 256 /* could be up to 65535 */
+    char multicastUpdPendingForPixelformat[(MULTICAST_MAX_CONCURRENT_PIXELFORMATS/8)+1];
+    char multicastUpdPendingForEncoding[1]; /* since non-pseudo encodings are < 256 */
+    rfbBool multicastUseCopyRect;  /* all multicast clients support CopyRect */
+    sraRegionPtr multicastUpdateRegion;
+#ifdef LIBVNCSERVER_HAVE_LIBPTHREAD
+    MUTEX(multicastOutputMutex);
+    MUTEX(multicastUpdateMutex);
+#endif
+    int multicastDeferUpdateTime;
 } rfbScreenInfo, *rfbScreenInfoPtr;
 
 
@@ -366,10 +401,6 @@ typedef void (*rfbTranslateFnType)(char *table, rfbPixelFormat *in,
                                    int width, int height);
 
 
-/* region stuff */
-
-struct sraRegion;
-typedef struct sraRegion* sraRegionPtr;
 
 /*
  * Per-client structure.
@@ -601,6 +632,14 @@ typedef struct _rfbClientRec {
     MUTEX(sendMutex);
 #endif
 
+    /* multicast stuff */
+    rfbBool  enableMulticastVNC;      /* client supports multicast FramebufferUpdates messages */
+    rfbBool  useMulticastVNC;         /* framebuffer updates should be sent via multicast socket*/
+    uint16_t multicastPixelformatId;  /* identifier assigned to client's pixelformat */
+    struct timeval startMulticastDeferring; /* this per-client tv is actually used per every combination
+					       of pixelformat and encoding, see main.c, each client is a
+					       representative of the (pixelformat, encoding) class it 
+					       belongs to */
 } rfbClientRec, *rfbClientPtr;
 
 /*
@@ -643,6 +682,11 @@ extern char rfbEndianTest;
 #define Swap24IfBE(l) (rfbEndianTest ? (l) : Swap24(l))
 #define Swap32IfBE(l) (rfbEndianTest ? (l) : Swap32(l))
 
+/* macros for bit (un)setting of buffers */
+#define rfbSetBit(buffer, position)  (buffer[(position & 255) / 8] |= (1 << (position % 8)))
+#define rfbUnsetBit(buffer, position)  (buffer[(position & 255) / 8] &= ~(1 << (position % 8)))
+
+
 /* sockets.c */
 
 extern int rfbMaxClientWait;
@@ -654,11 +698,13 @@ extern void rfbCloseClient(rfbClientPtr cl);
 extern int rfbReadExact(rfbClientPtr cl, char *buf, int len);
 extern int rfbReadExactTimeout(rfbClientPtr cl, char *buf, int len,int timeout);
 extern int rfbWriteExact(rfbClientPtr cl, const char *buf, int len);
+extern int rfbWriteExactMulticast(rfbScreenInfoPtr rfbScreen, const char *buf, int len);
 extern int rfbCheckFds(rfbScreenInfoPtr rfbScreen,long usec);
 extern int rfbConnect(rfbScreenInfoPtr rfbScreen, char* host, int port);
 extern int rfbConnectToTcpAddr(char* host, int port);
 extern int rfbListenOnTCPPort(int port, in_addr_t iface);
 extern int rfbListenOnUDPPort(int port, in_addr_t iface);
+extern int rfbCreateMulticastSocket(char* addr, int port, int ttl, in_addr_t iface, struct sockaddr_storage* sockAddrSave);
 extern int rfbStringToAddr(char* string,in_addr_t* addr);
 
 /* rfbserver.c */
@@ -684,8 +730,11 @@ extern void rfbClientConnFailed(rfbClientPtr cl, char *reason);
 extern void rfbNewUDPConnection(rfbScreenInfoPtr rfbScreen,int sock);
 extern void rfbProcessUDPInput(rfbScreenInfoPtr rfbScreen);
 extern rfbBool rfbSendFramebufferUpdate(rfbClientPtr cl, sraRegionPtr updateRegion);
+extern rfbBool rfbSendMulticastFramebufferUpdate(rfbClientPtr cl, sraRegionPtr updateRegion);
 extern rfbBool rfbSendRectEncodingRaw(rfbClientPtr cl, int x,int y,int w,int h);
+extern int rfbPutMulticastRectEncodingRaw(rfbClientPtr cl, int x,int y,int w,int h);
 extern rfbBool rfbSendUpdateBuf(rfbClientPtr cl);
+extern rfbBool rfbSendMulticastUpdateBuf(rfbScreenInfoPtr rfbScreen);
 extern void rfbSendServerCutText(rfbScreenInfoPtr rfbScreen,char *str, int len);
 extern rfbBool rfbSendCopyRegion(rfbClientPtr cl,sraRegionPtr reg,int dx,int dy);
 extern rfbBool rfbSendLastRectMarker(rfbClientPtr cl);

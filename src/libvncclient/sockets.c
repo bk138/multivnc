@@ -220,6 +220,78 @@ hexdump:
 }
 
 
+
+
+/*
+ * ReadFromRFBServerMulticast
+ * This reads in one PDU from the multicast socket and 
+ * provides it in cl->multicastbuf.
+ */
+
+rfbBool
+ReadFromRFBServerMulticast(rfbClient* client, char *out, unsigned int n)
+{
+  if(client->multicastSock < 0)
+    return FALSE;
+
+  /* enough data in buffer */
+  if (n <= client->multicastbuffered) 
+    {
+      memcpy(out, client->multicastbufoutptr, n);
+      client->multicastbufoutptr += n;
+      client->multicastbuffered -= n;
+      return TRUE;
+    }
+
+  /* not enough data left in buffer */
+  /* so flush buffer and read in another packet FIXME:really? */
+  memcpy(out, client->multicastbufoutptr, client->buffered);
+  out += client->multicastbuffered;
+  n -= client->multicastbuffered;
+
+  client->multicastbufoutptr = client->multicastbuf;
+  client->multicastbuffered = 0;
+
+  if (n <= RFB_MULTICAST_BUF_SIZE) 
+    {
+      int r;
+      r = recvfrom(client->multicastSock, client->multicastbuf, RFB_MULTICAST_BUF_SIZE, 0, NULL, NULL);
+      if(r <= 0) 
+	{
+	  if (r < 0) 
+	    {
+#ifdef WIN32
+	      errno=WSAGetLastError();
+#endif
+	      if (errno == EWOULDBLOCK || errno == EAGAIN) 
+		r = 0;
+	      else 
+		{
+		  rfbClientErr("read (%d: %s)\n",errno,strerror(errno));
+		  return FALSE;
+		}
+	    } 
+	  else 
+	    {
+	      if (errorMessageOnReadFailure) 
+		rfbClientLog("VNC server closed connection\n");
+	      return FALSE;
+	    }
+	}
+      client->multicastbuffered += r;
+	
+      memcpy(out, client->multicastbufoutptr, n);
+      client->multicastbufoutptr += n;
+      client->multicastbuffered -= n;
+      return TRUE;
+    } 
+  else 
+    /* with UDP multicast, all application PDUs must fit into a UDP PDU */
+    return FALSE;
+}
+
+
+
 /*
  * Write an exact number of bytes, and don't return until you've sent them.
  */
@@ -595,22 +667,158 @@ int WaitForMessage(rfbClient* client,unsigned int usecs)
   fd_set fds;
   struct timeval timeout;
   int num;
+  int maxfd; 
 
   if (client->serverPort==-1)
-    /* playing back vncrec file */
-    return 1;
+    {
+      /* playing back vncrec file */
+      client->serverMsg = TRUE;
+      return 1;
+    }
+
+  client->serverMsg = client->serverMsgMulticast = FALSE;
   
   timeout.tv_sec=(usecs/1000000);
   timeout.tv_usec=(usecs%1000000);
 
   FD_ZERO(&fds);
   FD_SET(client->sock,&fds);
+  maxfd = client->sock;
+  if(client->multicastSock >= 0 && !client->multicastDisabled)
+    {
+      FD_SET(client->multicastSock,&fds);
+      maxfd = max(client->sock, client->multicastSock);
+    }
 
-  num=select(client->sock+1, &fds, NULL, NULL, &timeout);
+  num=select(maxfd+1, &fds, NULL, NULL, &timeout);
   if(num<0)
     rfbClientLog("Waiting for message failed: %d (%s)\n",errno,strerror(errno));
+
+  if(FD_ISSET(client->sock, &fds))
+    client->serverMsg = TRUE;
+  if(client->multicastSock >= 0 && FD_ISSET(client->multicastSock, &fds))
+    client->serverMsgMulticast = TRUE;
 
   return num;
 }
 
 
+int CreateMulticastSocket(struct sockaddr_storage multicastSockAddr)
+{
+  int sock; 
+  struct sockaddr_storage localAddr;
+  int optval;
+  socklen_t optval_len = sizeof(optval);
+  int dfltrcvbuf;
+
+  if (!initSockets())
+    return -1;
+
+  localAddr = multicastSockAddr;
+  /* set source addr of localAddr to ANY, 
+     the rest is the same as in multicastSockAddr */
+  if(localAddr.ss_family == AF_INET) 
+    ((struct sockaddr_in*) &localAddr)->sin_addr.s_addr = htonl(INADDR_ANY);
+  else
+    if(localAddr.ss_family == AF_INET6)
+       ((struct sockaddr_in6*) &localAddr)->sin6_addr = in6addr_any;
+    else
+      {
+	rfbClientErr("CreateMulticastSocket: neither IPv4 nor IPv6 address received\n");
+	return -1;
+      }
+
+ 
+  optval = 1;
+  if((sock = socket(localAddr.ss_family, SOCK_DGRAM, 0)) < 0)
+    {
+      rfbClientErr("CreateMulticastSocket socket(): %s\n", strerror(errno));
+      return -1;
+    }
+
+  optval = 1;
+  if(setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&optval,sizeof(optval)) < 0) 
+    {
+      rfbClientErr("CreateMulticastSocket setsockopt(): %s\n", strerror(errno));
+      close(sock);
+      return -1;
+    } 
+
+  /* get/set socket receive buffer */
+  if(getsockopt(sock, SOL_SOCKET, SO_RCVBUF,&optval, &optval_len) <0)
+    {
+      rfbClientErr("CreateMulticastSocket getsockopt(): %s\n", strerror(errno));
+      close(sock);
+      return -1;
+    } 
+  dfltrcvbuf = optval;
+  optval = MULTICAST_SO_RCVBUF;
+  if(setsockopt(sock,SOL_SOCKET,SO_RCVBUF,&optval,sizeof(optval)) < 0) 
+    {
+      rfbClientErr("CreateMulticastSocket setsockopt(): %s\n", strerror(errno));
+      close(sock);
+      return -1;
+    } 
+  if(getsockopt(sock, SOL_SOCKET, SO_RCVBUF,&optval, &optval_len) <0)
+    {
+      rfbClientErr("CreateMulticastSocket getsockopt(): %s\n", strerror(errno));
+      close(sock);
+      return -1;
+    } 
+  rfbClientLog("MulticastVNC: tried to set socket receive buffer from %d to %d, got %d\n",
+	       dfltrcvbuf, MULTICAST_SO_RCVBUF, optval);
+
+
+  if(bind(sock, (struct sockaddr*)&localAddr, sizeof(localAddr)) < 0)
+    {
+      rfbClientErr("CreateMulticastSocket bind(): %s\n", strerror(errno));
+      close(sock);
+      return -1;
+    }
+
+  
+  /* Join the multicast group. We do this seperately for IPv4 and IPv6. */
+  if(multicastSockAddr.ss_family == AF_INET)
+    {
+      struct ip_mreq multicastRequest;  
+ 
+      memcpy(&multicastRequest.imr_multiaddr,
+	     &((struct sockaddr_in*) &multicastSockAddr)->sin_addr,
+	     sizeof(multicastRequest.imr_multiaddr));
+
+      multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
+
+      if(setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*) &multicastRequest, sizeof(multicastRequest)) < 0)
+        {
+	  rfbClientErr("CreateMulticastSocket setsockopt(): %s\n", strerror(errno));
+	  close(sock);
+	  return -1;
+        }
+    }
+  else 
+    if(multicastSockAddr.ss_family == AF_INET6)
+      {
+	struct ipv6_mreq multicastRequest;  
+
+	memcpy(&multicastRequest.ipv6mr_multiaddr,
+	       &((struct sockaddr_in6*) &multicastSockAddr)->sin6_addr,
+	       sizeof(multicastRequest.ipv6mr_multiaddr));
+
+	multicastRequest.ipv6mr_interface = 0;
+
+	if(setsockopt(sock, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (char*) &multicastRequest, sizeof(multicastRequest)) < 0)
+	  {
+	    rfbClientErr("CreateMulticastSocket setsockopt(): %s\n", strerror(errno));
+	    close(sock);
+	    return -1;
+	  }
+      }
+    else
+      {
+	rfbClientErr("CreateMulticastSocket: neither IPv6 nor IPv6 specified");
+	close(sock);
+	return -1;
+      }
+
+  return sock;
+}
