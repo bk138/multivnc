@@ -68,3 +68,13 @@ appbundle: src/multivnc
 	" >  $(bundle_contents)/Info.plist
 endif
 
+
+if MINGW
+nsis_installer: src/multivnc.exe multivnc.nsi README NEWS COPYING
+	cat README | unix2dos > README.TXT
+	cat NEWS | unix2dos > NEWS.TXT
+	cat COPYING | unix2dos > COPYING.TXT
+	makensis multivnc.nsi 
+endif
+
+
