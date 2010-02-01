@@ -38,19 +38,19 @@ section "Uninstall"
   # Always delete uninstaller first
   delete $INSTDIR\multivnc-uninstall.exe
 
- 
   # now delete installed files
   delete $INSTDIR\multivnc.exe
   delete $INSTDIR\mingwm10.dll
   delete $INSTDIR\NEWS.TXT
   delete $INSTDIR\README.TXT
+  RMDir  $INSTDIR
  
   # delete shortcuts
   delete "$SMPROGRAMS\MultiVNC\Multivnc.lnk"
   delete "$SMPROGRAMS\MultiVNC\Readme.lnk"
   delete "$SMPROGRAMS\MultiVNC\News.lnk"
   delete "$SMPROGRAMS\MultiVNC\Uninstall MultiVNC.lnk"
-  delete "$SMPROGRAMS\MultiVNC"
+  RMDir  "$SMPROGRAMS\MultiVNC"
   
 sectionEnd
 
