@@ -96,7 +96,14 @@ wxThread::ExitCode VNCThread::Entry()
       if(listenMode)
 	i=listenForIncomingConnectionsNoFork(p->cl, 500);
       else
-	i=WaitForMessage(p->cl, 500);
+	{
+	  if(!rfbProcessServerMessage(p->cl, 500))
+	    {
+	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), p);
+	      p->SendDisconnectNotify();
+	      break;
+	    }
+	}
 
 #ifdef __WXGTK__
       sigprocmask(SIG_SETMASK, &oldsigs, NULL);
@@ -116,23 +123,6 @@ wxThread::ExitCode VNCThread::Entry()
 	      return 0;
 	    }
 	}
-      else
-	{
-	  if(i<0)
-	    {
-	      wxLogDebug(wxT("VNCConn %p: vncthread waitforMessage() failed"), p);
-	      p->SendDisconnectNotify();
-	      return 0;
-	    }
-	  if(i)
-	    if(!HandleRFBServerMessage(p->cl))
-	      {
-		wxLogDebug(wxT("VNCConn %p: vncthread HandleRFBServerMessage() failed"), p);
-		p->SendDisconnectNotify();
-		return 0;
-	      }
-	}
-     
     }
   return 0;
 }
@@ -242,7 +232,7 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
 	     rect->y,
 	     rect->width,
 	     rect->height);
-
+  
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
 
@@ -518,6 +508,7 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   cl->GotXCutText = got_cuttext;
 
   cl->canHandleNewFBSize = TRUE;
+  cl->canHandleMulticastVNC = TRUE;
   
   return true;
 }
