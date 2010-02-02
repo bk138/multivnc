@@ -1,41 +1,57 @@
 
-how to compile
-^^^^^^^^^^^^^^
+ MultiVNC is a cross-platform Multicast-enabled VNC client using
+ wxWidgets and libvncclient . It runs on Unix, Mac OS X and Windows.
 
-the prerequisites:
-
-- the usual c-compiler with headers and stuff
-- wxWidgets dev package version >= 2.8.7
-- zlib dev package 
-- libjpeg dev package 
-
-to compile:
-
-./autogen.sh
-
-
-if crosscompiling with MinGW:
-
-
-./autogen.sh --build=<your build system type> --host=i586-mingw32msvc \
-	     --with-wx-config=<your win32 wx-config> \
-	     --with-zlib=<path to where zlib include and lib dirs are> \
-	     --with-jepg=<path to where jpeglib include and lib dirs are> 
-
-
-then
-
-
-make
-
-
-and cross fingers
-
-
-to install:
-- 'make install' as root
-- or copy binary wherever you like to
+ Features:
+   * MulticastVNC ;-) 
+   * Support for most encodings including Tight.
+   * Several connections with one viewer using tabs.
+   * Discovery of VNC servers advertising themselves via ZeroConf. 
+   * Listen mode (Reverse VNC). Via tabs it's possible to listen 
+     for and serve multiple incoming connections.
+   * Supports server framebuffer resize.
+   * Bookmarks.
+   * Simple, loggable statistics 
 
 
 
-that's pretty much it, have fun !
+
+ How to compile from source
+ ''''''''''''''''''''''''''
+
+ the prerequisites:
+
+   * the usual c-compiler with headers and stuff
+   * wxWidgets dev package version >= 2.8.7
+   * zlib dev package 
+   * libjpeg dev package 
+
+ to compile:
+
+   ./autogen.sh
+
+
+ if crosscompiling with MinGW:
+
+
+   ./autogen.sh --build=<your build system type> --host=i586-mingw32msvc \
+	        --with-wx-config=<your win32 wx-config> \
+	        --with-zlib=<path to where zlib include and lib dirs are> \
+	        --with-jepg=<path to where jpeglib include and lib dirs are> 
+
+ then
+
+
+   make
+
+
+ and cross fingers...
+
+
+ to install:
+ * 'make install' as root
+ * or copy binary wherever you like to
+
+
+
+ that's pretty much it, have fun !
