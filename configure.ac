@@ -27,6 +27,8 @@ esac
 AM_CONDITIONAL(MINGW, [ test "$HOST_IS_WINDOWS" = "yes" ])
 AM_CONDITIONAL(DARWIN, [ test "$HOST_IS_DARWIN" = "yes" ])
 
+dnl enable warnings
+CXXFLAGS="$CXXFLAGS -Wall"
 
 dnl default for wx-config
 WXCONFIG="wx-config"
