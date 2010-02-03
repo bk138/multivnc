@@ -21,6 +21,8 @@ public:
   
   bool OnInit();
   int  OnExit();
+  virtual void OnUnhandledException();
+ 
   bool setLocale(int language);
 
   // application-wide mutex protecting wxTheClipboard

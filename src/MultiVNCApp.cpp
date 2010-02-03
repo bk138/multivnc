@@ -70,6 +70,15 @@ int MultiVNCApp::OnExit()
 
 
 
+void MultiVNCApp::OnUnhandledException()
+{
+  //this way it should work under both normal and debug builds
+  wxLogError(_("GAAH! Got an unhandled exception!"));  
+  wxLogDebug(_("GAAH! Got an unhandled exception!"));          
+}
+
+
+
 bool MultiVNCApp::setLocale(int language)
 {
   delete locale;
