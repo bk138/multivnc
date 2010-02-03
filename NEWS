@@ -1,10 +1,14 @@
-MultiVNC 0.2 - 
+MultiVNC 0.2 - "The real thing"
+	* MulticastVNC incorporated! You can now connect to a
+ 	  MulticastVNC enabled server, e.g. based on libvncserver.
 	* Listen mode (Reverse VNC) implemented. Via tabs it is
 	  possible to listen for and serve multiple incoming
 	  connections.
         * Bookmarks are working now.
 	* Clipboard data is now properly encoded.
 	* Fix bug with canvas centering.
+	* Fix bug where disconnecting from a fast server would 
+ 	  terminate MultiVNC.
 
 
 MultiVNC 0.1 - "In the beginning"
