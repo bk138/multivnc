@@ -3,8 +3,11 @@
 #include <wx/aboutdlg.h>
 #include <wx/socket.h>
 #include <wx/clipbrd.h>
+#include <wx/imaglist.h>
 
 #include "res/about.png.h"
+#include "res/unicast.png.h"
+#include "res/multicast.png.h"
 
 #include "MyFrameMain.h"
 #include "MyDialogSettings.h"
@@ -60,6 +63,12 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   SetSize(x, y);
 
+  // assign image list to notebook_connections
+  notebook_connections->AssignImageList(new wxImageList(24, 24));
+  notebook_connections->GetImageList()->Add(bitmapFromMem(unicast_png));
+  notebook_connections->GetImageList()->Add(bitmapFromMem(multicast_png));
+
+
   /*
     setup menu items for a the frame
     unfortunately there seems to be a bug in wxMenu::FindItem(str): 
@@ -113,7 +122,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       wxTheClipboard->UsePrimarySelection(true);
       wxTheClipboard->Close();
     }
-
 #endif  
   
 
@@ -222,13 +230,18 @@ void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
     return;
 
   VNCConn* c = connections.at(sel);
-  
   if(c == event.GetEventObject())
     {
       wxRect* rect = static_cast<wxRect*>(event.GetClientData());
       VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
       canvas->drawRegion(*rect);
       delete rect; // avoid memleaks!
+
+      // update icon
+      if(c->isMulticast())
+	notebook_connections->SetPageImage(sel, 1);
+      else
+	notebook_connections->SetPageImage(sel, 0);
     }
 }
 
@@ -488,6 +501,10 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   else
     notebook_connections->AddPage(container, c->getDesktopName(), true);
 
+  if(c->isMulticast())
+    notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
+  else
+    notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
 
   // "end connection"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(true);

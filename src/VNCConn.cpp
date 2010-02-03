@@ -399,6 +399,7 @@ void VNCConn::kbd_leds(rfbClient* cl, int value, int pad)
 void VNCConn::textchat(rfbClient* cl, int value, char *text)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID); 
+  wxLogDebug(wxT("VNCConn %p: Got chat text: '%s'\n"), conn, text);
 }
 
 
@@ -634,7 +635,6 @@ void VNCConn::Shutdown()
 
   if(vncthread)
     {
-      //wxCriticalSectionLocker lock(mutex_vncthread);
       wxLogDebug(wxT( "VNCConn %p: Shutdown() before vncthread delete"), this);
       ((VNCThread*)vncthread)->Delete();
       // wait for deletion to finish
@@ -1033,3 +1033,13 @@ wxString VNCConn::getServerPort() const
   else
     return wxEmptyString;
 }
+
+bool VNCConn::isMulticast() const
+{
+  if(cl && cl->multicastSock >= 0 && !cl->multicastDisabled) 
+    return true;
+  else
+    return false;
+}
+
+
