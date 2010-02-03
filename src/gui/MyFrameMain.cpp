@@ -217,7 +217,12 @@ void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
 {
   // only process currently selected connection
-  VNCConn* c = connections.at(notebook_connections->GetSelection());
+  int sel;
+  if((sel = notebook_connections->GetSelection()) == -1) // none selected
+    return;
+
+  VNCConn* c = connections.at(sel);
+  
   if(c == event.GetEventObject())
     {
       wxRect* rect = static_cast<wxRect*>(event.GetClientData());
@@ -505,7 +510,7 @@ void MyFrameMain::terminate_conn(int which)
     {
       if(c->isReverse())
 	listen_ports.erase(wxAtoi(c->getServerPort()));
-    
+   
       connections.erase(connections.begin() + which);
 
       notebook_connections->DeletePage(which);
