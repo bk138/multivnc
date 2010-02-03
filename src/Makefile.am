@@ -40,11 +40,20 @@ multivnc_SOURCES = \
 	gui/DialogSettings.h \
 	gui/MyDialogSettings.cpp \
 	gui/MyDialogSettings.h \
+	gui/res/about.png \
+	gui/res/connect.png \
+	gui/res/disconnect.png \
+	gui/res/fullscreen.png \
+	gui/res/screenshot.png \
+	gui/res/unicast.png \
+	gui/res/multicast.png \
 	gui/res/about.png.h \
 	gui/res/connect.png.h \
 	gui/res/disconnect.png.h \
 	gui/res/fullscreen.png.h \
 	gui/res/screenshot.png.h \
+	gui/res/unicast.png.h \
+	gui/res/multicast.png.h \
 	gui/res/multivnc.xpm \
 	gui/res/vnccursor-mask.xbm \
 	gui/res/vnccursor.xbm
