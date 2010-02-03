@@ -25,6 +25,8 @@
 #define V_COMPRESSLEVEL 1
 #define K_QUALITY wxT("Quality")
 #define V_QUALITY 5
+#define K_MULTICAST wxT("MulticastVNC")
+#define V_MULTICAST true
 
 // logging
 #define K_LOGSAVETOFILE wxT("LogFile")

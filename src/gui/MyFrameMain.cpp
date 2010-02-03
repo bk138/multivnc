@@ -420,9 +420,12 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
   // get connection settings
   int compresslevel, quality;
+  bool multicast;
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
+  pConfig->Read(K_MULTICAST, &multicast, V_MULTICAST);
+
 
   VNCConn* c = new VNCConn(this);
   c->Setup(getpasswd);
@@ -458,7 +461,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
 
       wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
-      if(!c->Init(addr + wxT(":") + port, compresslevel, quality))
+      if(!c->Init(addr + wxT(":") + port, compresslevel, quality, multicast))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -794,6 +797,7 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
       pConfig->Write(K_QUALITY, dialog_settings.getQuality());
       pConfig->Write(K_STATSAUTOSAVE, dialog_settings.getStatsAutosave());
       pConfig->Write(K_LOGSAVETOFILE, dialog_settings.getLogSavetofile());
+      pConfig->Write(K_MULTICAST, dialog_settings.getMulticast());
 
       VNCConn::doLogfile(dialog_settings.getLogSavetofile());
     }

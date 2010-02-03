@@ -20,6 +20,7 @@ public:
   int getQuality() const { return slider_quality->GetValue(); };
   bool getStatsAutosave() const { return checkbox_stats_save->GetValue(); };
   bool getLogSavetofile() const { return checkbox_logfile->GetValue(); };
+  bool getMulticast() const { return checkbox_multicast->GetValue(); };
   
 };
 

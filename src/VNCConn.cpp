@@ -508,7 +508,6 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   cl->GotXCutText = got_cuttext;
 
   cl->canHandleNewFBSize = TRUE;
-  cl->canHandleMulticastVNC = TRUE;
   
   return true;
 }
@@ -556,7 +555,7 @@ bool VNCConn::Listen(int port)
 }
 
 
-bool VNCConn::Init(const wxString& host, int compresslevel, int quality)
+bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool multicast)
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
 
@@ -577,8 +576,11 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality)
   argv[3] = strdup((wxString() << compresslevel).mb_str());
   argv[4] = strdup("-quality");
   argv[5] = strdup((wxString() << quality).mb_str());
-  
-  
+  if(multicast)
+    cl->canHandleMulticastVNC = TRUE;
+  else
+    cl->canHandleMulticastVNC = FALSE;
+
   if(! rfbInitClient(cl, &argc, argv))
     {
       cl = 0; //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr

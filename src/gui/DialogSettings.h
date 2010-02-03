@@ -36,6 +36,7 @@ protected:
     wxSlider* slider_compresslevel;
     wxStaticText* label_quality;
     wxSlider* slider_quality;
+    wxCheckBox* checkbox_multicast;
     wxPanel* notebook_settings_pane_conn;
     wxCheckBox* checkbox_stats_save;
     wxPanel* notebook_settings_pane_stats;

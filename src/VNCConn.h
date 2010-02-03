@@ -106,7 +106,7 @@ public:
   bool Setup(char* (*getpasswdfunc)(rfbClient*));
   void Cleanup();
   bool Listen(int port);
-  bool Init(const wxString& host, int compresslevel = 1, int quality = 5);
+  bool Init(const wxString& host, int compresslevel = 1, int quality = 5, bool multicast = true);
   void Shutdown();
 
   bool isReverse() const { return cl ? cl->listenSpecified : false; };

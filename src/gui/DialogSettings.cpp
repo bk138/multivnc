@@ -21,6 +21,7 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     slider_compresslevel = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     label_quality = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Use the specified JPEG quality level for the  \"tight\"  encoding  (TightVNC-specific)."));
     slider_quality = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
+    checkbox_multicast = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Use MulticastVNC"));
     checkbox_stats_save = new wxCheckBox(notebook_settings_pane_stats, wxID_ANY, _("Autosave statistics on close"));
     checkbox_logfile = new wxCheckBox(notebook_settings_pane_log, wxID_ANY, _("Write VNC log to logfile (MultiVNC.log)"));
 
@@ -46,6 +47,7 @@ void DialogSettings::do_layout()
     wxBoxSizer* sizer_log = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* sizer_stats = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_conn = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* sizer_misc = new wxBoxSizer(wxHORIZONTAL);
     wxStaticBoxSizer* sizer_quality = new wxStaticBoxSizer(sizer_quality_staticbox, wxVERTICAL);
     wxStaticBoxSizer* sizer_compresslevel = new wxStaticBoxSizer(sizer_compresslevel_staticbox, wxVERTICAL);
     sizer_compresslevel->Add(label_compresslevel, 0, wxALL|wxADJUST_MINSIZE, 3);
@@ -54,6 +56,8 @@ void DialogSettings::do_layout()
     sizer_quality->Add(label_quality, 0, wxALL|wxADJUST_MINSIZE, 3);
     sizer_quality->Add(slider_quality, 0, wxALL|wxEXPAND|wxADJUST_MINSIZE, 3);
     sizer_conn->Add(sizer_quality, 1, wxALL|wxEXPAND, 3);
+    sizer_misc->Add(checkbox_multicast, 0, wxALL|wxEXPAND|wxADJUST_MINSIZE, 3);
+    sizer_conn->Add(sizer_misc, 1, wxALL, 3);
     notebook_settings_pane_conn->SetSizer(sizer_conn);
     sizer_stats->Add(checkbox_stats_save, 0, wxALL|wxADJUST_MINSIZE, 3);
     notebook_settings_pane_stats->SetSizer(sizer_stats);

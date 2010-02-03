@@ -27,6 +27,8 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   checkbox_stats_save->SetValue(value);
   pConfig->Read(K_LOGSAVETOFILE, &value, V_LOGSAVETOFILE);
   checkbox_logfile->SetValue(value);
+  pConfig->Read(K_MULTICAST, &value, V_MULTICAST);
+  checkbox_multicast->SetValue(value);
 }
 
 
