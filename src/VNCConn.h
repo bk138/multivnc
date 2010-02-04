@@ -29,6 +29,10 @@ class VNCConn: public wxEvtHandler
 
   rfbClient* cl;
 
+#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
+  static bool TLS_threading_initialized;
+#endif
+
   // this counts the ms since Init()
   wxStopWatch conn_stopwatch;
 

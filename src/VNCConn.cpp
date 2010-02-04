@@ -152,6 +152,16 @@ BEGIN_EVENT_TABLE(VNCConn, wxEvtHandler)
 END_EVENT_TABLE();
 
 
+#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
+bool VNCConn::TLS_threading_initialized;
+extern "C" 
+{
+#include <gcrypt.h>
+#include <errno.h>
+  GCRY_THREAD_OPTION_PTHREAD_IMPL;
+}
+#endif
+
 
 /*
   constructor/destructor
@@ -169,6 +179,17 @@ VNCConn::VNCConn(void* p)
   fb_data = 0;
 
   rfbClientLog = rfbClientErr = logger;
+
+#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
+  /* we're using threads in here, tell libgcrypt before TLS 
+     gets initialized by libvncclient! */
+  if(! TLS_threading_initialized)
+    {
+      wxLogDebug(wxT("Initialized libgcrypt threading."));
+      gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+      TLS_threading_initialized = true;
+    }
+#endif
 
   // statistics stuff
   do_stats = false;
