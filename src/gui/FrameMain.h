@@ -55,6 +55,8 @@ protected:
     wxTextCtrl* text_ctrl_fps;
     wxStaticText* label_latency;
     wxTextCtrl* text_ctrl_latency;
+    wxStaticText* label_lossratio;
+    wxTextCtrl* text_ctrl_lossratio;
     wxPanel* splitwin_leftlower_pane_2;
     wxSplitterWindow* splitwin_leftlower;
     wxPanel* splitwin_left_pane_2;
@@ -77,6 +79,7 @@ public:
     virtual void machine_screenshot(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_upd(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_lat(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_save_stats_lossratio(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_exit(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_toggletoolbar(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglediscovered(wxCommandEvent &event); // wxGlade: <event_handler>

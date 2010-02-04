@@ -59,7 +59,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   SetMinSize(wxSize(640, 480));
   splitwin_main->SetMinimumPaneSize(160);
   splitwin_left->SetMinimumPaneSize(250);
-  splitwin_leftlower->SetMinimumPaneSize(120);
+  splitwin_leftlower->SetMinimumPaneSize(160);
 
   SetSize(x, y);
 
@@ -82,6 +82,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // stats
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
@@ -172,8 +173,13 @@ MyFrameMain::~MyFrameMain()
 	      if(! saveArrayString(const_cast<wxArrayString&>(c->getLatencyStats()), filename))
 		wxLogError(_("Could not autosave pointer latency statistics!"));
 	    }
-
 	  
+	  if(! c->getMCLossRatioStats().IsEmpty())
+	    {
+	      wxString filename = desktopname + wxT("-MCLossRatio-Stats-") + wxNow() + wxT(".txt");
+	      if(! saveArrayString(const_cast<wxArrayString&>(c->getMCLossRatioStats()), filename))
+		wxLogError(_("Could not autosave multicast loss ratio statistics!"));
+	    }
 	}
     }
  
@@ -385,11 +391,14 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
 
       text_ctrl_fps->Clear();
       text_ctrl_latency->Clear();
+      text_ctrl_lossratio->Clear();
       
       if( ! c->getUpdateStats().IsEmpty() )
 	*text_ctrl_fps << c->getUpdateStats().Last().AfterFirst(wxT(','));
       if( ! c->getLatencyStats().IsEmpty() )
 	*text_ctrl_latency << c->getLatencyStats().Last().AfterFirst(wxT(','));
+      if( ! c->getMCLossRatioStats().IsEmpty() )
+	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterFirst(wxT(','));
     }
 }
 
@@ -513,6 +522,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   // stats
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(true);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
   
@@ -547,6 +557,7 @@ void MyFrameMain::terminate_conn(int which)
       // stats
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
       // bookmarks
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
     }
@@ -646,7 +657,7 @@ void MyFrameMain::splitwinlayout()
   else
     splitwin_left->SetSashPosition(h * 0.9);
 
-  splitwin_leftlower->SetSashPosition(h * 0.75);
+  splitwin_leftlower->SetSashPosition(h * 0.27);
   
   
   // finally if not shown, disable menu items
@@ -924,6 +935,42 @@ void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
 	}
     }
 }
+
+
+void MyFrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
+{
+  if(connections.size())
+    {
+      VNCConn* c = connections.at(notebook_connections->GetSelection());
+
+      if(c->getMCLossRatioStats().IsEmpty())
+	{
+	  wxLogMessage(_("Nothing to save!"));
+	  return;
+	}
+
+      wxString desktopname =  c->getDesktopName();
+#ifdef __WIN32__
+      // windows doesn't like ':'s
+      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
+
+      wxString filename = wxFileSelector(_("Save multicast loss ratio statistics..."), 
+					 wxEmptyString,
+					 desktopname + wxT("-MCLossRatio-Stats-") + wxNow() + wxT(".txt"), 
+					 wxT(".txt"), 
+					 _("TXT files|*.txt"), 
+					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+      
+      if(!filename.empty())
+	{
+	  wxBusyCursor busy;
+	  if(! saveArrayString(const_cast<wxArrayString&>(c->getMCLossRatioStats()), filename))
+	    wxLogError(_("Could not save file!"));
+	}
+    }
+}
+
 
 
 

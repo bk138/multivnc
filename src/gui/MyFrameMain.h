@@ -91,6 +91,7 @@ public:
   void machine_screenshot(wxCommandEvent &event);
   void machine_save_stats_upd(wxCommandEvent &event); 
   void machine_save_stats_lat(wxCommandEvent &event); 
+  void machine_save_stats_lossratio(wxCommandEvent &event); 
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);

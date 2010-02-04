@@ -35,6 +35,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxMenu* wxglade_tmp_menu_1_sub = new wxMenu();
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD, _("Save Framebuffer Update Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LAT, _("Save Pointer Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LOSSRATIO, _("Save Multicast Loss Ratio Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_ANY, _("Statistics"), wxglade_tmp_menu_1_sub, wxEmptyString);
     wxglade_tmp_menu_1->AppendSeparator();
     wxglade_tmp_menu_1->Append(wxID_EXIT, wxEmptyString, _("Exit MultiVNC."), wxITEM_NORMAL);
@@ -76,6 +77,8 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     text_ctrl_fps = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     label_latency = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Latency (ms):"));
     text_ctrl_latency = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    label_lossratio = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("MC loss ratio:"));
+    text_ctrl_lossratio = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     notebook_connections = new wxNotebook(splitwin_main_pane_2, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
 
     set_properties();
@@ -94,6 +97,7 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_SAVE, FrameMain::machine_screenshot)
     EVT_MENU(ID_STATS_SAVE_UPD, FrameMain::machine_save_stats_upd)
     EVT_MENU(ID_STATS_SAVE_LAT, FrameMain::machine_save_stats_lat)
+    EVT_MENU(ID_STATS_SAVE_LOSSRATIO, FrameMain::machine_save_stats_lossratio)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
     EVT_MENU(ID_TOOLBAR, FrameMain::view_toggletoolbar)
     EVT_MENU(ID_DISCOVERED, FrameMain::view_togglediscovered)
@@ -169,6 +173,13 @@ void FrameMain::machine_save_stats_lat(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_lat) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_lossratio) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 
@@ -321,6 +332,8 @@ void FrameMain::do_layout()
     sizer_3->Add(text_ctrl_fps, 0, wxALL|wxADJUST_MINSIZE, 3);
     sizer_3->Add(label_latency, 0, wxALL, 3);
     sizer_3->Add(text_ctrl_latency, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_3->Add(label_lossratio, 0, wxALL, 3);
+    sizer_3->Add(text_ctrl_lossratio, 0, wxALL|wxADJUST_MINSIZE, 3);
     splitwin_leftlower_pane_2->SetSizer(sizer_3);
     splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2, 83);
     sizer_leftlower->Add(splitwin_leftlower, 1, wxALL|wxEXPAND, 3);

@@ -54,6 +54,7 @@ class VNCConn: public wxEvtHandler
   // string arrays to store values over time
   wxArrayString updates;
   wxArrayString latencies;
+  wxArrayString mc_lossratios;
 
 
   // per-connection error string
@@ -126,6 +127,7 @@ public:
   // get stats, in format "timestamp, value"
   const wxArrayString& getUpdateStats() const { const wxArrayString& ref = updates; return ref; };
   const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
+  const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = mc_lossratios; return ref; };
 
   // cuttext
   const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };

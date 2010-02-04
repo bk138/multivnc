@@ -6,7 +6,6 @@
 #include <wx/thread.h>
 #include <wx/socket.h>
 
-
 #include "VNCConn.h"
 
 
@@ -313,6 +312,14 @@ void VNCConn::onUpdatesCountTimer(wxTimerEvent& event)
 		  + wxT(", ") +
 		  (wxString() << updates_count));
       updates_count = 0;
+
+      if(isMulticast())
+	{
+	  double lossrate = cl->multicastLost/(double)(cl->multicastRcvd+cl->multicastLost);
+	  mc_lossratios.Add((wxString() << (int)conn_stopwatch.Time())
+			    + wxT(", ") +
+			    wxString::Format(wxT("%.4f"), lossrate));
+	}
     }
 }
 
@@ -673,7 +680,7 @@ void VNCConn::Shutdown()
 #else
       close(cl->sock);
 #endif
-      // in case we called listen, canceled that, and nwo want to connect to some
+      // in case we called listen, canceled that, and now want to connect to some
       // host via Init()
       cl->listenSpecified = FALSE;
     }
@@ -894,6 +901,7 @@ void VNCConn::resetStats()
 {
   latencies.Clear();
   updates.Clear();
+  mc_lossratios.Clear();
 }
 
 
