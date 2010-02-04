@@ -1,6 +1,6 @@
 
 in order of importance:
 
- - actual multicast stuff
+ - (probably) fix TLS on win32
  - tooltips
  - translations
