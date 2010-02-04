@@ -3,11 +3,10 @@
 #include <wx/sizer.h>
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
-#include "VNCCanvas.h"
-#include "MultiVNCApp.h"
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
-
+#include "MultiVNCApp.h"
+#include "VNCCanvas.h"
 
 
 

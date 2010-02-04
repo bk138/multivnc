@@ -70,6 +70,8 @@ multivnc_LDADD = \
 
 if MINGW
 multivnc_SOURCES += gui/winres.rc
+multivnc_LDADD += -lws2_32
 .rc.o:
 	 $(WX_RESCOMP) -o $@ $<
 endif
+

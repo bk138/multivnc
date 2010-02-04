@@ -22,14 +22,6 @@ EXTRA_DIST = $(multivncdoc_DATA) \
              $(pixmap_DATA)
 
 
-# Copy all the spec files. Of cource, only one is actually used.
-dist-hook:
-	for specfile in *.spec; do \
-		if test -f $$specfile; then \
-			cp -p $$specfile $(distdir); \
-		fi \
-	done
-
 if DARWIN
 bundle_contents = MultiVNC.app/Contents
 appbundle: src/multivnc
@@ -70,7 +62,7 @@ endif
 
 
 if MINGW
-nsis_installer: src/multivnc.exe multivnc.nsi README NEWS COPYING
+nsis_installer: all multivnc.nsi README NEWS COPYING
 	cat README | unix2dos > README.TXT
 	cat NEWS | unix2dos > NEWS.TXT
 	cat COPYING | unix2dos > COPYING.TXT
