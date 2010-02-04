@@ -1126,10 +1126,24 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   wxIcon icon;
   icon.CopyFromBitmap(bitmapFromMem(about_png));
 
+  wxString desc = _("MultiVNC is a cross-platform Multicast-enabled VNC client.");
+#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
+  desc += _("\n\nBuiltin features:\n");
+  desc += wxT("Anonymous TLS, VeNCrypt\n");
+#endif
+  desc += _("\nSupported Encodings:\n");
+  desc += wxT("Raw, RRE, coRRE, CopyRect, Hextile, Ultra");
+#ifdef LIBVNCSERVER_HAVE_LIBZ 
+  desc += wxT(", UltraZip, Zlib, ZlibHex, ZRLE, ZYWRLE");
+#ifdef LIBVNCSERVER_HAVE_LIBJPEG 
+  desc += wxT(", Tight");
+#endif
+#endif
+
   info.SetIcon(icon);
   info.SetName(wxT("MultiVNC"));
   info.SetVersion(wxT(VERSION));
-  info.SetDescription(_("MultiVNC is a cross-platform Multicast-enabled VNC client."));
+  info.SetDescription(desc);
   info.SetCopyright(wxT(COPYRIGHT));
   
   wxAboutBox(info); 
