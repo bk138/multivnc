@@ -1173,9 +1173,9 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   wxIcon icon;
   icon.CopyFromBitmap(bitmapFromMem(about_png));
 
-  wxString desc = _("MultiVNC is a cross-platform Multicast-enabled VNC client.");
+  wxString desc = _("MultiVNC is a cross-platform Multicast-enabled VNC client.\n");
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
-  desc += _("\n\nBuiltin features:\n");
+  desc += _("\nBuiltin features:\n");
   desc += wxT("Anonymous TLS, VeNCrypt\n");
 #endif
   desc += _("\nSupported Encodings:\n");
