@@ -123,9 +123,9 @@ bool VNCThread::sendPointerEvent(pointerEvent &event)
 
   if(p->do_stats)
     {
+      wxCriticalSectionLocker lock(p->mutex_latency_stats);
       p->pointer_pos.x = event.m_x;
       p->pointer_pos.y = event.m_y;
-      wxCriticalSectionLocker lock(p->mutex_pointer_stopwatch);
       p->pointer_stopwatch.Start();
     }
 
@@ -346,14 +346,12 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
       // updates/s
       ++updates_count;
   
+      wxCriticalSectionLocker lock(mutex_latency_stats);
       // pointer latency
       // well, this is not neccessarily correct, but wtf
       if(rect->Contains(pointer_pos))
 	{
-	  {
-	    wxCriticalSectionLocker lock(mutex_pointer_stopwatch);
-	    pointer_stopwatch.Pause();
-	  }
+	  pointer_stopwatch.Pause();
 	  latencies.Add((wxString() << (int)conn_stopwatch.Time()) + 
 			wxT(", ") + 
 			(wxString() << (int)pointer_stopwatch.Time()));
