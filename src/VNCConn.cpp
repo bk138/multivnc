@@ -108,6 +108,7 @@ bool VNCThread::sendPointerEvent(pointerEvent &event)
 
   if(event.Entering() && ! p->cuttext.IsEmpty())
     {
+      wxCriticalSectionLocker lock(p->mutex_cuttext); // since cuttext can be set from the main thread
       // if encoding fails, a NULL pointer is returned!
       if(p->cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))))
 	{
