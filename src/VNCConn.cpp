@@ -5,7 +5,7 @@
 #include <wx/log.h>
 #include <wx/thread.h>
 #include <wx/socket.h>
-
+#include "msgqueue.h"
 #include "VNCConn.h"
 
 
@@ -24,6 +24,15 @@ DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnCuttextNOTIFY) 
+
+// these are passed to the worker thread
+typedef wxMouseEvent pointerEvent;
+struct keyEvent
+{
+  rfbKeySym keysym;
+  bool down; 
+};
+
 
 // pixelformat defaults
 // seems 8,3,4 and 5,3,2 are possible with rfbGetClient()
@@ -46,8 +55,14 @@ class VNCThread : public wxThread
 {
   VNCConn *p;    // our parent object
   bool listenMode;
+
+  bool sendPointerEvent(pointerEvent &event);
+  bool sendKeyEvent(keyEvent &event);
  
 public:
+  wxMessageQueue<pointerEvent> pointer_event_q;
+  wxMessageQueue<keyEvent> key_event_q;
+
   VNCThread(VNCConn *parent, bool listen);
   
   // thread execution starts here
@@ -71,6 +86,62 @@ VNCThread::VNCThread(VNCConn *parent, bool listen)
 
 
 
+
+bool VNCThread::sendPointerEvent(pointerEvent &event)
+{
+  int buttonmask = 0;
+
+  if(event.LeftIsDown())
+    buttonmask |= rfbButton1Mask;
+
+  if(event.MiddleIsDown())
+    buttonmask |= rfbButton2Mask;
+  
+  if(event.RightIsDown())
+    buttonmask |= rfbButton3Mask;
+
+  if(event.GetWheelRotation() > 0)
+    buttonmask |= rfbWheelUpMask;
+
+  if(event.GetWheelRotation() < 0)
+    buttonmask |= rfbWheelDownMask;
+
+  if(event.Entering() && ! p->cuttext.IsEmpty())
+    {
+      // if encoding fails, a NULL pointer is returned!
+      if(p->cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))))
+	{
+	  wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), p, p->cuttext.c_str());
+	  char* encoded_text = strdup(p->cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
+	  SendClientCutText(p->cl, encoded_text, strlen(encoded_text));
+	  free(encoded_text);	  
+	}
+      else
+	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), p, p->cuttext.c_str());
+    }
+
+  if(p->do_stats)
+    {
+      p->pointer_pos.x = event.m_x;
+      p->pointer_pos.y = event.m_y;
+      p->pointer_stopwatch.Start();
+    }
+
+  wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), p, event.m_x, event.m_y, buttonmask);
+  return SendPointerEvent(p->cl, event.m_x, event.m_y, buttonmask);
+}
+
+
+
+
+bool VNCThread::sendKeyEvent(keyEvent &event)
+{
+  return SendKeyEvent(p->cl, event.keysym, event.down);
+}
+
+
+
+
 wxThread::ExitCode VNCThread::Entry()
 {
   int i;
@@ -86,6 +157,9 @@ wxThread::ExitCode VNCThread::Entry()
   sigaddset(&newsigs, SIGRTMIN-1);
 #endif
 
+  pointerEvent pe;
+  keyEvent ke;
+
   while(! TestDestroy()) 
     {
 #ifdef __WXGTK__
@@ -96,6 +170,12 @@ wxThread::ExitCode VNCThread::Entry()
 	i=listenForIncomingConnectionsNoFork(p->cl, 500);
       else
 	{
+	  // send everything that's inside the input queues
+	  while(pointer_event_q.ReceiveTimeout(0, pe) != wxMSGQUEUE_TIMEOUT) // timeout == empty
+	    sendPointerEvent(pe);
+	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
+	    sendKeyEvent(ke);
+
 	  if(!rfbProcessServerMessage(p->cl, 500))
 	    {
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), p);
@@ -186,6 +266,9 @@ VNCConn::VNCConn(void* p)
     {
       wxLogDebug(wxT("Initialized libgcrypt threading."));
       gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+      gcry_check_version (NULL);
+      gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
+      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
       TLS_threading_initialized = true;
     }
 #endif
@@ -700,57 +783,18 @@ void VNCConn::Shutdown()
 
 
 
-
-bool VNCConn::sendPointerEvent(wxMouseEvent &event)
+// this simply posts the mouse event into the worker thread's input queue
+void VNCConn::sendPointerEvent(wxMouseEvent &event)
 {
-  int buttonmask = 0;
-
-  if(event.LeftIsDown())
-    buttonmask |= rfbButton1Mask;
-
-  if(event.MiddleIsDown())
-    buttonmask |= rfbButton2Mask;
   
-  if(event.RightIsDown())
-    buttonmask |= rfbButton3Mask;
-
-  if(event.GetWheelRotation() > 0)
-    buttonmask |= rfbWheelUpMask;
-
-  if(event.GetWheelRotation() < 0)
-    buttonmask |= rfbWheelDownMask;
-
-  if(event.Entering() && ! cuttext.IsEmpty())
-    {
-      // if encoding fails, a NULL pointer is returned!
-      if(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))))
-	{
-	  wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), this, cuttext.c_str());
-	  char* encoded_text = strdup(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
-	  SendClientCutText(cl, encoded_text, strlen(encoded_text));
-	  free(encoded_text);	  
-	}
-      else
-	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
-    }
-
-  if(do_stats)
-    {
-      pointer_pos.x = event.m_x;
-      pointer_pos.y = event.m_y;
-      pointer_stopwatch.Start();
-    }
-
-  wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
-
-  return SendPointerEvent(cl, event.m_x, event.m_y, buttonmask);
+  ((VNCThread*)vncthread)->pointer_event_q.Post(event);
 }
 
 
-
+// because of the possible wxKeyEvent.Skip(), this posts the found keysym + down
 bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 {
-  rfbKeySym k = 0;
+  keyEvent kev = {0,0};
 
   if(isChar)
     {
@@ -761,114 +805,118 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
       wxLogDebug(wxT("VNCConn %p:     unicode char:   %c"), this, event.GetUnicodeKey()); 
 
       // get tranlated char
-      k = event.GetKeyCode();
+      kev.keysym = event.GetKeyCode();
       // if we got ne keycode, try unicodekey
-      if(k==0) 
-	k = event.GetUnicodeKey();
+      if(kev.keysym==0) 
+	kev.keysym = event.GetUnicodeKey();
 
       // if wxwidgets translates a key combination into a
       // value below 32, revert this here.
       // we dont't send ASCII 0x03, but ctrl and then a 'c'!
-      if(k <= 32)
+      if(kev.keysym <= 32)
 	{
-	  k += 96;
-	  wxLogDebug(wxT("VNCConn %p: translating key to: %d"), this, k);
+	  kev.keysym += 96;
+	  wxLogDebug(wxT("VNCConn %p: translating key to: %d"), this, kev.keysym);
 	}
 
-      wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x down"), this, k);
-      wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x  up"), this, k);
+      wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x down"), this, kev.keysym);
+      wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x  up"), this, kev.keysym);
       
       // down, then up
-      SendKeyEvent(cl, k, true);
-      SendKeyEvent(cl, k, false);
+      kev.down = true;
+      ((VNCThread*)vncthread)->key_event_q.Post(kev);
+      kev.down = false;
+      ((VNCThread*)vncthread)->key_event_q.Post(kev);
       return true;
     }
   else
     {
-      // lookup k
+      // lookup keysym  
       switch(event.GetKeyCode()) 
 	{
-	case WXK_BACK: k = XK_BackSpace; break;
-	case WXK_TAB: k = XK_Tab; break;
-	case WXK_CLEAR: k = XK_Clear; break;
-	case WXK_RETURN: k = XK_Return; break;
-	case WXK_PAUSE: k = XK_Pause; break;
-	case WXK_ESCAPE: k = XK_Escape; break;
-	case WXK_SPACE: k = XK_space; break;
-	case WXK_DELETE: k = XK_Delete; break;
-	case WXK_NUMPAD0: k = XK_KP_0; break;
-	case WXK_NUMPAD1: k = XK_KP_1; break;
-	case WXK_NUMPAD2: k = XK_KP_2; break;
-	case WXK_NUMPAD3: k = XK_KP_3; break;
-	case WXK_NUMPAD4: k = XK_KP_4; break;
-	case WXK_NUMPAD5: k = XK_KP_5; break;
-	case WXK_NUMPAD6: k = XK_KP_6; break;
-	case WXK_NUMPAD7: k = XK_KP_7; break;
-	case WXK_NUMPAD8: k = XK_KP_8; break;
-	case WXK_NUMPAD9: k = XK_KP_9; break;
-	case WXK_NUMPAD_DECIMAL: k = XK_KP_Decimal; break;
-	case WXK_NUMPAD_DIVIDE: k = XK_KP_Divide; break;
-	case WXK_NUMPAD_MULTIPLY: k = XK_KP_Multiply; break;
-	case WXK_NUMPAD_SUBTRACT: k = XK_KP_Subtract; break;
-	case WXK_NUMPAD_ADD: k = XK_KP_Add; break;
-	case WXK_NUMPAD_ENTER: k = XK_KP_Enter; break;
-	case WXK_NUMPAD_EQUAL: k = XK_KP_Equal; break;
-	case WXK_UP: k = XK_Up; break;
-	case WXK_DOWN: k = XK_Down; break;
-	case WXK_RIGHT: k = XK_Right; break;
-	case WXK_LEFT: k = XK_Left; break;
-	case WXK_INSERT: k = XK_Insert; break;
-	case WXK_HOME: k = XK_Home; break;
-	case WXK_END: k = XK_End; break;
-	case WXK_PAGEUP: k = XK_Page_Up; break;
-	case WXK_PAGEDOWN: k = XK_Page_Down; break;
-	case WXK_F1: k = XK_F1; break;
-	case WXK_F2: k = XK_F2; break;
-	case WXK_F3: k = XK_F3; break;
-	case WXK_F4: k = XK_F4; break;
-	case WXK_F5: k = XK_F5; break;
-	case WXK_F6: k = XK_F6; break;
-	case WXK_F7: k = XK_F7; break;
-	case WXK_F8: k = XK_F8; break;
-	case WXK_F9: k = XK_F9; break;
-	case WXK_F10: k = XK_F10; break;
-	case WXK_F11: k = XK_F11; break;
-	case WXK_F12: k = XK_F12; break;
-	case WXK_F13: k = XK_F13; break;
-	case WXK_F14: k = XK_F14; break;
-	case WXK_F15: k = XK_F15; break;
-	case WXK_NUMLOCK: k = XK_Num_Lock; break;
-	case WXK_CAPITAL: k = XK_Caps_Lock; break;
-	case WXK_SCROLL: k = XK_Scroll_Lock; break;
-	  //case WXK_RSHIFT: k = XK_Shift_R; break;
-	case WXK_SHIFT: k = XK_Shift_L; break;
-	  //case WXK_RCTRL: k = XK_Control_R; break;
-	case WXK_CONTROL: k = XK_Control_L; break;
-	  //    case WXK_RALT: k = XK_Alt_R; break;
-	case WXK_ALT: k = XK_Alt_L; break;
-	  // case WXK_RMETA: k = XK_Meta_R; break;
-	  // case WXK_META: k = XK_Meta_L; break;
-	case WXK_WINDOWS_LEFT: k = XK_Super_L; break;	
-	case WXK_WINDOWS_RIGHT: k = XK_Super_R; break;	
-	  //case WXK_COMPOSE: k = XK_Compose; break;
-	  //case WXK_MODE: k = XK_Mode_switch; break;
-	case WXK_HELP: k = XK_Help; break;
-	case WXK_PRINT: k = XK_Print; break;
-	  //case WXK_SYSREQ: k = XK_Sys_Req; break;
-	case WXK_CANCEL: k = XK_Break; break;
+	case WXK_BACK: kev.keysym = XK_BackSpace; break;
+	case WXK_TAB: kev.keysym = XK_Tab; break;
+	case WXK_CLEAR: kev.keysym = XK_Clear; break;
+	case WXK_RETURN: kev.keysym = XK_Return; break;
+	case WXK_PAUSE: kev.keysym = XK_Pause; break;
+	case WXK_ESCAPE: kev.keysym = XK_Escape; break;
+	case WXK_SPACE: kev.keysym = XK_space; break;
+	case WXK_DELETE: kev.keysym = XK_Delete; break;
+	case WXK_NUMPAD0: kev.keysym = XK_KP_0; break;
+	case WXK_NUMPAD1: kev.keysym = XK_KP_1; break;
+	case WXK_NUMPAD2: kev.keysym = XK_KP_2; break;
+	case WXK_NUMPAD3: kev.keysym = XK_KP_3; break;
+	case WXK_NUMPAD4: kev.keysym = XK_KP_4; break;
+	case WXK_NUMPAD5: kev.keysym = XK_KP_5; break;
+	case WXK_NUMPAD6: kev.keysym = XK_KP_6; break;
+	case WXK_NUMPAD7: kev.keysym = XK_KP_7; break;
+	case WXK_NUMPAD8: kev.keysym = XK_KP_8; break;
+	case WXK_NUMPAD9: kev.keysym = XK_KP_9; break;
+	case WXK_NUMPAD_DECIMAL: kev.keysym = XK_KP_Decimal; break;
+	case WXK_NUMPAD_DIVIDE: kev.keysym = XK_KP_Divide; break;
+	case WXK_NUMPAD_MULTIPLY: kev.keysym = XK_KP_Multiply; break;
+	case WXK_NUMPAD_SUBTRACT: kev.keysym = XK_KP_Subtract; break;
+	case WXK_NUMPAD_ADD: kev.keysym = XK_KP_Add; break;
+	case WXK_NUMPAD_ENTER: kev.keysym = XK_KP_Enter; break;
+	case WXK_NUMPAD_EQUAL: kev.keysym = XK_KP_Equal; break;
+	case WXK_UP: kev.keysym = XK_Up; break;
+	case WXK_DOWN: kev.keysym = XK_Down; break;
+	case WXK_RIGHT: kev.keysym = XK_Right; break;
+	case WXK_LEFT: kev.keysym = XK_Left; break;
+	case WXK_INSERT: kev.keysym = XK_Insert; break;
+	case WXK_HOME: kev.keysym = XK_Home; break;
+	case WXK_END: kev.keysym = XK_End; break;
+	case WXK_PAGEUP: kev.keysym = XK_Page_Up; break;
+	case WXK_PAGEDOWN: kev.keysym = XK_Page_Down; break;
+	case WXK_F1: kev.keysym = XK_F1; break;
+	case WXK_F2: kev.keysym = XK_F2; break;
+	case WXK_F3: kev.keysym = XK_F3; break;
+	case WXK_F4: kev.keysym = XK_F4; break;
+	case WXK_F5: kev.keysym = XK_F5; break;
+	case WXK_F6: kev.keysym = XK_F6; break;
+	case WXK_F7: kev.keysym = XK_F7; break;
+	case WXK_F8: kev.keysym = XK_F8; break;
+	case WXK_F9: kev.keysym = XK_F9; break;
+	case WXK_F10: kev.keysym = XK_F10; break;
+	case WXK_F11: kev.keysym = XK_F11; break;
+	case WXK_F12: kev.keysym = XK_F12; break;
+	case WXK_F13: kev.keysym = XK_F13; break;
+	case WXK_F14: kev.keysym = XK_F14; break;
+	case WXK_F15: kev.keysym = XK_F15; break;
+	case WXK_NUMLOCK: kev.keysym = XK_Num_Lock; break;
+	case WXK_CAPITAL: kev.keysym = XK_Caps_Lock; break;
+	case WXK_SCROLL: kev.keysym = XK_Scroll_Lock; break;
+	  //case WXK_RSHIFT: kev.keysym = XK_Shift_R; break;
+	case WXK_SHIFT: kev.keysym = XK_Shift_L; break;
+	  //case WXK_RCTRL: kev.keysym = XK_Control_R; break;
+	case WXK_CONTROL: kev.keysym = XK_Control_L; break;
+	  //    case WXK_RALT: kev.keysym = XK_Alt_R; break;
+	case WXK_ALT: kev.keysym = XK_Alt_L; break;
+	  // case WXK_RMETA: kev.keysym = XK_Meta_R; break;
+	  // case WXK_META: kev.keysym = XK_Meta_L; break;
+	case WXK_WINDOWS_LEFT: kev.keysym = XK_Super_L; break;	
+	case WXK_WINDOWS_RIGHT: kev.keysym = XK_Super_R; break;	
+	  //case WXK_COMPOSE: kev.keysym = XK_Compose; break;
+	  //case WXK_MODE: kev.keysym = XK_Mode_switch; break;
+	case WXK_HELP: kev.keysym = XK_Help; break;
+	case WXK_PRINT: kev.keysym = XK_Print; break;
+	  //case WXK_SYSREQ: kev.keysym = XK_Sys_Req; break;
+	case WXK_CANCEL: kev.keysym = XK_Break; break;
 	default: break;
 	}
 
-      if(k)
+      if(kev.keysym)
 	{
 	  wxLogDebug(wxT("VNCConn %p: got key %s event:"), this, down ? wxT("down") : wxT("up"));
 	  wxLogDebug(wxT("VNCConn %p:     wxkeycode:      %d"), this, event.GetKeyCode());
 	  wxLogDebug(wxT("VNCConn %p:     wxkeycode char: %c"), this, event.GetKeyCode());
 	  wxLogDebug(wxT("VNCConn %p:     unicode:        %d"), this, event.GetUnicodeKey());
 	  wxLogDebug(wxT("VNCConn %p:     unicode char:   %c"), this, event.GetUnicodeKey()); 
-	  wxLogDebug(wxT("VNCConn %p: sending rfbkeysym:  0x%.3x %s"), this, k, down ? wxT("down") : wxT("up"));
+	  wxLogDebug(wxT("VNCConn %p: sending rfbkeysym:  0x%.3x %s"), this, kev.keysym, down ? wxT("down") : wxT("up"));
 
-	  return SendKeyEvent(cl, k, down);
+	  kev.down = down;
+	  ((VNCThread*)vncthread)->key_event_q.Post(kev);
+	  return true;
 	}
       else
 	{
@@ -880,7 +928,8 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
     }
 
   wxLogDebug(wxT("VNCConn %p: no matching keysym found"), this);
-  return false;
+  return false; 
+
 }
 
 

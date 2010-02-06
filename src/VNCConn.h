@@ -117,7 +117,7 @@ public:
   bool isReverse() const { return cl ? cl->listenSpecified : false; };
   bool isMulticast() const;
 
-  bool sendPointerEvent(wxMouseEvent &event);
+  void sendPointerEvent(wxMouseEvent &event);
   bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
   
   // toggle statistics, default is off
