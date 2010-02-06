@@ -346,12 +346,12 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
       // updates/s
       ++updates_count;
   
-      wxCriticalSectionLocker lock(mutex_latency_stats);
       // pointer latency
       // well, this is not neccessarily correct, but wtf
       if(rect->Contains(pointer_pos))
 	{
 	  pointer_stopwatch.Pause();
+	  wxCriticalSectionLocker lock(mutex_latency_stats);
 	  latencies.Add((wxString() << (int)conn_stopwatch.Time()) + 
 			wxT(", ") + 
 			(wxString() << (int)pointer_stopwatch.Time()));
@@ -395,6 +395,7 @@ void VNCConn::onUpdatesCountTimer(wxTimerEvent& event)
 {
   if(do_stats)
     {
+      wxCriticalSectionLocker lock(mutex_latency_stats);
       updates.Add((wxString() << (int)conn_stopwatch.Time())
 		  + wxT(", ") +
 		  (wxString() << updates_count));
@@ -943,6 +944,7 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 void VNCConn::doStats(bool yesno)
 {
   do_stats = yesno;
+  wxCriticalSectionLocker lock(mutex_latency_stats);
   if(do_stats)
     updates_count_timer.Start(1000);
   else
@@ -952,6 +954,7 @@ void VNCConn::doStats(bool yesno)
 
 void VNCConn::resetStats()
 {
+  wxCriticalSectionLocker lock(mutex_latency_stats);
   latencies.Clear();
   updates.Clear();
   mc_lossratios.Clear();
