@@ -51,6 +51,7 @@ class VNCConn: public wxEvtHandler
   void onUpdatesCountTimer(wxTimerEvent& event);
   wxPoint pointer_pos;
   wxStopWatch pointer_stopwatch;
+  wxCriticalSection mutex_pointer_stopwatch;
   // string arrays to store values over time
   wxArrayString updates;
   wxArrayString latencies;
