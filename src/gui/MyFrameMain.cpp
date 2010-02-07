@@ -389,12 +389,12 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
     {
       VNCConn* c = connections.at(notebook_connections->GetSelection());
 
-      text_ctrl_fps->Clear();
+      text_ctrl_upd->Clear();
       text_ctrl_latency->Clear();
       text_ctrl_lossratio->Clear();
       
       if( ! c->getUpdateStats().IsEmpty() )
-	*text_ctrl_fps << c->getUpdateStats().Last().AfterFirst(wxT(','));
+	*text_ctrl_upd << wxAtoi(c->getUpdateStats().Last().AfterFirst(wxT(',')))/1024;
       if( ! c->getLatencyStats().IsEmpty() )
 	*text_ctrl_latency << c->getLatencyStats().Last().AfterFirst(wxT(','));
       if( ! c->getMCLossRatioStats().IsEmpty() )
@@ -562,7 +562,7 @@ void MyFrameMain::terminate_conn(int which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
 
       // clear stats
-      text_ctrl_fps->Clear();
+      text_ctrl_upd->Clear();
       text_ctrl_latency->Clear();
       text_ctrl_lossratio->Clear();
     }
@@ -1054,8 +1054,9 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
   else
     stats_timer.Stop();
 
-  text_ctrl_fps->Clear();
+  text_ctrl_upd->Clear();
   text_ctrl_latency->Clear();
+  text_ctrl_lossratio->Clear();
 
   // for now, toggle all VNCConn instances
   for(size_t i=0; i < connections.size(); ++i)

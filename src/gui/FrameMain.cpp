@@ -73,8 +73,8 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     list_box_services = new wxListBox(splitwin_left_pane_1, ID_LISTBOX_SERVICES, wxDefaultPosition, wxDefaultSize, 0, list_box_services_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
     const wxString *list_box_bookmarks_choices = NULL;
     list_box_bookmarks = new wxListBox(splitwin_leftlower_pane_1, ID_LISTBOX_BOOKMARKS, wxDefaultPosition, wxDefaultSize, 0, list_box_bookmarks_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
-    label_fps = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Updates/s:"));
-    text_ctrl_fps = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    label_upd = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Update KB/s:"));
+    text_ctrl_upd = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     label_latency = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Latency (ms):"));
     text_ctrl_latency = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     label_lossratio = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("MC loss ratio:"));
@@ -328,8 +328,8 @@ void FrameMain::do_layout()
     splitwin_left_pane_1->SetSizer(sizer_services);
     sizer_bookmarks->Add(list_box_bookmarks, 1, wxALL|wxEXPAND, 3);
     splitwin_leftlower_pane_1->SetSizer(sizer_bookmarks);
-    sizer_3->Add(label_fps, 0, wxALL|wxEXPAND, 3);
-    sizer_3->Add(text_ctrl_fps, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_3->Add(label_upd, 0, wxALL|wxEXPAND, 3);
+    sizer_3->Add(text_ctrl_upd, 0, wxALL|wxADJUST_MINSIZE, 3);
     sizer_3->Add(label_latency, 0, wxALL, 3);
     sizer_3->Add(text_ctrl_latency, 0, wxALL|wxADJUST_MINSIZE, 3);
     sizer_3->Add(label_lossratio, 0, wxALL, 3);

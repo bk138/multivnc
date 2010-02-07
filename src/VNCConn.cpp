@@ -343,8 +343,8 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
 
   if(do_stats)
     {
-      // updates/s
-      ++updates_count;
+      // raw byte updates/second
+      updates_count += w*h*BYTESPERPIXEL;
   
       // pointer latency
       // well, this is not neccessarily correct, but wtf

@@ -51,8 +51,8 @@ protected:
     wxPanel* splitwin_left_pane_1;
     wxListBox* list_box_bookmarks;
     wxPanel* splitwin_leftlower_pane_1;
-    wxStaticText* label_fps;
-    wxTextCtrl* text_ctrl_fps;
+    wxStaticText* label_upd;
+    wxTextCtrl* text_ctrl_upd;
     wxStaticText* label_latency;
     wxTextCtrl* text_ctrl_latency;
     wxStaticText* label_lossratio;

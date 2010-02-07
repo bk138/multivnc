@@ -46,8 +46,8 @@ class VNCConn: public wxEvtHandler
 
   // statistics
   bool do_stats;
-  int updates_count;
-  wxTimer updates_count_timer; // a timer to reset draw_count periodically
+  int updates_count; // counts raw bytes of updates
+  wxTimer updates_count_timer; // a timer to reset updates_count periodically
   void onUpdatesCountTimer(wxTimerEvent& event);
   wxPoint pointer_pos;
   wxStopWatch pointer_stopwatch;
