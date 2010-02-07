@@ -560,6 +560,11 @@ void MyFrameMain::terminate_conn(int which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
       // bookmarks
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
+
+      // clear stats
+      text_ctrl_fps->Clear();
+      text_ctrl_latency->Clear();
+      text_ctrl_lossratio->Clear();
     }
 
   wxLogStatus( _("Connection terminated."));
