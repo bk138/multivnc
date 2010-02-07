@@ -515,7 +515,20 @@ void VNCConn::kbd_leds(rfbClient* cl, int value, int pad)
 void VNCConn::textchat(rfbClient* cl, int value, char *text)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID); 
-  wxLogDebug(wxT("VNCConn %p: Got chat text: '%s'\n"), conn, text);
+  switch(value)
+    {
+    case rfbTextChatOpen:
+      wxLogDebug(wxT("VNCConn %p: got textchat open\n"), conn);
+      break;
+    case rfbTextChatClose:
+      wxLogDebug(wxT("VNCConn %p: got textchat close\n"), conn);
+      break;
+    case rfbTextChatFinished:
+      wxLogDebug(wxT("VNCConn %p: got textchat finish\n"), conn);
+      break;
+    default:
+      wxLogDebug(wxT("VNCConn %p: got textchat text: '%s'\n"), conn, text);
+    }
 }
 
 
