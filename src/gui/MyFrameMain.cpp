@@ -155,6 +155,7 @@ MyFrameMain::~MyFrameMain()
 	{
 	  VNCConn* c = connections.at(i);
 	  wxString desktopname =  c->getDesktopName();
+	  desktopname += wxString::Format(wxT("(%i)"), i);
 #ifdef __WIN32__
 	  // windows doesn't like ':'s
 	  desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
@@ -874,7 +875,8 @@ void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
 {
   if(connections.size())
     {
-      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel);
       
       if(c->getUpdateStats().IsEmpty())
 	{
@@ -883,6 +885,7 @@ void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
 	}
 
       wxString desktopname =  c->getDesktopName();
+      desktopname += wxString::Format(wxT("(%i)"), sel);
 #ifdef __WIN32__
       // windows doesn't like ':'s
       desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
@@ -911,7 +914,8 @@ void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
 {
   if(connections.size())
     {
-      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel);
 
       if(c->getLatencyStats().IsEmpty())
 	{
@@ -920,6 +924,7 @@ void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
 	}
 
       wxString desktopname =  c->getDesktopName();
+      desktopname += wxString::Format(wxT("(%i)"), sel);
 #ifdef __WIN32__
       // windows doesn't like ':'s
       desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
@@ -946,7 +951,8 @@ void MyFrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
 {
   if(connections.size())
     {
-      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel);
 
       if(c->getMCLossRatioStats().IsEmpty())
 	{
@@ -955,6 +961,7 @@ void MyFrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
 	}
 
       wxString desktopname =  c->getDesktopName();
+      desktopname += wxString::Format(wxT("(%i)"), sel);
 #ifdef __WIN32__
       // windows doesn't like ':'s
       desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
