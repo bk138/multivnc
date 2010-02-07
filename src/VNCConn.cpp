@@ -181,7 +181,7 @@ wxThread::ExitCode VNCThread::Entry()
 	  if(!rfbProcessServerMessage(p->cl, 500))
 	    {
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), p);
-	      p->SendDisconnectNotify();
+	      p->post_disconnect_notify();
 	      break;
 	    }
 	}
@@ -195,12 +195,12 @@ wxThread::ExitCode VNCThread::Entry()
 	  if(i<0)
 	    {
 	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), p);
-	      p->SendDisconnectNotify();
+	      p->post_disconnect_notify();
 	      return 0;
 	    }
 	  if(i)
 	    {
-	      p->SendIncomingConnectionNotify();
+	      p->post_incomingconnection_notify();
 	      return 0;
 	    }
 	}
@@ -229,7 +229,7 @@ void VNCThread::OnExit()
 ********************************************/
 
 BEGIN_EVENT_TABLE(VNCConn, wxEvtHandler)
-    EVT_TIMER (wxID_ANY, VNCConn::onUpdatesCountTimer)
+    EVT_TIMER (wxID_ANY, VNCConn::on_updatescount_timer)
 END_EVENT_TABLE();
 
 
@@ -297,7 +297,7 @@ VNCConn::~VNCConn()
   private members
 */
 
-void VNCConn::SendIncomingConnectionNotify() 
+void VNCConn::post_incomingconnection_notify() 
 {
   wxLogDebug(wxT("VNCConn %p: SendIncomingConnectionNotify()"), this);
 
@@ -310,7 +310,7 @@ void VNCConn::SendIncomingConnectionNotify()
 }
 
 
-void VNCConn::SendDisconnectNotify() 
+void VNCConn::post_disconnect_notify() 
 {
   wxLogDebug(wxT("VNCConn %p: SendDisconnectNotify()"), this);
 
@@ -323,7 +323,7 @@ void VNCConn::SendDisconnectNotify()
 }
 
 
-void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
+void VNCConn::post_update_notify(int x, int y, int w, int h)
 {
   // new NOTIFY event, we got no window id
   wxCommandEvent event(VNCConnUpdateNOTIFY, wxID_ANY);
@@ -362,7 +362,7 @@ void VNCConn::SendUpdateNotify(int x, int y, int w, int h)
 }
 
 
-void VNCConn::SendFBResizeNotify() 
+void VNCConn::post_fbresize_notify() 
 {
   wxLogDebug(wxT("VNCConn %p: SendFBResizeNotify() (%i, %i)"), 
 	     this,
@@ -379,7 +379,7 @@ void VNCConn::SendFBResizeNotify()
 
 
 
-void VNCConn::SendCuttextNotify()
+void VNCConn::post_cuttext_notify()
 {
   // new NOTIFY event, we got no window id
   wxCommandEvent event(VNCConnCuttextNOTIFY, wxID_ANY);
@@ -391,7 +391,7 @@ void VNCConn::SendCuttextNotify()
 
 
 
-void VNCConn::onUpdatesCountTimer(wxTimerEvent& event)
+void VNCConn::on_updatescount_timer(wxTimerEvent& event)
 {
   if(do_stats)
     {
@@ -485,7 +485,7 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
 #endif
  
   // notify our parent
-  conn->SendFBResizeNotify();
+  conn->post_fbresize_notify();
  
   return client->frameBuffer ? TRUE : FALSE;
 }
@@ -498,7 +498,7 @@ void VNCConn::got_update(rfbClient* client,int x,int y,int w,int h)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
  
-  conn->SendUpdateNotify(x, y, w, h);
+  conn->post_update_notify(x, y, w, h);
 }
 
 
@@ -540,7 +540,7 @@ void VNCConn::got_cuttext(rfbClient *cl, const char *text, int len)
 
   wxCriticalSectionLocker lock(conn->mutex_cuttext); // since cuttext can also be set from the main thread
   conn->cuttext = wxString(text, wxCSConv(wxT("iso-8859-1")));
-  conn->SendCuttextNotify();
+  conn->post_cuttext_notify();
 }
 
 

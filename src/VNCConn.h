@@ -48,7 +48,7 @@ class VNCConn: public wxEvtHandler
   bool do_stats;
   int updates_count; // counts raw bytes of updates
   wxTimer updates_count_timer; // a timer to reset updates_count periodically
-  void onUpdatesCountTimer(wxTimerEvent& event);
+  void on_updatescount_timer(wxTimerEvent& event);
   wxPoint pointer_pos;
   wxStopWatch pointer_stopwatch;
   wxCriticalSection mutex_latency_stats;
@@ -69,13 +69,13 @@ class VNCConn: public wxEvtHandler
   static bool do_logfile;
 
   // event dispatchers
-  void SendIncomingConnectionNotify();
-  void SendDisconnectNotify();
+  void post_incomingconnection_notify();
+  void post_disconnect_notify();
   // NB: this sets the event's clientdata ptr a newly created wRect 
   // which MUST be freed by its receiver!!!
-  void SendUpdateNotify(int x, int y, int w, int h);
-  void SendFBResizeNotify();
-  void SendCuttextNotify();
+  void post_update_notify(int x, int y, int w, int h);
+  void post_fbresize_notify();
+  void post_cuttext_notify();
 
 
   //callbacks
