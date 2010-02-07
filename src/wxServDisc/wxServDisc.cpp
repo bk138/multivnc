@@ -396,8 +396,7 @@ wxServDisc::wxServDisc(void* p, const wxString& what, int type)
 wxServDisc::~wxServDisc()
 {
   wxLogDebug(wxT("wxServDisc %p: before scanthread delete"), this);
-  GetThread()->Delete(); // this makes TestDestroy() return true
-  GetThread()->Wait();   // this frees the threads system resources
+  GetThread()->Delete(); // this makes TestDestroy() return true and cleans up the threas
 
   wxLogDebug(wxT("wxServDisc %p: scanthread deleted, wxServDisc destroyed, query was '%s'"), this, query.c_str());
   wxLogDebug(wxT("")); 
