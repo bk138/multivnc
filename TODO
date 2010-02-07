@@ -1,6 +1,7 @@
 
 in order of importance:
 
+ - make update stats comparable between uni- and multicast case.
  - (probably) fix TLS on win32
  - tooltips
  - translations
