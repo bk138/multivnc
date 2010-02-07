@@ -325,18 +325,16 @@ void VNCConn::post_disconnect_notify()
 
 void VNCConn::post_update_notify(int x, int y, int w, int h)
 {
-  // new NOTIFY event, we got no window id
-  wxCommandEvent event(VNCConnUpdateNOTIFY, wxID_ANY);
+  VNCConnUpdateNotifyEvent event(VNCConnUpdateNOTIFY, wxID_ANY);
   event.SetEventObject(this); // set sender
 
   // set info about what was updated
-  wxRect* rect = new wxRect(x, y, w, h);
-  event.SetClientData(rect);
+  event.rect = wxRect(x, y, w, h);
   wxLogDebug(wxT("VNCConn %p: SendUpdateNotify(%i,%i,%i,%i)"), this,
-	     rect->x,
-	     rect->y,
-	     rect->width,
-	     rect->height);
+	     event.rect.x,
+	     event.rect.y,
+	     event.rect.width,
+	     event.rect.height);
   
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
@@ -348,7 +346,7 @@ void VNCConn::post_update_notify(int x, int y, int w, int h)
   
       // pointer latency
       // well, this is not neccessarily correct, but wtf
-      if(rect->Contains(pointer_pos))
+      if(event.rect.Contains(pointer_pos))
 	{
 	  pointer_stopwatch.Pause();
 	  wxCriticalSectionLocker lock(mutex_latency_stats);

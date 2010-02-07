@@ -25,7 +25,7 @@ using namespace std;
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
-  EVT_COMMAND (wxID_ANY, VNCConnUpdateNOTIFY, MyFrameMain::onVNCConnUpdateNotify)
+  EVT_VNCCONNUPDATENOTIFY (wxID_ANY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnFBResizeNOTIFY, MyFrameMain::onVNCConnFBResizeNotify)
   EVT_COMMAND (wxID_ANY, VNCConnCuttextNOTIFY, MyFrameMain::onVNCConnCuttextNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
@@ -229,7 +229,7 @@ void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 
 
 
-void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
+void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
 {
   // only process currently selected connection
   int sel;
@@ -239,10 +239,8 @@ void MyFrameMain::onVNCConnUpdateNotify(wxCommandEvent& event)
   VNCConn* c = connections.at(sel);
   if(c == event.GetEventObject())
     {
-      wxRect* rect = static_cast<wxRect*>(event.GetClientData());
       VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
-      canvas->drawRegion(*rect);
-      delete rect; // avoid memleaks!
+      canvas->drawRegion(event.rect);
 
       // update icon
       if(c->isMulticast())

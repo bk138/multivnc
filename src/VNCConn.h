@@ -16,10 +16,50 @@
 // make available custom events
 DECLARE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
-DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnCuttextNOTIFY, -1) 
+DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 
+
+// the custom VNCConnUpdateNotifyEvent
+class VNCConnUpdateNotifyEvent: public wxCommandEvent
+{
+public:
+  wxRect rect;
+
+  VNCConnUpdateNotifyEvent(wxEventType commandType = VNCConnUpdateNOTIFY, int id = 0 )
+    :  wxCommandEvent(commandType, id) { }
+ 
+  // You *must* copy here the data to be transported
+  VNCConnUpdateNotifyEvent( const VNCConnUpdateNotifyEvent &event )
+    :  wxCommandEvent(event) { this->rect = event.rect; }
+ 
+  // Required for sending with wxPostEvent()
+  wxEvent* Clone() const { return new VNCConnUpdateNotifyEvent(*this); }
+ };
+ 
+
+// This #define simplifies the one below, and makes the syntax less
+// ugly if you want to use Connect() instead of an event table.
+typedef void (wxEvtHandler::*VNCConnUpdateNotifyEventFunction)(VNCConnUpdateNotifyEvent &);
+#define VNCConnUpdateNotifyEventHandler(func)				\
+  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)	\
+  wxStaticCastEvent(VNCConnUpdateNotifyEventFunction, &func)                    
+ 
+// Define the event table entry. Yes, it really *does* end in a comma.
+#define EVT_VNCCONNUPDATENOTIFY(id, fn)					\
+  DECLARE_EVENT_TABLE_ENTRY(VNCConnUpdateNOTIFY, id, wxID_ANY,		\
+			    (wxObjectEventFunction)(wxEventFunction)	\
+			    (wxCommandEventFunction)			\
+			    wxStaticCastEvent(VNCConnUpdateNotifyEventFunction, &fn ), (wxObject*) NULL ),
+ 
+
+
+
+
+/*
+  the VNCConn class
+*/
 class VNCConn: public wxEvtHandler
 {
   friend class VNCThread;
@@ -71,8 +111,6 @@ class VNCConn: public wxEvtHandler
   // event dispatchers
   void post_incomingconnection_notify();
   void post_disconnect_notify();
-  // NB: this sets the event's clientdata ptr a newly created wRect 
-  // which MUST be freed by its receiver!!!
   void post_update_notify(int x, int y, int w, int h);
   void post_fbresize_notify();
   void post_cuttext_notify();

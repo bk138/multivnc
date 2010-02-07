@@ -52,7 +52,7 @@ class MyFrameMain: public FrameMain
   
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
-  void onVNCConnUpdateNotify(wxCommandEvent& event);
+  void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
   void onVNCConnFBResizeNotify(wxCommandEvent& event);
   void onVNCConnDisconnectNotify(wxCommandEvent& event);
   void onVNCConnIncomingConnectionNotify(wxCommandEvent& event);
