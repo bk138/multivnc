@@ -23,6 +23,70 @@ DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 
 class VNCConn: public wxEvtHandler
 {
+public:
+  VNCConn(void *parent);
+  ~VNCConn(); 
+
+  /*
+    to make a connection, call
+    Setup(), then
+    Listen() (optional), then
+    Init(), then
+    Shutdown, then
+    Cleanup()
+    
+    NB: If Init() fails, you have to call Setup() again!
+
+    The semantic counterparts are:
+       Setup() <-> Cleanup()
+       Init()  <-> Shutdown()
+  */
+  bool Setup(char* (*getpasswdfunc)(rfbClient*));
+  void Cleanup();
+  bool Listen(int port);
+  bool Init(const wxString& host, int compresslevel = 1, int quality = 5, bool multicast = true);
+  void Shutdown();
+
+  bool isReverse() const { return cl ? cl->listenSpecified : false; };
+  bool isMulticast() const;
+
+  void sendPointerEvent(wxMouseEvent &event);
+  bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
+  
+  // toggle statistics, default is off
+  void doStats(bool yesno);
+  // this clears internal statistics
+  void resetStats();
+  // get stats, in format "timestamp, value"
+  const wxArrayString& getUpdateStats() const { const wxArrayString& ref = updates; return ref; };
+  const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
+  const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = mc_lossratios; return ref; };
+
+  // cuttext
+  const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
+  void setCuttext(const wxString& text) { wxCriticalSectionLocker lock(mutex_cuttext); cuttext = text; };
+
+  wxBitmap getFrameBufferRegion(const wxRect& region) const;
+  int getFrameBufferWidth() const;
+  int getFrameBufferHeight() const;
+
+  wxString getDesktopName() const;
+  wxString getServerName() const;
+  wxString getServerAddr() const;
+  wxString getServerPort() const;
+ 
+  // get error string
+  const wxString& getErr() const { const wxString& ref = err; return ref; };
+  // get global log string
+  static const wxArrayString& getLog() { const wxArrayString& ref = log; return ref; };
+  static void doLogfile(bool yesno) { do_logfile = yesno; };
+
+
+protected:
+  DECLARE_EVENT_TABLE();
+
+
+private:
   friend class VNCThread;
   void *vncthread;
 
@@ -84,70 +148,6 @@ class VNCConn: public wxEvtHandler
   static void textchat(rfbClient* cl, int value, char *text);
   static void got_cuttext(rfbClient *cl, const char *text, int len);
   static void logger(const char *format, ...);
-
-
-protected:
-  DECLARE_EVENT_TABLE();
-
-
-public:
-  VNCConn(void *parent);
-  ~VNCConn(); 
-
-  /*
-    to make a connection, call
-    Setup(), then
-    Listen() (optional), then
-    Init(), then
-    Shutdown, then
-    Cleanup()
-    
-    NB: If Init() fails, you have to call Setup() again!
-
-    The semantic counterparts are:
-       Setup() <-> Cleanup()
-       Init()  <-> Shutdown()
-  */
-  bool Setup(char* (*getpasswdfunc)(rfbClient*));
-  void Cleanup();
-  bool Listen(int port);
-  bool Init(const wxString& host, int compresslevel = 1, int quality = 5, bool multicast = true);
-  void Shutdown();
-
-  bool isReverse() const { return cl ? cl->listenSpecified : false; };
-  bool isMulticast() const;
-
-  void sendPointerEvent(wxMouseEvent &event);
-  bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
-  
-  // toggle statistics, default is off
-  void doStats(bool yesno);
-  // this clears internal statistics
-  void resetStats();
-  // get stats, in format "timestamp, value"
-  const wxArrayString& getUpdateStats() const { const wxArrayString& ref = updates; return ref; };
-  const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
-  const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = mc_lossratios; return ref; };
-
-  // cuttext
-  const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
-  void setCuttext(const wxString& text) { wxCriticalSectionLocker lock(mutex_cuttext); cuttext = text; };
-
-  wxBitmap getFrameBufferRegion(const wxRect& region) const;
-  int getFrameBufferWidth() const;
-  int getFrameBufferHeight() const;
-
-  wxString getDesktopName() const;
-  wxString getServerName() const;
-  wxString getServerAddr() const;
-  wxString getServerPort() const;
- 
-  // get error string
-  const wxString& getErr() const { const wxString& ref = err; return ref; };
-  // get global log string
-  static const wxArrayString& getLog() { const wxArrayString& ref = log; return ref; };
-  static void doLogfile(bool yesno) { do_logfile = yesno; };
-
 };
 
 
