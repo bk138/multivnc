@@ -274,7 +274,7 @@ int wxServDisc::ans(mdnsda a, void *arg)
     // entry update
     moi->results[key] = result;
 
-  moi->SendNotify();
+  moi->post_notify();
     
   
   wxLogDebug(wxT("wxServDisc %p: got answer:"), moi);
@@ -428,7 +428,7 @@ size_t wxServDisc::getResultCount() const
 
 
 
-void wxServDisc::SendNotify()
+void wxServDisc::post_notify()
 {
   if(parent)
     {

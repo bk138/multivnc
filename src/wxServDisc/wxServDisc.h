@@ -56,18 +56,32 @@ struct wxSDEntry
 };
 
 
-// a string hash map containing these entries
-WX_DECLARE_STRING_HASH_MAP(wxSDEntry, wxSDMap);
-
 
 // our main class
 class wxServDisc: public wxObject, public wxThreadHelper
 {
+public:
+  // type can be one of QTYPE_A, QTYPE_NS, QTYPE_CNAME, QTYPE_PTR or QTYPE_SRV 
+  wxServDisc(void* parent, const wxString& what, int type);
+  ~wxServDisc();
+  
+  // yeah well...
+  std::vector<wxSDEntry> getResults() const;
+  size_t getResultCount() const;
+
+  // get query name
+  const wxString& getQuery() const { const wxString& ref = query; return ref; };
+  // get error string
+  const wxString& getErr() const { const wxString& ref = err; return ref; };
+
+
+private:
   SOCKET sock;
   wxString err;
   void *parent;
   wxString query;
   int querytype; 
+WX_DECLARE_STRING_HASH_MAP(wxSDEntry, wxSDMap);
   wxSDMap results;
   
   // this runs as a separate thread
@@ -81,24 +95,7 @@ class wxServDisc: public wxObject, public wxThreadHelper
   // callback for the mdns resolver
   static int ans(mdnsda a, void *caller);
 
-  void SendNotify();
-
-
-public:
-  // type can be one of QTYPE_A, QTYPE_NS, QTYPE_CNAME, QTYPE_PTR or QTYPE_SRV 
-  wxServDisc(void* parent, const wxString& what, int type);
-  ~wxServDisc();
-  
-
-  // yeah well...
-  std::vector<wxSDEntry> getResults() const;
-  size_t getResultCount() const;
-
-
-  // get query name
-  const wxString& getQuery() const { const wxString& ref = query; return ref; };
-  // get error string
-  const wxString& getErr() const { const wxString& ref = err; return ref; };
+  void post_notify();
 };
 
 
