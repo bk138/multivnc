@@ -59,12 +59,10 @@ class MyFrameMain: public FrameMain
   void onVNCConnCuttextNotify(wxCommandEvent& event);
   void onSDNotify(wxCommandEvent& event);
 
-
-  
   static char* getpasswd(rfbClient* client);
 
-  bool saveArrayString(wxArrayString& arrstr, wxString& path);
- 
+  bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
+
   
 protected:
   DECLARE_EVENT_TABLE();

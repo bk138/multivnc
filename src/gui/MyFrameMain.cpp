@@ -154,33 +154,12 @@ MyFrameMain::~MyFrameMain()
       for(int i = connections.size()-1; i >= 0; --i)
 	{
 	  VNCConn* c = connections.at(i);
-	  wxString desktopname =  c->getDesktopName();
-	  desktopname += wxString::Format(wxT("(%i)"), i);
-#ifdef __WIN32__
-	  // windows doesn't like ':'s
-	  desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
-#endif
-
-	  if(! c->getUpdateStats().IsEmpty())
-	    {
-	      wxString filename = desktopname + wxT("-FramebufferUpdate-Stats-") + wxNow() + wxT(".txt");
-	      if(! saveArrayString(const_cast<wxArrayString&>(c->getUpdateStats()), filename))
-		wxLogError(_("Could not autosave framebuffer update statistics!"));
-	    }
-	  
-	  if(! c->getLatencyStats().IsEmpty())
-	    {
-	      wxString filename = desktopname + wxT("-PointerLatency-Stats-") + wxNow() + wxT(".txt");
-	      if(! saveArrayString(const_cast<wxArrayString&>(c->getLatencyStats()), filename))
-		wxLogError(_("Could not autosave pointer latency statistics!"));
-	    }
-	  
-	  if(! c->getMCLossRatioStats().IsEmpty())
-	    {
-	      wxString filename = desktopname + wxT("-MCLossRatio-Stats-") + wxNow() + wxT(".txt");
-	      if(! saveArrayString(const_cast<wxArrayString&>(c->getMCLossRatioStats()), filename))
-		wxLogError(_("Could not autosave multicast loss ratio statistics!"));
-	    }
+	  if(!saveStats(c, i, c->getUpdateStats(), _("frame buffer update"), true))
+	    wxLogError(_("Could not autosave framebuffer update statistics!"));    
+	  if(!saveStats(c, i, c->getLatencyStats(), _("latency"), true))
+	    wxLogError(_("Could not autosave pointer latency statistics!"));
+	  if(!saveStats(c, i, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
+	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
 	}
     }
  
@@ -412,17 +391,51 @@ char* MyFrameMain::getpasswd(rfbClient* client)
 
 
 
-bool MyFrameMain::saveArrayString(wxArrayString& arrstr, wxString& path)
+bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave)
 {
-  ofstream ostream(path.char_str());
-  if(! ostream)
-    return false;
+  if(stats.IsEmpty())
+    {
+      if(!autosave)
+	wxLogMessage(_("Nothing to save!"));
+      return true;
+    }
+  
+  wxString desktopname =  c->getDesktopName();
+  desktopname += wxString::Format(wxT("(%i)"), conn_index);
+#ifdef __WIN32__
+  // windows doesn't like ':'s
+  desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
 
-  for(size_t i=0; i < arrstr.GetCount(); ++i)
-    ostream << arrstr[i].char_str() << endl;
+  wxString filename;
+  if(!autosave)
+    filename = wxFileSelector(_("Saving ") + desc +_(" statistics..."), 
+					 wxEmptyString,
+					 desktopname + wxT(" ") + desc + wxT(" stats-") + wxNow() + wxT(".txt"), 
+					 wxT(".txt"), 
+					 _("TXT files|*.txt"), 
+					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+  else
+    filename = desktopname + wxT(" ") + desc + wxT(" stats-") + wxNow() + wxT(".txt");
+      
+  if(!filename.empty())
+    {
+      wxBusyCursor busy;
+
+      ofstream ostream(filename.char_str());
+      if(! ostream)
+	{
+	  wxLogError(_("Could not save file!"));
+	  return false;
+	}
+      for(size_t i=0; i < stats.GetCount(); ++i)
+	ostream << stats[i].char_str() << endl;
+    }
 
   return true;
 }
+
+
 
 
 
@@ -875,72 +888,18 @@ void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel);
-      
-      if(c->getUpdateStats().IsEmpty())
-	{
-	  wxLogMessage(_("Nothing to save!"));
-	  return;
-	}
-
-      wxString desktopname =  c->getDesktopName();
-      desktopname += wxString::Format(wxT("(%i)"), sel);
-#ifdef __WIN32__
-      // windows doesn't like ':'s
-      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
-#endif
-
-      wxString filename = wxFileSelector(_("Save framebuffer update statistics..."), 
-					 wxEmptyString,
-					 desktopname + wxT("-FramebufferUpdate-Stats-") + wxNow() + wxT(".txt"), 
-					 wxT(".txt"), 
-					 _("TXT files|*.txt"), 
-					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-      
-      if(!filename.empty())
-	{
-	  wxBusyCursor busy;
-	  if(! saveArrayString(const_cast<wxArrayString&>(c->getUpdateStats()), filename))
-	    wxLogError(_("Could not save file!"));
-	}
+      saveStats(c, sel, c->getUpdateStats(), _("framebuffer update"), false);
     }
 }
 
 
-
-
 void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
 {
-  if(connections.size())
+ if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel);
-
-      if(c->getLatencyStats().IsEmpty())
-	{
-	  wxLogMessage(_("Nothing to save!"));
-	  return;
-	}
-
-      wxString desktopname =  c->getDesktopName();
-      desktopname += wxString::Format(wxT("(%i)"), sel);
-#ifdef __WIN32__
-      // windows doesn't like ':'s
-      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
-#endif
-
-      wxString filename = wxFileSelector(_("Save pointer latency statistics..."), 
-					 wxEmptyString,
-					 desktopname + wxT("-PointerLatency-Stats-") + wxNow() + wxT(".txt"), 
-					 wxT(".txt"), 
-					 _("TXT files|*.txt"), 
-					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-      
-      if(!filename.empty())
-	{
-	  wxBusyCursor busy;
-	  if(! saveArrayString(const_cast<wxArrayString&>(c->getLatencyStats()), filename))
-	    wxLogError(_("Could not save file!"));
-	}
+      saveStats(c, sel, c->getLatencyStats(), _("latency"), false);
     }
 }
 
@@ -951,33 +910,7 @@ void MyFrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel);
-
-      if(c->getMCLossRatioStats().IsEmpty())
-	{
-	  wxLogMessage(_("Nothing to save!"));
-	  return;
-	}
-
-      wxString desktopname =  c->getDesktopName();
-      desktopname += wxString::Format(wxT("(%i)"), sel);
-#ifdef __WIN32__
-      // windows doesn't like ':'s
-      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
-#endif
-
-      wxString filename = wxFileSelector(_("Save multicast loss ratio statistics..."), 
-					 wxEmptyString,
-					 desktopname + wxT("-MCLossRatio-Stats-") + wxNow() + wxT(".txt"), 
-					 wxT(".txt"), 
-					 _("TXT files|*.txt"), 
-					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-      
-      if(!filename.empty())
-	{
-	  wxBusyCursor busy;
-	  if(! saveArrayString(const_cast<wxArrayString&>(c->getMCLossRatioStats()), filename))
-	    wxLogError(_("Could not save file!"));
-	}
+      saveStats(c, sel, c->getMCLossRatioStats(), _("multicast loss ratio"), false);
     }
 }
 
