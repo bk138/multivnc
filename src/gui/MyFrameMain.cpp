@@ -1121,9 +1121,9 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   desc += _("\nSupported Security Types:\n");
   desc += _("VNC Authentication");
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
-  desc += wxT(", Anonymous TLS, VeNCrypt\n");
+  desc += wxT(", Anonymous TLS, VeNCrypt");
 #endif
-  desc += _("\nSupported Encodings:\n");
+  desc += _("\n\nSupported Encodings:\n");
   desc += wxT("Raw, RRE, coRRE, CopyRect, Hextile, Ultra");
 #ifdef LIBVNCSERVER_HAVE_LIBZ 
   desc += wxT(", UltraZip, Zlib, ZlibHex, ZRLE, ZYWRLE");
