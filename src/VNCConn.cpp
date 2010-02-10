@@ -299,7 +299,7 @@ VNCConn::~VNCConn()
 
 void VNCConn::post_incomingconnection_notify() 
 {
-  wxLogDebug(wxT("VNCConn %p: SendIncomingConnectionNotify()"), this);
+  wxLogDebug(wxT("VNCConn %p: post_incomingconnection_notify()"), this);
 
   // new NOTIFY event, we got no window id
   wxCommandEvent event(VNCConnIncomingConnectionNOTIFY, wxID_ANY);
@@ -312,7 +312,7 @@ void VNCConn::post_incomingconnection_notify()
 
 void VNCConn::post_disconnect_notify() 
 {
-  wxLogDebug(wxT("VNCConn %p: SendDisconnectNotify()"), this);
+  wxLogDebug(wxT("VNCConn %p: post_disconnect_notify()"), this);
 
   // new NOTIFY event, we got no window id
   wxCommandEvent event(VNCConnDisconnectNOTIFY, wxID_ANY);
@@ -330,7 +330,7 @@ void VNCConn::post_update_notify(int x, int y, int w, int h)
 
   // set info about what was updated
   event.rect = wxRect(x, y, w, h);
-  wxLogDebug(wxT("VNCConn %p: SendUpdateNotify(%i,%i,%i,%i)"), this,
+  wxLogDebug(wxT("VNCConn %p: post_update_notify(%i,%i,%i,%i)"), this,
 	     event.rect.x,
 	     event.rect.y,
 	     event.rect.width,
@@ -362,7 +362,7 @@ void VNCConn::post_update_notify(int x, int y, int w, int h)
 
 void VNCConn::post_fbresize_notify() 
 {
-  wxLogDebug(wxT("VNCConn %p: SendFBResizeNotify() (%i, %i)"), 
+  wxLogDebug(wxT("VNCConn %p: post_fbresize_notify() (%i, %i)"), 
 	     this,
 	     getFrameBufferWidth(),
 	     getFrameBufferHeight());
