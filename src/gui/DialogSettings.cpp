@@ -59,9 +59,9 @@ void DialogSettings::do_layout()
     sizer_misc->Add(checkbox_multicast, 0, wxALL|wxEXPAND|wxADJUST_MINSIZE, 3);
     sizer_conn->Add(sizer_misc, 1, wxALL, 3);
     notebook_settings_pane_conn->SetSizer(sizer_conn);
-    sizer_stats->Add(checkbox_stats_save, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_stats->Add(checkbox_stats_save, 0, wxALL|wxADJUST_MINSIZE, 6);
     notebook_settings_pane_stats->SetSizer(sizer_stats);
-    sizer_log->Add(checkbox_logfile, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_log->Add(checkbox_logfile, 0, wxALL|wxADJUST_MINSIZE, 6);
     notebook_settings_pane_log->SetSizer(sizer_log);
     notebook_settings->AddPage(notebook_settings_pane_conn, _("Connections"));
     notebook_settings->AddPage(notebook_settings_pane_stats, _("Statistics"));
