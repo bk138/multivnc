@@ -54,6 +54,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
   pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
 
+  bool do_log;
+  pConfig->Read(K_LOGSAVETOFILE, &do_log, V_LOGSAVETOFILE);
+  VNCConn::doLogfile(do_log);
 
   show_fullscreen = false;
   SetMinSize(wxSize(640, 480));
