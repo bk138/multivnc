@@ -402,10 +402,6 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
   
   wxString desktopname =  c->getDesktopName();
   desktopname += wxString::Format(wxT("(%i)"), conn_index);
-#ifdef __WIN32__
-  // windows doesn't like ':'s
-  desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
-#endif
 
   wxString filename;
   if(!autosave)
@@ -417,6 +413,13 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
   else
     filename = desktopname + wxT(" ") + desc + wxT(" stats-") + wxNow() + wxT(".txt");
+
+#ifdef __WIN32__
+  // windows doesn't like ':'s
+  filename.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
+
+  wxLogDebug(wxT("About to save stats to ") + filename);
       
   if(!filename.empty())
     {
