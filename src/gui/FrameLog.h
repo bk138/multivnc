@@ -30,6 +30,7 @@ private:
 protected:
     // begin wxGlade: FrameLog::attributes
     wxTextCtrl* text_ctrl_log;
+    wxButton* button_clear;
     wxButton* button_save;
     wxButton* button_close;
     wxPanel* panel_top;
@@ -38,6 +39,7 @@ protected:
     DECLARE_EVENT_TABLE();
 
 public:
+    virtual void log_clear(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void log_saveas(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void log_close(wxCommandEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class

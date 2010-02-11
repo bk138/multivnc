@@ -34,6 +34,7 @@ public:
 
   void log_saveas(wxCommandEvent &event); 
   void log_close(wxCommandEvent &event);
+  void log_clear(wxCommandEvent &event);
 };
 
 #endif

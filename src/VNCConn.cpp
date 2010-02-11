@@ -645,6 +645,13 @@ void VNCConn::logger(const char *format, ...)
 
 
 
+void VNCConn::clearLog()
+{
+  // since we're accessing some global things here from different threads
+  wxCriticalSectionLocker lock(mutex_log);
+  log.Clear();
+}
+
 
 
 

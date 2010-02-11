@@ -113,6 +113,7 @@ public:
   const wxString& getErr() const { const wxString& ref = err; return ref; };
   // get global log string
   static const wxArrayString& getLog() { const wxArrayString& ref = log; return ref; };
+  static void clearLog();
   static void doLogfile(bool yesno) { do_logfile = yesno; };
 
 

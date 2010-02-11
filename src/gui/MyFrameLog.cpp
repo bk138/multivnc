@@ -90,12 +90,17 @@ void MyFrameLog::log_saveas(wxCommandEvent &event)
 }
  
 
-
 void MyFrameLog::log_close(wxCommandEvent &event)
 {
   Close();
 }
 
 
+void MyFrameLog::log_clear(wxCommandEvent &event)
+{
+  text_ctrl_log->Clear();
+  VNCConn::clearLog();
+  lines_printed = 0;
+}
 
 
