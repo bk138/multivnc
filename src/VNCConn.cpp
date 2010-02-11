@@ -147,7 +147,7 @@ bool VNCThread::sendKeyEvent(keyEvent &event)
 
 wxThread::ExitCode VNCThread::Entry()
 {
-  int i;
+  int i=0;
 
 #ifdef __WXGTK__
   // this signal is generated when we pop up a file dialog wwith wxGTK
@@ -161,7 +161,7 @@ wxThread::ExitCode VNCThread::Entry()
 #endif
 
   pointerEvent pe;
-  keyEvent ke;
+  keyEvent ke = {0, 0};
 
   while(! TestDestroy()) 
     {

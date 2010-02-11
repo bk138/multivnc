@@ -27,8 +27,6 @@ esac
 AM_CONDITIONAL(MINGW, [ test "$HOST_IS_WINDOWS" = "yes" ])
 AM_CONDITIONAL(DARWIN, [ test "$HOST_IS_DARWIN" = "yes" ])
 
-dnl enable warnings
-CXXFLAGS="$CXXFLAGS -Wall"
 
 dnl default for wx-config
 WXCONFIG="wx-config"
@@ -54,6 +52,8 @@ if test "x$enable_debug" = "xyes"; then
 	AC_MSG_RESULT(yes)
 else
 	WXCONFIG="$WXCONFIG --debug=no"	
+	CFLAGS="$CFLAGS -O3"	
+	CXXFLAGS="$CXXFLAGS -Wall -O3 -fno-strict-aliasing "	
 	AC_MSG_RESULT(no)
 fi
 
