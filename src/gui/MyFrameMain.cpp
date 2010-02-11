@@ -403,25 +403,22 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
       return true;
     }
   
-  wxString desktopname =  c->getDesktopName();
-  desktopname += wxString::Format(wxT("(%i)"), conn_index);
-
-  wxString filename;
-  if(!autosave)
-    filename = wxFileSelector(_("Saving ") + desc +_(" statistics..."), 
-					 wxEmptyString,
-					 desktopname + wxT(" ") + desc + wxT(" stats-") + wxNow() + wxT(".txt"), 
-					 wxT(".txt"), 
-					 _("TXT files|*.txt"), 
-					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-  else
-    filename = desktopname + wxT(" ") + desc + wxT(" stats-") + wxNow() + wxT(".txt");
-
+  wxString filename = c->getDesktopName() + wxString::Format(wxT("(%i)"), conn_index) +
+    wxT(" ") + desc + wxT(" stats-") + wxNow() + wxT(".txt");
+  
 #ifdef __WIN32__
   // windows doesn't like ':'s
   filename.Replace(wxString(wxT(":")), wxString(wxT("-")));
 #endif
 
+  if(!autosave)
+    filename = wxFileSelector(_("Saving ") + desc +_(" statistics..."), 
+			      wxEmptyString,
+			      filename, 
+			      wxT(".txt"), 
+			      _("TXT files|*.txt"), 
+			      wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+ 
   wxLogDebug(wxT("About to save stats to ") + filename);
       
   if(!filename.empty())
