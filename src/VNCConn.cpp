@@ -24,6 +24,7 @@ DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnCuttextNOTIFY) 
+DEFINE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY);
 
 // these are passed to the worker thread
 typedef wxMouseEvent pointerEvent;
@@ -184,6 +185,13 @@ wxThread::ExitCode VNCThread::Entry()
 	      p->post_disconnect_notify();
 	      break;
 	    }
+
+	  int now = p->isMulticast();
+	  if(now != p->multicastStatus)
+	    {
+	      p->multicastStatus = now;
+	      p->post_unimultichanged_notify();
+	    }
 	}
 
 #ifdef __WXGTK__
@@ -258,6 +266,7 @@ VNCConn::VNCConn(void* p)
   cl = 0;
   framebuffer = 0;
   fb_data = 0;
+  multicastStatus = 0;
 
   rfbClientLog = rfbClientErr = logger;
 
@@ -383,6 +392,17 @@ void VNCConn::post_cuttext_notify()
   wxCommandEvent event(VNCConnCuttextNOTIFY, wxID_ANY);
   event.SetEventObject(this); // set sender
 
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+
+void VNCConn::post_unimultichanged_notify()
+{
+  wxCommandEvent event(VNCConnUniMultiChangedNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
 }

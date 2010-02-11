@@ -26,6 +26,9 @@ DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnCuttextNOTIFY, -1) 
 // sent framebuffer update, event's rect is set to region
 DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
+// sent when status changes from/to uni/-multicast. 
+// get current state via isMulticast()
+DECLARE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY, -1) 
 
 
 class VNCConn: public wxEvtHandler
@@ -100,7 +103,8 @@ private:
   void *parent;
 
   rfbClient* cl;
-
+  int multicastStatus;
+  
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
   static bool TLS_threading_initialized;
 #endif
@@ -146,9 +150,10 @@ private:
   void post_update_notify(int x, int y, int w, int h);
   void post_fbresize_notify();
   void post_cuttext_notify();
+  void post_unimultichanged_notify();
 
 
-  //callbacks
+  // libvncclient callbacks
   static rfbBool alloc_framebuffer(rfbClient* client);
   static void got_update(rfbClient* cl,int x,int y,int w,int h);
   static void kbd_leds(rfbClient* cl, int value, int pad);

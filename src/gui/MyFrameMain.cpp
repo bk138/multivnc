@@ -26,6 +26,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
   EVT_VNCCONNUPDATENOTIFY (wxID_ANY, MyFrameMain::onVNCConnUpdateNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnUniMultiChangedNOTIFY, MyFrameMain::onVNCConnUniMultiChangedNotify)
   EVT_COMMAND (wxID_ANY, VNCConnFBResizeNOTIFY, MyFrameMain::onVNCConnFBResizeNotify)
   EVT_COMMAND (wxID_ANY, VNCConnCuttextNOTIFY, MyFrameMain::onVNCConnCuttextNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
@@ -223,12 +224,32 @@ void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
     {
       VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
       canvas->drawRegion(event.rect);
+    }
+}
 
+
+
+void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
+{
+  // get sender
+  VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
+
+  // find index of this connection
+  vector<VNCConn*>::iterator it = connections.begin();
+  size_t index = 0;
+  while(it != connections.end() && *it != c)
+    {
+      ++it;
+      ++index;
+    }
+
+  if(index < connections.size()) // found
+    {
       // update icon
       if(c->isMulticast())
-	notebook_connections->SetPageImage(sel, 1);
+	notebook_connections->SetPageImage(index, 1);
       else
-	notebook_connections->SetPageImage(sel, 0);
+	notebook_connections->SetPageImage(index, 0);
     }
 }
 
