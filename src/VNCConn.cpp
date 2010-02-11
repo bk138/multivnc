@@ -191,7 +191,7 @@ wxThread::ExitCode VNCThread::Entry()
 #endif
 
       if(listenMode)
-	i=listenForIncomingConnectionsNoFork(p->cl, 500);
+	i=listenForIncomingConnectionsNoFork(p->cl, 100000); // 100 ms
       else
 	{
 	  // send everything that's inside the input queues
