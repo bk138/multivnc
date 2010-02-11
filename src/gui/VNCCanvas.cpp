@@ -162,12 +162,13 @@ void VNCCanvas::drawRegion(wxRect& rect)
 
 #ifdef __WXDEBUG__
   wxLongLong t1 = wxGetLocalTimeMillis();
-  wxLogDebug(wxT("VNCCanvas %p: drawing region (%i,%i,%i,%i) took %lld ms"),
+  wxLogDebug(wxT("VNCCanvas %p: drawing region (%i,%i,%i,%i) size %d took %lld ms"),
 	     this,
 	     rect.x,
 	     rect.y,
 	     rect.width,
 	     rect.height,
+	     rect.width * rect.height,
 	     (t1-t0).GetValue());
 #endif
 
