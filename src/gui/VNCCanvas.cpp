@@ -151,16 +151,26 @@ void VNCCanvas::onFocusLoss(wxFocusEvent &event)
 
 void VNCCanvas::drawRegion(wxRect& rect)
 {
-  wxLogDebug(wxT("VNCCanvas %p: drawing region (%i,%i,%i,%i)"),
+#ifdef __WXDEBUG__
+  wxLongLong t0 = wxGetLocalTimeMillis();
+#endif
+
+  wxClientDC dc(this);
+
+  wxBitmap region = conn->getFrameBufferRegion(rect);
+  dc.DrawBitmap(region, rect.x, rect.y);
+
+#ifdef __WXDEBUG__
+  wxLongLong t1 = wxGetLocalTimeMillis();
+  wxLogDebug(wxT("VNCCanvas %p: drawing region (%i,%i,%i,%i) took %lld ms"),
 	     this,
 	     rect.x,
 	     rect.y,
 	     rect.width,
-	     rect.height);
+	     rect.height,
+	     (t1-t0).GetValue());
+#endif
 
-  wxClientDC dc(this);
-  wxBitmap region = conn->getFrameBufferRegion(rect);
-  dc.DrawBitmap(region, rect.x, rect.y);
 }
 
 
