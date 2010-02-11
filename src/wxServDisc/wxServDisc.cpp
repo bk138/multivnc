@@ -75,7 +75,11 @@ wxThread::ExitCode wxServDisc::Entry()
 
   d = mdnsd_new(1,1000);
 
+#ifdef __WIN32__
+  if((s = msock()) == INVALID_SOCKET) 
+#else
   if((s = msock()) < 0) 
+#endif
     { 
       err.Printf(_("Can't create socket: %s\n"), strerror(errno));
       exit = true;
@@ -154,15 +158,14 @@ wxThread::ExitCode wxServDisc::Entry()
   mdnsd_shutdown(d);
   mdnsd_free(d);
 
-  if(sock >= 0)
-    {
 #ifdef __WIN32__
-      closesocket(sock);
+  if(sock != INVALID_SOCKET)
+    closesocket(sock);
 #else
-      close(sock);
+  if(sock >= 0)
+    close(sock);
 #endif 
-    }
-
+    
   wxLogDebug(wxT("wxServDisc %p: scanthread exiting"), this);
 
   return NULL;
@@ -324,7 +327,12 @@ SOCKET wxServDisc::msock()
 
 
   // Create a new socket
-  if((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
+  if((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) 
+#ifdef __WIN32__
+     == INVALID_SOCKET)
+#else
+    < 0)
+#endif
     return -1;
 
   // set to reuse address
