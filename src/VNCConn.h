@@ -13,11 +13,18 @@
 
 
 
-// make available custom events
+/*
+  custom events
+*/
+// sent when an incoming connection is available
 DECLARE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY, -1)
+// sent on disconnect
 DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
+// sent on framebuffer resize, get new size via getFrameBufferWidth/Height()
 DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
+// sent when new cuttext is available
 DECLARE_EVENT_TYPE(VNCConnCuttextNOTIFY, -1) 
+// sent framebuffer update, event's rect is set to region
 DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 
 
