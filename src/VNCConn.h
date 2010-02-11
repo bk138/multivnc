@@ -76,6 +76,7 @@ public:
   const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
   void setCuttext(const wxString& text) { wxCriticalSectionLocker lock(mutex_cuttext); cuttext = text; };
 
+  // returns a wxBitmap (this uses COW, so is okay)
   wxBitmap getFrameBufferRegion(const wxRect& region) const;
   int getFrameBufferWidth() const;
   int getFrameBufferHeight() const;

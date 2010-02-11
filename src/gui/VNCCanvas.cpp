@@ -75,7 +75,7 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 		 update_rect.height);
       
     
-      wxBitmap region = conn->getFrameBufferRegion(update_rect);
+      const wxBitmap& region = conn->getFrameBufferRegion(update_rect);
       dc.DrawBitmap(region, update_rect.x, update_rect.y);
 	
       ++upd;
@@ -157,7 +157,7 @@ void VNCCanvas::drawRegion(wxRect& rect)
 
   wxClientDC dc(this);
 
-  wxBitmap region = conn->getFrameBufferRegion(rect);
+  const wxBitmap& region = conn->getFrameBufferRegion(rect);
   dc.DrawBitmap(region, rect.x, rect.y);
 
 #ifdef __WXDEBUG__
