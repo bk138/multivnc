@@ -703,7 +703,7 @@ bool VNCConn::Listen(int port)
 }
 
 
-bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool multicast)
+bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool multicast, int multicast_recvbuf)
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
 
@@ -725,7 +725,10 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool mu
   argv[4] = strdup("-quality");
   argv[5] = strdup((wxString() << quality).mb_str());
   if(multicast)
-    cl->canHandleMulticastVNC = TRUE;
+    {
+      cl->canHandleMulticastVNC = TRUE;
+      cl->multicastRcvBufSize = multicast_recvbuf*1024;
+    }
   else
     cl->canHandleMulticastVNC = FALSE;
 

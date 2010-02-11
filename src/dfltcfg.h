@@ -27,6 +27,8 @@
 #define V_QUALITY 5
 #define K_MULTICAST wxT("MulticastVNC")
 #define V_MULTICAST true
+#define K_MULTICASTRECVBUF wxT("MulticastRecvBufSize")
+#define V_MULTICASTRECVBUF 325
 
 // logging
 #define K_LOGSAVETOFILE wxT("LogFile")

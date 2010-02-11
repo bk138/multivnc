@@ -30,6 +30,7 @@ private:
 
 protected:
     // begin wxGlade: DialogSettings::attributes
+    wxStaticBox* sizer_multicast_staticbox;
     wxStaticBox* sizer_quality_staticbox;
     wxStaticBox* sizer_compresslevel_staticbox;
     wxStaticText* label_compresslevel;
@@ -37,6 +38,8 @@ protected:
     wxStaticText* label_quality;
     wxSlider* slider_quality;
     wxCheckBox* checkbox_multicast;
+    wxStaticText* label_recvbuf;
+    wxSlider* slider_recvbuf;
     wxPanel* notebook_settings_pane_conn;
     wxCheckBox* checkbox_stats_save;
     wxPanel* notebook_settings_pane_stats;
