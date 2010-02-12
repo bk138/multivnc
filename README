@@ -13,25 +13,40 @@
    * Bookmarks.
    * Simple, loggable statistics 
 
+ 
+ For features that are planned, but not completed yet, look at the
+ TODO file.
+
+
+
+
+ MulticastVNC notes
+ ''''''''''''''''''
+ 
+ This is still experimental and there is no server support, 
+ however you can get a modified libvncserver/libvncclient
+ at http://github.com/bk138/x11vnc-multiptr, branch multicastvnc.
+ This is the same library that MultiVNC uses internally.
+
 
 
 
  How to compile from source
  ''''''''''''''''''''''''''
 
- the prerequisites:
+ The prerequisites:
 
    * the usual c-compiler with headers and stuff
    * wxWidgets dev package version >= 2.8.7
    * zlib dev package 
    * libjpeg dev package 
 
- to compile:
+ To compile:
 
    ./autogen.sh
 
 
- if crosscompiling with MinGW:
+ If crosscompiling with MinGW:
 
 
    ./autogen.sh --build=<your build system type> --host=i586-mingw32msvc \
@@ -39,19 +54,19 @@
 	        --with-zlib=<path to where zlib include and lib dirs are> \
 	        --with-jepg=<path to where jpeglib include and lib dirs are> 
 
- then
+ Then
 
 
    make
 
 
- and cross fingers...
+ And cross fingers...
 
 
- to install:
- * 'make install' as root
- * or copy binary wherever you like to
+ To install:
+   * 'make install' as root
+   * or copy binary wherever you like to
 
 
 
- that's pretty much it, have fun !
+ That's pretty much it, have fun !
