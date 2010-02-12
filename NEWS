@@ -9,6 +9,8 @@ MultiVNC 0.2 - "The real thing"
 	* Fix bug with canvas centering.
 	* Fix bug where disconnecting from a fast server would 
  	  terminate MultiVNC.
+        * Fix really nasty bug where listening on windows would
+          take 100% CPU.
 
 
 MultiVNC 0.1 - "In the beginning"

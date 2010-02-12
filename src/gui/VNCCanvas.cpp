@@ -29,11 +29,13 @@ END_EVENT_TABLE();
 
 
 /*
-  constructor/destructor
+  constructor/destructor 
+  (make sure size is set to 0,0 ow win32 gets stuck sending 
+  paint events in listen mode)
 */
 
 VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
-  wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS)
+  wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(0,0), wxWANTS_CHARS)
 {
   conn = c;
   adjustSize(); 
@@ -56,6 +58,7 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
 void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 {
+  // this happens on GTK even if our size is (0,0)
   if(GetSize().GetWidth() == 0 || GetSize().GetHeight() == 0)
     return;
 
