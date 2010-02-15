@@ -247,9 +247,15 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
     {
       // update icon
       if(c->isMulticast())
-	notebook_connections->SetPageImage(index, 1);
+	{
+	  wxLogStatus( _("Connection to %s is now multicast."), c->getServerName().c_str());
+	  notebook_connections->SetPageImage(index, 1);
+	}
       else
-	notebook_connections->SetPageImage(index, 0);
+	{
+	  wxLogStatus( _("Connection to %s is now unicast."), c->getServerName().c_str());
+	  notebook_connections->SetPageImage(index, 0);
+	}
     }
 }
 
@@ -545,7 +551,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   if(listen)
     notebook_connections->AddPage(container, _("Listening on port ") + port, true);    
   else
-    notebook_connections->AddPage(container, c->getDesktopName(), true);
+    notebook_connections->AddPage(container, c->getDesktopName() + wxT(" @ ") + c->getServerName(), true);
 
   if(c->isMulticast())
     notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
