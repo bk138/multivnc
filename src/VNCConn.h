@@ -129,6 +129,7 @@ private:
 
   rfbClient* cl;
   int multicastStatus;
+  double multicastLossRatio;
   
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
   static bool TLS_threading_initialized;

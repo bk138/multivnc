@@ -200,11 +200,37 @@ wxThread::ExitCode VNCThread::Entry()
 	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
 	    sendKeyEvent(ke);
 
+	  // request update and handle response 
 	  if(!rfbProcessServerMessage(p->cl, 500))
 	    {
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), p);
 	      p->post_disconnect_notify();
 	      break;
+	    }
+
+	  if(p->isMulticast())
+	    {
+	      // compute loss ratio: the way we do it here is per 500 packets
+	      if(p->cl->multicastRcvd >= 500 || p->cl->multicastTimeouts)
+		{
+		  p->multicastLossRatio = p->cl->multicastLost/(double)(p->cl->multicastRcvd + p->cl->multicastLost);
+		  p->cl->multicastRcvd = p->cl->multicastLost = 0;
+		}
+
+	      // and act accordingly 
+	      if(p->multicastLossRatio > 0.5)
+		{
+		  rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
+		  wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), p);
+		  p->cl->multicastDisabled = TRUE;
+		  SendFramebufferUpdateRequest(p->cl, 0, 0, p->cl->width, p->cl->height, FALSE);
+		}
+	      else if(p->multicastLossRatio > 0.2) 
+		{
+		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full unicast framebuffer update\n");
+		  SendFramebufferUpdateRequest(p->cl, 0, 0, p->cl->width, p->cl->height, FALSE);
+		  p->cl->multicastLost -= p->cl->multicastLost/10;
+		}
 	    }
 
 	  int now = p->isMulticast();
@@ -288,6 +314,7 @@ VNCConn::VNCConn(void* p)
   framebuffer = 0;
   fb_data = 0;
   multicastStatus = 0;
+  multicastLossRatio = 0;
 
   rfbClientLog = rfbClientErr = logger;
 
@@ -441,12 +468,9 @@ void VNCConn::on_updatescount_timer(wxTimerEvent& event)
       updates_count = 0;
 
       if(isMulticast())
-	{
-	  double lossrate = cl->multicastLost/(double)(cl->multicastRcvd+cl->multicastLost);
-	  mc_lossratios.Add((wxString() << (int)conn_stopwatch.Time())
-			    + wxT(", ") +
-			    wxString::Format(wxT("%.4f"), lossrate));
-	}
+	mc_lossratios.Add((wxString() << (int)conn_stopwatch.Time())
+			  + wxT(", ") +
+			  wxString::Format(wxT("%.4f"), multicastLossRatio));
     }
 }
 
