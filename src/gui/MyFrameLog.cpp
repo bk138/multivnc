@@ -62,16 +62,24 @@ void MyFrameLog::SendCloseNotify()
 
 void MyFrameLog::onUpdateTimer(wxTimerEvent& event)
 {
-  wxBusyCursor wait;
   wxArrayString log = VNCConn::getLog();
+  if(log.GetCount() -  lines_printed > 50)
+    {
+      wxBeginBusyCursor();
+      Freeze();
+    }
 
-  Freeze();
   while(lines_printed < log.GetCount())
     {
       *text_ctrl_log << log[lines_printed];
       ++lines_printed;
     }
-  Thaw();
+
+  if(IsFrozen())
+    {
+      Thaw();
+      wxEndBusyCursor();
+    }
 }
 
 
