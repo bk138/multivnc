@@ -26,6 +26,7 @@ multivnc_SOURCES = \
 	VNCConn.cpp   \
 	VNCConn.h   \
 	dfltcfg.h \
+	msgqueue.h\
 	gui/FrameMain.cpp \
 	gui/FrameMain.h \
 	gui/MyFrameMain.cpp \
@@ -40,6 +41,8 @@ multivnc_SOURCES = \
 	gui/DialogSettings.h \
 	gui/MyDialogSettings.cpp \
 	gui/MyDialogSettings.h \
+	gui/evtids.h\
+	gui/bitmapFromMem.h\
 	gui/res/about.png \
 	gui/res/connect.png \
 	gui/res/disconnect.png \
