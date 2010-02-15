@@ -210,8 +210,8 @@ wxThread::ExitCode VNCThread::Entry()
 
 	  if(p->isMulticast())
 	    {
-	      // compute loss ratio: the way we do it here is per 500 packets
-	      if(p->cl->multicastRcvd >= 500 || p->cl->multicastTimeouts)
+	      // compute loss ratio: the way we do it here is per 1000 packets
+	      if(p->cl->multicastRcvd >= 1000 || p->cl->multicastTimeouts)
 		{
 		  p->multicastLossRatio = p->cl->multicastLost/(double)(p->cl->multicastRcvd + p->cl->multicastLost);
 		  p->cl->multicastRcvd = p->cl->multicastLost = 0;
