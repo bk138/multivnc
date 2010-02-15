@@ -62,6 +62,7 @@ void MyFrameLog::SendCloseNotify()
 
 void MyFrameLog::onUpdateTimer(wxTimerEvent& event)
 {
+  wxBusyCursor wait;
   wxArrayString log = VNCConn::getLog();
 
   Freeze();
