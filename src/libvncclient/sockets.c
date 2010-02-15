@@ -559,14 +559,12 @@ SetNonBlocking(int sock)
 {
 #ifndef __MINGW32__
   if (fcntl(sock, F_SETFL, O_NONBLOCK) < 0) {
-#else
-  unsigned long block=1;
-  if (ioctlsocket(sock, FIONBIO, &block) != 0) {
-#endif
-    rfbClientErr("SetNonBlocking: %s\n", strerror(errno));
+    rfbClientErr("AcceptTcpConnection: fcntl\n");
     return FALSE;
   }
-
+#else
+  rfbClientErr("O_NONBLOCK on MinGW32 NOT IMPLEMENTED\n");
+#endif
   return TRUE;
 }
 
@@ -730,19 +728,13 @@ int CreateMulticastSocket(struct sockaddr_storage multicastSockAddr, int so_recv
 	return -1;
       }
 
-
+ 
+  optval = 1;
   if((sock = socket(localAddr.ss_family, SOCK_DGRAM, 0)) < 0)
     {
       rfbClientErr("CreateMulticastSocket socket(): %s\n", strerror(errno));
       return -1;
     }
-
-  if(!SetNonBlocking(sock))
-    {
-      rfbClientErr("CreateMulticastSocket SetNonBlocking(): %s\n", strerror(errno));
-      close(sock);
-      return -1;
-    } 
 
   optval = 1;
   if(setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&optval,sizeof(optval)) < 0) 
