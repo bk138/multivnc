@@ -64,11 +64,13 @@ void MyFrameLog::onUpdateTimer(wxTimerEvent& event)
 {
   wxArrayString log = VNCConn::getLog();
 
+  Freeze();
   while(lines_printed < log.GetCount())
     {
       *text_ctrl_log << log[lines_printed];
       ++lines_printed;
     }
+  Thaw();
 }
 
 
