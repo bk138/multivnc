@@ -551,7 +551,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   if(listen)
     notebook_connections->AddPage(container, _("Listening on port ") + port, true);    
   else
-    notebook_connections->AddPage(container, c->getDesktopName() + wxT(" @ ") + c->getServerName(), true);
+    notebook_connections->AddPage(container, c->getDesktopName() + wxT(" (") + c->getServerName() + wxT(")") , true);
 
   if(c->isMulticast())
     notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
