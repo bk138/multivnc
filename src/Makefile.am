@@ -43,13 +43,6 @@ multivnc_SOURCES = \
 	gui/MyDialogSettings.h \
 	gui/evtids.h\
 	gui/bitmapFromMem.h\
-	gui/res/about.png \
-	gui/res/connect.png \
-	gui/res/disconnect.png \
-	gui/res/fullscreen.png \
-	gui/res/screenshot.png \
-	gui/res/unicast.png \
-	gui/res/multicast.png \
 	gui/res/about.png.h \
 	gui/res/connect.png.h \
 	gui/res/disconnect.png.h \
@@ -61,6 +54,17 @@ multivnc_SOURCES = \
 	gui/res/vnccursor-mask.xbm \
 	gui/res/vnccursor.xbm
 
+EXTRA_DIST = \
+	gui/winres.rc\
+	gui/res/icon.ico \
+	gui/res/icon.icns \
+	gui/res/about.png \
+	gui/res/connect.png \
+	gui/res/disconnect.png \
+	gui/res/fullscreen.png \
+	gui/res/screenshot.png \
+	gui/res/unicast.png \
+	gui/res/multicast.png 
 
 multivnc_LDFLAGS = 
 

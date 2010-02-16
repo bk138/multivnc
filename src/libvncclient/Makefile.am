@@ -11,7 +11,7 @@ rfbproto.o: rfbproto.c corre.c hextile.c rre.c tight.c zlib.c zrle.c ultra.c
 EXTRA_DIST=corre.c hextile.c rre.c tight.c zlib.c zrle.c ultra.c\
 $(top_srcdir)/src/libvncserver/d3des.c $(top_srcdir)/src/libvncserver/d3des.h\
 $(top_srcdir)/src/libvncserver/vncauth.c $(top_srcdir)/src/libvncserver/zywrletemplate.c\
-$(top_srcdir)/src/rfb/rfbclient.h  $(top_srcdir)/src/rfb/rfbproto.h
+$(top_srcdir)/src/rfb/rfbclient.h $(top_srcdir)/src/rfb/rfbproto.h $(top_srcdir)/src/rfb/keysym.h
 
 
 

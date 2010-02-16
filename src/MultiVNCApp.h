@@ -34,7 +34,7 @@
 
 
 
-#define VERSION "0.2"
+#define VERSION "0.3pre"
 #define COPYRIGHT "Copyright (C) 2009, 2010 Christian Beier <dontmind@freeshell.org>"
 
 
