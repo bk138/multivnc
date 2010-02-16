@@ -74,6 +74,7 @@ if test "$HOST_IS_DARWIN" = "yes"; then
      CC="gcc -arch i386 -arch ppc"
      CXX="g++ -arch i386 -arch ppc"
      CPP="cpp"
+     CXXCPP="cpp"
      AC_MSG_RESULT([yes])
    else
      AC_MSG_RESULT([no])
@@ -121,7 +122,6 @@ dnl ***************************************************************************
 GETTEXT_PACKAGE=multivnc
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
-AM_GLIB_GNU_GETTEXT
 IT_PROG_INTLTOOL([0.35.0])
 
 

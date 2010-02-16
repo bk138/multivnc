@@ -19,7 +19,9 @@ pixmap_DATA = src/gui/res/multivnc.xpm
 
 EXTRA_DIST = $(multivncdoc_DATA) \
              $(Applications_DATA) \
-             $(pixmap_DATA)
+             $(pixmap_DATA)\
+             debian/changelog  debian/compat  debian/control  debian/copyright\
+             debian/dirs  debian/docs  debian/menu  debian/rules  debian/watch
 
 
 if DARWIN
