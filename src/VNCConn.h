@@ -92,9 +92,11 @@ public:
   // call this to tell the VNCConn that a VNCConnUpdateNOTIFY was processed
   void UpdateProcessed();
 
+
   // get kind of VNCConn
   bool isReverse() const { return cl ? cl->listenSpecified : false; };
   bool isMulticast() const;
+  bool isBlocking() const { return blocking_mode; };
 
   // send events
   void sendPointerEvent(wxMouseEvent &event);
