@@ -270,6 +270,7 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
 	}
       else
 	{
+	  c->SetBlocking(true);
 	  wxLogStatus( _("Connection to %s is now unicast."), c->getServerName().c_str());
 	  notebook_connections->SetPageImage(index, 0);
 	}
@@ -584,7 +585,10 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
     notebook_connections->AddPage(container, c->getDesktopName() + wxT(" (") + c->getServerName() + wxT(")") , true);
 
   if(c->isMulticast())
-    notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
+    {
+      c->SetBlocking(false);
+      notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
+    }
   else
     {
       c->SetBlocking(true);
