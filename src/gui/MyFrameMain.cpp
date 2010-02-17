@@ -16,7 +16,9 @@
 #include "../MultiVNCApp.h"
 
 #define STATS_TIMER_INTERVAL 50
-
+#define STATS_TIMER_ID 0
+#define DISPLAY_TIMER_INTERVAL 30
+#define DISPLAY_TIMER_ID 1
 
 using namespace std;
 
@@ -31,7 +33,8 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnCuttextNOTIFY, MyFrameMain::onVNCConnCuttextNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
-  EVT_TIMER   (wxID_ANY, MyFrameMain::onStatsTimer)
+  EVT_TIMER   (STATS_TIMER_ID, MyFrameMain::onStatsTimer)
+  EVT_TIMER   (DISPLAY_TIMER_ID, MyFrameMain::onDisplayTimer)
 END_EVENT_TABLE()
 
 
@@ -133,7 +136,10 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // theres no log window at startup
   logwindow = 0;
 
-  stats_timer.SetOwner(this);
+  stats_timer.SetOwner(this, STATS_TIMER_ID);
+  display_timer.SetOwner(this, DISPLAY_TIMER_ID);
+  // disabled for now
+  //display_timer.Start(DISPLAY_TIMER_INTERVAL);
 
 
   // finally, our mdns service scanner
@@ -214,17 +220,27 @@ void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 
 void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
 {
-  // only process currently selected connection
-  int sel;
-  if((sel = notebook_connections->GetSelection()) == -1) // none selected
-    return;
+  VNCConn* sending_conn = static_cast<VNCConn*>(event.GetEventObject());
 
-  VNCConn* c = connections.at(sel);
-  if(c == event.GetEventObject())
+  // only draw something for the currently selected connection
+  int sel;
+  if((sel = notebook_connections->GetSelection()) != -1) 
     {
-      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
-      canvas->drawRegion(event.rect);
+      VNCConn* selected_conn = connections.at(sel);
+      if(selected_conn == sending_conn)
+	{
+	  VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
+	  canvas->drawRegion(event.rect);
+	}
     }
+
+  // call this in any case, even if we don't draw anything
+  for(vector<VNCConn*>::iterator it = connections.begin(); it != connections.end(); it++)
+    if(*it == sending_conn)
+      {
+	sending_conn->UpdateProcessed();
+	break;
+      }
 }
 
 
@@ -248,6 +264,7 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
       // update icon
       if(c->isMulticast())
 	{
+	  c->SetBlocking(false);
 	  wxLogStatus( _("Connection to %s is now multicast."), c->getServerName().c_str());
 	  notebook_connections->SetPageImage(index, 1);
 	}
@@ -411,6 +428,19 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
 }
 
 
+void MyFrameMain::onDisplayTimer(wxTimerEvent& event)
+{
+  // only draw something for the currently selected connection
+  int sel;
+  if((sel = notebook_connections->GetSelection()) != -1) 
+    {
+      VNCConn* conn = connections.at(sel);
+      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
+      wxRect complete_rect = wxRect(0, 0, conn->getFrameBufferWidth(), conn->getFrameBufferHeight());
+      canvas->drawRegion(complete_rect);
+    }
+}
+
 
 char* MyFrameMain::getpasswd(rfbClient* client)
 {
@@ -556,7 +586,10 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   if(c->isMulticast())
     notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
   else
-    notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
+    {
+      c->SetBlocking(true);
+      notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
+    }
 
   // "end connection"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(true);

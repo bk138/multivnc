@@ -41,6 +41,10 @@ class MyFrameMain: public FrameMain
   wxTimer stats_timer;
   void onStatsTimer(wxTimerEvent& event);
 
+  // timer to perdiodically update display
+  wxTimer display_timer;
+  void onDisplayTimer(wxTimerEvent& event);
+
   void splitwinlayout();
 
   // array of bookmark strings

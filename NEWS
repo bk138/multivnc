@@ -1,3 +1,9 @@
+
+MultiVNC 0.3 - "Collab me!"
+	* Fixed a bug where a fast VNC server would make MultiVNC
+	  GUI unresponsive on a slow client.
+
+
 MultiVNC 0.2 - "The real thing"
 	* MulticastVNC incorporated! You can now connect to a
  	  MulticastVNC enabled server, e.g. based on libvncserver.
