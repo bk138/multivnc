@@ -73,6 +73,7 @@ public:
        Setup() <-> Cleanup()
        Init()  <-> Shutdown()
   */
+
   bool Setup(char* (*getpasswdfunc)(rfbClient*));
   void Cleanup();
   bool Listen(int port);
@@ -80,9 +81,22 @@ public:
 	    bool multicast = true, int multicastRecvBuf = 325);
   void Shutdown();
 
+
+  /* 
+     Turning blocking mode on makes a VNCConn block after it issued a 
+     VNCConnUpdateNOTIFY event until UpdateProcessed() is called.
+     This way a slow drawing engine can be synchronized with a fast VNCConn.
+     Default is OFF.
+  */
+  void SetBlocking(bool yesno);
+  // call this to tell the VNCConn that a VNCConnUpdateNOTIFY was processed
+  void UpdateProcessed();
+
+  // get kind of VNCConn
   bool isReverse() const { return cl ? cl->listenSpecified : false; };
   bool isMulticast() const;
 
+  // send events
   void sendPointerEvent(wxMouseEvent &event);
   bool sendKeyEvent(wxKeyEvent &event, bool down, bool isChar);
   
@@ -142,6 +156,10 @@ private:
   wxBitmap* framebuffer;
   wxAlphaPixelData* fb_data;
 
+  // blocking mode stuff
+  bool blocking_mode;
+  wxSemaphore* sema_unprocessed_upd;
+
   // this contains cuttext we received or should send
   wxString cuttext;
   wxCriticalSection mutex_cuttext;
@@ -169,6 +187,7 @@ private:
   static wxArrayString log;
   static wxCriticalSection mutex_log;
   static bool do_logfile;
+
 
   // event dispatchers
   void post_incomingconnection_notify();

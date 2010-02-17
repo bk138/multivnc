@@ -336,6 +336,10 @@ VNCConn::VNCConn(void* p)
   do_stats = false;
   updates_count = 0;
   updates_count_timer.SetOwner(this);
+
+  // blocking mode
+  blocking_mode = false;
+  sema_unprocessed_upd = new wxSemaphore(1, 1);
 }
 
 
@@ -345,6 +349,7 @@ VNCConn::~VNCConn()
 {
   Shutdown();
   Cleanup();
+  delete sema_unprocessed_upd;
   wxLogDebug(wxT("VNCConn %p: I'm dead!"), this);
 }
 
@@ -560,8 +565,16 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
 void VNCConn::got_update(rfbClient* client,int x,int y,int w,int h)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
- 
-  conn->post_update_notify(x, y, w, h);
+  VNCThread* t = (VNCThread*)conn->vncthread;
+  if(! t->TestDestroy())
+    {
+      conn->post_update_notify(x, y, w, h);
+      
+      // if we are in blocking mode,
+      // decrement semaphore if there's is something left and go on, else block
+      if(conn->blocking_mode)
+	conn->sema_unprocessed_upd->Wait();
+    }
 }
 
 
@@ -571,7 +584,7 @@ void VNCConn::got_update(rfbClient* client,int x,int y,int w,int h)
 void VNCConn::kbd_leds(rfbClient* cl, int value, int pad)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID); 
-  wxLogDebug(wxT("VNCConn %p: Led State= 0x%02X\n"), conn, value);
+  wxLogDebug(wxT("VNCConn %p: Led State= 0x%02X"), conn, value);
 }
 
 
@@ -708,7 +721,7 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   cl->GotXCutText = got_cuttext;
 
   cl->canHandleNewFBSize = TRUE;
-  
+
   return true;
 }
 
@@ -841,7 +854,10 @@ void VNCConn::Shutdown()
       ((VNCThread*)vncthread)->Delete();
       // wait for deletion to finish
       while(vncthread)
-	wxMilliSleep(100);
+	{
+	  sema_unprocessed_upd->Post(); // if the thread is currently blocking, unblock it
+	  wxMilliSleep(100);
+	}
       
       wxLogDebug(wxT("VNCConn %p: Shutdown() after vncthread delete"), this);
     }
@@ -869,6 +885,25 @@ void VNCConn::Shutdown()
     {
       delete framebuffer;
       framebuffer = 0;
+    }
+}
+
+
+
+void VNCConn::SetBlocking(bool enable)
+{
+  blocking_mode = enable;
+  // in case the worker thread is currently blocked, unblock it
+  sema_unprocessed_upd->Post(); 
+}
+
+
+void VNCConn::UpdateProcessed()
+{
+  if(blocking_mode)
+    {
+      wxLogDebug(wxT("VNCConn %p: UpdateProcessed"), this);
+      sema_unprocessed_upd->Post();
     }
 }
 
@@ -1129,8 +1164,8 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
       fbsub_it.OffsetY(fbsub_data, 1);
     }
 
+
   return region;
- 
 }
 
 
