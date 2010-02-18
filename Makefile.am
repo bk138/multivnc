@@ -20,6 +20,7 @@ pixmap_DATA = src/gui/res/multivnc.xpm
 EXTRA_DIST = $(multivncdoc_DATA) \
              $(Applications_DATA) \
              $(pixmap_DATA)\
+	     contrib/WinVNC.exe contrib/VNCHooks.dll contrib/README-contrib.txt\	
              debian/changelog  debian/compat  debian/control  debian/copyright\
              debian/dirs  debian/docs  debian/menu  debian/rules  debian/watch
 
