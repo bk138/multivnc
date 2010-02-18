@@ -420,7 +420,7 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
       text_ctrl_lossratio->Clear();
       
       if( ! c->getUpdateStats().IsEmpty() )
-	*text_ctrl_upd << wxAtoi(c->getUpdateStats().Last().AfterFirst(wxT(',')))/1024;
+	*text_ctrl_upd << wxAtoi(c->getUpdateStats().Last().AfterFirst(wxT(',')));
       if( ! c->getLatencyStats().IsEmpty() )
 	*text_ctrl_latency << c->getLatencyStats().Last().AfterFirst(wxT(','));
       if( ! c->getMCLossRatioStats().IsEmpty() )
