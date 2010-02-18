@@ -2,6 +2,8 @@
 MultiVNC 0.3 - "Collab me!"
 	* Fixed a bug where a fast VNC server would make MultiVNC
 	  GUI unresponsive on a slow client.
+	* Fixed bug where saving log or screenshot would terminate
+	  the connection or even crash on some machines.
 
 
 MultiVNC 0.2 - "The real thing"
