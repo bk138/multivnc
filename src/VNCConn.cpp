@@ -912,8 +912,8 @@ void VNCConn::UpdateProcessed()
 // this simply posts the mouse event into the worker thread's input queue
 void VNCConn::sendPointerEvent(wxMouseEvent &event)
 {
-  
-  ((VNCThread*)vncthread)->pointer_event_q.Post(event);
+  if(vncthread)
+    ((VNCThread*)vncthread)->pointer_event_q.Post(event);
 }
 
 
@@ -949,10 +949,13 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
       wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x  up"), this, kev.keysym);
       
       // down, then up
-      kev.down = true;
-      ((VNCThread*)vncthread)->key_event_q.Post(kev);
-      kev.down = false;
-      ((VNCThread*)vncthread)->key_event_q.Post(kev);
+      if(vncthread)
+	{
+	  kev.down = true;
+	  ((VNCThread*)vncthread)->key_event_q.Post(kev);
+	  kev.down = false;
+	  ((VNCThread*)vncthread)->key_event_q.Post(kev);
+	}
       return true;
     }
   else
@@ -1041,7 +1044,8 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 	  wxLogDebug(wxT("VNCConn %p: sending rfbkeysym:  0x%.3x %s"), this, kev.keysym, down ? wxT("down") : wxT("up"));
 
 	  kev.down = down;
-	  ((VNCThread*)vncthread)->key_event_q.Post(kev);
+	  if(vncthread)
+	    ((VNCThread*)vncthread)->key_event_q.Post(kev);
 	  return true;
 	}
       else
