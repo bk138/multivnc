@@ -23,7 +23,7 @@
 
 
 #include <cstdarg>
-#include <csignal>
+#include <cerrno>
 #include <wx/intl.h>
 #include <wx/log.h>
 #include <wx/thread.h>
@@ -170,28 +170,28 @@ wxThread::ExitCode VNCThread::Entry()
 {
   int i=0;
 
-#ifdef __WXGTK__
-  // this signal is generated when we pop up a file dialog wwith wxGTK
-  // we need to block it here cause it interrupts the select() call
-  // in WaitForMessage()
-  sigset_t            newsigs;
-  sigset_t            oldsigs;
-  sigemptyset(&newsigs);
-  sigemptyset(&oldsigs);
-  sigaddset(&newsigs, SIGRTMIN-1);
-#endif
-
   pointerEvent pe;
   keyEvent ke = {0, 0};
 
   while(! TestDestroy()) 
     {
-#ifdef __WXGTK__
-      sigprocmask(SIG_BLOCK, &newsigs, &oldsigs);
-#endif
-
       if(listenMode)
-	i=listenForIncomingConnectionsNoFork(p->cl, 100000); // 100 ms
+	{
+	  i=listenForIncomingConnectionsNoFork(p->cl, 100000); // 100 ms
+	  if(i<0)
+	    {
+	      if(errno==EINTR)
+		continue;
+	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), p);
+	      p->post_disconnect_notify();
+	      break;
+	    }
+	  if(i)
+	    {
+	      p->post_incomingconnection_notify();
+	      break;
+	    }
+	}
       else
 	{
 	  // send everything that's inside the input queues
@@ -203,6 +203,8 @@ wxThread::ExitCode VNCThread::Entry()
 	  // request update and handle response 
 	  if(!rfbProcessServerMessage(p->cl, 500))
 	    {
+	      if(errno == EINTR)
+		continue;
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), p);
 	      p->post_disconnect_notify();
 	      break;
@@ -240,26 +242,8 @@ wxThread::ExitCode VNCThread::Entry()
 	      p->post_unimultichanged_notify();
 	    }
 	}
-
-#ifdef __WXGTK__
-      sigprocmask(SIG_SETMASK, &oldsigs, NULL);
-#endif
-      
-      if(listenMode)
-	{
-	  if(i<0)
-	    {
-	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), p);
-	      p->post_disconnect_notify();
-	      break;
-	    }
-	  if(i)
-	    {
-	      p->post_incomingconnection_notify();
-	      break;
-	    }
-	}
     }
+  
   return 0;
 }
 
