@@ -251,12 +251,12 @@ wxThread::ExitCode VNCThread::Entry()
 	    {
 	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), p);
 	      p->post_disconnect_notify();
-	      return 0;
+	      break;
 	    }
 	  if(i)
 	    {
 	      p->post_incomingconnection_notify();
-	      return 0;
+	      break;
 	    }
 	}
     }
