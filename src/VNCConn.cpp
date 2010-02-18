@@ -453,7 +453,7 @@ void VNCConn::on_updatescount_timer(wxTimerEvent& event)
       wxCriticalSectionLocker lock(mutex_latency_stats);
       updates.Add((wxString() << (int)conn_stopwatch.Time())
 		  + wxT(", ") +
-		  (wxString() << updates_count/1024));
+		  (wxString() << updates_count));
       updates_count = 0;
 
       if(isMulticast())
