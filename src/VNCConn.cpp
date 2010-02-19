@@ -396,7 +396,9 @@ void VNCConn::post_update_notify(int x, int y, int w, int h)
 	{
 	  pointer_stopwatch.Pause();
 	  wxCriticalSectionLocker lock(mutex_latency_stats);
-	  latencies.Add((wxString() << (int)conn_stopwatch.Time()) + 
+	  latencies.Add((wxString() << wxGetUTCTime()) + 
+			wxT(", ") + 
+			(wxString() << (int)conn_stopwatch.Time()) + 
 			wxT(", ") + 
 			(wxString() << (int)pointer_stopwatch.Time()));
 
@@ -451,13 +453,17 @@ void VNCConn::on_updatescount_timer(wxTimerEvent& event)
   if(do_stats)
     {
       wxCriticalSectionLocker lock(mutex_latency_stats);
-      updates.Add((wxString() << (int)conn_stopwatch.Time())
+      updates.Add((wxString() << wxGetUTCTime()) + 
+		  wxT(", ") + 
+		  (wxString() << (int)conn_stopwatch.Time())
 		  + wxT(", ") +
 		  (wxString() << updates_count));
       updates_count = 0;
 
       if(isMulticast())
-	mc_lossratios.Add((wxString() << (int)conn_stopwatch.Time())
+	mc_lossratios.Add((wxString() << wxGetUTCTime()) + 
+			  wxT(", ") + 
+			  (wxString() << (int)conn_stopwatch.Time())
 			  + wxT(", ") +
 			  wxString::Format(wxT("%.4f"), multicastLossRatio));
     }
