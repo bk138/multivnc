@@ -146,6 +146,9 @@ private:
   void *parent;
 
   rfbClient* cl;
+  wxString serverName;
+  wxString serverAddress;
+
   int multicastStatus;
   double multicastLossRatio;
   

@@ -725,6 +725,14 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool mu
       return false;
     }
   
+  wxLogDebug(wxT("VNCConn %p: Init() resolving hostname/address."), this);
+  wxIPV4address a;
+  a.Hostname(wxString(cl->serverHost, wxConvUTF8));
+  serverName = a.Hostname();
+  serverAddress = a.IPAddress();
+  wxLogDebug(wxT("VNCConn %p: Init() done resolving hostname/address."), this);
+
+  
   // this is like our main loop
   thread_listenmode = false;
   if( Create() != wxTHREAD_NO_ERROR )
@@ -1111,11 +1119,7 @@ wxString VNCConn::getServerName() const
       if(cl->listenSpecified)
 	return wxString(wxT("listening"));
       else
-	{
-	  wxIPV4address a;
-	  a.Hostname(wxString(cl->serverHost, wxConvUTF8));
-	  return a.Hostname();
-	}
+	return serverName;
     }
   else
     return wxEmptyString;
@@ -1125,10 +1129,10 @@ wxString VNCConn::getServerAddr() const
 {
   if(cl)
     {
-      wxIPV4address a;
-      if(!cl->listenSpecified)
-	a.Hostname(wxString(cl->serverHost, wxConvUTF8));
-      return a.IPAddress();
+      if(cl->listenSpecified)
+	return wxString(wxT("listening"));
+      else
+	return serverAddress;
     }
   else
     return wxEmptyString;
