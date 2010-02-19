@@ -26,17 +26,22 @@
 #include <cerrno>
 #include <wx/intl.h>
 #include <wx/log.h>
-#include <wx/thread.h>
 #include <wx/socket.h>
-#include "msgqueue.h"
 #include "VNCConn.h"
 
 
 // use some global address
-#define VNCCONN_OBJ_ID (void*)VNCConn::got_update
+#define VNCCONN_OBJ_ID (void*)VNCConn::thread_got_update
 
 // logfile name
 #define LOGFILE _T("MultiVNC.log")
+
+
+// pixelformat defaults
+// seems 8,3,4 and 5,3,2 are possible with rfbGetClient()
+#define BITSPERSAMPLE 8
+#define SAMPLESPERPIXEL 3
+#define BYTESPERPIXEL 4 
 
 
 // define our new notify events!
@@ -47,225 +52,6 @@ DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnCuttextNOTIFY) 
 DEFINE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY);
 
-// these are passed to the worker thread
-typedef wxMouseEvent pointerEvent;
-struct keyEvent
-{
-  rfbKeySym keysym;
-  bool down; 
-};
-
-
-// pixelformat defaults
-// seems 8,3,4 and 5,3,2 are possible with rfbGetClient()
-#define BITSPERSAMPLE 8
-#define SAMPLESPERPIXEL 3
-#define BYTESPERPIXEL 4 
-
-
-
-
-
-
-/********************************************
-
-  internal worker thread class
-
-********************************************/
-
-class VNCThread : public wxThread
-{
-  VNCConn *p;    // our parent object
-  bool listenMode;
-
-  bool sendPointerEvent(pointerEvent &event);
-  bool sendKeyEvent(keyEvent &event);
- 
-public:
-  wxMessageQueue<pointerEvent> pointer_event_q;
-  wxMessageQueue<keyEvent> key_event_q;
-
-  VNCThread(VNCConn *parent, bool listen);
-  
-  // thread execution starts here
-  virtual wxThread::ExitCode Entry();
-  
-  // called when the thread exits - whether it terminates normally or is
-  // stopped with Delete() (but not when it is Kill()ed!)
-  virtual void OnExit();
-};
-
-
-
-
-
-VNCThread::VNCThread(VNCConn *parent, bool listen)
-  : wxThread()
-{
-  p = parent;
-  listenMode = listen;
-}
-
-
-
-
-bool VNCThread::sendPointerEvent(pointerEvent &event)
-{
-  int buttonmask = 0;
-
-  if(event.LeftIsDown())
-    buttonmask |= rfbButton1Mask;
-
-  if(event.MiddleIsDown())
-    buttonmask |= rfbButton2Mask;
-  
-  if(event.RightIsDown())
-    buttonmask |= rfbButton3Mask;
-
-  if(event.GetWheelRotation() > 0)
-    buttonmask |= rfbWheelUpMask;
-
-  if(event.GetWheelRotation() < 0)
-    buttonmask |= rfbWheelDownMask;
-
-  if(event.Entering() && ! p->cuttext.IsEmpty())
-    {
-      wxCriticalSectionLocker lock(p->mutex_cuttext); // since cuttext can be set from the main thread
-      // if encoding fails, a NULL pointer is returned!
-      if(p->cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))))
-	{
-	  wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), p, p->cuttext.c_str());
-	  char* encoded_text = strdup(p->cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
-	  SendClientCutText(p->cl, encoded_text, strlen(encoded_text));
-	  free(encoded_text);	  
-	}
-      else
-	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), p, p->cuttext.c_str());
-    }
-
-  if(p->do_stats)
-    {
-      wxCriticalSectionLocker lock(p->mutex_latency_stats);
-      p->pointer_pos.x = event.m_x;
-      p->pointer_pos.y = event.m_y;
-      p->pointer_stopwatch.Start();
-    }
-
-  wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), p, event.m_x, event.m_y, buttonmask);
-  return SendPointerEvent(p->cl, event.m_x, event.m_y, buttonmask);
-}
-
-
-
-
-bool VNCThread::sendKeyEvent(keyEvent &event)
-{
-  return SendKeyEvent(p->cl, event.keysym, event.down);
-}
-
-
-
-
-wxThread::ExitCode VNCThread::Entry()
-{
-  int i=0;
-
-  pointerEvent pe;
-  keyEvent ke = {0, 0};
-
-  while(! TestDestroy()) 
-    {
-      if(listenMode)
-	{
-	  i=listenForIncomingConnectionsNoFork(p->cl, 100000); // 100 ms
-	  if(i<0)
-	    {
-	      if(errno==EINTR)
-		continue;
-	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), p);
-	      p->post_disconnect_notify();
-	      break;
-	    }
-	  if(i)
-	    {
-	      p->post_incomingconnection_notify();
-	      break;
-	    }
-	}
-      else
-	{
-	  // send everything that's inside the input queues
-	  while(pointer_event_q.ReceiveTimeout(0, pe) != wxMSGQUEUE_TIMEOUT) // timeout == empty
-	    sendPointerEvent(pe);
-	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
-	    sendKeyEvent(ke);
-
-	  // request update and handle response 
-	  if(!rfbProcessServerMessage(p->cl, 500))
-	    {
-	      if(errno == EINTR)
-		continue;
-	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), p);
-	      p->post_disconnect_notify();
-	      break;
-	    }
-
-	  if(p->isMulticast())
-	    {
-	      // compute loss ratio: the way we do it here is per 1000 packets
-	      if(p->cl->multicastRcvd >= 1000 || p->cl->multicastTimeouts)
-		{
-		  p->multicastLossRatio = p->cl->multicastLost/(double)(p->cl->multicastRcvd + p->cl->multicastLost);
-		  p->cl->multicastRcvd = p->cl->multicastLost = 0;
-		}
-
-	      // and act accordingly 
-	      if(p->multicastLossRatio > 0.5)
-		{
-		  rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
-		  wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), p);
-		  p->cl->multicastDisabled = TRUE;
-		  SendFramebufferUpdateRequest(p->cl, 0, 0, p->cl->width, p->cl->height, FALSE);
-		}
-	      else if(p->multicastLossRatio > 0.2) 
-		{
-		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full unicast framebuffer update\n");
-		  SendFramebufferUpdateRequest(p->cl, 0, 0, p->cl->width, p->cl->height, FALSE);
-		  p->cl->multicastLost -= p->cl->multicastLost/10;
-		}
-	    }
-
-	  int now = p->isMulticast();
-	  if(now != p->multicastStatus)
-	    {
-	      p->multicastStatus = now;
-	      p->post_unimultichanged_notify();
-	    }
-	}
-    }
-  
-  return 0;
-}
-
-
-
-void VNCThread::OnExit()
-{
-  // cause wxThreads delete themselves after completion
-  p->vncthread = 0;
-  wxLogDebug(wxT("VNCConn %p: %s vncthread exiting"), p, listenMode ? wxT("listening") : wxT(""));
-}
-
-
-
-
-
-
-/********************************************
-
-  VNCConn class
-
-********************************************/
 
 BEGIN_EVENT_TABLE(VNCConn, wxEvtHandler)
     EVT_TIMER (wxID_ANY, VNCConn::on_updatescount_timer)
@@ -283,6 +69,8 @@ extern "C"
 #endif
 
 
+
+
 /*
   constructor/destructor
 */
@@ -293,14 +81,13 @@ VNCConn::VNCConn(void* p)
   // save our caller
   parent = p;
   
-  vncthread = 0;
   cl = 0;
   framebuffer = 0;
   fb_data = 0;
   multicastStatus = 0;
   multicastLossRatio = 0;
 
-  rfbClientLog = rfbClientErr = logger;
+  rfbClientLog = rfbClientErr = thread_logger;
 
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
   /* we're using threads in here, tell libgcrypt before TLS 
@@ -343,110 +130,6 @@ VNCConn::~VNCConn()
   private members
 */
 
-void VNCConn::post_incomingconnection_notify() 
-{
-  wxLogDebug(wxT("VNCConn %p: post_incomingconnection_notify()"), this);
-
-  // new NOTIFY event, we got no window id
-  wxCommandEvent event(VNCConnIncomingConnectionNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-
-  // Send it
-  wxPostEvent((wxEvtHandler*)parent, event);
-}
-
-
-void VNCConn::post_disconnect_notify() 
-{
-  wxLogDebug(wxT("VNCConn %p: post_disconnect_notify()"), this);
-
-  // new NOTIFY event, we got no window id
-  wxCommandEvent event(VNCConnDisconnectNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-
-  // Send it
-  wxPostEvent((wxEvtHandler*)parent, event);
-}
-
-
-void VNCConn::post_update_notify(int x, int y, int w, int h)
-{
-  VNCConnUpdateNotifyEvent event(VNCConnUpdateNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-
-  // set info about what was updated
-  event.rect = wxRect(x, y, w, h);
-  wxLogDebug(wxT("VNCConn %p: post_update_notify(%i,%i,%i,%i)"), this,
-	     event.rect.x,
-	     event.rect.y,
-	     event.rect.width,
-	     event.rect.height);
-  
-  // Send it
-  wxPostEvent((wxEvtHandler*)parent, event);
-
-  if(do_stats)
-    {
-      // raw byte updates/second
-      updates_count += w*h*BYTESPERPIXEL;
-  
-      // pointer latency
-      // well, this is not neccessarily correct, but wtf
-      if(event.rect.Contains(pointer_pos))
-	{
-	  pointer_stopwatch.Pause();
-	  wxCriticalSectionLocker lock(mutex_latency_stats);
-	  latencies.Add((wxString() << wxGetUTCTime()) + 
-			wxT(", ") + 
-			(wxString() << (int)conn_stopwatch.Time()) + 
-			wxT(", ") + 
-			(wxString() << (int)pointer_stopwatch.Time()));
-
-	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointer_stopwatch.Time());
-	}
-    }
-}
-
-
-void VNCConn::post_fbresize_notify() 
-{
-  wxLogDebug(wxT("VNCConn %p: post_fbresize_notify() (%i, %i)"), 
-	     this,
-	     getFrameBufferWidth(),
-	     getFrameBufferHeight());
-
-  // new NOTIFY event, we got no window id
-  wxCommandEvent event(VNCConnFBResizeNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-
-  // Send it
-  wxPostEvent((wxEvtHandler*)parent, event);
-}
-
-
-
-void VNCConn::post_cuttext_notify()
-{
-  // new NOTIFY event, we got no window id
-  wxCommandEvent event(VNCConnCuttextNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-
-  // Send it
-  wxPostEvent((wxEvtHandler*)parent, event);
-}
-
-
-
-void VNCConn::post_unimultichanged_notify()
-{
-  wxCommandEvent event(VNCConnUniMultiChangedNOTIFY, wxID_ANY);
-  event.SetEventObject(this); // set sender
-  
-  // Send it
-  wxPostEvent((wxEvtHandler*)parent, event);
-}
-
-
 
 void VNCConn::on_updatescount_timer(wxTimerEvent& event)
 {
@@ -461,11 +144,16 @@ void VNCConn::on_updatescount_timer(wxTimerEvent& event)
       updates_count = 0;
 
       if(isMulticast())
-	mc_lossratios.Add((wxString() << wxGetUTCTime()) + 
-			  wxT(", ") + 
-			  (wxString() << (int)conn_stopwatch.Time())
-			  + wxT(", ") +
-			  wxString::Format(wxT("%.4f"), multicastLossRatio));
+	{
+	  wxString lossratestring = wxString::Format(wxT("%.4f"), multicastLossRatio);
+	  lossratestring.Replace(wxT(","), wxT("."));
+	  mc_lossratios.Add((wxString() << wxGetUTCTime()) + 
+			    wxT(", ") + 
+			    (wxString() << (int)conn_stopwatch.Time())
+			    + wxT(", ") +
+			    lossratestring);
+	}
+
     }
 }
 
@@ -543,7 +231,7 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
 #endif
  
   // notify our parent
-  conn->post_fbresize_notify();
+  conn->thread_post_fbresize_notify();
  
   return client->frameBuffer ? TRUE : FALSE;
 }
@@ -551,14 +239,260 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
 
 
 
+wxThread::ExitCode VNCConn::Entry()
+{
+  int i=0;
 
-void VNCConn::got_update(rfbClient* client,int x,int y,int w,int h)
+  pointerEvent pe;
+  keyEvent ke = {0, 0};
+
+  while(! GetThread()->TestDestroy()) 
+    {
+      if(thread_listenmode)
+	{
+	  i=listenForIncomingConnectionsNoFork(cl, 100000); // 100 ms
+	  if(i<0)
+	    {
+	      if(errno==EINTR)
+		continue;
+	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), this);
+	      thread_post_disconnect_notify();
+	      break;
+	    }
+	  if(i)
+	    {
+	      thread_post_incomingconnection_notify();
+	      break;
+	    }
+	}
+      else
+	{
+	  // send everything that's inside the input queues
+	  while(pointer_event_q.ReceiveTimeout(0, pe) != wxMSGQUEUE_TIMEOUT) // timeout == empty
+	    thread_send_pointer_event(pe);
+	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
+	    thread_send_key_event(ke);
+
+	  // request update and handle response 
+	  if(!rfbProcessServerMessage(cl, 500))
+	    {
+	      if(errno == EINTR)
+		continue;
+	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), this);
+	      thread_post_disconnect_notify();
+	      break;
+	    }
+
+	  if(isMulticast())
+	    {
+	      // compute loss ratio: the way we do it here is per 1000 packets
+	      if(cl->multicastRcvd >= 1000 || cl->multicastTimeouts > 10)
+		{
+		  multicastLossRatio = cl->multicastLost/(double)(cl->multicastRcvd + cl->multicastLost);
+		  cl->multicastRcvd = cl->multicastLost = 0;
+		}
+
+	      // and act accordingly 
+	      if(multicastLossRatio > 0.5)
+		{
+		  rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
+		  wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), this);
+		  cl->multicastDisabled = TRUE;
+		  SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
+		}
+	      else if(multicastLossRatio > 0.2) 
+		{
+		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full unicast framebuffer update\n");
+		  SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
+		  cl->multicastLost -= cl->multicastLost/10;
+		}
+	    }
+
+	  int now = isMulticast();
+	  if(now != multicastStatus)
+	    {
+	      multicastStatus = now;
+	      thread_post_unimultichanged_notify();
+	    }
+	}
+    }
+  
+  return 0;
+}
+
+
+
+
+
+bool VNCConn::thread_send_pointer_event(pointerEvent &event)
+{
+  int buttonmask = 0;
+
+  if(event.LeftIsDown())
+    buttonmask |= rfbButton1Mask;
+
+  if(event.MiddleIsDown())
+    buttonmask |= rfbButton2Mask;
+  
+  if(event.RightIsDown())
+    buttonmask |= rfbButton3Mask;
+
+  if(event.GetWheelRotation() > 0)
+    buttonmask |= rfbWheelUpMask;
+
+  if(event.GetWheelRotation() < 0)
+    buttonmask |= rfbWheelDownMask;
+
+  if(event.Entering() && ! cuttext.IsEmpty())
+    {
+      wxCriticalSectionLocker lock(mutex_cuttext); // since cuttext can be set from the main thread
+      // if encoding fails, a NULL pointer is returned!
+      if(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))))
+	{
+	  wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), this, cuttext.c_str());
+	  char* encoded_text = strdup(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
+	  SendClientCutText(cl, encoded_text, strlen(encoded_text));
+	  free(encoded_text);	  
+	}
+      else
+	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
+    }
+
+  if(do_stats)
+    {
+      wxCriticalSectionLocker lock(mutex_latency_stats);
+      pointer_pos.x = event.m_x;
+      pointer_pos.y = event.m_y;
+      pointer_stopwatch.Start();
+    }
+
+  wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
+  return SendPointerEvent(cl, event.m_x, event.m_y, buttonmask);
+}
+
+
+
+
+bool VNCConn::thread_send_key_event(keyEvent &event)
+{
+  return SendKeyEvent(cl, event.keysym, event.down);
+}
+
+
+
+
+void VNCConn::thread_post_incomingconnection_notify() 
+{
+  wxLogDebug(wxT("VNCConn %p: post_incomingconnection_notify()"), this);
+
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnIncomingConnectionNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+void VNCConn::thread_post_disconnect_notify() 
+{
+  wxLogDebug(wxT("VNCConn %p: post_disconnect_notify()"), this);
+
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnDisconnectNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
+{
+  VNCConnUpdateNotifyEvent event(VNCConnUpdateNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // set info about what was updated
+  event.rect = wxRect(x, y, w, h);
+  wxLogDebug(wxT("VNCConn %p: post_update_notify(%i,%i,%i,%i)"), this,
+	     event.rect.x,
+	     event.rect.y,
+	     event.rect.width,
+	     event.rect.height);
+  
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+
+  if(do_stats)
+    {
+      // raw byte updates/second
+      updates_count += w*h*BYTESPERPIXEL;
+  
+      // pointer latency
+      // well, this is not neccessarily correct, but wtf
+      if(event.rect.Contains(pointer_pos))
+	{
+	  pointer_stopwatch.Pause();
+	  wxCriticalSectionLocker lock(mutex_latency_stats);
+	  latencies.Add((wxString() << wxGetUTCTime()) + 
+			wxT(", ") + 
+			(wxString() << (int)conn_stopwatch.Time()) + 
+			wxT(", ") + 
+			(wxString() << (int)pointer_stopwatch.Time()));
+
+	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointer_stopwatch.Time());
+	}
+    }
+}
+
+
+void VNCConn::thread_post_fbresize_notify() 
+{
+  wxLogDebug(wxT("VNCConn %p: post_fbresize_notify() (%i, %i)"), 
+	     this,
+	     getFrameBufferWidth(),
+	     getFrameBufferHeight());
+
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnFBResizeNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+
+void VNCConn::thread_post_cuttext_notify()
+{
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnCuttextNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+
+void VNCConn::thread_post_unimultichanged_notify()
+{
+  wxCommandEvent event(VNCConnUniMultiChangedNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+
+
+void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
-  VNCThread* t = (VNCThread*)conn->vncthread;
-  if(! t->TestDestroy())
+  if(! conn->GetThread()->TestDestroy())
     {
-      conn->post_update_notify(x, y, w, h);
+      conn->thread_post_update_notify(x, y, w, h);
       
       // if we are in blocking mode,
       // decrement semaphore if there's is something left and go on, else block
@@ -569,16 +503,14 @@ void VNCConn::got_update(rfbClient* client,int x,int y,int w,int h)
 
 
 
-
-
-void VNCConn::kbd_leds(rfbClient* cl, int value, int pad)
+void VNCConn::thread_kbd_leds(rfbClient* cl, int value, int pad)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID); 
   wxLogDebug(wxT("VNCConn %p: Led State= 0x%02X"), conn, value);
 }
 
 
-void VNCConn::textchat(rfbClient* cl, int value, char *text)
+void VNCConn::thread_textchat(rfbClient* cl, int value, char *text)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID); 
   switch(value)
@@ -598,7 +530,7 @@ void VNCConn::textchat(rfbClient* cl, int value, char *text)
 }
 
 
-void VNCConn::got_cuttext(rfbClient *cl, const char *text, int len)
+void VNCConn::thread_got_cuttext(rfbClient *cl, const char *text, int len)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
 
@@ -606,7 +538,7 @@ void VNCConn::got_cuttext(rfbClient *cl, const char *text, int len)
 
   wxCriticalSectionLocker lock(conn->mutex_cuttext); // since cuttext can also be set from the main thread
   conn->cuttext = wxString(text, wxCSConv(wxT("iso-8859-1")));
-  conn->post_cuttext_notify();
+  conn->thread_post_cuttext_notify();
 }
 
 
@@ -617,25 +549,22 @@ wxArrayString VNCConn::log;
 wxCriticalSection VNCConn::mutex_log;
 bool VNCConn::do_logfile;
 
-void VNCConn::logger(const char *format, ...)
+void VNCConn::thread_logger(const char *format, ...)
 {
-  FILE* logfile;
-  wxString logfile_str = LOGFILE;
-  va_list args;
-  wxChar timebuf[256];
-  time_t log_clock;
-  wxString wx_format(format, wxConvUTF8);
-
   if(!rfbEnableClientLogging)
     return;
 
   // since we're accessing some global things here from different threads
   wxCriticalSectionLocker lock(mutex_log);
 
+  wxChar timebuf[256];
+  time_t log_clock;
   time(&log_clock);
   wxStrftime(timebuf, WXSIZEOF(timebuf), _T("%d/%m/%Y %X "), localtime(&log_clock));
 
   // global log string array
+  va_list args;  
+  wxString wx_format(format, wxConvUTF8);
   va_start(args, format);
   char msg[1024];
   vsnprintf(msg, 1024, format, args);
@@ -645,6 +574,8 @@ void VNCConn::logger(const char *format, ...)
   // global log file
   if(do_logfile)
     {
+      FILE* logfile;
+      wxString logfile_str = LOGFILE;
       // delete logfile on program startup
       static bool firstrun = 1;
       if(firstrun)
@@ -672,14 +603,6 @@ void VNCConn::logger(const char *format, ...)
 
 
 
-void VNCConn::clearLog()
-{
-  // since we're accessing some global things here from different threads
-  wxCriticalSectionLocker lock(mutex_log);
-  log.Clear();
-}
-
-
 
 
 /*
@@ -704,11 +627,11 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
  
   // callbacks
   cl->MallocFrameBuffer = alloc_framebuffer;
-  cl->GotFrameBufferUpdate = got_update;
+  cl->GotFrameBufferUpdate = thread_got_update;
   cl->GetPassword = getpasswdfunc;
-  cl->HandleKeyboardLedState = kbd_leds;
-  cl->HandleTextChat = textchat;
-  cl->GotXCutText = got_cuttext;
+  cl->HandleKeyboardLedState = thread_kbd_leds;
+  cl->HandleTextChat = thread_textchat;
+  cl->GotXCutText = thread_got_cuttext;
 
   cl->canHandleNewFBSize = TRUE;
 
@@ -735,19 +658,17 @@ bool VNCConn::Listen(int port)
   wxLogDebug(wxT("VNCConn %p: Listen() port %d"), this, port);
 
   cl->listenPort = port;
-  
-  VNCThread *tp = new VNCThread(this, true);
-  // save it for later on
-  vncthread = tp;
-  
-  if( tp->Create() != wxTHREAD_NO_ERROR )
+
+  thread_listenmode = true;
+
+  if( Create() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not create VNC listener thread!"));
       Shutdown();
       return false;
     }
 
-  if( tp->Run() != wxTHREAD_NO_ERROR )
+  if( GetThread()->Run() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not start VNC listener thread!")); 
       Shutdown();
@@ -762,7 +683,7 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool mu
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
 
-  if(fb_data || framebuffer || vncthread)
+  if(fb_data || framebuffer || (GetThread() && GetThread()->IsRunning()))
     {
       wxLogDebug(wxT("VNCConn %p: Init() already done. Call Shutdown() first!"), this);
       return false;
@@ -804,20 +725,16 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool mu
       return false;
     }
   
-
   // this is like our main loop
-  VNCThread *tp = new VNCThread(this, false);
-  // save it for later on
-  vncthread = tp;
-  
-  if( tp->Create() != wxTHREAD_NO_ERROR )
+  thread_listenmode = false;
+  if( Create() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not create VNC thread!"));
       Shutdown();
       return false;
     }
 
-  if( tp->Run() != wxTHREAD_NO_ERROR )
+  if( GetThread()->Run() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not start VNC thread!")); 
       Shutdown();
@@ -838,17 +755,11 @@ void VNCConn::Shutdown()
 
   conn_stopwatch.Pause();
 
-  if(vncthread)
+  if(GetThread() && GetThread()->IsRunning())
     {
       wxLogDebug(wxT( "VNCConn %p: Shutdown() before vncthread delete"), this);
-      ((VNCThread*)vncthread)->Delete();
-      // wait for deletion to finish
-      while(vncthread)
-	{
-	  sema_unprocessed_upd->Post(); // if the thread is currently blocking, unblock it
-	  wxMilliSleep(100);
-	}
-      
+      sema_unprocessed_upd->Post(); // if the thread is currently blocking, unblock it
+      GetThread()->Delete(); // this blocks if thread is joinable, i.e. on stack
       wxLogDebug(wxT("VNCConn %p: Shutdown() after vncthread delete"), this);
     }
   
@@ -902,8 +813,8 @@ void VNCConn::UpdateProcessed()
 // this simply posts the mouse event into the worker thread's input queue
 void VNCConn::sendPointerEvent(wxMouseEvent &event)
 {
-  if(vncthread)
-    ((VNCThread*)vncthread)->pointer_event_q.Post(event);
+  if(GetThread() && GetThread()->IsRunning())
+    pointer_event_q.Post(event);
 }
 
 
@@ -939,12 +850,12 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
       wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x  up"), this, kev.keysym);
       
       // down, then up
-      if(vncthread)
+      if(GetThread() && GetThread()->IsRunning())
 	{
 	  kev.down = true;
-	  ((VNCThread*)vncthread)->key_event_q.Post(kev);
+	  key_event_q.Post(kev);
 	  kev.down = false;
-	  ((VNCThread*)vncthread)->key_event_q.Post(kev);
+	  key_event_q.Post(kev);
 	}
       return true;
     }
@@ -1034,8 +945,8 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 	  wxLogDebug(wxT("VNCConn %p: sending rfbkeysym:  0x%.3x %s"), this, kev.keysym, down ? wxT("down") : wxT("up"));
 
 	  kev.down = down;
-	  if(vncthread)
-	    ((VNCThread*)vncthread)->key_event_q.Post(kev);
+	  if(GetThread() && GetThread()->IsRunning())
+	    key_event_q.Post(kev);
 	  return true;
 	}
       else
@@ -1243,3 +1154,9 @@ bool VNCConn::isMulticast() const
 }
 
 
+void VNCConn::clearLog()
+{
+  // since we're accessing some global things here from different threads
+  wxCriticalSectionLocker lock(mutex_log);
+  log.Clear();
+}

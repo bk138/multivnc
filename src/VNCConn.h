@@ -31,6 +31,8 @@
 #include <wx/bitmap.h>
 #include <wx/rawbmp.h>
 #include <wx/timer.h>
+#include <wx/thread.h>
+#include "msgqueue.h"
 #include "rfb/rfbclient.h"
 
 
@@ -53,7 +55,8 @@ DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY, -1) 
 
 
-class VNCConn: public wxEvtHandler
+
+class VNCConn: public wxEvtHandler, public wxThreadHelper
 {
 public:
   VNCConn(void *parent);
@@ -134,13 +137,12 @@ public:
 
 
 protected:
+  // thread execution starts here
+  virtual wxThread::ExitCode Entry();
+
   DECLARE_EVENT_TABLE();
 
-
 private:
-  friend class VNCThread;
-  void *vncthread;
-
   void *parent;
 
   rfbClient* cl;
@@ -190,23 +192,38 @@ private:
   static wxCriticalSection mutex_log;
   static bool do_logfile;
 
+ 
+  // messagequeues for posting events to the worker thread
+  typedef wxMouseEvent pointerEvent;
+  struct keyEvent
+  {
+    rfbKeySym keysym;
+    bool down; 
+  };
+  wxMessageQueue<pointerEvent> pointer_event_q;
+  wxMessageQueue<keyEvent> key_event_q;
+
+  bool thread_listenmode; 
+  bool thread_send_pointer_event(pointerEvent &event);
+  bool thread_send_key_event(keyEvent &event);
+
 
   // event dispatchers
-  void post_incomingconnection_notify();
-  void post_disconnect_notify();
-  void post_update_notify(int x, int y, int w, int h);
-  void post_fbresize_notify();
-  void post_cuttext_notify();
-  void post_unimultichanged_notify();
+  void thread_post_incomingconnection_notify();
+  void thread_post_disconnect_notify();
+  void thread_post_update_notify(int x, int y, int w, int h);
+  void thread_post_fbresize_notify();
+  void thread_post_cuttext_notify();
+  void thread_post_unimultichanged_notify();
 
 
   // libvncclient callbacks
   static rfbBool alloc_framebuffer(rfbClient* client);
-  static void got_update(rfbClient* cl,int x,int y,int w,int h);
-  static void kbd_leds(rfbClient* cl, int value, int pad);
-  static void textchat(rfbClient* cl, int value, char *text);
-  static void got_cuttext(rfbClient *cl, const char *text, int len);
-  static void logger(const char *format, ...);
+  static void thread_got_update(rfbClient* cl,int x,int y,int w,int h);
+  static void thread_kbd_leds(rfbClient* cl, int value, int pad);
+  static void thread_textchat(rfbClient* cl, int value, char *text);
+  static void thread_got_cuttext(rfbClient *cl, const char *text, int len);
+  static void thread_logger(const char *format, ...);
 };
 
 
