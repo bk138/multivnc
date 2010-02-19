@@ -4,6 +4,8 @@ MultiVNC 0.3 - "Collab me!"
 	  GUI unresponsive on a slow client.
 	* Fixed bug where saving log or screenshot would terminate
 	  the connection or even crash on some machines.
+        * Fixed bug where setting up connection would take very long
+          due to unnecessary DNS lookups.
 
 
 MultiVNC 0.2 - "The real thing"
