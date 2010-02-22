@@ -19,7 +19,7 @@
 
 GETTEXT_PACKAGE = multivnc
 PACKAGE = multivnc
-VERSION = 0.2
+VERSION = 0.3pre
 
 SHELL = /bin/sh
 
@@ -44,7 +44,7 @@ mkdir_p = $(install_sh) -d
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 
-GMSGFMT = /usr/bin/msgfmt
+GMSGFMT = @GMSGFMT@
 MSGFMT = /usr/bin/msgfmt
 XGETTEXT = /usr/bin/xgettext
 INTLTOOL_UPDATE = /usr/bin/intltool-update
@@ -66,7 +66,6 @@ DISTFILES = ChangeLog Makefile.in.in POTFILES.in $(POFILES)
 EXTRA_DISTFILES = POTFILES.skip Makevars LINGUAS
 
 POTFILES = \
-	../src/main.c
 # This comment gets stripped out
 
 CATALOGS=$(shell LINGUAS="$(USE_LINGUAS)"; for lang in $$LINGUAS; do printf "$$lang.gmo "; done)
@@ -90,7 +89,7 @@ CATALOGS=$(shell LINGUAS="$(USE_LINGUAS)"; for lang in $$LINGUAS; do printf "$$l
 	  && rm -f $@ && gencat $@ $*.msg
 
 
-all: all-yes
+all: all-@USE_NLS@
 
 all-yes: $(CATALOGS)
 all-no:
@@ -99,7 +98,7 @@ $(GETTEXT_PACKAGE).pot: $(POTFILES)
 	$(GENPOT)
 
 install: install-data
-install-data: install-data-yes
+install-data: install-data-@USE_NLS@
 install-data-no: all
 install-data-yes: all
 	$(mkdir_p) $(DESTDIR)$(itlocaledir)
