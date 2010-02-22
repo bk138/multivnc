@@ -1,5 +1,7 @@
 
 MultiVNC 0.3 - "Collab me!"
+	* Implemented window sharing: You can now beam one of your 
+          windows to the remote side.	  
 	* Fixed a bug where a fast VNC server would make MultiVNC
 	  GUI unresponsive on a slow client.
 	* Fixed bug where saving log or screenshot would terminate
