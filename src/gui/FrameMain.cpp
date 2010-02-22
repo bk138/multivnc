@@ -55,16 +55,20 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_3->Append(wxID_DELETE, _("&Delete Bookmark"), wxEmptyString, wxITEM_NORMAL);
     frame_main_menubar->Append(wxglade_tmp_menu_3, _("&Bookmarks"));
     wxMenu* wxglade_tmp_menu_4 = new wxMenu();
-    wxglade_tmp_menu_4->Append(wxID_HELP, _("&Contents"), _("Show Help."), wxITEM_NORMAL);
-    wxglade_tmp_menu_4->Append(wxID_ABOUT, wxEmptyString, wxEmptyString, wxITEM_NORMAL);
-    frame_main_menubar->Append(wxglade_tmp_menu_4, _("&Help"));
+    wxglade_tmp_menu_4->Append(wxID_UP, _("&Share a Window"), _("Beam a window to the server."), wxITEM_NORMAL);
+    wxglade_tmp_menu_4->Append(wxID_CANCEL, _("S&top Sharing Window"), _("Stop Window Sharing."), wxITEM_NORMAL);
+    frame_main_menubar->Append(wxglade_tmp_menu_4, _("Window &Sharing"));
+    wxMenu* wxglade_tmp_menu_5 = new wxMenu();
+    wxglade_tmp_menu_5->Append(wxID_HELP, _("&Contents"), _("Show Help."), wxITEM_NORMAL);
+    wxglade_tmp_menu_5->Append(wxID_ABOUT, wxEmptyString, wxEmptyString, wxITEM_NORMAL);
+    frame_main_menubar->Append(wxglade_tmp_menu_5, _("&Help"));
     SetMenuBar(frame_main_menubar);
     frame_main_statusbar = CreateStatusBar(2, 0);
     frame_main_toolbar = new wxToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxTB_DOCKABLE|wxTB_3DBUTTONS|wxTB_TEXT);
     SetToolBar(frame_main_toolbar);
     frame_main_toolbar->SetToolBitmapSize(wxSize(24, 24));
     frame_main_toolbar->AddTool(wxID_YES, _("Connect"), (bitmapFromMem(connect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-    frame_main_toolbar->AddTool(wxID_CANCEL, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+    frame_main_toolbar->AddTool(wxID_STOP, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->AddSeparator();
     frame_main_toolbar->AddTool(ID_FULLSCREEN, _("Fullscreen"), (bitmapFromMem(fullscreen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->AddTool(wxID_SAVE, _("Take Screenshot"), (bitmapFromMem(screenshot_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
@@ -107,15 +111,18 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_ADD, FrameMain::bookmarks_add)
     EVT_MENU(wxID_EDIT, FrameMain::bookmarks_edit)
     EVT_MENU(wxID_DELETE, FrameMain::bookmarks_delete)
+    EVT_MENU(wxID_UP, FrameMain::windowshare_start)
+    EVT_MENU(wxID_CANCEL, FrameMain::windowshare_stop)
     EVT_MENU(wxID_HELP, FrameMain::help_contents)
     EVT_MENU(wxID_ABOUT, FrameMain::help_about)
-    EVT_TOOL(wxID_CANCEL, FrameMain::machine_disconnect)
+    EVT_TOOL(wxID_STOP, FrameMain::machine_disconnect)
     EVT_TOOL(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
     EVT_TOOL(wxID_SAVE, FrameMain::machine_screenshot)
     EVT_LISTBOX_DCLICK(ID_LISTBOX_SERVICES, FrameMain::listbox_services_dclick)
     EVT_LISTBOX(ID_LISTBOX_SERVICES, FrameMain::listbox_services_select)
     EVT_LISTBOX_DCLICK(ID_LISTBOX_BOOKMARKS, FrameMain::listbox_bookmarks_dclick)
     EVT_LISTBOX(ID_LISTBOX_BOOKMARKS, FrameMain::listbox_bookmarks_select)
+    EVT_NOTEBOOK_PAGE_CHANGED(wxID_ANY, FrameMain::notebook_connections_pagechanged)
     // end wxGlade
 END_EVENT_TABLE();
 
@@ -246,6 +253,20 @@ void FrameMain::bookmarks_delete(wxCommandEvent &event)
 }
 
 
+void FrameMain::windowshare_start(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::windowshare_start) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::windowshare_stop(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::windowshare_stop) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
 void FrameMain::help_contents(wxCommandEvent &event)
 {
     event.Skip();
@@ -285,6 +306,13 @@ void FrameMain::listbox_bookmarks_select(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::listbox_bookmarks_select) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::notebook_connections_pagechanged) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 

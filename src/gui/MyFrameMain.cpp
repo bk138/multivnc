@@ -11,7 +11,6 @@
 
 #include "MyFrameMain.h"
 #include "MyDialogSettings.h"
-#include "VNCCanvas.h"
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
@@ -35,6 +34,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
   EVT_TIMER   (STATS_TIMER_ID, MyFrameMain::onStatsTimer)
   EVT_TIMER   (DISPLAY_TIMER_ID, MyFrameMain::onDisplayTimer)
+  EVT_END_PROCESS (ID_WINDOWSHARE_PROC_END, MyFrameMain::onWindowshareTerminate)
 END_EVENT_TABLE()
 
 
@@ -62,12 +62,16 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_LOGSAVETOFILE, &do_log, V_LOGSAVETOFILE);
   VNCConn::doLogfile(do_log);
 
+  // windowshare template
+  windowshare_cmd_template = pConfig->Read(K_WINDOWSHARE, V_DFLTWINDOWSHARE);
+
+
+  // window size
   show_fullscreen = false;
   SetMinSize(wxSize(640, 480));
   splitwin_main->SetMinimumPaneSize(160);
   splitwin_left->SetMinimumPaneSize(250);
   splitwin_leftlower->SetMinimumPaneSize(160);
-
   SetSize(x, y);
 
   // assign image list to notebook_connections
@@ -94,7 +98,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(false);
-  
+  // window sharing
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
 
   if(show_toolbar)
      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
@@ -163,7 +169,7 @@ MyFrameMain::~MyFrameMain()
     {
       for(int i = connections.size()-1; i >= 0; --i)
 	{
-	  VNCConn* c = connections.at(i);
+	  VNCConn* c = connections.at(i).conn;
 	  if(!saveStats(c, i, c->getUpdateStats(), _("frame buffer update"), true))
 	    wxLogError(_("Could not autosave framebuffer update statistics!"));    
 	  if(!saveStats(c, i, c->getLatencyStats(), _("latency"), true))
@@ -226,17 +232,14 @@ void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
   int sel;
   if((sel = notebook_connections->GetSelection()) != -1) 
     {
-      VNCConn* selected_conn = connections.at(sel);
+      VNCConn* selected_conn = connections.at(sel).conn;
       if(selected_conn == sending_conn)
-	{
-	  VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
-	  canvas->drawRegion(event.rect);
-	}
+	connections.at(sel).canvas->drawRegion(event.rect);
     }
 
   // call this in any case, even if we don't draw anything
-  for(vector<VNCConn*>::iterator it = connections.begin(); it != connections.end(); it++)
-    if(*it == sending_conn)
+  for(vector<ConnBlob>::iterator it = connections.begin(); it != connections.end(); it++)
+    if(it->conn == sending_conn)
       {
 	sending_conn->UpdateProcessed();
 	break;
@@ -251,9 +254,9 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
   VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
   // find index of this connection
-  vector<VNCConn*>::iterator it = connections.begin();
+  vector<ConnBlob>::iterator it = connections.begin();
   size_t index = 0;
-  while(it != connections.end() && *it != c)
+  while(it != connections.end() && it->conn != c)
     {
       ++it;
       ++index;
@@ -285,19 +288,16 @@ void MyFrameMain::onVNCConnFBResizeNotify(wxCommandEvent& event)
   VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
   // find index of this connection
-  vector<VNCConn*>::iterator it = connections.begin();
+  vector<ConnBlob>::iterator it = connections.begin();
   size_t index = 0;
-  while(it != connections.end() && *it != c)
+  while(it != connections.end() && it->conn != c)
     {
       ++it;
       ++index;
     }
 
   if(index < connections.size()) // found
-    {
-      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetPage(index))->getCanvas();
-      canvas->adjustSize();
-    }
+    connections.at(index).canvas->adjustSize();
 }
 
 
@@ -334,9 +334,9 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
     
   
   // find index of this connection
-  vector<VNCConn*>::iterator it = connections.begin();
+  vector<ConnBlob>::iterator it = connections.begin();
   size_t index = 0;
-  while(it != connections.end() && *it != c)
+  while(it != connections.end() && it->conn != c)
     {
       ++it;
       ++index;
@@ -375,9 +375,9 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   else
     {
       // find index of this connection
-      vector<VNCConn*>::iterator it = connections.begin();
+      vector<ConnBlob>::iterator it = connections.begin();
       size_t index = 0;
-      while(it != connections.end() && *it != c)
+      while(it != connections.end() && it->conn != c)
 	{
 	  ++it;
 	  ++index;
@@ -413,7 +413,7 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
 {
   if(connections.size())
     {
-      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
 
       text_ctrl_upd->Clear();
       text_ctrl_latency->Clear();
@@ -435,12 +435,73 @@ void MyFrameMain::onDisplayTimer(wxTimerEvent& event)
   int sel;
   if((sel = notebook_connections->GetSelection()) != -1) 
     {
-      VNCConn* conn = connections.at(sel);
-      VNCCanvas* canvas = static_cast<VNCCanvasContainer*>(notebook_connections->GetCurrentPage())->getCanvas();
+      VNCConn* conn = connections.at(sel).conn;
+      VNCCanvas* canvas = connections.at(sel).canvas;
       wxRect complete_rect = wxRect(0, 0, conn->getFrameBufferWidth(), conn->getFrameBufferHeight());
       canvas->drawRegion(complete_rect);
     }
 }
+
+
+
+
+void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
+{
+  int status = event.GetExitCode();
+  int pid = event.GetPid();
+  wxLogDebug(wxT("onWindowshareTerminate() called for %d with exit code %d."), pid, status);
+
+  ConnBlob* cb;
+  // find index of this connection
+  vector<ConnBlob>::iterator it = connections.begin();
+  size_t index = 0;
+  while(it != connections.end() && it->windowshare_proc_pid != pid)
+    {
+      ++it;
+      ++index;
+    }
+
+  //found?
+  if(index < connections.size())
+    cb = &*it;
+  else
+    {
+      wxLogError(_("Window share helper exited without an associated connection. That should not happen."));
+      return;
+    }
+
+  if(status == 0) 
+    {
+      wxString msg = _("Window sharing stopped. Either the other side does not support receiving windows or the window was closed there.");
+      wxLogMessage(msg);
+      SetStatusText(msg);
+    }
+  else
+    if(status == -1 || status == 1)
+       SetStatusText( _("Window sharing stopped. Shared window was closed."));
+    else
+      {
+	SetStatusText(_("Could not run window share helper."));
+	wxLogError(_("Could not run window share helper."));
+      }
+   
+  delete cb->windowshare_proc;
+  cb->windowshare_proc = 0;
+  cb->windowshare_proc_pid = 0;
+  
+  // the window sharer of the currently selected session terminated,
+  // so update menu
+  if(notebook_connections->GetSelection() == (int)index)
+    {  
+      // this is "share window"
+      frame_main_menubar->GetMenu(frame_main_menubar->
+				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
+      // "stop window share"
+      frame_main_menubar->GetMenu(frame_main_menubar->
+				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+    }
+}
+
 
 
 char* MyFrameMain::getpasswd(rfbClient* client)
@@ -571,14 +632,20 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 	}
     }
   
-  connections.push_back(c);
-
   if(show_stats)
     c->doStats(true);
 
   VNCCanvasContainer* container = new VNCCanvasContainer(notebook_connections);
   VNCCanvas* canvas = new VNCCanvas(container, c);
   container->setCanvas(canvas);
+
+  ConnBlob cb;
+  cb.conn = c;
+  cb.canvas = canvas;
+  cb.windowshare_proc = 0;
+  cb.windowshare_proc_pid = 0;
+  connections.push_back(cb);
+
   if(listen)
     notebook_connections->AddPage(container, _("Listening on port ") + port, true);    
   else
@@ -595,6 +662,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
       notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
     }
 
+
   // "end connection"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(true);
   // "screenshot"
@@ -605,6 +673,9 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(true);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
+  // window sharing
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
   
   return true;
 }
@@ -615,18 +686,34 @@ void MyFrameMain::terminate_conn(int which)
   if(which == wxNOT_FOUND)
     return;
 
-  VNCConn* c = connections.at(which);
-  if(c != 0)
+  ConnBlob* cb = &connections.at(which);
+
+  if(cb->conn->isReverse())
+    listen_ports.erase(wxAtoi(cb->conn->getServerPort()));
+  // this deletes the CanvasContainer plus canvas   
+  notebook_connections->DeletePage(which);
+  // this deletes the VNCConn
+  delete cb->conn;
+  // this deletes the windowsharer, if there's any
+  if(cb->windowshare_proc)
     {
-      if(c->isReverse())
-	listen_ports.erase(wxAtoi(c->getServerPort()));
-   
-      connections.erase(connections.begin() + which);
-
-      notebook_connections->DeletePage(which);
-
-      delete c;
+      wxLogDebug(wxT("terminate_conn(): trying to kill %d."), cb->windowshare_proc_pid);
+      if(!wxProcess::Exists(cb->windowshare_proc_pid))
+	{
+	  wxLogDebug(wxT("terminate_conn(): window sharing helper PID does not exist!"));
+	}
+      else
+	{
+	  // avoid callback call, now obj pointed to by windowshare_proc deletes itself!
+	  cb->windowshare_proc->Detach(); 
+	  if(wxKill(cb->windowshare_proc_pid, wxSIGTERM, NULL, wxKILL_CHILDREN) == 0)
+	    wxLogDebug(wxT("terminate_conn(): successfully killed %d."), cb->windowshare_proc_pid);
+	  else
+	    wxLogDebug(wxT("terminate_conn(): could not kill %d."), cb->windowshare_proc_pid);
+	}
     }
+  // erase the ConnBlob
+  connections.erase(connections.begin() + which);
 
   if(connections.size() == 0) // nothing to end
     {
@@ -640,6 +727,9 @@ void MyFrameMain::terminate_conn(int which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
       // bookmarks
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
+      // window sharing
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
 
       // clear stats
       text_ctrl_upd->Clear();
@@ -841,9 +931,6 @@ bool MyFrameMain::loadbookmarks()
 */
 
 
-
-
-
 void MyFrameMain::machine_connect(wxCommandEvent &event)
 {
   wxString s = wxGetTextFromUser(_("Enter host to connect to:"),
@@ -922,7 +1009,7 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 {
   if(connections.size())
     {
-      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
 
       wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
       if(rect.IsEmpty())
@@ -956,7 +1043,7 @@ void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
   if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel);
+      VNCConn* c = connections.at(sel).conn;
       saveStats(c, sel, c->getUpdateStats(), _("framebuffer update"), false);
     }
 }
@@ -967,7 +1054,7 @@ void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
  if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel);
+      VNCConn* c = connections.at(sel).conn;
       saveStats(c, sel, c->getLatencyStats(), _("latency"), false);
     }
 }
@@ -978,7 +1065,7 @@ void MyFrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
   if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel);
+      VNCConn* c = connections.at(sel).conn;
       saveStats(c, sel, c->getMCLossRatioStats(), _("multicast loss ratio"), false);
     }
 }
@@ -1067,7 +1154,7 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
 
   // for now, toggle all VNCConn instances
   for(size_t i=0; i < connections.size(); ++i)
-    connections.at(i)->doStats(show_stats);
+    connections.at(i).conn->doStats(show_stats);
 
   splitwinlayout();
 
@@ -1105,7 +1192,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 				
   if(name != wxEmptyString)
     {
-      VNCConn* c = connections.at(notebook_connections->GetSelection());
+      VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
       wxConfigBase *cfg = wxConfigBase::Get();
       
       if(cfg->Exists(G_BOOKMARKS + name))
@@ -1329,7 +1416,142 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 }
 
 
+void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
+{
+  ConnBlob* cb;
+  if(connections.size())
+    cb = &connections.at(notebook_connections->GetSelection());
+  else
+    return;
+
+  bool isSharing = cb->windowshare_proc ? true : false;
+
+  wxLogDebug(wxT("notebook_connections_pagechanged(): VNCConn %p sharing is %d"), cb->conn, isSharing);
+    
+  // this is "share window"
+  frame_main_menubar->GetMenu(frame_main_menubar->
+			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(!isSharing);
+  // this is "stop share window"
+  frame_main_menubar->GetMenu(frame_main_menubar->
+			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(isSharing);
+}
+
+
+
 bool MyFrameMain::cmdline_connect(wxString& hostarg)
 {
   return spawn_conn(false, hostarg.BeforeFirst(wxT(':')), wxEmptyString, hostarg.AfterFirst(wxT(':')));
 }
+
+
+
+
+void MyFrameMain::windowshare_start(wxCommandEvent &event)
+{
+  wxBusyCursor busy;
+
+  ConnBlob* cb = 0;
+  if(connections.size())
+    cb = &connections.at(notebook_connections->GetSelection());
+  else
+    return;
+
+  // right now x11vnc and WinVNC behave differently :-/
+#ifdef __WIN32__
+  wxString window = wxGetTextFromUser(_("Enter name of window to share:"), _("Share a Window"));
+  if(window == wxEmptyString)
+    return;
+#else
+  if(wxMessageBox(_("A cross-shaped cursor will appear. Use it to select the window you want to share."),
+		  _("Share a Window"), wxOK|wxCANCEL)
+     == wxCANCEL)
+    return;
+#endif
+
+  // handle %a and %p
+  wxString cmd = windowshare_cmd_template;
+  cmd.Replace(wxT("%a"), cb->conn->getServerAddr());
+  //  cmd.Replace(_T("%p"), port); //unused by now
+#ifdef __WIN32__
+  cmd.Replace(wxT("%w"), window);
+#endif
+  
+  // terminate old one
+  wxCommandEvent unused;
+  windowshare_stop(unused);
+
+  // and start new one
+  cb->windowshare_proc = new wxProcess(this, ID_WINDOWSHARE_PROC_END);
+  cb->windowshare_proc_pid = wxExecute(cmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, cb->windowshare_proc);
+  wxLogDebug(wxT("windowshare_start() spawned %d"), cb->windowshare_proc_pid);
+  
+  if(cb->windowshare_proc_pid == 0)
+    {
+      SetStatusText(_("Window sharing helper execution failed."));
+      wxLogError( _("Could not share window, external program execution failed."));
+
+      delete cb->windowshare_proc;
+      cb->windowshare_proc = 0; 
+      cb->windowshare_proc_pid = 0;
+      return;
+    }
+
+  SetStatusText(_("Sharing window with ") + cb->conn->getDesktopName());
+		
+  // this is "share window"
+  frame_main_menubar->GetMenu(frame_main_menubar->
+			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
+  // this is "stop share window"
+  frame_main_menubar->GetMenu(frame_main_menubar->
+			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(true);
+}
+
+
+
+
+void MyFrameMain::windowshare_stop(wxCommandEvent &event)
+{
+  wxBusyCursor busy;
+
+  ConnBlob* cb;
+  if(connections.size())
+    cb = &connections.at(notebook_connections->GetSelection());
+  else
+    return;
+
+  if(!cb->windowshare_proc || !cb->windowshare_proc_pid)
+    return;
+
+  wxLogDebug(wxT("windowshare_stop(): tries to kill %d."), cb->windowshare_proc_pid);
+
+  if(!wxProcess::Exists(cb->windowshare_proc_pid))
+    {
+      wxLogDebug(wxT("windowshare_stop(): PID does not exist, exiting!"));
+      return;
+    }
+
+  // avoid callback call, now obj pointed to by windowshare_proc deletes itself!
+  cb->windowshare_proc->Detach(); 
+
+  if(wxKill(cb->windowshare_proc_pid, wxSIGTERM, NULL, wxKILL_CHILDREN) == 0)
+    {
+      wxLogDebug(wxT("windowshare_stop(): successfully killed %d."), cb->windowshare_proc_pid);
+      cb->windowshare_proc = 0; // obj deleted itself because of Detach()!
+      cb->windowshare_proc_pid = 0;
+      
+      wxLogStatus(_("Stopped sharing window with ") + cb->conn->getDesktopName());
+
+      // this is "share window"
+      frame_main_menubar->GetMenu(frame_main_menubar->
+				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
+      // this is "stop share window"
+      frame_main_menubar->GetMenu(frame_main_menubar->
+				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+    }
+  else
+    wxLogDebug(wxT("windowshare_stop(): Could not kill %d. Not good."), cb->windowshare_proc_pid);
+}
+
+
+
+

@@ -89,12 +89,15 @@ public:
     virtual void bookmarks_add(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_edit(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_delete(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void windowshare_start(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void windowshare_stop(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void help_contents(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void help_about(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_services_dclick(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_services_select(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_bookmarks_dclick(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_bookmarks_select(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void notebook_connections_pagechanged(wxNotebookEvent &event); // wxGlade: <event_handler>
 }; // wxGlade: end class
 
 

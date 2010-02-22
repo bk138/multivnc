@@ -22,8 +22,8 @@
 */
 
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef DFLTCFG_H
+#define DFLTCFG_H
 
 
 // gui stuff
@@ -63,5 +63,13 @@
 #define K_BOOKMARKS_HOST wxT("Host")
 #define K_BOOKMARKS_PORT wxT("Port")
 
+// collab features
+#define K_WINDOWSHARE _T("WindowShareCmd")
+#ifdef __WIN32__
+#define V_DFLTWINDOWSHARE _T("winvnc.exe -oneshot -sharewindow \"%w\" -connect %a")
+#else
+#define V_DFLTWINDOWSHARE _T("x11vnc -repeat -sid pick -xrandr -connect_or_exit %a")
+#endif
 
-#endif // CONFIG_H
+
+#endif // DFLTCFG_H

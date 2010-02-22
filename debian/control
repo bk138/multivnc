@@ -8,7 +8,7 @@ Homepage: http://sourceforge.net/projects/multivnc/
 
 Package: multivnc
 Architecture: any
-Depends: ${shlibs:Depends},
+Depends: ${shlibs:Depends}, x11vnc
 Description: Multicast enabled VNC viewer
  MultiVNC is a cross-platform Multicast-enabled VNC client using wxWidgets 
  and libvncclient . It runs on Unix, Mac OS X and Windows.

@@ -6,12 +6,23 @@
 
 #include <vector>
 #include <set>
+#include <wx/process.h> 
 #include "FrameMain.h"
 #include "MyFrameLog.h"
 #include "wxServDisc/wxServDisc.h"
 #include "VNCConn.h"
+#include "VNCCanvas.h"
 
 
+
+// this hold all info regarding one connection
+struct ConnBlob
+{
+  VNCConn* conn;
+  VNCCanvas* canvas;
+  wxProcess* windowshare_proc;
+  long windowshare_proc_pid; // this should be saved in the wxProcess, but isn't
+};
 
 
 class MyFrameMain: public FrameMain
@@ -20,7 +31,7 @@ class MyFrameMain: public FrameMain
   wxServDisc* servscan;
 
   // array of connections
-  std::vector<VNCConn*> connections;
+  std::vector<ConnBlob> connections;
   // set of reverse VNC (listen) connection's port numbers
   std::set<int> listen_ports;
 
@@ -53,6 +64,11 @@ class MyFrameMain: public FrameMain
 
   bool spawn_conn(bool listen, wxString host, wxString addr, wxString port);
   void terminate_conn(int which);
+
+  // collab features
+  wxString windowshare_cmd_template;
+  void onWindowshareTerminate(wxProcessEvent& event);
+
   
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
@@ -86,6 +102,8 @@ public:
   void listbox_bookmarks_select(wxCommandEvent &event); 
   void listbox_bookmarks_dclick(wxCommandEvent &event); 
 
+  void notebook_connections_pagechanged(wxNotebookEvent &event);
+
   void machine_connect(wxCommandEvent &event);
   void machine_listen(wxCommandEvent &event);
   void machine_disconnect(wxCommandEvent &event);
@@ -106,6 +124,9 @@ public:
   void bookmarks_add(wxCommandEvent &event); 
   void bookmarks_edit(wxCommandEvent &event); 
   void bookmarks_delete(wxCommandEvent &event);
+
+  void windowshare_start(wxCommandEvent &event);
+  void windowshare_stop(wxCommandEvent &event);
 
   void help_about(wxCommandEvent &event);
   void help_contents(wxCommandEvent &event);
