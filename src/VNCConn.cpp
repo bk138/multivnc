@@ -27,6 +27,11 @@
 #include <wx/intl.h>
 #include <wx/log.h>
 #include <wx/socket.h>
+#ifdef __WIN32__
+#include <winsock.h>
+#else
+#include <arpa/inet.h>
+#endif
 #include "VNCConn.h"
 
 
@@ -725,10 +730,16 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool mu
       return false;
     }
   
+
   wxLogDebug(wxT("VNCConn %p: Init() resolving hostname/address."), this);
   wxIPV4address a;
   a.Hostname(wxString(cl->serverHost, wxConvUTF8));
-  serverName = a.Hostname();
+  // if cl->serverHost is a hostname, not a dotted ip address, 
+  // use this, else resolve the address into a name
+  if(inet_addr(cl->serverHost) == INADDR_NONE) 
+    serverName = wxString(cl->serverHost, wxConvUTF8);
+  else
+    serverName = a.Hostname();
   serverAddress = a.IPAddress();
   wxLogDebug(wxT("VNCConn %p: Init() done resolving hostname/address."), this);
 

@@ -472,7 +472,9 @@ void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
 
   if(status == 0) 
     {
-      wxString msg = _("Window sharing stopped. Either the other side does not support receiving windows or the window was closed there.");
+      wxString msg = _("Window sharing with ") +
+        cb->conn->getDesktopName() +
+	_(" stopped. Either the other side does not support receiving windows or the window was closed there.");
       wxLogMessage(msg);
       SetStatusText(msg);
     }
@@ -618,7 +620,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
 
       wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
-      if(!c->Init(addr + wxT(":") + port, compresslevel, quality, multicast, multicast_recvbuf))
+      if(!c->Init(hostname + wxT(":") + port, compresslevel, quality, multicast, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -1483,7 +1485,7 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
   // and start new one
   cb->windowshare_proc = new wxProcess(this, ID_WINDOWSHARE_PROC_END);
   cb->windowshare_proc_pid = wxExecute(cmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, cb->windowshare_proc);
-  wxLogDebug(wxT("windowshare_start() spawned %d"), cb->windowshare_proc_pid);
+  wxLogDebug(wxT("windowshare_start() spawned %d."), cb->windowshare_proc_pid);
   
   if(cb->windowshare_proc_pid == 0)
     {
