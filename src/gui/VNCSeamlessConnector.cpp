@@ -27,10 +27,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   edge_width=5;
   restingx=-1;
   restingy=-1;
-  emulate_nav=0;
-  wheel_button_up=4;
-  scroll_lines=1;
-  mac_mode=0;
   hidden=0;
   client_selection_text=0;
   client_selection_text_length=0;
@@ -100,7 +96,6 @@ void VNCSeamlessConnector::adjustSize()
 
 wxThread::ExitCode VNCSeamlessConnector::Entry()
 {
-  
   while (! GetThread()->TestDestroy())
     {
       HandleXEvents();
@@ -118,12 +113,6 @@ wxThread::ExitCode VNCSeamlessConnector::Entry()
   private members
 */
 
-int warn_about_hotkey(Display *dpy, XErrorEvent *ev)
-{
-  //grabkeysym=0;
-  fprintf(stderr,"Warning: Failed to bind x2vnc hotkey, hotkey disabled.\n");
-  return 0;
-}
 
 
 
@@ -173,8 +162,8 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   
   if(restingy == -1)
     {
-      restingy = framebuffer_size.GetHeight() -2 - mac_mode;
-      restingx = framebuffer_size.GetWidth() -2 + mac_mode;
+      restingy = framebuffer_size.GetHeight() -2;
+      restingx = framebuffer_size.GetWidth() -2;
     }
 
 #ifdef HAVE_XINERAMA
@@ -536,12 +525,6 @@ int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
 
 int VNCSeamlessConnector::sendpointerevent(int x, int y, int buttonmask)
 {
-  if(mac_mode && (buttonmask & (1<<2)))
-    {
-      buttonmask &=~ (1<<2);
-      buttonmask |=~ (1<<0);
-    }
-
   wxMouseEvent e;
   e.m_x = x;
   e.m_y = y;
@@ -1001,46 +984,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	
     case ButtonPress:
     case ButtonRelease:
-      if (emulate_nav &&
-	  ev->xbutton.button >= 6 &&
-	  ev->xbutton.button <= 7)
-	{
-	  int ctrlcode;
-	  if (ev->xbutton.button == 6)
-	    ks = XK_Left;
-	  else
-	    ks = XK_Right;
-
-
-	  ctrlcode=XKeysymToKeycode(dpy, XK_Alt_L);
-
-	  //SendKeyEvent(XK_Alt_L, ev->type == ButtonPress);
-	  wxKeyEvent key_event;
-	  key_event.m_keyCode = XK_Alt_L;
-	  conn->sendKeyEvent(key_event, ev->type == ButtonPress, false); /* keydown */
-
-	  modifierPressed[ctrlcode]=ev->type == ButtonPress;
-
-	  //SendKeyEvent(ks, ev->type == ButtonPress); /* keydown */
-	  key_event.m_keyCode = ks;
-	  conn->sendKeyEvent(key_event, ev->type == ButtonPress, false); /* keydown */
-
-	  break;
-	}
-
-      if(mac_mode && ev->xbutton.button == 3)
-	{
-	  int ctrlcode=XKeysymToKeycode(dpy, XK_Control_L);
-
-	  //SendKeyEvent(XK_Control_L, ev->type == ButtonPress);
-	  wxKeyEvent key_event;
-	  key_event.m_keyCode = XK_Control_L;
-	  conn->sendKeyEvent(key_event, ev->type == ButtonPress, false); 
-
-
-	  modifierPressed[ctrlcode]=ev->type == ButtonPress;
-	}
-
       if (ev->type == ButtonPress) {
 	buttonMask = (((ev->xbutton.state & 0x1f00) >> 8) |
 		      (1 << (ev->xbutton.button - 1)));

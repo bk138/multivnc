@@ -129,10 +129,6 @@ private:
   int edge_width;
   int restingx;
   int restingy;
-  int emulate_nav;
-  int wheel_button_up;
-  int scroll_lines;
-  int mac_mode;
   int hidden;
   int debug;
 
