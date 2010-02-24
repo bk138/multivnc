@@ -49,6 +49,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   current_number_of_desktops = -2;
   remote_is_locked = 0;
 
+  debug = true;
   noblank=0;
   resurface = false;
   si.framebufferWidth = c->getFrameBufferWidth();
@@ -1310,7 +1311,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	//      return SendKeyEvent(ks, (ev->type == KeyPress));
 	wxKeyEvent key_event;
 	key_event.m_keyCode = ks;
-	conn->sendKeyEvent(key_event, ev->type == KeyPress, false); 
+	conn->sendKeyEvent(key_event, ev->type == KeyPress, true); 
 	return 1;
       }
       
