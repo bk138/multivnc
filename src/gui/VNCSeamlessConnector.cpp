@@ -48,7 +48,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   remote_is_locked = 0;
 
   debug = true;
-  noblank=0;
   resurface = false;
   si.framebufferWidth = c->getFrameBufferWidth();
   si.framebufferHeight = c->getFrameBufferHeight();
@@ -164,23 +163,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
    * check extensions
    */
 
-
-#ifdef HAVE_MIT_SCREENSAVER
-  {
-    int x,y;
-    server_has_mitscreensaver=XScreenSaverQueryExtension(dpy, &x,&y);
-    if(debug)
-      fprintf(stderr,"MIT-SCREEN-SAVER = %d\n",server_has_mitscreensaver);
-  }
-#endif
-
-  if(noblank
-#ifdef HAVE_MIT_SCREENSAVER
-     && (!server_has_mitscreensaver)
-#endif
-     )
-    fprintf(stderr,"-noblank option used, but no approperiate extensions found:\n"
-	    " x2vnc will keep the remote screen active at all times.\n");
   
   for (i = 0; i < 256; i++)
     modifierPressed[i] = False;
@@ -462,47 +444,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 
 
 
-/*
- * check_idle()
- * Check how long the user has been idle using
- * various methods.... (in ms)
- */
-
-Time VNCSeamlessConnector::check_idle(void)
-{
-
-#if HAVE_MIT_SCREENSAVER
-  if(server_has_mitscreensaver)
-    {
-      static XScreenSaverInfo* info = 0; 
-  
-      if (!info) info = XScreenSaverAllocInfo();
-    
-      XScreenSaverQueryInfo(dpy, DefaultRootWindow(dpy), info);
-      return info->idle;
-    }
-#endif
-
-  return 0;
-}
-
-
-
-
-
-void VNCSeamlessConnector::WiggleMouse(void)
-{
-  int tmpy=restingy > si.framebufferHeight /2 ? restingy -1 : restingy + 1;
-
-  wxMouseEvent e;
-  e.m_x = restingx;
-  e.m_y = tmpy;
-  conn->sendPointerEvent(e);
-  e.m_x = restingx;
-  e.m_y = restingy;
-  conn->sendPointerEvent(e);
-}
-
 void VNCSeamlessConnector::doWarp(void)
 {
   if(grabbed)
@@ -550,13 +491,6 @@ Bool VNCSeamlessConnector::HandleXEvents(void)
 #ifdef DEBUG
     fprintf(stderr,"IDLE=%d remote_idle=%d noblank=%d remote_is_locked=%d\n", check_idle(),remote_idle,noblank,remote_is_locked);
 #endif
-    if(noblank &&
-       remote_idle >= 45 &&
-       !remote_is_locked &&
-       check_idle() < 30000)
-      {
-	WiggleMouse();
-      }
   }
   
   
@@ -767,15 +701,6 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 
 
 
-void VNCSeamlessConnector::shortsleep(int usec)
-{
-  struct timeval timeout;
-  timeout.tv_sec=0;
-  timeout.tv_usec=usec;
-  select(0,0,0,0,&timeout);
-}
-
-
 void VNCSeamlessConnector::dumpMotionEvent(XEvent *ev)
 {
   fprintf(stderr,"{ %d, %d } -> { %d, %d } = %d, %d\n",
@@ -956,7 +881,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	  long t=time(0);
 
 	  if(t == last_resurface)
-	    shortsleep(5000);
+	    wxMilliSleep(5);
 
 	  last_resurface=t;
 #ifdef DEBUG

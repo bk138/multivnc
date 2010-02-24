@@ -63,11 +63,6 @@ private:
 
   Bool CreateXWindow();
   Bool HandleXEvents();
- 
-
-
-  Time check_idle();
-  void WiggleMouse();
   void doWarp();
   int enter_translate(int isedge, int width, int pos);
   int leave_translate(int isedge, int width, int pos);
@@ -77,7 +72,6 @@ private:
   void grabit(int x, int y, int state);
   void ungrabit(int x, int y, Window warpWindow);
   
-  void shortsleep(int usec);
   void dumpMotionEvent(XEvent *ev);
   int coord_dist_sq(wxPoint a, wxPoint b);
   int coord_dist_from_edge(wxPoint a);
@@ -100,13 +94,6 @@ private:
   }
 
 
-
-#ifdef HAVE_MIT_SCREENSAVER
-#include <X11/extensions/scrnsaver.h>
-
-  int server_has_mitscreensaver=0;
-#endif
-
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
@@ -121,7 +108,6 @@ private:
 
 
   float acceleration;
-  int noblank;
   Bool resurface;
   int no_wakeup_delay;
 
