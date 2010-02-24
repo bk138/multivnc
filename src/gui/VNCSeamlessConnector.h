@@ -5,14 +5,9 @@
 
 
 #include <X11/Xlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <math.h>
 #include <X11/X.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
-#include <X11/cursorfont.h>
-#include <X11/keysym.h>
 
 
 #include <wx/thread.h>
@@ -44,6 +39,7 @@ protected:
 
 private:
   VNCConn* conn;
+  wxSize framebuffer_size;
 
   wxString err;
 
@@ -56,10 +52,7 @@ private:
     };
 
 
-
-
   Display *dpy;
-  unsigned long BGR233ToPixel[];
 
   Bool CreateXWindow();
   Bool HandleXEvents();
@@ -78,15 +71,8 @@ private:
   int get_root_int_prop(Atom property);
   void check_desktop(void);
   void handle_cut_text(char *str, size_t len);
-  
-
-  struct dim
-  {
-    int framebufferHeight, framebufferWidth;
-  };
-  struct dim si;
-  
-
+  Bool HandleTopLevelEvent(XEvent *ev);
+  Bool HandleRootEvent(XEvent *ev); 
 
   void dumpcoord(wxPoint *c)
   {
@@ -109,8 +95,6 @@ private:
 
   float acceleration;
   Bool resurface;
-  int no_wakeup_delay;
-
   
 
   Window topLevel;
@@ -119,8 +103,7 @@ private:
   Atom wmProtocols, wmDeleteWindow, wmState;
   Bool modifierPressed[256];
 
-  Bool HandleTopLevelEvent(XEvent *ev);
-  Bool HandleRootEvent(XEvent *ev);
+ 
   int displayWidth, displayHeight;
   int x_offset, y_offset;
   int grabbed;
@@ -141,15 +124,11 @@ private:
 
 #define XROOT(E) ((E).x_root - x_offset)
 #define YROOT(E) ((E).y_root - y_offset)
-#define CENTERX (displayWidth/2+x_offset)
-#define CENTERY (displayHeight/2+y_offset)
-#define ABS(X) ((X) >= 0 ? (X) : -(X))
 
   enum edge_enum edge;
   int edge_width;
   int restingx;
   int restingy;
-  int emulate_wheel;
   int emulate_nav;
   int wheel_button_up;
   int scroll_lines;
@@ -157,21 +136,13 @@ private:
   int hidden;
   int debug;
 
-  int last_event_time ;
-
   char *client_selection_text;
   size_t client_selection_text_length;
 
   int saved_xpos;
   int saved_ypos;
-
   int saved_remote_xpos;
   int saved_remote_ypos;
-
-  long grab_timeout;
-  long grab_timeout_delay;
-#define SET_GRAB_TIMEOUT() grab_timeout= time(0) + grab_timeout_delay
-
 
   /* We must do our own desktop handling */
   Atom current_desktop_atom;
@@ -181,30 +152,13 @@ private:
   int current_desktop;
   int current_number_of_desktops;
 
-  int remote_is_locked;
-
-
-
-
-  typedef int(*xerrorhandler)(Display *, XErrorEvent *);
-
-
-
-
- 
-
   /*
    * This variable is true (1) if the mouse is on the same screen as the one
    * we're monitoring, or if there is only one screen on the X server.
    * - GRM
    */
   Bool mouseOnScreen;
-
-
-
 };
-	
-
 
 
 #endif //VNCSEAMLESSCONNECTOR_H

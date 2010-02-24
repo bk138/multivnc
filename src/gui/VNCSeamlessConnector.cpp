@@ -27,39 +27,33 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   edge_width=5;
   restingx=-1;
   restingy=-1;
-  emulate_wheel=0;
   emulate_nav=0;
   wheel_button_up=4;
   scroll_lines=1;
   mac_mode=0;
   hidden=0;
-  last_event_time = 0;
   client_selection_text=0;
   client_selection_text_length=0;
   saved_xpos=-1;
   saved_ypos=-1;
   saved_remote_xpos=-1;
   saved_remote_ypos=-1;
-  grab_timeout=0;
-  grab_timeout_delay=590;
   requested_desktop = -2;
   current_desktop = -2;
   current_number_of_desktops = -2;
-  remote_is_locked = 0;
 
   debug = true;
   resurface = false;
-  si.framebufferWidth = c->getFrameBufferWidth();
-  si.framebufferHeight = c->getFrameBufferHeight();
   acceleration=1.0;
-  no_wakeup_delay = 0x7fffffff;
   // init all x stuff end
 
+ 
+  adjustSize(); 
 
   if(CreateXWindow())
     fprintf(stderr, "sucessfully created xwindow!\n");
 
-  adjustSize(); 
+
 
   
   // this is like our main loop
@@ -93,6 +87,8 @@ void VNCSeamlessConnector::adjustSize()
 	     conn->getFrameBufferWidth(),
 	     conn->getFrameBufferHeight());
 
+  framebuffer_size.SetWidth(conn->getFrameBufferWidth());
+  framebuffer_size.SetHeight(conn->getFrameBufferHeight());
 }
 
 
@@ -177,8 +173,8 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   
   if(restingy == -1)
     {
-      restingy = si.framebufferHeight -2 - mac_mode;
-      restingx = si.framebufferWidth -2 + mac_mode;
+      restingy = framebuffer_size.GetHeight() -2 - mac_mode;
+      restingx = framebuffer_size.GetWidth() -2 + mac_mode;
     }
 
 #ifdef HAVE_XINERAMA
@@ -400,7 +396,7 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   e.m_y = restingy;
   conn->sendPointerEvent(e);
 
-  pointer_speed = acceleration * pow( (si.framebufferWidth * si.framebufferHeight) / (float)(displayWidth * displayHeight), 0.25 );
+  pointer_speed = acceleration * pow( (framebuffer_size.GetWidth() * framebuffer_size.GetHeight()) / (float)(displayWidth * displayHeight), 0.25 );
 
 
 
@@ -480,20 +476,7 @@ Bool VNCSeamlessConnector::HandleXEvents(void)
 {
   XEvent ev;
 
-  if(grabbed)
-    {
-      if(grab_timeout_delay && time(0) > grab_timeout)
-	ungrabit(-1, -1, DefaultRootWindow(dpy));
-    }else{ /* grabbed */
-    int remote_idle = time(0) - last_event_time;
-    if(remote_idle > no_wakeup_delay)
-      remote_is_locked=1;
-#ifdef DEBUG
-    fprintf(stderr,"IDLE=%d remote_idle=%d noblank=%d remote_is_locked=%d\n", check_idle(),remote_idle,noblank,remote_is_locked);
-#endif
-  }
-  
-  
+ 
   /* presumably XCheckMaskEvent is more efficient than XCheckIfEvent -GRM */
   while(XCheckIfEvent(dpy, &ev, AllXEventsPredicate, NULL))
     {
@@ -545,10 +528,10 @@ int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
 #define EDGE(X) ((X)?edge_width:0)
 
 #define SCALEX(X)							\
-  ( ((X)-EDGE(edge==EDGE_WEST ))*(si.framebufferWidth-1 )/(displayWidth -1-EDGE(EW)) )
+  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(displayWidth -1-EDGE(EW)) )
 
 #define SCALEY(Y)							\
-  ( ((Y)-EDGE(edge==EDGE_NORTH))*(si.framebufferHeight-1)/(displayHeight-1-EDGE(NS)) )
+  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(displayHeight-1-EDGE(NS)) )
 
 
 int VNCSeamlessConnector::sendpointerevent(int x, int y, int buttonmask)
@@ -646,7 +629,6 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 			XA_PRIMARY, XA_STRING, XA_CUT_BUFFER0,
 			topLevel, CurrentTime);
     }
-  SET_GRAB_TIMEOUT();
 }
 
 void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
@@ -743,8 +725,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
   static Atom COMPOUND_TEXT;
   /* Atom: requestor asks for a list of supported targets (GRM 24 Oct 2003) */
   static Atom TARGETS;
-
-  SET_GRAB_TIMEOUT();
 
   switch (ev->type)
     {
@@ -961,8 +941,8 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 #if 0
 	  fprintf(stderr," ==> {%f, %f} (%d,%d)\n",
 		  remote_xpos, remote_ypos,
-		  si.framebufferWidth,
-		  si.framebufferHeight);
+		  framebuffer_size.GetWidth(),
+		  framebuffer_size.GetHeight());
 #endif
 	
 	  if(!(ev->xmotion.state & 0x1f00))
@@ -971,24 +951,24 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	      switch(edge)
 		{
 		case EDGE_NORTH: 
-		  d=remote_ypos >= si.framebufferHeight;
+		  d=remote_ypos >= framebuffer_size.GetHeight();
 		  y = edge_width;  /* FIXME */
-		  x = remote_xpos * displayWidth / si.framebufferWidth;
+		  x = remote_xpos * displayWidth / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_SOUTH:
 		  d=remote_ypos < 0;
 		  y = displayHeight - edge_width -1; /* FIXME */
-		  x = remote_xpos * displayWidth / si.framebufferWidth;
+		  x = remote_xpos * displayWidth / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_EAST:
 		  d=remote_xpos < 0;
 		  x = displayWidth -  edge_width -1;  /* FIXME */
-		  y = remote_ypos * displayHeight /si.framebufferHeight ;
+		  y = remote_ypos * displayHeight /framebuffer_size.GetHeight() ;
 		  break;
 		case EDGE_WEST:
-		  d=remote_xpos > si.framebufferWidth;
+		  d=remote_xpos > framebuffer_size.GetWidth();
 		  x = edge_width;  /* FIXME */
-		  y = remote_ypos * displayHeight / si.framebufferHeight;
+		  y = remote_ypos * displayHeight / framebuffer_size.GetHeight();
 		  break;
 		}
 	    }
@@ -1005,11 +985,11 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	    if(remote_xpos < 0) remote_xpos=0;
 	    if(remote_ypos < 0) remote_ypos=0;
 
-	    if(remote_xpos >= si.framebufferWidth)
-	      remote_xpos=si.framebufferWidth-1;
+	    if(remote_xpos >= framebuffer_size.GetWidth())
+	      remote_xpos=framebuffer_size.GetWidth()-1;
 
-	    if(remote_ypos >= si.framebufferHeight)
-	      remote_ypos=si.framebufferHeight-1;
+	    if(remote_ypos >= framebuffer_size.GetHeight())
+	      remote_ypos=framebuffer_size.GetHeight()-1;
 
 	    i=sendpointerevent((int)remote_xpos,
 			       (int)remote_ypos,
@@ -1021,37 +1001,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	
     case ButtonPress:
     case ButtonRelease:
-      if (emulate_wheel &&
-	  ev->xbutton.button >= 4 &&
-	  ev->xbutton.button <= 5)
-	{
-	  int l;
-	  if (ev->xbutton.button == wheel_button_up)
-	    ks = XK_Up;
-	  else
-	    ks = XK_Down;
-
-	  if(ev->type == ButtonPress)
-	    {
-	      for(l=1;l<scroll_lines;l++)
-		{
-		  //SendKeyEvent(ks, 1); /* keydown */
-		  //SendKeyEvent(ks, 0); /* keyup */
-		  wxKeyEvent key_event;
-		  key_event.m_keyCode = ks;
-		  conn->sendKeyEvent(key_event, true, false);
-		  conn->sendKeyEvent(key_event, false, false);
-		}
-	    }
-
-
-	  //SendKeyEvent(ks, ev->type == ButtonPress); /* keydown */
-	  wxKeyEvent key_event;
-	  key_event.m_keyCode = ks;
-	  conn->sendKeyEvent(key_event, ev->type == ButtonPress, false); /* keydown */
-	  break;
-	}
-
       if (emulate_nav &&
 	  ev->xbutton.button >= 6 &&
 	  ev->xbutton.button <= 7)
@@ -1136,8 +1085,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	  fprintf(stderr,"  --> %x (%c) name=%s (%s)\n",ks,ks,keyname,
 		  ev->type == KeyPress ? "down" : "up");
 
-	/* We assume that typing means an unlocked display */
-	remote_is_locked=0;
 
 	//      return SendKeyEvent(ks, (ev->type == KeyPress));
 	wxKeyEvent key_event;
