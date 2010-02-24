@@ -84,7 +84,6 @@ private:
   int get_root_int_prop(Atom property);
   void check_desktop(void);
   void handle_cut_text(char *str, size_t len);
-  void sethotkey(char *key);
   
 
   struct dim
@@ -173,10 +172,6 @@ private:
   int debug;
 
   int last_event_time ;
-
-  KeySym grabkeysym;
-  KeyCode grabkey;
-  int grabmod;
 
   char *client_selection_text;
   size_t client_selection_text_length;

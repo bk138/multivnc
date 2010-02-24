@@ -24,7 +24,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   remote_ypos=0.0;
   pointer_speed = 0.0;
   edge = EDGE_NORTH;
-  edge_width=1;
+  edge_width=5;
   restingx=-1;
   restingy=-1;
   emulate_wheel=0;
@@ -34,8 +34,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   mac_mode=0;
   hidden=0;
   last_event_time = 0;
-  grabkeysym=XK_F12;
-  grabmod = ControlMask;
   client_selection_text=0;
   client_selection_text_length=0;
   saved_xpos=-1;
@@ -78,9 +76,9 @@ VNCSeamlessConnector::~VNCSeamlessConnector()
 {
   if(GetThread() && GetThread()->IsRunning())
     {
-      wxLogDebug(wxT( "VNCSeamlessConnector %p: before thread delete"), this);
+      fprintf(stderr,"VNCSeamlessConnector %p: before thread delete\n", this);
       GetThread()->Delete(); // this blocks if thread is joinable, i.e. on stack
-      wxLogDebug(wxT("VNCSeamlessConnector %p: after vncthread delete"), this);
+      fprintf(stderr,"VNCSeamlessConnector %p: after thread delete\n", this);
     }
   
   //close window
@@ -112,7 +110,8 @@ wxThread::ExitCode VNCSeamlessConnector::Entry()
     {
       HandleXEvents();
     }
-
+  
+  fprintf(stderr, "seamless thread exiting\n");
   return 0;
 }
 
@@ -147,10 +146,8 @@ AllXEventsPredicate(Display *dpy, XEvent *ev, char *arg)
 Bool VNCSeamlessConnector::CreateXWindow(void)
 {
   XSetWindowAttributes attr;
-  XEvent ev;
   char defaultGeometry[256];
   XSizeHints wmHints;
-  XGCValues gcv;
   int i;
   int ew;
   
@@ -412,30 +409,7 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
       XCreatePixmapCursor(dpy, nullPixmap, nullPixmap,
 			  &dummyColor, &dummyColor, 0, 0);
   
-  if(grabkeysym)
-    {
-      xerrorhandler prev_err_handler=XSetErrorHandler(warn_about_hotkey);
-      grabkey=XKeysymToKeycode(dpy, grabkeysym);
-#ifdef DEBUG
-      fprintf(stderr,"Grabbing key = %d, modifiers = %x\n",grabkey,grabmod);
-#endif
-      XGrabKey(dpy, grabkey, grabmod,
-	       DefaultRootWindow(dpy),
-	       1, GrabModeSync, GrabModeSync);
-
-      XSync(dpy, 0);
-
-      if(grabkeysym)
-	{
-	  /* Allow numlock */
-	  XGrabKey(dpy, grabkey, grabmod | Mod2Mask,
-		   DefaultRootWindow(dpy),
-		   1, GrabModeSync, GrabModeSync);
-	}
-      XSync(dpy, 0);
-
-      XSetErrorHandler(prev_err_handler);
-    }
+ 
 
   /* hide the cursor, so user won't get confused
      which keyboard has control */
@@ -837,8 +811,6 @@ int VNCSeamlessConnector::coord_dist_from_edge(wxPoint a)
  */
 Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 {
-  Bool grab;
-  int i;
   int x, y;
   
   int buttonMask;
@@ -881,7 +853,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 		 *
 		 * (GRM 24 Oct 2003)
 		 */
-		int ret;
 		Atom targets[2];
 		if(req->property == None)
 		  req->property = TARGETS;
@@ -901,7 +872,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	      }
 	    else if(req->target == XA_STRING || req->target == COMPOUND_TEXT)
 	      {
-		int ret;
 		if(req->property == None)
 		  req->property = XA_CUT_BUFFER0;
 
@@ -1161,7 +1131,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	  ev->xbutton.button >= 6 &&
 	  ev->xbutton.button <= 7)
 	{
-	  int l, ctrlcode;
+	  int ctrlcode;
 	  if (ev->xbutton.button == 6)
 	    ks = XK_Left;
 	  else
@@ -1219,16 +1189,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	XLookupString(&ev->xkey, keyname, 256, &ks, NULL);
 	/*      fprintf(stderr,"Pressing %x (%c) name=%s  code=%d\n",ks,ks,keyname,ev->xkey.keycode); */
 
-	if(ev->type == KeyPress && 
-	   ev->xkey.keycode == grabkey &&
-	   (ev->xkey.state == grabmod ||
-	    (ev->xkey.state & ~ Mod2Mask ) == grabmod ))
-	  {
-	    saved_remote_xpos=remote_xpos;
-	    saved_remote_ypos=remote_ypos;
-	    ungrabit(saved_xpos,saved_ypos,DefaultRootWindow(dpy));
-	    return 1;
-	  }
 	if (IsModifierKey(ks)) {
 	  ks = XKeycodeToKeysym(dpy, ev->xkey.keycode, 0);
 
@@ -1478,46 +1438,3 @@ void VNCSeamlessConnector::handle_cut_text(char *str, size_t len)
 
 
 
-
-
-void VNCSeamlessConnector::sethotkey(char *key)
-{
-  grabmod = 0;
-
-#define GOBBLE(X,Y)						\
-  if(!strncasecmp(key,X "-",sizeof(X) +1 -sizeof(""))) {	\
-    grabmod|=Y;							\
-    key+=sizeof(X) +1 -sizeof("");				\
-    continue;							\
-  }
-
-  while(1)
-    {
-      GOBBLE("s",ShiftMask);
-      GOBBLE("shift",ShiftMask);
-
-      GOBBLE("c",ControlMask);
-      GOBBLE("ctrl",ControlMask);
-      GOBBLE("control",ControlMask);
-
-      GOBBLE("a",Mod1Mask);
-      GOBBLE("alt",Mod1Mask);
-      GOBBLE("mod1",Mod1Mask);
-
-      GOBBLE("mod2",Mod2Mask);
-
-      GOBBLE("m",Mod3Mask);
-      GOBBLE("meta",Mod3Mask);
-      GOBBLE("mod3",Mod3Mask);
-
-      GOBBLE("super",Mod4Mask);
-      GOBBLE("mod4",Mod4Mask);
-
-      GOBBLE("hyper",Mod5Mask);
-      GOBBLE("mod5",Mod5Mask);
-
-      break;
-    }
-
-  grabkeysym=XStringToKeysym(key);
-}
