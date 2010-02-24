@@ -18,11 +18,6 @@
 #include <wx/thread.h>
 #include "VNCConn.h"
 
-  struct coord
-  {
-    int x, y;
-  };
-
 
 
 /*
@@ -84,23 +79,13 @@ private:
   
   void shortsleep(int usec);
   void dumpMotionEvent(XEvent *ev);
-  struct coord coord_subtract(struct coord a, struct coord b);
-  struct coord coord_add(struct coord a, struct coord b);
-  int coord_dist_sq(struct coord a, struct coord b);
-  int coord_dist_from_edge(struct coord a);
+  int coord_dist_sq(wxPoint a, wxPoint b);
+  int coord_dist_from_edge(wxPoint a);
   int get_root_int_prop(Atom property);
   void check_desktop(void);
   void handle_cut_text(char *str, size_t len);
   void sethotkey(char *key);
   
-  
-  
-  
-  
-
-
-
-
 
   struct dim
   {
@@ -109,15 +94,8 @@ private:
   struct dim si;
   
 
-  struct coord mkcoord(int x, int y)
-  {
-    struct coord ret;
-    ret.x=x;
-    ret.y=y;
-    return ret;
-  }
 
-  void dumpcoord(struct coord *c)
+  void dumpcoord(wxPoint *c)
   {
     fprintf(stderr,"{ %d, %d }",c->x,c->y);
   }
@@ -168,11 +146,11 @@ private:
   float remote_ypos;
   float pointer_speed;
 
-  struct coord origo1, origo2;
-  struct coord current_location;
-  struct coord current_speed;
-  struct coord * next_origo;
-  struct coord * current_origo;
+  wxPoint origo1, origo2;
+  wxPoint current_location;
+  wxPoint current_speed;
+  wxPoint * next_origo;
+  wxPoint * current_origo;
   int origo_separation;
   int motion_events;
 

@@ -454,21 +454,21 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   /* Compute two identifiable locations, as far as possible from each other */
   if(displayWidth * 2 > displayHeight)
     {
-      origo1=mkcoord(displayWidth/3,displayHeight/2);
-      origo2=mkcoord(displayWidth*2/3,displayHeight/2);
+      origo1=wxPoint(displayWidth/3,displayHeight/2);
+      origo2=wxPoint(displayWidth*2/3,displayHeight/2);
       origo_separation=displayWidth/3;
     }
   else if(displayHeight * 2 > displayWidth)
     {
-      origo1=mkcoord(displayWidth/2,displayHeight/3);
-      origo2=mkcoord(displayWidth/2,displayHeight*2/3);
+      origo1=wxPoint(displayWidth/2,displayHeight/3);
+      origo2=wxPoint(displayWidth/2,displayHeight*2/3);
       origo_separation=displayHeight/3;
     }
   else
     {
       int N=(int)( (2*(displayWidth+displayHeight)-sqrt((-3*displayWidth*displayWidth-3*displayHeight*displayHeight+8*displayWidth*displayHeight)) )/7.0 );
-      origo1=mkcoord(N,N);
-      origo2=mkcoord(displayWidth-N,displayHeight-N);
+      origo1=wxPoint(N,N);
+      origo2=wxPoint(displayWidth-N,displayHeight-N);
       origo_separation=N;
     }
   origo1.x+=x_offset;
@@ -813,23 +813,14 @@ void VNCSeamlessConnector::dumpMotionEvent(XEvent *ev)
 	  YROOT(ev->xmotion)-current_location.y);
 }
 
-struct coord VNCSeamlessConnector::coord_subtract(struct coord a, struct coord b)
-{
-  return mkcoord(a.x-b.x, a.y-b.y);
-}
 
-struct coord VNCSeamlessConnector::coord_add(struct coord a, struct coord b)
+int VNCSeamlessConnector::coord_dist_sq(wxPoint a, wxPoint b)
 {
-  return mkcoord(a.x+b.x, a.y+b.y);
-}
-
-int VNCSeamlessConnector::coord_dist_sq(struct coord a, struct coord b)
-{
-  a=coord_subtract(a,b);
+  a= a-b;
   return a.x*a.x + a.y*a.y;
 }
 
-int VNCSeamlessConnector::coord_dist_from_edge(struct coord a)
+int VNCSeamlessConnector::coord_dist_from_edge(wxPoint a)
 {
   int n,ret=a.x;
   if(a.y < ret) ret=a.y;
@@ -1026,13 +1017,13 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	{
 	  int i, d=0;
 	  Window warpWindow;
-	  struct coord offset=mkcoord(0,0);
+	  wxPoint offset(0,0);
 
 	  do
 	    {
 
 		{
-		  struct coord new_location=mkcoord(ev->xmotion.x_root, ev->xmotion.y_root);
+		  wxPoint new_location(ev->xmotion.x_root, ev->xmotion.y_root);
 		  if(debug) 
 		    {
 		      dumpMotionEvent(ev);
@@ -1053,9 +1044,9 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 		      motion_events=0;
 		    }
 	    
-		  current_speed=coord_subtract(new_location, current_location);
+		  current_speed = new_location - current_location;
 		  if(current_origo)
-		    offset=coord_add(offset, current_speed);
+		    offset= offset + current_speed;
 		  current_location=new_location;
 		}
 	    }
