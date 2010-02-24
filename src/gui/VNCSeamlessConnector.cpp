@@ -166,12 +166,7 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   /*
    * check extensions
    */
-#ifdef HAVE_XIDLE
-  {
-    int x,y;
-    server_has_xidle=XidleQueryExtension(dpy, &x,&y);
-  }
-#endif
+
 
 #ifdef HAVE_MIT_SCREENSAVER
   {
@@ -183,9 +178,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 #endif
 
   if(noblank
-#ifdef HAVE_XIDLE
-     && (!server_has_xidle)
-#endif
 #ifdef HAVE_MIT_SCREENSAVER
      && (!server_has_mitscreensaver)
 #endif
@@ -454,22 +446,7 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 
   pointer_speed = acceleration * pow( (si.framebufferWidth * si.framebufferHeight) / (float)(displayWidth * displayHeight), 0.25 );
 
-#ifdef HAVE_XF86DGA
-  {
-    int major=0, minor=0;
-    if (XF86DGAQueryVersion(dpy, &major, &minor))
-      {
-	int num, den, thr;
-	server_has_xf86dga=1;
-	XGetPointerControl(dpy, &num, &den, &thr);
-	pointer_speed *= num;
-	pointer_speed /= den;
-	pointer_warp_threshold = thr * thr;
-	if(debug)
-	  fprintf(stderr,"USING DGA\n");
-      }
-  }
-#endif
+
 
   fprintf(stderr," pointer multiplier: %f\n",pointer_speed);
 
@@ -519,14 +496,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 
 Time VNCSeamlessConnector::check_idle(void)
 {
-#ifdef HAVE_XIDLE
-  if(server_has_xidle)
-    {
-      Time ret = 0;
-      XGetIdleTime(dpy, &ret);
-      return ret;
-    }
-#endif
 
 #if HAVE_MIT_SCREENSAVER
   if(server_has_mitscreensaver)
@@ -742,10 +711,6 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 		GrabModeAsync, GrabModeAsync,
 		CurrentTime);
 
-#ifdef HAVE_XF86DGA
-  if(server_has_xf86dga)
-    XF86DGADirectVideo(dpy, DefaultScreen(dpy), XF86DGADirectMouse);
-#endif
 
   grabbed=1;
   next_origo=NULL;
@@ -780,10 +745,7 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 {
   int i;
 
-#ifdef HAVE_XF86DGA
-  if(server_has_xf86dga)
-    XF86DGADirectVideo(dpy, DefaultScreen(dpy), 0);
-#endif
+
   wxMouseEvent e;
   e.m_x = restingx;
   e.m_y = restingy;
@@ -1068,14 +1030,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 
 	  do
 	    {
-#ifdef HAVE_XF86DGA
-	      if(server_has_xf86dga)
-		{
-		  offset.x+=ev->xmotion.x_root;
-		  offset.y+=ev->xmotion.y_root;
-		}
-	      else
-#endif
+
 		{
 		  struct coord new_location=mkcoord(ev->xmotion.x_root, ev->xmotion.y_root);
 		  if(debug) 

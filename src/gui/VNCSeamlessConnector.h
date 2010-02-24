@@ -123,11 +123,6 @@ private:
   }
 
 
-#ifdef HAVE_XIDLE
-#include "xidle.h"
-
-  int server_has_xidle=0;
-#endif
 
 #ifdef HAVE_MIT_SCREENSAVER
 #include <X11/extensions/scrnsaver.h>
@@ -146,12 +141,6 @@ private:
   int xrandr_event_base;
   int xrandr_error_base;
 #endif
-
-#ifdef HAVE_XF86DGA
-#include <X11/extensions/xf86dga.h>
-  int server_has_xf86dga=0;
-#endif
-
 
 
   float acceleration;
