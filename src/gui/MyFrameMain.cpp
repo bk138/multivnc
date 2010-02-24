@@ -641,11 +641,15 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   VNCCanvas* canvas = new VNCCanvas(container, c);
   container->setCanvas(canvas);
 
+  VNCSeamlessConnector* sc = new VNCSeamlessConnector(this, c);
+
   ConnBlob cb;
   cb.conn = c;
   cb.canvas = canvas;
+  cb.seamlessconnector = sc;  
   cb.windowshare_proc = 0;
   cb.windowshare_proc_pid = 0;
+
   connections.push_back(cb);
 
   if(listen)
@@ -663,6 +667,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
       c->SetBlocking(true);
       notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
     }
+
 
 
   // "end connection"
@@ -694,6 +699,8 @@ void MyFrameMain::terminate_conn(int which)
     listen_ports.erase(wxAtoi(cb->conn->getServerPort()));
   // this deletes the CanvasContainer plus canvas   
   notebook_connections->DeletePage(which);
+  // this deletes the seamless connector
+  delete cb->seamlessconnector;
   // this deletes the VNCConn
   delete cb->conn;
   // this deletes the windowsharer, if there's any

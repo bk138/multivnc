@@ -12,6 +12,10 @@
    * Supports server framebuffer resize.
    * Bookmarks.
    * Simple, loggable statistics 
+   * Seamless control of the remote side by moving pointer over the
+     (default upper) screen edge. Borrows heavily from x2vnc by
+     Fredrik Hübinette <hubbe@hubbe.net>, which in turn was based on
+     ideas from x2x and code from vncviewer.
 
  
  For features that are planned, but not completed yet, look at the

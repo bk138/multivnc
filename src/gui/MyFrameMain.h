@@ -12,6 +12,7 @@
 #include "wxServDisc/wxServDisc.h"
 #include "VNCConn.h"
 #include "VNCCanvas.h"
+#include "VNCSeamlessConnector.h"
 
 
 
@@ -20,6 +21,7 @@ struct ConnBlob
 {
   VNCConn* conn;
   VNCCanvas* canvas;
+  VNCSeamlessConnector* seamlessconnector;
   wxProcess* windowshare_proc;
   long windowshare_proc_pid; // this should be saved in the wxProcess, but isn't
 };
