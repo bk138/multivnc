@@ -684,7 +684,22 @@ int VNCSeamlessConnector::sendpointerevent(int x, int y, int buttonmask)
   wxMouseEvent e;
   e.m_x = x;
   e.m_y = y;
-  //FIXME buttonmask!!
+
+  if(buttonmask & rfbButton1Mask)
+    e.m_leftDown = true;
+
+  if(buttonmask & rfbButton2Mask)
+    e.m_middleDown = true;
+  
+  if(buttonmask & rfbButton3Mask)
+    e.m_rightDown = true;
+
+  if(buttonmask & rfbWheelUpMask)
+    e.m_wheelRotation = 1;
+  
+  if(buttonmask & rfbWheelDownMask)
+    e.m_wheelRotation = -1;
+
   conn->sendPointerEvent(e);
   return 1;
 }
