@@ -41,6 +41,7 @@ protected:
 private:
   VNCConn* conn;
   wxSize framebuffer_size;
+  wxSize display_size;
   int edge;
   
 
@@ -73,10 +74,6 @@ private:
   Bool HandleTopLevelEvent(XEvent *ev);
   Bool HandleRootEvent(XEvent *ev); 
 
-  void dumpcoord(wxPoint *c)
-  {
-    fprintf(stderr,"{ %d, %d }",c->x,c->y);
-  }
 
 
 #ifdef HAVE_XINERAMA
@@ -102,8 +99,6 @@ private:
   Atom wmProtocols, wmDeleteWindow, wmState;
   Bool modifierPressed[256];
 
- 
-  int displayWidth, displayHeight;
   int x_offset, y_offset;
   int grabbed;
   int pointer_warp_threshold;

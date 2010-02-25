@@ -36,8 +36,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   client_selection_text_length=0;
   saved_xpos=-1;
   saved_ypos=-1;
-  saved_remote_xpos=-1;
-  saved_remote_ypos=-1;
   requested_desktop = -2;
   current_desktop = -2;
   current_number_of_desktops = -2;
@@ -47,9 +45,14 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   acceleration=1.0;
   // init all x stuff end
 
- 
+
   adjustSize(); 
 
+ 
+  for (int i = 0; i < 256; i++)
+    modifierPressed[i] = False;
+ 
+ 
   if(CreateXWindow())
     fprintf(stderr, "sucessfully created xwindow!\n");
 
@@ -68,17 +71,65 @@ VNCSeamlessConnector::~VNCSeamlessConnector()
 
 
 
+
 void VNCSeamlessConnector::adjustSize()
 {
-  wxLogDebug(wxT("VNCSeamlessConnector %p: adjusting size to (%i, %i)"),
-	     this,
-	     conn->getFrameBufferWidth(),
-	     conn->getFrameBufferHeight());
+  // get local display size
+  display_size = wxGetDisplaySize();
 
+  saved_remote_xpos = display_size.GetWidth() / 2;
+  saved_remote_ypos = display_size.GetHeight() / 2;
+  
+  // get remote display size
   framebuffer_size.SetWidth(conn->getFrameBufferWidth());
   framebuffer_size.SetHeight(conn->getFrameBufferHeight());
-}
 
+  // compute a pos to hide cursor, so user won't get confused
+  // which keyboard has control 
+  restingy = framebuffer_size.GetHeight() -2;
+  restingx = framebuffer_size.GetWidth() -2;
+  wxMouseEvent e;
+  e.m_x = restingx;
+  e.m_y = restingy;
+  conn->sendPointerEvent(e);
+
+  // calc pointer speed from sizes
+  pointer_speed = acceleration * pow( (framebuffer_size.GetWidth() * framebuffer_size.GetHeight()) / (float)(display_size.GetWidth() * display_size.GetHeight()), 0.25 );
+
+  fprintf(stderr," pointer multiplier: %f\n",pointer_speed);
+
+
+
+
+  // Compute two identifiable locations, as far as possible from each other 
+  if(display_size.GetWidth() * 2 > display_size.GetHeight())
+    {
+      origo1=wxPoint(display_size.GetWidth()/3,display_size.GetHeight()/2);
+      origo2=wxPoint(display_size.GetWidth()*2/3,display_size.GetHeight()/2);
+      origo_separation=display_size.GetWidth()/3;
+    }
+  else if(display_size.GetHeight() * 2 > display_size.GetWidth())
+    {
+      origo1=wxPoint(display_size.GetWidth()/2,display_size.GetHeight()/3);
+      origo2=wxPoint(display_size.GetWidth()/2,display_size.GetHeight()*2/3);
+      origo_separation=display_size.GetHeight()/3;
+    }
+  else
+    {
+      int N=(int)( (2*(display_size.GetWidth()+display_size.GetHeight())-sqrt((-3*display_size.GetWidth()*display_size.GetWidth()-3*display_size.GetHeight()*display_size.GetHeight()+8*display_size.GetWidth()*display_size.GetHeight())) )/7.0 );
+      origo1=wxPoint(N,N);
+      origo2=wxPoint(display_size.GetWidth()-N,display_size.GetHeight()-N);
+      origo_separation=N;
+    }
+  origo1.x+=x_offset;
+  origo1.y+=y_offset;
+  origo2.x+=x_offset;
+  origo2.y+=y_offset;
+
+  fprintf(stderr, "{%d, %d}\n", origo1.x,origo1.y);
+  fprintf(stderr, "{%d, %d}\n", origo2.x,origo2.y);
+  fprintf(stderr,"multiscreen offset=%d, %d\n",x_offset,y_offset);
+}
 
 
 
@@ -119,7 +170,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   XSetWindowAttributes attr;
   char defaultGeometry[256];
   XSizeHints wmHints;
-  int i;
   int ew;
   
   Pixmap    nullPixmap;
@@ -134,25 +184,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   /*
    * check extensions
    */
-
-  
-  for (i = 0; i < 256; i++)
-    modifierPressed[i] = False;
-  
-  /* Try to work out the geometry of the top-level window */
-  
-  displayWidth = WidthOfScreen(DefaultScreenOfDisplay(dpy));
-  displayHeight = HeightOfScreen(DefaultScreenOfDisplay(dpy));
-  
-  saved_remote_xpos = displayWidth / 2;
-  saved_remote_ypos = displayHeight / 2;
-  
-  if(restingy == -1)
-    {
-      restingy = framebuffer_size.GetHeight() -2;
-      restingx = framebuffer_size.GetWidth() -2;
-    }
-
 #ifdef HAVE_XINERAMA
   {
     int x,y;
@@ -208,11 +239,11 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 
 	    x_offset = heads[besthead].x_org;
 	    y_offset = heads[besthead].y_org;
-	    displayWidth = heads[besthead].width;
-	    displayHeight = heads[besthead].height;
+	    display_size.SetWidth(heads[besthead].width);
+	    display_size.SetHeight(heads[besthead].height);
 #if 0
 	    fprintf(stderr,"[%d,%d-%d,%d]\n",x_offset,y_offset,
-		    displayWidth,displayHeight);
+		    display_size.GetWidth(),display_size.GetHeight());
 #endif
 	  }
 	XFree(heads);
@@ -229,12 +260,12 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   
   switch(edge)
     {
-    case EDGE_EAST: wmHints.x=displayWidth-ew+x_offset;
-    case EDGE_WEST: topLevelHeight=displayHeight;
+    case EDGE_EAST: wmHints.x=display_size.GetWidth()-ew+x_offset;
+    case EDGE_WEST: topLevelHeight=display_size.GetHeight();
       break;
       
-    case EDGE_SOUTH: wmHints.y=displayHeight-ew+y_offset;
-    case EDGE_NORTH: topLevelWidth=displayWidth;
+    case EDGE_SOUTH: wmHints.y=display_size.GetHeight()-ew+y_offset;
+    case EDGE_NORTH: topLevelWidth=display_size.GetWidth();
       break;
     }
   
@@ -286,21 +317,16 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   current_desktop_atom = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);
   number_of_desktops_atom = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
 
-#if 1
-  {
-    Atom t = XInternAtom(dpy, "_NET_WM_WINDOW_DOCK", False);
-
-    XChangeProperty(dpy,
-		    topLevel,
-		    XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False),
-		    XA_ATOM,
-		    32,
-		    PropModeReplace,
+  Atom t = XInternAtom(dpy, "_NET_WM_WINDOW_DOCK", False);
+  
+  XChangeProperty(dpy,
+		  topLevel,
+		  XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False),
+		  XA_ATOM,
+		  32,
+		  PropModeReplace,
 		    (unsigned char *)&t,
-		    1);
-  }
-#endif
-
+		  1);
 
   wmHints.flags |= USPosition; /* try to force WM to place window */
   XSetWMNormalHints(dpy, topLevel, &wmHints);
@@ -365,50 +391,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   
  
 
-  /* hide the cursor, so user won't get confused
-     which keyboard has control */
-  wxMouseEvent e;
-  e.m_x = restingx;
-  e.m_y = restingy;
-  conn->sendPointerEvent(e);
-
-  pointer_speed = acceleration * pow( (framebuffer_size.GetWidth() * framebuffer_size.GetHeight()) / (float)(displayWidth * displayHeight), 0.25 );
-
-
-
-  fprintf(stderr," pointer multiplier: %f\n",pointer_speed);
-
-
-  /* Compute two identifiable locations, as far as possible from each other */
-  if(displayWidth * 2 > displayHeight)
-    {
-      origo1=wxPoint(displayWidth/3,displayHeight/2);
-      origo2=wxPoint(displayWidth*2/3,displayHeight/2);
-      origo_separation=displayWidth/3;
-    }
-  else if(displayHeight * 2 > displayWidth)
-    {
-      origo1=wxPoint(displayWidth/2,displayHeight/3);
-      origo2=wxPoint(displayWidth/2,displayHeight*2/3);
-      origo_separation=displayHeight/3;
-    }
-  else
-    {
-      int N=(int)( (2*(displayWidth+displayHeight)-sqrt((-3*displayWidth*displayWidth-3*displayHeight*displayHeight+8*displayWidth*displayHeight)) )/7.0 );
-      origo1=wxPoint(N,N);
-      origo2=wxPoint(displayWidth-N,displayHeight-N);
-      origo_separation=N;
-    }
-  origo1.x+=x_offset;
-  origo1.y+=y_offset;
-  origo2.x+=x_offset;
-  origo2.y+=y_offset;
-
-  /*
-    dumpcoord(&origo1);
-    dumpcoord(&origo2);
-    fprintf(stderr,"offset=%d, %d\n",x_offset,y_offset);
-  */
     
   return True;
 }
@@ -504,10 +486,10 @@ int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
 #define EDGE(X) ((X)?edge_width:0)
 
 #define SCALEX(X)							\
-  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(displayWidth -1-EDGE(EW)) )
+  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(display_size.GetWidth() -1-EDGE(EW)) )
 
 #define SCALEY(Y)							\
-  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(displayHeight-1-EDGE(NS)) )
+  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(NS)) )
 
 
 int VNCSeamlessConnector::sendpointerevent(int x, int y, int buttonmask)
@@ -675,9 +657,9 @@ int VNCSeamlessConnector::coord_dist_from_edge(wxPoint a)
 {
   int n,ret=a.x;
   if(a.y < ret) ret=a.y;
-  n=displayHeight - a.y;
+  n=display_size.GetHeight() - a.y;
   if(n < ret) ret=n;
-  n=displayWidth - a.x;
+  n=display_size.GetWidth() - a.x;
   if(n < ret) ret=n;
   return ret;
 }
@@ -850,8 +832,8 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
     case EnterNotify:
       if(!grabbed && ev->xcrossing.mode==NotifyNormal)
 	{
-	  grabit(enter_translate(EW,displayWidth ,XROOT(ev->xcrossing)),
-		 enter_translate(NS,displayHeight,YROOT(ev->xcrossing)),
+	  grabit(enter_translate(EW,display_size.GetWidth() ,XROOT(ev->xcrossing)),
+		 enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing)),
 		 ev->xcrossing.state);
 	}
       return 1;
@@ -923,22 +905,22 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 		case EDGE_NORTH: 
 		  d=remote_ypos >= framebuffer_size.GetHeight();
 		  y = edge_width;  /* FIXME */
-		  x = remote_xpos * displayWidth / framebuffer_size.GetWidth();
+		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_SOUTH:
 		  d=remote_ypos < 0;
-		  y = displayHeight - edge_width -1; /* FIXME */
-		  x = remote_xpos * displayWidth / framebuffer_size.GetWidth();
+		  y = display_size.GetHeight() - edge_width -1; /* FIXME */
+		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_EAST:
 		  d=remote_xpos < 0;
-		  x = displayWidth -  edge_width -1;  /* FIXME */
-		  y = remote_ypos * displayHeight /framebuffer_size.GetHeight() ;
+		  x = display_size.GetWidth() -  edge_width -1;  /* FIXME */
+		  y = remote_ypos * display_size.GetHeight() /framebuffer_size.GetHeight() ;
 		  break;
 		case EDGE_WEST:
 		  d=remote_xpos > framebuffer_size.GetWidth();
 		  x = edge_width;  /* FIXME */
-		  y = remote_ypos * displayHeight / framebuffer_size.GetHeight();
+		  y = remote_ypos * display_size.GetHeight() / framebuffer_size.GetHeight();
 		  break;
 		}
 	    }
@@ -947,8 +929,8 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	    {
 	      if(x<0) x=0;
 	      if(y<0) y=0;
-	      if(y>=displayHeight) y=displayHeight-1;
-	      if(x>=displayWidth) x=displayWidth-1;
+	      if(y>=display_size.GetHeight()) y=display_size.GetHeight()-1;
+	      if(x>=display_size.GetWidth()) x=display_size.GetWidth()-1;
 	      ungrabit(x, y, warpWindow);
 	      return 1;
 	    }else{
@@ -1160,22 +1142,22 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 	    x = XROOT(ev->xcrossing);
 	    y = XROOT(ev->xcrossing);
 	    if (!nowOnScreen) {
-	      x = enter_translate(EW,displayWidth,XROOT(ev->xcrossing));
-	      y = enter_translate(NS,displayHeight,YROOT(ev->xcrossing));
+	      x = enter_translate(EW,display_size.GetWidth(),XROOT(ev->xcrossing));
+	      y = enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing));
 	    }
 	    switch(edge)
 	      {
 	      case EDGE_NORTH:
-		grab=y < displayHeight / 2;
+		grab=y < display_size.GetHeight() / 2;
 		break;
 	      case EDGE_SOUTH:
-		grab=y > displayHeight / 2;
+		grab=y > display_size.GetHeight() / 2;
 		break;
 	      case EDGE_EAST:
-		grab=x > displayWidth / 2;
+		grab=x > display_size.GetWidth() / 2;
 		break;
 	      case EDGE_WEST:
-		grab=x < displayWidth / 2;
+		grab=x < display_size.GetWidth() / 2;
 		break;
 	      }
 	  }
@@ -1190,8 +1172,8 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
        */
       if(grab && ev->xcrossing.mode == NotifyNormal)
 	{
-	  grabit(enter_translate(EW,displayWidth ,XROOT(ev->xcrossing)),
-		 enter_translate(NS,displayHeight,YROOT(ev->xcrossing)),
+	  grabit(enter_translate(EW,display_size.GetWidth() ,XROOT(ev->xcrossing)),
+		 enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing)),
 		 ev->xcrossing.state);
 	}
       break;
