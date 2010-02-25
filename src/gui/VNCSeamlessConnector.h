@@ -10,7 +10,7 @@
 #include <X11/Xatom.h>
 
 
-#include <wx/thread.h>
+#include <wx/timer.h>
 #include "VNCConn.h"
 
 
@@ -21,7 +21,7 @@
   screen edge and submits mouse and key events.
 
 */
-class VNCSeamlessConnector: public wxThreadHelper
+class VNCSeamlessConnector: public wxEvtHandler
 {
 public:
   VNCSeamlessConnector(wxWindow* parent, VNCConn* c);
@@ -33,9 +33,7 @@ public:
 
 
 protected:
-  // thread execution starts here
-  virtual wxThread::ExitCode Entry();
-  
+  DECLARE_EVENT_TABLE();
 
 private:
   VNCConn* conn;
@@ -51,8 +49,12 @@ private:
       EDGE_SOUTH
     };
 
+  wxTimer runtimer;
 
   Display *dpy;
+
+  void onRuntimer(wxTimerEvent& event);
+  
 
   Bool CreateXWindow();
   Bool HandleXEvents();

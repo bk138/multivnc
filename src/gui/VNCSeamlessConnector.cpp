@@ -11,6 +11,9 @@
 */
 
 
+BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxEvtHandler)
+  EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
+END_EVENT_TABLE();
 
 VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
 {
@@ -49,26 +52,14 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   if(CreateXWindow())
     fprintf(stderr, "sucessfully created xwindow!\n");
 
-
-
-  
-  // this is like our main loop
-  if( Create() != wxTHREAD_NO_ERROR )
-    err.Printf(_("Could not create VNC thread!"));
-
-  if( GetThread()->Run() != wxTHREAD_NO_ERROR )
-    err.Printf(_("Could not start VNC thread!")); 
+  runtimer.SetOwner(this, 666);
+  runtimer.Start(5);
 }
 
 
 VNCSeamlessConnector::~VNCSeamlessConnector()
 {
-  if(GetThread() && GetThread()->IsRunning())
-    {
-      fprintf(stderr,"VNCSeamlessConnector %p: before thread delete\n", this);
-      GetThread()->Delete(); // this blocks if thread is joinable, i.e. on stack
-      fprintf(stderr,"VNCSeamlessConnector %p: after thread delete\n", this);
-    }
+  runtimer.Stop();
   
   //close window
   XDestroyWindow(dpy,  topLevel);
@@ -94,17 +85,6 @@ void VNCSeamlessConnector::adjustSize()
   protected members
 */
 
-wxThread::ExitCode VNCSeamlessConnector::Entry()
-{
-  while (! GetThread()->TestDestroy())
-    {
-      HandleXEvents();
-    }
-  
-  fprintf(stderr, "seamless thread exiting\n");
-  return 0;
-}
-
 
 
 
@@ -113,6 +93,12 @@ wxThread::ExitCode VNCSeamlessConnector::Entry()
   private members
 */
 
+
+
+void VNCSeamlessConnector::onRuntimer(wxTimerEvent& event)
+{
+ HandleXEvents();
+}
 
 
 
