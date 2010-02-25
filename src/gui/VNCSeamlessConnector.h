@@ -43,6 +43,7 @@ private:
   wxSize framebuffer_size;
   wxSize display_size;
   int edge;
+  wxPoint remoteParkingPos;
 
   void OnMouse(wxMouseEvent& evt);
 
@@ -117,12 +118,7 @@ private:
   int origo_separation;
   int motion_events;
 
-#define XROOT(E) ((E).x_root - x_offset)
-#define YROOT(E) ((E).y_root - y_offset)
-
   int edge_width;
-  int restingx;
-  int restingy;
   int hidden;
   int debug;
 

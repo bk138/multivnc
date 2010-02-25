@@ -19,6 +19,11 @@ BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxFrame)
 END_EVENT_TABLE();
 
 
+#define EDGE_EW (edge == EDGE_EAST || edge==EDGE_WEST)
+#define EDGE_NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
+#define EDGE_ES (edge == EDGE_EAST || edge==EDGE_SOUTH)
+#define EDGE_NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
+
 
 VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   : wxFrame(parent, wxID_ANY, c->getDesktopName(), wxDefaultPosition, wxDefaultSize,
@@ -35,10 +40,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   remote_xpos=0.0;
   remote_ypos=0.0;
   pointer_speed = 0.0;
- 
   edge_width=5;
-  restingx=-1;
-  restingy=-1;
   hidden=0;
   client_selection_text=0;
   client_selection_text_length=0;
@@ -46,7 +48,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   saved_ypos=-1;
   requested_desktop = -2;
   current_desktop = -2;
-
 
   debug = true;
   resurface = false;
@@ -108,11 +109,12 @@ void VNCSeamlessConnector::adjustSize()
 
   // compute a pos to hide cursor, so user won't get confused
   // which keyboard has control 
-  restingy = framebuffer_size.GetHeight() -2;
-  restingx = framebuffer_size.GetWidth() -2;
+  remoteParkingPos.x = framebuffer_size.GetWidth() -2;
+  remoteParkingPos.y = framebuffer_size.GetHeight() -2;
+
   wxMouseEvent e;
-  e.m_x = restingx;
-  e.m_y = restingy;
+  e.m_x = remoteParkingPos.x;
+  e.m_y = remoteParkingPos.y;
   conn->sendPointerEvent(e);
 
   // calc pointer speed from sizes
@@ -169,24 +171,6 @@ void VNCSeamlessConnector::adjustSize()
 */
 
 
-
-
-#define EW (edge == EDGE_EAST || edge==EDGE_WEST)
-#define NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
-#define ES (edge == EDGE_EAST || edge==EDGE_SOUTH)
-#define NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
-
-
-#define EDGE(X) ((X)?edge_width:0)
-
-#define SCALEX(X)							\
-  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(display_size.GetWidth() -1-EDGE(EW)) )
-
-#define SCALEY(Y)							\
-  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(NS)) )
-
-
-
 void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 {
   wxPoint pos = ClientToScreen(event.GetPosition());
@@ -196,9 +180,7 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 
   if(!HasCapture() && event.Entering())
     {
-      /*grabit(enter_translate(EW,display_size.GetWidth() ,XROOT(ev->xcrossing)),
-	     enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing)),
-	     ev->xcrossing.state);*/
+
     }
   return;
 
@@ -467,14 +449,14 @@ void VNCSeamlessConnector::doWarp(void)
 	next_origo=&origo1;
 
       fprintf(stderr,"X11 WARP: %d %d\n",next_origo->x, next_origo->y); 
-      /*      XWarpPointer(dpy,None,
+           XWarpPointer(dpy,None,
 		   DefaultRootWindow(dpy),0,0,0,0,
 		   next_origo->x,
 		   next_origo->y);
-      */
+      
 
-      wxPoint warp_pos= ScreenToClient(*next_origo);
-      WarpPointer(warp_pos.x, warp_pos.y);
+	   //wxPoint warp_pos= ScreenToClient(*next_origo);
+      //WarpPointer(warp_pos.x, warp_pos.y);
 
       motion_events=0;
     }
@@ -521,15 +503,19 @@ Bool VNCSeamlessConnector::HandleXEvents(void)
 
 int VNCSeamlessConnector::enter_translate(int isedge, int width, int pos)
 {
-  if(!isedge) return pos;
-  if(ES) return 0;
+  if(!isedge)
+    return pos;
+  if(EDGE_ES)
+    return 0;
   return width-1;
 }
 
 int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
 {
-  if(!isedge) return pos;
-  if(ES) return width-edge_width;
+  if(!isedge) 
+    return pos;
+  if(EDGE_ES)
+    return width-edge_width;
   return 0;
 }
 
@@ -606,6 +592,12 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
     {
       doWarp();
 
+#define EDGE(X) ((X)?edge_width:0)
+#define SCALEX(X)							\
+  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(display_size.GetWidth() -1-EDGE(EDGE_EW)) )
+#define SCALEY(Y)							\
+  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(EDGE_NS)) )
+
       /* Whut? How can this be right? */
       remote_xpos=SCALEX(x);
       remote_ypos=SCALEY(y);
@@ -630,17 +622,20 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 {
   int i;
 
-
   wxMouseEvent e;
-  e.m_x = restingx;
-  e.m_y = restingy;
+  e.m_x = remoteParkingPos.x;
+  e.m_y = remoteParkingPos.y;
   
   conn->sendPointerEvent(e);
 
   if(x > -1 && y > -1 )
     {
-      XWarpPointer(dpy,None, warpWindow, 0,0,0,0, x_offset + x, y_offset + y);
+            XWarpPointer(dpy,None, warpWindow, 0,0,0,0, x_offset + x, y_offset + y);
+      
+	    //wxPoint warp_pos= ScreenToClient(wxPoint(x_offset+x, y_offset+y));
+	    //WarpPointer(warp_pos.x, warp_pos.y);
       XFlush(dpy);
+      fprintf(stderr, "ungrab warp!\n");
     }
   XUngrabKeyboard(dpy, CurrentTime);
   XUngrabPointer(dpy, CurrentTime);
@@ -683,10 +678,10 @@ void VNCSeamlessConnector::dumpMotionEvent(XEvent *ev)
   fprintf(stderr,"{ %d, %d } -> { %d, %d } = %d, %d\n",
 	  current_location.x,
 	  current_location.y,
-	  XROOT(ev->xmotion),
-	  YROOT(ev->xmotion),
-	  XROOT(ev->xmotion)-current_location.x,
-	  YROOT(ev->xmotion)-current_location.y);
+	  ev->xmotion.x_root - x_offset,
+	  ev->xmotion.y_root- y_offset,
+	  (ev->xmotion.x_root - x_offset) - current_location.x,
+	  (ev->xmotion.y_root - y_offset)-current_location.y);
 }
 
 
@@ -875,8 +870,8 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
     case EnterNotify:
       if(!grabbed && ev->xcrossing.mode==NotifyNormal)
 	{
-	  grabit(enter_translate(EW,display_size.GetWidth() ,XROOT(ev->xcrossing)),
-		 enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing)),
+	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (ev->xcrossing.x_root - x_offset)),
+		 enter_translate(EDGE_NS,display_size.GetHeight(), (ev->xcrossing.y_root - y_offset)),
 		 ev->xcrossing.state);
 	}
       return 1;
@@ -1048,12 +1043,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	return 1;
       }
       
-    case ClientMessage:
-      if ((ev->xclient.message_type == wmProtocols) &&
-	  (ev->xclient.data.l[0] == wmDeleteWindow))
-	{
-	  exit(0);
-	}
       break;
     }
 
@@ -1134,7 +1123,7 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
     default:
 #ifdef HAVE_XRANDR
       if(ev->type == RRScreenChangeNotify + xrandr_event_base)
-	exit(0);
+	;//exit(0);
 #endif
       break;
     
@@ -1149,8 +1138,8 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 #endif
 	if(ev->xkey.keycode)
 	  {
-	    saved_xpos=XROOT(ev->xkey);
-	    saved_ypos=YROOT(ev->xkey);
+	    saved_xpos=(ev->xkey.x_root - x_offset);
+	    saved_ypos=(ev->xkey.y_root - y_offset);
 	    grabit(saved_remote_xpos, saved_remote_ypos, 0);
 	  }
 	break;
@@ -1182,11 +1171,11 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 	     * 
 	     * - GRM
 	     */
-	    x = XROOT(ev->xcrossing);
-	    y = XROOT(ev->xcrossing);
+	    x = (ev->xcrossing.x_root - x_offset);
+	    y = (ev->xcrossing.y_root - y_offset);
 	    if (!nowOnScreen) {
-	      x = enter_translate(EW,display_size.GetWidth(),XROOT(ev->xcrossing));
-	      y = enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing));
+	      x = enter_translate(EDGE_EW,display_size.GetWidth(),(ev->xcrossing.x_root - x_offset));
+	      y = enter_translate(EDGE_NS,display_size.GetHeight(),(ev->xcrossing.y_root - y_offset));
 	    }
 	    switch(edge)
 	      {
@@ -1215,8 +1204,8 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
        */
       if(grab && ev->xcrossing.mode == NotifyNormal)
 	{
-	  grabit(enter_translate(EW,display_size.GetWidth() ,XROOT(ev->xcrossing)),
-		 enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing)),
+	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() ,(ev->xcrossing.x_root - x_offset)),
+		 enter_translate(EDGE_NS,display_size.GetHeight(),(ev->xcrossing.y_root - y_offset)),
 		 ev->xcrossing.state);
 	}
       break;
