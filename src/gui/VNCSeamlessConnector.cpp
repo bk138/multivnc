@@ -74,6 +74,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   // this sets: topLevel, deskopt atoms
   //if(CreateXWindow())
   // fprintf(stderr, "sucessfully created xwindow!\n");
+  topLevel = GDK_WINDOW_XID(GetHandle()->window);
 
   runtimer.SetOwner(this, 666);
   runtimer.Start(5);
@@ -159,7 +160,7 @@ void VNCSeamlessConnector::adjustSize()
   
 
   // the following code sizes and places our window
-  int ew = edge_width*2;//FIXME
+  int ew = edge_width;
   if(!ew) 
     ew=1;
 
@@ -208,16 +209,20 @@ void VNCSeamlessConnector::adjustSize()
 void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 {
   wxPoint evt_root_pos = ClientToScreen(event.GetPosition());
-  fprintf(stderr, "mouse x: %d y: %d\n", evt_root_pos.x, evt_root_pos.y);
+  fprintf(stderr, "new mouse evt:: x: %d y: %d\n", evt_root_pos.x, evt_root_pos.y);
 
   int x,y;
+
 
 
   if(event.Entering())
     {
       //  if(!HasCapture())
+      fprintf(stderr, "mouse entering!\n");
+
       if(!grabbed)
 	{
+	  fprintf(stderr, "mouse entering!, grabbing\n");
 	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (evt_root_pos.x - x_offset)),
 		 enter_translate(EDGE_NS,display_size.GetHeight(), (evt_root_pos.y - y_offset)),
 		 0);
@@ -228,8 +233,10 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 
   if(event.Moving())
     {
+      fprintf(stderr, "mouse moving!\n");
       if(grabbed)
 	{
+	  fprintf(stderr, "mouse moving and grabbed!\n");
 	  int i, d=0;
 	  Window warpWindow;
 	  wxPoint offset(0,0);
@@ -280,7 +287,9 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 #endif
 	
 	  // if(!(ev->xmotion.state & 0x1f00)) //FIXME
+	  if(!event.Dragging());
 	    {
+	      fprintf(stderr, "d gets set!!!\n");
 	      warpWindow = DefaultRootWindow(dpy);
 	      switch(edge)
 		{
@@ -309,6 +318,7 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 
 	  if(d)
 	    {
+	      fprintf(stderr, "d is set!!!\n");
 	      if(x<0) x=0;
 	      if(y<0) y=0;
 	      if(y>=display_size.GetHeight()) y=display_size.GetHeight()-1;
@@ -728,13 +738,14 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
       hidden=0;
     }
 
-  XGrabPointer(dpy, topLevel, True,
+  CaptureMouse();
+  /*  XGrabPointer(dpy, topLevel, True,
 	       PointerMotionMask | ButtonPressMask | ButtonReleaseMask,
 	       GrabModeAsync, GrabModeAsync,
-	       None, grabCursor, CurrentTime);
-  XGrabKeyboard(dpy, topLevel, True, 
+	       None, grabCursor, CurrentTime);*/
+  /* XGrabKeyboard(dpy, topLevel, True, 
 		GrabModeAsync, GrabModeAsync,
-		CurrentTime);
+		CurrentTime);*/
 
 
   grabbed=1;
@@ -760,15 +771,18 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 
   mouseOnScreen = 1;
 
+  /*
   selection_owner=XGetSelectionOwner(dpy, XA_PRIMARY);
-  /*   fprintf(stderr,"Selection owner: %lx\n",(long)selection_owner); */
+  //   fprintf(stderr,"Selection owner: %lx\n",(long)selection_owner); 
 
   if(selection_owner != None && selection_owner != topLevel)
     {
       XConvertSelection(dpy,
 			XA_PRIMARY, XA_STRING, XA_CUT_BUFFER0,
 			topLevel, CurrentTime);
-    }
+			}
+  */
+  XSync(dpy, False);
 }
 
 void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
@@ -790,8 +804,11 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
       XFlush(dpy);
       fprintf(stderr, "ungrab warp!\n");
     }
-  XUngrabKeyboard(dpy, CurrentTime);
-  XUngrabPointer(dpy, CurrentTime);
+  //XUngrabKeyboard(dpy, CurrentTime);
+
+  //XUngrabPointer(dpy, CurrentTime);
+  ReleaseMouse();
+
   mouseOnScreen = warpWindow == DefaultRootWindow(dpy);
   XFlush(dpy);
   
@@ -821,6 +838,8 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
   if(!edge_width) hidewindow();
   
   grabbed=0;
+
+  fprintf(stderr, "ungrab!\n");
 }
 
 
@@ -1086,6 +1105,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	
 	  if(!(ev->xmotion.state & 0x1f00))
 	    {
+	      fprintf(stderr, "d gets set!!!\n");
 	      warpWindow = DefaultRootWindow(dpy);
 	      switch(edge)
 		{
@@ -1114,6 +1134,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 
 	  if(d)
 	    {
+	      fprintf(stderr, "d is set!!!\n");
 	      if(x<0) x=0;
 	      if(y<0) y=0;
 	      if(y>=display_size.GetHeight()) y=display_size.GetHeight()-1;
