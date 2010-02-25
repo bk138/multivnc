@@ -58,13 +58,11 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   adjustSize(); 
 
 
-  SetBackgroundColour(*wxGREEN);
-  Move(10,10);
-
+  
 #ifdef __WXGTK__
   gtk_window_set_type_hint(GTK_WINDOW(GetHandle()), GDK_WINDOW_TYPE_HINT_DOCK);
   gtk_window_set_keep_above(GTK_WINDOW(GetHandle()), true);	
-#endif   
+#endif  
 
  
   for (int i = 0; i < 256; i++)
@@ -74,13 +72,16 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
     fprintf(stderr," unable to open display %s\n",  XDisplayName(NULL));
   
   // this sets: topLevel, deskopt atoms
-  if(CreateXWindow())
-    fprintf(stderr, "sucessfully created xwindow!\n");
+  //if(CreateXWindow())
+  // fprintf(stderr, "sucessfully created xwindow!\n");
 
   runtimer.SetOwner(this, 666);
   runtimer.Start(5);
 
   this->Show(true);
+  // seems that has to come after Show() to take effect
+  SetBackgroundColour(*wxGREEN);
+  SetTransparent(100);
 }
 
 
@@ -154,6 +155,39 @@ void VNCSeamlessConnector::adjustSize()
   fprintf(stderr, "{%d, %d}\n", origo1.x,origo1.y);
   fprintf(stderr, "{%d, %d}\n", origo2.x,origo2.y);
   fprintf(stderr,"multiscreen offset=%d, %d\n",x_offset,y_offset);
+
+  
+
+  // the following code sizes and places our window
+  int ew = edge_width*2;//FIXME
+  if(!ew) 
+    ew=1;
+
+  int width=ew;
+  int height=ew;
+  int x = x_offset;
+  int y = y_offset;
+  
+  switch(edge)
+    {
+    case EDGE_EAST: x = display_size.GetWidth() - ew + x_offset;
+    case EDGE_WEST: height = display_size.GetHeight();
+      break;
+      
+    case EDGE_SOUTH: y = display_size.GetHeight() - ew + y_offset;
+    case EDGE_NORTH: width = display_size.GetWidth();
+      break;
+    }
+  
+
+  SetSize(width, height);
+  Move(x, y);
+
+   /*
+  if(edge_width)
+    Raise();
+  else
+  hidden=1;*/
 }
 
 
@@ -173,16 +207,133 @@ void VNCSeamlessConnector::adjustSize()
 
 void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 {
-  wxPoint pos = ClientToScreen(event.GetPosition());
+  wxPoint evt_root_pos = ClientToScreen(event.GetPosition());
+  fprintf(stderr, "mouse x: %d y: %d\n", evt_root_pos.x, evt_root_pos.y);
 
-  fprintf(stderr, "mouse x: %d y: %d\n", pos.x, pos.y);
+  int x,y;
 
 
-  if(!HasCapture() && event.Entering())
+  if(event.Entering())
     {
-
+      //  if(!HasCapture())
+      if(!grabbed)
+	{
+	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (evt_root_pos.x - x_offset)),
+		 enter_translate(EDGE_NS,display_size.GetHeight(), (evt_root_pos.y - y_offset)),
+		 0);
+	  //	     ev->xcrossing.state); //FIXME buttons
+	}
+      return;
     }
-  return;
+
+  if(event.Moving())
+    {
+      if(grabbed)
+	{
+	  int i, d=0;
+	  Window warpWindow;
+	  wxPoint offset(0,0);
+		
+	  wxPoint new_location(evt_root_pos.x, evt_root_pos.y);
+	  if(debug) 
+	    {
+	      //dumpMotionEvent(ev);
+	      
+	      if(next_origo)
+		fprintf(stderr," {%d} <? {%d}\n",coord_dist_sq(new_location, *next_origo), coord_dist_sq(new_location, current_location));
+	    }
+	    
+	  motion_events++;
+	    
+	  if(next_origo &&
+	     (coord_dist_sq(new_location, *next_origo) < coord_dist_sq(new_location, current_location) ||
+	      coord_dist_from_edge(new_location) < motion_events))
+	    {
+	      current_origo=next_origo;
+	      current_location=*next_origo;
+	      next_origo=NULL;
+	      motion_events=0;
+	    }
+	    
+	  current_speed = new_location - current_location;
+	  if(current_origo)
+	    offset= offset + current_speed;
+	  current_location=new_location;
+		
+	  
+	  if(pointer_speed > 1 &&
+	     offset.x*offset.x + offset.y*offset.y < 
+	     pointer_warp_threshold)
+	    {
+	      remote_xpos+=offset.x;
+	      remote_ypos+=offset.y;
+	    }else{
+	    remote_xpos+=offset.x * pointer_speed;
+	    remote_ypos+=offset.y * pointer_speed;
+	  }
+
+#if 0
+	  fprintf(stderr," ==> {%f, %f} (%d,%d)\n",
+		  remote_xpos, remote_ypos,
+		  framebuffer_size.GetWidth(),
+		  framebuffer_size.GetHeight());
+#endif
+	
+	  // if(!(ev->xmotion.state & 0x1f00)) //FIXME
+	    {
+	      warpWindow = DefaultRootWindow(dpy);
+	      switch(edge)
+		{
+		case EDGE_NORTH: 
+		  d=remote_ypos >= framebuffer_size.GetHeight();
+		  y = edge_width;  /* FIXME */
+		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
+		  break;
+		case EDGE_SOUTH:
+		  d=remote_ypos < 0;
+		  y = display_size.GetHeight() - edge_width -1; /* FIXME */
+		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
+		  break;
+		case EDGE_EAST:
+		  d=remote_xpos < 0;
+		  x = display_size.GetWidth() -  edge_width -1;  /* FIXME */
+		  y = remote_ypos * display_size.GetHeight() /framebuffer_size.GetHeight() ;
+		  break;
+		case EDGE_WEST:
+		  d=remote_xpos > framebuffer_size.GetWidth();
+		  x = edge_width;  /* FIXME */
+		  y = remote_ypos * display_size.GetHeight() / framebuffer_size.GetHeight();
+		  break;
+		}
+	    }
+
+	  if(d)
+	    {
+	      if(x<0) x=0;
+	      if(y<0) y=0;
+	      if(y>=display_size.GetHeight()) y=display_size.GetHeight()-1;
+	      if(x>=display_size.GetWidth()) x=display_size.GetWidth()-1;
+	      ungrabit(x, y, warpWindow);
+	      return;
+	    }else{
+	    if(remote_xpos < 0) remote_xpos=0;
+	    if(remote_ypos < 0) remote_ypos=0;
+
+	    if(remote_xpos >= framebuffer_size.GetWidth())
+	      remote_xpos=framebuffer_size.GetWidth()-1;
+
+	    if(remote_ypos >= framebuffer_size.GetHeight())
+	      remote_ypos=framebuffer_size.GetHeight()-1;
+
+	    i=sendpointerevent((int)remote_xpos,
+			       (int)remote_ypos,
+			       0); //FIXME button state
+			       //(ev->xmotion.state & 0x1f00) >> 8);
+	  }
+
+	}
+      return;
+    }
 
 }
 
@@ -483,15 +634,15 @@ Bool VNCSeamlessConnector::HandleXEvents(void)
 	  if (!HandleTopLevelEvent(&ev))
 	    return False;
 	}
-      else if (ev.xany.window == DefaultRootWindow(dpy) ||
+      /*      else if (ev.xany.window == DefaultRootWindow(dpy) ||
 	       ev.xany.window == RootWindow(dpy, 0)) {
 	if (!HandleRootEvent(&ev))
 	  return False;
-      }
-      else if (ev.type == MappingNotify)
-	{
-	  XRefreshKeyboardMapping(&ev.xmapping);
-	}
+	  }*/
+      /*      else if (ev.type == MappingNotify)
+	      {
+	      XRefreshKeyboardMapping(&ev.xmapping);
+	      }*/
     }
 
   doWarp();
@@ -569,6 +720,8 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 {
   Window selection_owner;
 
+  fprintf(stderr, "grab! \n");
+  
   if(hidden)
     {
       XMapRaised(dpy, topLevel);
@@ -884,39 +1037,35 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	  Window warpWindow;
 	  wxPoint offset(0,0);
 
-	  do
+	  
+		
+	  wxPoint new_location(ev->xmotion.x_root, ev->xmotion.y_root);
+	  if(debug) 
 	    {
-
-		{
-		  wxPoint new_location(ev->xmotion.x_root, ev->xmotion.y_root);
-		  if(debug) 
-		    {
-		      dumpMotionEvent(ev);
+	      dumpMotionEvent(ev);
 	      
-		      if(next_origo)
-			fprintf(stderr," {%d} <? {%d}\n",coord_dist_sq(new_location, *next_origo), coord_dist_sq(new_location, current_location));
-		    }
-	    
-		  motion_events++;
-	    
-		  if(next_origo &&
-		     (coord_dist_sq(new_location, *next_origo) < coord_dist_sq(new_location, current_location) ||
-		      coord_dist_from_edge(new_location) < motion_events))
-		    {
-		      current_origo=next_origo;
-		      current_location=*next_origo;
-		      next_origo=NULL;
-		      motion_events=0;
-		    }
-	    
-		  current_speed = new_location - current_location;
-		  if(current_origo)
-		    offset= offset + current_speed;
-		  current_location=new_location;
-		}
+	      if(next_origo)
+		fprintf(stderr," {%d} <? {%d}\n",coord_dist_sq(new_location, *next_origo), coord_dist_sq(new_location, current_location));
 	    }
-	  while (XCheckTypedWindowEvent(dpy, topLevel, MotionNotify, ev));
-
+	    
+	  motion_events++;
+	    
+	  if(next_origo &&
+	     (coord_dist_sq(new_location, *next_origo) < coord_dist_sq(new_location, current_location) ||
+	      coord_dist_from_edge(new_location) < motion_events))
+	    {
+	      current_origo=next_origo;
+	      current_location=*next_origo;
+	      next_origo=NULL;
+	      motion_events=0;
+	    }
+	    
+	  current_speed = new_location - current_location;
+	  if(current_origo)
+	    offset= offset + current_speed;
+	  current_location=new_location;
+		
+	  
 	  if(pointer_speed > 1 &&
 	     offset.x*offset.x + offset.y*offset.y < 
 	     pointer_warp_threshold)
@@ -1133,9 +1282,9 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 	char keyname[256];
 	keyname[0] = '\0';
 	XLookupString(&ev->xkey, keyname, 256, &ks, NULL);
-#ifdef DEBUG
+
 	fprintf(stderr,"ROOT: Pressing %x (%c) name=%s  code=%d\n",ks,ks,keyname,ev->xkey.keycode);
-#endif
+
 	if(ev->xkey.keycode)
 	  {
 	    saved_xpos=(ev->xkey.x_root - x_offset);
