@@ -641,7 +641,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   VNCCanvas* canvas = new VNCCanvas(container, c);
   container->setCanvas(canvas);
 
-  VNCSeamlessConnector* sc = new VNCSeamlessConnector(this, c);
+  VNCSeamlessConnector* sc = new VNCSeamlessConnector(this, c, EDGE_NORTH);
 
   ConnBlob cb;
   cb.conn = c;

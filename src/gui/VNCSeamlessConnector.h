@@ -13,6 +13,10 @@
 #include <wx/timer.h>
 #include "VNCConn.h"
 
+#define EDGE_EAST 0
+#define EDGE_WEST 1
+#define EDGE_NORTH 2 
+#define EDGE_SOUTH 3
 
 
 /*
@@ -24,12 +28,11 @@
 class VNCSeamlessConnector: public wxEvtHandler
 {
 public:
-  VNCSeamlessConnector(wxWindow* parent, VNCConn* c);
+  VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e);
   ~VNCSeamlessConnector();
 
   void adjustSize(); 
 
-  const wxString& getErr() const { const wxString& ref = err; return ref; };
 
 
 protected:
@@ -38,16 +41,10 @@ protected:
 private:
   VNCConn* conn;
   wxSize framebuffer_size;
+  int edge;
+  
 
   wxString err;
-
-  enum edge_enum
-    {
-      EDGE_EAST,
-      EDGE_WEST,
-      EDGE_NORTH,
-      EDGE_SOUTH
-    };
 
   wxTimer runtimer;
 
@@ -127,7 +124,6 @@ private:
 #define XROOT(E) ((E).x_root - x_offset)
 #define YROOT(E) ((E).y_root - y_offset)
 
-  enum edge_enum edge;
   int edge_width;
   int restingx;
   int restingy;

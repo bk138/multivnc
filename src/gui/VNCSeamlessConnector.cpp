@@ -15,9 +15,10 @@ BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxEvtHandler)
   EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
 END_EVENT_TABLE();
 
-VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
+VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
 {
   conn = c;
+  edge = e;
 
   // init all x stuff start
   x_offset=0; y_offset=0;
@@ -26,7 +27,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c)
   remote_xpos=0.0;
   remote_ypos=0.0;
   pointer_speed = 0.0;
-  edge = EDGE_NORTH;
+ 
   edge_width=5;
   restingx=-1;
   restingy=-1;
