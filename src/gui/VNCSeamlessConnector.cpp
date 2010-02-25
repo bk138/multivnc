@@ -1,8 +1,10 @@
 
 #include <wx/log.h>
+#ifdef __WXGTK__
+#include <gdk/gdkx.h>
+#include <gtk/gtk.h>
+#endif
 #include "VNCSeamlessConnector.h"
-
-
 
 
 
@@ -11,15 +13,21 @@
 */
 
 
-BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxEvtHandler)
+BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxFrame)
+  EVT_MOUSE_EVENTS(VNCSeamlessConnector::OnMouse)
   EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
 END_EVENT_TABLE();
 
+
+
 VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
+  : wxFrame(parent, wxID_ANY, c->getDesktopName(), wxDefaultPosition, wxDefaultSize,
+	    wxFRAME_SHAPED | wxBORDER_NONE | wxFRAME_NO_TASKBAR | wxSTAY_ON_TOP)
 {
   conn = c;
   edge = e;
 
+  
   // init all x stuff start
   x_offset=0; y_offset=0;
   pointer_warp_threshold=5;
@@ -38,7 +46,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   saved_ypos=-1;
   requested_desktop = -2;
   current_desktop = -2;
-  current_number_of_desktops = -2;
+
 
   debug = true;
   resurface = false;
@@ -48,16 +56,30 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
 
   adjustSize(); 
 
+
+  SetBackgroundColour(*wxGREEN);
+  Move(10,10);
+
+#ifdef __WXGTK__
+  gtk_window_set_type_hint(GTK_WINDOW(GetHandle()), GDK_WINDOW_TYPE_HINT_DOCK);
+  gtk_window_set_keep_above(GTK_WINDOW(GetHandle()), true);	
+#endif   
+
  
   for (int i = 0; i < 256; i++)
     modifierPressed[i] = False;
  
- 
+  if (!(dpy = XOpenDisplay(NULL))) 
+    fprintf(stderr," unable to open display %s\n",  XDisplayName(NULL));
+  
+  // this sets: topLevel, deskopt atoms
   if(CreateXWindow())
     fprintf(stderr, "sucessfully created xwindow!\n");
 
   runtimer.SetOwner(this, 666);
   runtimer.Start(5);
+
+  this->Show(true);
 }
 
 
@@ -100,7 +122,6 @@ void VNCSeamlessConnector::adjustSize()
 
 
 
-
   // Compute two identifiable locations, as far as possible from each other 
   if(display_size.GetWidth() * 2 > display_size.GetHeight())
     {
@@ -116,7 +137,9 @@ void VNCSeamlessConnector::adjustSize()
     }
   else
     {
-      int N=(int)( (2*(display_size.GetWidth()+display_size.GetHeight())-sqrt((-3*display_size.GetWidth()*display_size.GetWidth()-3*display_size.GetHeight()*display_size.GetHeight()+8*display_size.GetWidth()*display_size.GetHeight())) )/7.0 );
+      int N=(int)( (2*(display_size.GetWidth()+display_size.GetHeight())-
+		    sqrt((-3*display_size.GetWidth()*display_size.GetWidth()-3*display_size.GetHeight()*display_size.GetHeight()+8*display_size.GetWidth()*display_size.GetHeight()))
+		    )/7.0 );
       origo1=wxPoint(N,N);
       origo2=wxPoint(display_size.GetWidth()-N,display_size.GetHeight()-N);
       origo_separation=N;
@@ -147,9 +170,44 @@ void VNCSeamlessConnector::adjustSize()
 
 
 
+
+#define EW (edge == EDGE_EAST || edge==EDGE_WEST)
+#define NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
+#define ES (edge == EDGE_EAST || edge==EDGE_SOUTH)
+#define NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
+
+
+#define EDGE(X) ((X)?edge_width:0)
+
+#define SCALEX(X)							\
+  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(display_size.GetWidth() -1-EDGE(EW)) )
+
+#define SCALEY(Y)							\
+  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(NS)) )
+
+
+
+void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
+{
+  wxPoint pos = ClientToScreen(event.GetPosition());
+
+  fprintf(stderr, "mouse x: %d y: %d\n", pos.x, pos.y);
+
+
+  if(!HasCapture() && event.Entering())
+    {
+      /*grabit(enter_translate(EW,display_size.GetWidth() ,XROOT(ev->xcrossing)),
+	     enter_translate(NS,display_size.GetHeight(),YROOT(ev->xcrossing)),
+	     ev->xcrossing.state);*/
+    }
+  return;
+
+}
+
+
 void VNCSeamlessConnector::onRuntimer(wxTimerEvent& event)
 {
- HandleXEvents();
+  HandleXEvents();
 }
 
 
@@ -171,15 +229,10 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   char defaultGeometry[256];
   XSizeHints wmHints;
   int ew;
-  
+  int topLevelWidth, topLevelHeight;
   Pixmap    nullPixmap;
   XColor    dummyColor;
-  
-  if (!(dpy = XOpenDisplay(NULL))) {
-    fprintf(stderr," unable to open display %s\n",
-	    XDisplayName(NULL));
-    return False;
-  }
+ 
 
   /*
    * check extensions
@@ -413,11 +466,16 @@ void VNCSeamlessConnector::doWarp(void)
       else
 	next_origo=&origo1;
 
-      /* fprintf(stderr,"WARP: %d %d\n",next_origo->x, next_origo->y); */
-      XWarpPointer(dpy,None,
+      fprintf(stderr,"X11 WARP: %d %d\n",next_origo->x, next_origo->y); 
+      /*      XWarpPointer(dpy,None,
 		   DefaultRootWindow(dpy),0,0,0,0,
 		   next_origo->x,
 		   next_origo->y);
+      */
+
+      wxPoint warp_pos= ScreenToClient(*next_origo);
+      WarpPointer(warp_pos.x, warp_pos.y);
+
       motion_events=0;
     }
 }
@@ -461,13 +519,6 @@ Bool VNCSeamlessConnector::HandleXEvents(void)
 
 
 
-
-
-#define EW (edge == EDGE_EAST || edge==EDGE_WEST)
-#define NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
-#define ES (edge == EDGE_EAST || edge==EDGE_SOUTH)
-#define NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
-
 int VNCSeamlessConnector::enter_translate(int isedge, int width, int pos)
 {
   if(!isedge) return pos;
@@ -482,14 +533,6 @@ int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
   return 0;
 }
 
-
-#define EDGE(X) ((X)?edge_width:0)
-
-#define SCALEX(X)							\
-  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(display_size.GetWidth() -1-EDGE(EW)) )
-
-#define SCALEY(Y)							\
-  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(NS)) )
 
 
 int VNCSeamlessConnector::sendpointerevent(int x, int y, int buttonmask)

@@ -9,7 +9,7 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 
-
+#include "wx/frame.h"
 #include <wx/timer.h>
 #include "VNCConn.h"
 
@@ -25,7 +25,7 @@
   screen edge and submits mouse and key events.
 
 */
-class VNCSeamlessConnector: public wxEvtHandler
+class VNCSeamlessConnector: public wxFrame
 {
 public:
   VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e);
@@ -43,7 +43,8 @@ private:
   wxSize framebuffer_size;
   wxSize display_size;
   int edge;
-  
+
+  void OnMouse(wxMouseEvent& evt);
 
   wxString err;
 
@@ -94,7 +95,7 @@ private:
   
 
   Window topLevel;
-  int topLevelWidth, topLevelHeight;
+
 
   Atom wmProtocols, wmDeleteWindow, wmState;
   Bool modifierPressed[256];
@@ -136,10 +137,9 @@ private:
   /* We must do our own desktop handling */
   Atom current_desktop_atom;
   Atom number_of_desktops_atom;
-
   int requested_desktop;
   int current_desktop;
-  int current_number_of_desktops;
+
 
   /*
    * This variable is true (1) if the mouse is on the same screen as the one

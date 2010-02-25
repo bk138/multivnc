@@ -42,6 +42,15 @@ AC_ARG_WITH(wx-config,
 
 
 
+AC_MSG_CHECKING([wxWidgets version])
+if wxversion=`$WXCONFIG --version`; then
+    AC_MSG_RESULT([$wxversion])
+else
+    AC_MSG_RESULT([not found])
+    AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
+fi
+
+
 dnl Check if we have enabled debug support.
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE(debug, [  --enable-debug          enable debug build [[default=no]]],, enable_debug="no")
@@ -58,13 +67,6 @@ else
 fi
 
 
-AC_MSG_CHECKING([wxWidgets version])
-if wxversion=`$WXCONFIG --version`; then
-    AC_MSG_RESULT([$wxversion])
-else
-    AC_MSG_RESULT([not found])
-    AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
-fi
 
 dnl check for universal wx lib
 if test "$HOST_IS_DARWIN" = "yes"; then
@@ -89,10 +91,17 @@ if test "$HOST_IS_WINDOWS" = "yes"; then
    CXXFLAGS="$CXXFLAGS -gstabs+"
 fi
  
+
 WX_CPPFLAGS="`$WXCONFIG --cppflags`"
 WX_CXXFLAGS="`$WXCONFIG --cxxflags`"
 WX_LIBS="`$WXCONFIG --libs`"
 WX_RESCOMP="`$WXCONFIG --rescomp`"
+
+dnl add some extra includes needed by src/gui/VNCSeamlessConnector
+if test ! -z "`$WXCONFIG --selected-config | grep "gtk2" 2>/dev/null`"; then
+    PKG_CHECK_MODULES(GTK, gtk+-2.0)  
+    WX_CXXFLAGS+=" `pkg-config --cflags gtk+-2.0`"
+fi
 
  
 AC_SUBST(WX_CPPFLAGS)
