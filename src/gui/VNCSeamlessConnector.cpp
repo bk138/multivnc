@@ -32,6 +32,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   conn = c;
   edge = e;
 
+  grabbed = 0;
   
   // init all x stuff start
   x_offset=0; y_offset=0;
