@@ -348,17 +348,213 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 }
 
 
+
+void VNCSeamlessConnector::doWarp(void)
+{
+  if(grabbed)
+    {
+      if(next_origo) return;
+      if(current_origo &&
+	 current_location.x == current_origo->x &&
+	 current_location.y == current_origo->y)
+	return;
+
+      if(current_origo == &origo1)
+	next_origo=&origo2;
+      else
+	next_origo=&origo1;
+
+      fprintf(stderr,"X11 WARP: %d %d\n",next_origo->x, next_origo->y); 
+           XWarpPointer(dpy,None,
+		   DefaultRootWindow(dpy),0,0,0,0,
+		   next_origo->x,
+		   next_origo->y);
+      
+
+	   //wxPoint warp_pos= ScreenToClient(*next_origo);
+      //WarpPointer(warp_pos.x, warp_pos.y);
+
+      motion_events=0;
+    }
+}
+
+
+
+int VNCSeamlessConnector::enter_translate(int isedge, int width, int pos)
+{
+  if(!isedge)
+    return pos;
+  if(EDGE_ES)
+    return 0;
+  return width-1;
+}
+
+int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
+{
+  if(!isedge) 
+    return pos;
+  if(EDGE_ES)
+    return width-edge_width;
+  return 0;
+}
+
+
+void VNCSeamlessConnector::grabit(int x, int y, int state)
+{
+  Window selection_owner;
+
+  fprintf(stderr, "grab! \n");
+  
+  if(hidden)
+    {
+      XMapRaised(dpy, topLevel);
+      hidden=0;
+    }
+
+  CaptureMouse();
+  /*  XGrabPointer(dpy, topLevel, True,
+	       PointerMotionMask | ButtonPressMask | ButtonReleaseMask,
+	       GrabModeAsync, GrabModeAsync,
+	       None, grabCursor, CurrentTime);*/
+  /* XGrabKeyboard(dpy, topLevel, True, 
+		GrabModeAsync, GrabModeAsync,
+		CurrentTime);*/
+
+
+  grabbed=1;
+  next_origo=NULL;
+  current_origo=NULL;
+
+  if(x > -1 && y > -1)
+    {
+      doWarp();
+
+#define EDGE(X) ((X)?edge_width:0)
+#define SCALEX(X)							\
+  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(display_size.GetWidth() -1-EDGE(EDGE_EW)) )
+#define SCALEY(Y)							\
+  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(EDGE_NS)) )
+
+      /* Whut? How can this be right? */
+      remote_xpos=SCALEX(x);
+      remote_ypos=SCALEY(y);
+      sendpointerevent(remote_xpos, remote_ypos, (state & 0x1f00) >> 8);
+    }
+
+
+  mouseOnScreen = 1;
+
+  /*
+  selection_owner=XGetSelectionOwner(dpy, XA_PRIMARY);
+  //   fprintf(stderr,"Selection owner: %lx\n",(long)selection_owner); 
+
+  if(selection_owner != None && selection_owner != topLevel)
+    {
+      XConvertSelection(dpy,
+			XA_PRIMARY, XA_STRING, XA_CUT_BUFFER0,
+			topLevel, CurrentTime);
+			}
+  */
+  XSync(dpy, False);
+}
+
+void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
+{
+  int i;
+
+  wxMouseEvent e;
+  e.m_x = remoteParkingPos.x;
+  e.m_y = remoteParkingPos.y;
+  
+  conn->sendPointerEvent(e);
+
+  if(x > -1 && y > -1 )
+    {
+            XWarpPointer(dpy,None, warpWindow, 0,0,0,0, x_offset + x, y_offset + y);
+      
+	    //wxPoint warp_pos= ScreenToClient(wxPoint(x_offset+x, y_offset+y));
+	    //WarpPointer(warp_pos.x, warp_pos.y);
+      XFlush(dpy);
+      fprintf(stderr, "ungrab warp!\n");
+    }
+  //XUngrabKeyboard(dpy, CurrentTime);
+
+  //XUngrabPointer(dpy, CurrentTime);
+  ReleaseMouse();
+
+  mouseOnScreen = warpWindow == DefaultRootWindow(dpy);
+  XFlush(dpy);
+  
+
+  
+  for (i = 255; i >= 0; i--)
+    {
+      if (modifierPressed[i]) 
+	{
+	  wxKeyEvent key_event;
+
+	  key_event.m_keyCode = WXK_SHIFT;
+	  conn->sendKeyEvent(key_event, false, false);
+	  key_event.m_keyCode = WXK_ALT;
+	  conn->sendKeyEvent(key_event, false, false);
+	  key_event.m_keyCode = WXK_CONTROL;
+	  conn->sendKeyEvent(key_event, false, false);
+	
+	  //if (!SendKeyEvent(XKeycodeToKeysym(dpy, i, 0), False))
+	  //  return;
+	  modifierPressed[i]=False;
+	}
+    }
+
+
+
+  if(!edge_width) hidewindow();
+  
+  grabbed=0;
+
+  fprintf(stderr, "ungrab!\n");
+}
+
+
+int VNCSeamlessConnector::coord_dist_sq(wxPoint a, wxPoint b)
+{
+  a= a-b;
+  return a.x*a.x + a.y*a.y;
+}
+
+int VNCSeamlessConnector::coord_dist_from_edge(wxPoint a)
+{
+  int n,ret=a.x;
+  if(a.y < ret) ret=a.y;
+  n=display_size.GetHeight() - a.y;
+  if(n < ret) ret=n;
+  n=display_size.GetWidth() - a.x;
+  if(n < ret) ret=n;
+  return ret;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+  x2vnc stuff
+*/
+
+
 void VNCSeamlessConnector::onRuntimer(wxTimerEvent& event)
 {
   HandleXEvents();
 }
 
 
-
-
-/*
- * AllXEventsPredicate is needed to make XCheckIfEvent return all events.
- */
 
 Bool
 AllXEventsPredicate(Display *dpy, XEvent *ev, char *arg)
@@ -594,37 +790,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 
 
 
-void VNCSeamlessConnector::doWarp(void)
-{
-  if(grabbed)
-    {
-      if(next_origo) return;
-      if(current_origo &&
-	 current_location.x == current_origo->x &&
-	 current_location.y == current_origo->y)
-	return;
-
-      if(current_origo == &origo1)
-	next_origo=&origo2;
-      else
-	next_origo=&origo1;
-
-      fprintf(stderr,"X11 WARP: %d %d\n",next_origo->x, next_origo->y); 
-           XWarpPointer(dpy,None,
-		   DefaultRootWindow(dpy),0,0,0,0,
-		   next_origo->x,
-		   next_origo->y);
-      
-
-	   //wxPoint warp_pos= ScreenToClient(*next_origo);
-      //WarpPointer(warp_pos.x, warp_pos.y);
-
-      motion_events=0;
-    }
-}
-
-
-
 
 
 /*
@@ -661,24 +826,6 @@ Bool VNCSeamlessConnector::HandleXEvents(void)
 }
 
 
-
-int VNCSeamlessConnector::enter_translate(int isedge, int width, int pos)
-{
-  if(!isedge)
-    return pos;
-  if(EDGE_ES)
-    return 0;
-  return width-1;
-}
-
-int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
-{
-  if(!isedge) 
-    return pos;
-  if(EDGE_ES)
-    return width-edge_width;
-  return 0;
-}
 
 
 
@@ -726,122 +873,6 @@ void VNCSeamlessConnector::hidewindow(void)
 
 
 
-void VNCSeamlessConnector::grabit(int x, int y, int state)
-{
-  Window selection_owner;
-
-  fprintf(stderr, "grab! \n");
-  
-  if(hidden)
-    {
-      XMapRaised(dpy, topLevel);
-      hidden=0;
-    }
-
-  CaptureMouse();
-  /*  XGrabPointer(dpy, topLevel, True,
-	       PointerMotionMask | ButtonPressMask | ButtonReleaseMask,
-	       GrabModeAsync, GrabModeAsync,
-	       None, grabCursor, CurrentTime);*/
-  /* XGrabKeyboard(dpy, topLevel, True, 
-		GrabModeAsync, GrabModeAsync,
-		CurrentTime);*/
-
-
-  grabbed=1;
-  next_origo=NULL;
-  current_origo=NULL;
-
-  if(x > -1 && y > -1)
-    {
-      doWarp();
-
-#define EDGE(X) ((X)?edge_width:0)
-#define SCALEX(X)							\
-  ( ((X)-EDGE(edge==EDGE_WEST ))*(framebuffer_size.GetWidth()-1 )/(display_size.GetWidth() -1-EDGE(EDGE_EW)) )
-#define SCALEY(Y)							\
-  ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(EDGE_NS)) )
-
-      /* Whut? How can this be right? */
-      remote_xpos=SCALEX(x);
-      remote_ypos=SCALEY(y);
-      sendpointerevent(remote_xpos, remote_ypos, (state & 0x1f00) >> 8);
-    }
-
-
-  mouseOnScreen = 1;
-
-  /*
-  selection_owner=XGetSelectionOwner(dpy, XA_PRIMARY);
-  //   fprintf(stderr,"Selection owner: %lx\n",(long)selection_owner); 
-
-  if(selection_owner != None && selection_owner != topLevel)
-    {
-      XConvertSelection(dpy,
-			XA_PRIMARY, XA_STRING, XA_CUT_BUFFER0,
-			topLevel, CurrentTime);
-			}
-  */
-  XSync(dpy, False);
-}
-
-void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
-{
-  int i;
-
-  wxMouseEvent e;
-  e.m_x = remoteParkingPos.x;
-  e.m_y = remoteParkingPos.y;
-  
-  conn->sendPointerEvent(e);
-
-  if(x > -1 && y > -1 )
-    {
-            XWarpPointer(dpy,None, warpWindow, 0,0,0,0, x_offset + x, y_offset + y);
-      
-	    //wxPoint warp_pos= ScreenToClient(wxPoint(x_offset+x, y_offset+y));
-	    //WarpPointer(warp_pos.x, warp_pos.y);
-      XFlush(dpy);
-      fprintf(stderr, "ungrab warp!\n");
-    }
-  //XUngrabKeyboard(dpy, CurrentTime);
-
-  //XUngrabPointer(dpy, CurrentTime);
-  ReleaseMouse();
-
-  mouseOnScreen = warpWindow == DefaultRootWindow(dpy);
-  XFlush(dpy);
-  
-
-  
-  for (i = 255; i >= 0; i--)
-    {
-      if (modifierPressed[i]) 
-	{
-	  wxKeyEvent key_event;
-
-	  key_event.m_keyCode = WXK_SHIFT;
-	  conn->sendKeyEvent(key_event, false, false);
-	  key_event.m_keyCode = WXK_ALT;
-	  conn->sendKeyEvent(key_event, false, false);
-	  key_event.m_keyCode = WXK_CONTROL;
-	  conn->sendKeyEvent(key_event, false, false);
-	
-	  //if (!SendKeyEvent(XKeycodeToKeysym(dpy, i, 0), False))
-	  //  return;
-	  modifierPressed[i]=False;
-	}
-    }
-
-
-
-  if(!edge_width) hidewindow();
-  
-  grabbed=0;
-
-  fprintf(stderr, "ungrab!\n");
-}
-
 
 
 
@@ -857,22 +888,6 @@ void VNCSeamlessConnector::dumpMotionEvent(XEvent *ev)
 }
 
 
-int VNCSeamlessConnector::coord_dist_sq(wxPoint a, wxPoint b)
-{
-  a= a-b;
-  return a.x*a.x + a.y*a.y;
-}
-
-int VNCSeamlessConnector::coord_dist_from_edge(wxPoint a)
-{
-  int n,ret=a.x;
-  if(a.y < ret) ret=a.y;
-  n=display_size.GetHeight() - a.y;
-  if(n < ret) ret=n;
-  n=display_size.GetWidth() - a.x;
-  if(n < ret) ret=n;
-  return ret;
-}
 
 
 /*

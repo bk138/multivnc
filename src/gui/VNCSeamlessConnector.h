@@ -40,43 +40,43 @@ protected:
 
 private:
   VNCConn* conn;
+
   wxSize framebuffer_size;
   wxSize display_size;
+
   int edge;
+  int edge_width;
+  
+  wxPoint origo1, origo2;
+  wxPoint * next_origo;
+  wxPoint * current_origo;
+  int origo_separation;
+
+  wxPoint current_location;
+  wxPoint current_speed;
+
   wxPoint remoteParkingPos;
 
+  void doWarp();
+  int enter_translate(int isedge, int width, int pos);
+  int leave_translate(int isedge, int width, int pos);
+  void grabit(int x, int y, int state);
+  void ungrabit(int x, int y, Window warpWindow);
+  int coord_dist_sq(wxPoint a, wxPoint b);
+  int coord_dist_from_edge(wxPoint a);
+
+  // event handlers
   void OnMouse(wxMouseEvent& evt);
 
-  wxString err;
+
+
+
+
+
 
   wxTimer runtimer;
 
   Display *dpy;
-
-  void onRuntimer(wxTimerEvent& event);
-  
-
-  Bool CreateXWindow();
-  Bool HandleXEvents();
-  void doWarp();
-  int enter_translate(int isedge, int width, int pos);
-  int leave_translate(int isedge, int width, int pos);
-  int sendpointerevent(int x, int y, int buttonmask);
-  void mapwindow(void);
-  void hidewindow(void);
-  void grabit(int x, int y, int state);
-  void ungrabit(int x, int y, Window warpWindow);
-  
-  void dumpMotionEvent(XEvent *ev);
-  int coord_dist_sq(wxPoint a, wxPoint b);
-  int coord_dist_from_edge(wxPoint a);
-  int get_root_int_prop(Atom property);
-  void check_desktop(void);
-  void handle_cut_text(char *str, size_t len);
-  Bool HandleTopLevelEvent(XEvent *ev);
-  Bool HandleRootEvent(XEvent *ev); 
-
-
 
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
@@ -110,15 +110,9 @@ private:
   float remote_ypos;
   float pointer_speed;
 
-  wxPoint origo1, origo2;
-  wxPoint current_location;
-  wxPoint current_speed;
-  wxPoint * next_origo;
-  wxPoint * current_origo;
-  int origo_separation;
   int motion_events;
 
-  int edge_width;
+ 
   int hidden;
   int debug;
 
@@ -143,6 +137,19 @@ private:
    * - GRM
    */
   Bool mouseOnScreen;
+
+  void onRuntimer(wxTimerEvent& event);
+  Bool CreateXWindow();
+  Bool HandleXEvents();
+  int sendpointerevent(int x, int y, int buttonmask);
+  void mapwindow(void);
+  void hidewindow(void);
+  void dumpMotionEvent(XEvent *ev);
+  int get_root_int_prop(Atom property);
+  void check_desktop(void);
+  void handle_cut_text(char *str, size_t len);
+  Bool HandleTopLevelEvent(XEvent *ev);
+  Bool HandleRootEvent(XEvent *ev); 
 };
 
 
