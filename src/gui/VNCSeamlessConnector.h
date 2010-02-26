@@ -124,13 +124,6 @@ private:
   int saved_remote_xpos;
   int saved_remote_ypos;
 
-  /* We must do our own desktop handling */
-  Atom current_desktop_atom;
-  Atom number_of_desktops_atom;
-  int requested_desktop;
-  int current_desktop;
-
-
   /*
    * This variable is true (1) if the mouse is on the same screen as the one
    * we're monitoring, or if there is only one screen on the X server.
@@ -145,8 +138,6 @@ private:
   void mapwindow(void);
   void hidewindow(void);
   void dumpMotionEvent(XEvent *ev);
-  int get_root_int_prop(Atom property);
-  void check_desktop(void);
   void handle_cut_text(char *str, size_t len);
   Bool HandleTopLevelEvent(XEvent *ev);
   Bool HandleRootEvent(XEvent *ev); 

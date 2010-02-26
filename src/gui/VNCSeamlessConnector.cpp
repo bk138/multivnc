@@ -46,8 +46,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   client_selection_text_length=0;
   saved_xpos=-1;
   saved_ypos=-1;
-  requested_desktop = -2;
-  current_desktop = -2;
 
   debug = true;
   resurface = false;
@@ -706,8 +704,6 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 			    CWBackPixel),
 			   &attr);
 
-  current_desktop_atom = XInternAtom(dpy, "_NET_CURRENT_DESKTOP", False);
-  number_of_desktops_atom = XInternAtom(dpy, "_NET_NUMBER_OF_DESKTOPS", False);
 
   Atom t = XInternAtom(dpy, "_NET_WM_WINDOW_DOCK", False);
   
@@ -1237,58 +1233,6 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 
 
 
-
-
-int VNCSeamlessConnector::get_root_int_prop(Atom property)
-{
-  unsigned char *data=0;
-  Atom t;
-  int format;
-  unsigned long len;
-  unsigned long bytes_left;
-  int ret=XGetWindowProperty(dpy,
-			     DefaultRootWindow(dpy),
-			     property,
-			     0,
-			     1,
-			     0, /* delete */
-			     XA_CARDINAL,
-			     &t,
-			     &format,
-			     &len,
-			     &bytes_left,
-			     &data);
-
-  ret = *(uint32_t *)data;
-  
-  if(data)
-    XFree(data);
-
-  return ret;
-}
-
-void VNCSeamlessConnector::check_desktop(void)
-{
-  int t=requested_desktop;
-
-  current_desktop=get_root_int_prop(current_desktop_atom);
-  
-  switch(t)
-    {
-    case -2: t=current_desktop; break;
-    case -1:
-      t=get_root_int_prop(number_of_desktops_atom)-1;
-      if(t<0) t=0;
-      break;
-    }
-  if( t == current_desktop)
-    {
-      mapwindow();
-    }else{
-    hidewindow();
-  }
-}
-
 /*
  * HandleRootEvent.
  */
@@ -1409,10 +1353,7 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 	    XFree(str);
 	  }
 	}
-      if(ev->xproperty.atom == current_desktop_atom ||
-	 ev->xproperty.atom == number_of_desktops_atom)
-	check_desktop();
-
+     
       break;
     }
   
