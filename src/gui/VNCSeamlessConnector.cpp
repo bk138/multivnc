@@ -362,14 +362,14 @@ void VNCSeamlessConnector::doWarp(void)
 	next_origo=&origo1;
 
       fprintf(stderr,"X11 WARP: %d %d\n",next_origo->x, next_origo->y); 
-           XWarpPointer(dpy,None,
+      /*XWarpPointer(dpy,None,
 		   DefaultRootWindow(dpy),0,0,0,0,
 		   next_origo->x,
-		   next_origo->y);
+		   next_origo->y);*/
       
 
-	   //wxPoint warp_pos= ScreenToClient(*next_origo);
-      //WarpPointer(warp_pos.x, warp_pos.y);
+      wxPoint warp_pos= ScreenToClient(*next_origo);
+      WarpPointer(warp_pos.x, warp_pos.y);
 
       motion_events=0;
     }
@@ -471,11 +471,12 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 
   if(x > -1 && y > -1 )
     {
-            XWarpPointer(dpy,None, warpWindow, 0,0,0,0, x_offset + x, y_offset + y);
+      //XWarpPointer(dpy,None, warpWindow, 0,0,0,0, x_offset + x, y_offset + y);
+      //XFlush(dpy);
       
-	    //wxPoint warp_pos= ScreenToClient(wxPoint(x_offset+x, y_offset+y));
-	    //WarpPointer(warp_pos.x, warp_pos.y);
-      XFlush(dpy);
+      wxPoint warp_pos= ScreenToClient(wxPoint(x_offset+x, y_offset+y));
+      WarpPointer(warp_pos.x, warp_pos.y);
+
       fprintf(stderr, "ungrab warp!\n");
     }
   //XUngrabKeyboard(dpy, CurrentTime);
