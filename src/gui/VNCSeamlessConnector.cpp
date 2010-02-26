@@ -333,10 +333,9 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 	    if(remote_ypos >= framebuffer_size.GetHeight())
 	      remote_ypos=framebuffer_size.GetHeight()-1;
 
-	    i=sendpointerevent((int)remote_xpos,
-			       (int)remote_ypos,
-			       0); //FIXME button state
-			       //(ev->xmotion.state & 0x1f00) >> 8);
+	    event.m_x = remote_xpos;
+	    event.m_y = remote_ypos;
+	    conn->sendPointerEvent(event);
 	  }
 
 	}
@@ -436,7 +435,11 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
       /* Whut? How can this be right? */
       remote_xpos=SCALEX(x);
       remote_ypos=SCALEY(y);
-      sendpointerevent(remote_xpos, remote_ypos, (state & 0x1f00) >> 8);
+      wxMouseEvent evt;
+      evt.m_x = remote_xpos;
+      evt.m_y = remote_ypos;
+      //sendpointerevent(remote_xpos, remote_ypos, (state & 0x1f00) >> 8);
+      conn->sendPointerEvent(evt);
     }
 
 
