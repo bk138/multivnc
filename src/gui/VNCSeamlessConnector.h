@@ -9,7 +9,8 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 
-#include "wx/frame.h"
+#include <wx/frame.h>
+#include <wx/panel.h>
 #include <wx/timer.h>
 #include "VNCConn.h"
 
@@ -17,6 +18,10 @@
 #define EDGE_WEST 1
 #define EDGE_NORTH 2 
 #define EDGE_SOUTH 3
+
+
+
+class VNCSeamlessConnectorCanvas;
 
 
 /*
@@ -65,8 +70,13 @@ private:
   int coord_dist_sq(wxPoint a, wxPoint b);
   int coord_dist_from_edge(wxPoint a);
 
-  // event handlers
-  void OnMouse(wxMouseEvent& evt);
+  //this is needed as GTK does not give key events for toplevel windows
+  friend class VNCSeamlessConnectorCanvas;
+  VNCSeamlessConnectorCanvas* canvas; 
+
+  // these are called by the canvas
+  void handleMouse(wxMouseEvent& evt);
+  void handleKey(wxKeyEvent& evt);
 
 
 
@@ -141,6 +151,33 @@ private:
   void handle_cut_text(char *str, size_t len);
   Bool HandleTopLevelEvent(XEvent *ev);
   Bool HandleRootEvent(XEvent *ev); 
+};
+
+
+
+
+
+/*
+  this is needed as GTK does not give key events for toplevel windows,
+  it just passes events it receives to its parent
+*/
+class VNCSeamlessConnectorCanvas: public wxPanel
+{
+public:
+  VNCSeamlessConnectorCanvas(VNCSeamlessConnector* parent);
+
+protected:
+  DECLARE_EVENT_TABLE();
+
+private:
+  VNCSeamlessConnector* p;
+
+  // event handlers
+  void onMouse(wxMouseEvent &event);
+  void onKeyDown(wxKeyEvent &event);
+  void onKeyUp(wxKeyEvent &event);
+  void onChar(wxKeyEvent &event);
+  void onFocusLoss(wxFocusEvent &event);
 };
 
 

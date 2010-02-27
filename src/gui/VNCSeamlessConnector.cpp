@@ -8,13 +8,21 @@
 
 
 
+
+/********************************************
+
+  VNCSeamlessConnector class
+
+********************************************/
+
+
 /*
   public members
 */
 
 
 BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxFrame)
-  EVT_MOUSE_EVENTS(VNCSeamlessConnector::OnMouse)
+  EVT_MOUSE_EVENTS(VNCSeamlessConnector::handleMouse)
   EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
 END_EVENT_TABLE();
 
@@ -57,6 +65,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   adjustSize(); 
 
 
+    
   
 #ifdef __WXGTK__
   gtk_window_set_type_hint(GTK_WINDOW(GetHandle()), GDK_WINDOW_TYPE_HINT_DOCK);
@@ -71,16 +80,23 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
     fprintf(stderr," unable to open display %s\n",  XDisplayName(NULL));
   
   // this sets: topLevel, deskopt atoms
-  //if(CreateXWindow())
-  // fprintf(stderr, "sucessfully created xwindow!\n");
-  topLevel = GDK_WINDOW_XID(GetHandle()->window);
+  /*if(CreateXWindow())
+   fprintf(stderr, "sucessfully created xwindow!\n");
+   topLevel = GDK_WINDOW_XID(GetHandle()->window);*/
 
+
+  topLevel = 0;
   runtimer.SetOwner(this, 666);
   runtimer.Start(5);
+  
+
+
+  canvas = new VNCSeamlessConnectorCanvas(this);
+
 
   this->Show(true);
   // seems that has to come after Show() to take effect
-  SetBackgroundColour(*wxGREEN);
+  SetBackgroundColour(*wxRED);
   SetTransparent(100);
 }
 
@@ -205,7 +221,7 @@ void VNCSeamlessConnector::adjustSize()
 */
 
 
-void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
+void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 {
   wxPoint evt_root_pos = ClientToScreen(event.GetPosition());
   fprintf(stderr, "new mouse evt:: x: %d y: %d\n", evt_root_pos.x, evt_root_pos.y);
@@ -236,7 +252,7 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
       if(grabbed)
 	{
 	  fprintf(stderr, "mouse moving and grabbed!\n");
-	  int i, d=0;
+	  int d=0;
 	  Window warpWindow;
 	  wxPoint offset(0,0);
 		
@@ -347,6 +363,16 @@ void VNCSeamlessConnector::OnMouse(wxMouseEvent& event)
 
 
 
+
+void VNCSeamlessConnector::handleKey(wxKeyEvent& evt)
+{
+  fprintf(stderr, "got some key event\n");
+
+}
+
+
+
+
 void VNCSeamlessConnector::doWarp(void)
 {
   if(grabbed)
@@ -409,15 +435,26 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
       hidden=0;
     }
 
-  CaptureMouse();
-  /*  XGrabPointer(dpy, topLevel, True,
+  if(!topLevel)
+    {
+      canvas->SetFocus();
+      CaptureMouse();
+      canvas->SetFocus();
+#ifdef __WXGTK__     
+      gdk_keyboard_grab(canvas->GetHandle()->window, False, GDK_CURRENT_TIME);
+      canvas->SetFocus();
+#endif
+    }
+  else
+    {
+      XGrabPointer(dpy, topLevel, True,
 	       PointerMotionMask | ButtonPressMask | ButtonReleaseMask,
 	       GrabModeAsync, GrabModeAsync,
-	       None, grabCursor, CurrentTime);*/
-  /* XGrabKeyboard(dpy, topLevel, True, 
-		GrabModeAsync, GrabModeAsync,
-		CurrentTime);*/
-
+	       None, grabCursor, CurrentTime);
+      XGrabKeyboard(dpy, topLevel, True, 
+		    GrabModeAsync, GrabModeAsync,
+		    CurrentTime);
+    }
 
   grabbed=1;
   next_origo=NULL;
@@ -480,10 +517,20 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 
       fprintf(stderr, "ungrab warp!\n");
     }
-  //XUngrabKeyboard(dpy, CurrentTime);
 
-  //XUngrabPointer(dpy, CurrentTime);
-  ReleaseMouse();
+ if(topLevel)
+    {
+      XUngrabKeyboard(dpy, CurrentTime);
+      XUngrabPointer(dpy, CurrentTime);
+    }
+  else
+    {
+#ifdef __WXGTK__    
+      gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+#endif
+      ReleaseMouse();
+    }
+
 
   mouseOnScreen = warpWindow == DefaultRootWindow(dpy);
   XFlush(dpy);
@@ -535,6 +582,77 @@ int VNCSeamlessConnector::coord_dist_from_edge(wxPoint a)
   if(n < ret) ret=n;
   return ret;
 }
+
+
+
+
+
+/********************************************
+
+  VNCSeamlessConnector class
+
+********************************************/
+
+BEGIN_EVENT_TABLE(VNCSeamlessConnectorCanvas, wxPanel)
+  EVT_MOUSE_EVENTS(VNCSeamlessConnectorCanvas::onMouse)
+  EVT_KEY_DOWN (VNCSeamlessConnectorCanvas::onKeyDown)
+  EVT_KEY_UP (VNCSeamlessConnectorCanvas::onKeyUp)
+  EVT_CHAR (VNCSeamlessConnectorCanvas::onChar)
+  EVT_KILL_FOCUS(VNCSeamlessConnectorCanvas::onFocusLoss)
+END_EVENT_TABLE();
+
+
+VNCSeamlessConnectorCanvas::VNCSeamlessConnectorCanvas(VNCSeamlessConnector* parent)
+  : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS)
+{
+    p = parent;
+    SetBackgroundColour(*wxGREEN);
+}
+
+
+void VNCSeamlessConnectorCanvas::onMouse(wxMouseEvent &event)
+{
+  fprintf(stderr, " ---> mouse event rcvd by canvas!\n");
+  p->handleMouse(event);
+}
+
+
+
+void VNCSeamlessConnectorCanvas::onKeyDown(wxKeyEvent &event)
+{
+  p->handleKey(event);
+}
+
+
+void VNCSeamlessConnectorCanvas::onKeyUp(wxKeyEvent &event)
+{
+  p->handleKey(event);
+}
+
+
+void VNCSeamlessConnectorCanvas::onChar(wxKeyEvent &event)
+{
+  p->handleKey(event);
+}
+
+void VNCSeamlessConnectorCanvas::onFocusLoss(wxFocusEvent &event)
+{
+  wxLogDebug(wxT("VNCSeamlessConnector %p: lost focus, upping key modifiers"), this);
+ 
+  fprintf(stderr, "-> lost focus, upping key modifiers\n");
+
+  wxKeyEvent key_event;
+
+  key_event.m_keyCode = WXK_SHIFT;
+  p->conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_ALT;
+  p->conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_CONTROL;
+  p->conn->sendKeyEvent(key_event, false, false);
+}
+
+
+
 
 
 
