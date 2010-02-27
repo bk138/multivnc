@@ -60,6 +60,7 @@ private:
   wxPoint current_location;
   wxPoint current_speed;
 
+  wxRealPoint remotePos;
   wxPoint remoteParkingPos;
 
   void doWarp();
@@ -117,8 +118,7 @@ private:
   int pointer_warp_threshold;
   Cursor  grabCursor;
 
-  float remote_xpos;
-  float remote_ypos;
+
   float pointer_speed;
 
   int motion_events;

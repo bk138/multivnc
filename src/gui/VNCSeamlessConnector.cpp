@@ -46,8 +46,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
   x_offset=0; y_offset=0;
   pointer_warp_threshold=5;
   grabCursor=0;
-  remote_xpos=0.0;
-  remote_ypos=0.0;
   pointer_speed = 0.0;
   edge_width=5;
   hidden=0;
@@ -291,16 +289,16 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	     offset.x*offset.x + offset.y*offset.y < 
 	     pointer_warp_threshold)
 	    {
-	      remote_xpos+=offset.x;
-	      remote_ypos+=offset.y;
+	      remotePos.x+=offset.x;
+	      remotePos.y+=offset.y;
 	    }else{
-	    remote_xpos+=offset.x * pointer_speed;
-	    remote_ypos+=offset.y * pointer_speed;
+	    remotePos.x+=offset.x * pointer_speed;
+	    remotePos.y+=offset.y * pointer_speed;
 	  }
 
 #if 0
 	  fprintf(stderr," ==> {%f, %f} (%d,%d)\n",
-		  remote_xpos, remote_ypos,
+		  remotePos.x, remotePos.y,
 		  framebuffer_size.GetWidth(),
 		  framebuffer_size.GetHeight());
 #endif
@@ -313,24 +311,24 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	      switch(edge)
 		{
 		case EDGE_NORTH: 
-		  d=remote_ypos >= framebuffer_size.GetHeight();
+		  d=remotePos.y >= framebuffer_size.GetHeight();
 		  y = edge_width;  /* FIXME */
-		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
+		  x = remotePos.x * display_size.GetWidth() / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_SOUTH:
-		  d=remote_ypos < 0;
+		  d=remotePos.y < 0;
 		  y = display_size.GetHeight() - edge_width -1; /* FIXME */
-		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
+		  x = remotePos.x * display_size.GetWidth() / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_EAST:
-		  d=remote_xpos < 0;
+		  d=remotePos.x < 0;
 		  x = display_size.GetWidth() -  edge_width -1;  /* FIXME */
-		  y = remote_ypos * display_size.GetHeight() /framebuffer_size.GetHeight() ;
+		  y = remotePos.y * display_size.GetHeight() /framebuffer_size.GetHeight() ;
 		  break;
 		case EDGE_WEST:
-		  d=remote_xpos > framebuffer_size.GetWidth();
+		  d=remotePos.x > framebuffer_size.GetWidth();
 		  x = edge_width;  /* FIXME */
-		  y = remote_ypos * display_size.GetHeight() / framebuffer_size.GetHeight();
+		  y = remotePos.y * display_size.GetHeight() / framebuffer_size.GetHeight();
 		  break;
 		}
 	    }
@@ -345,17 +343,17 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	      ungrabit(x, y, warpWindow);
 	      return;
 	    }else{
-	    if(remote_xpos < 0) remote_xpos=0;
-	    if(remote_ypos < 0) remote_ypos=0;
+	    if(remotePos.x < 0) remotePos.x=0;
+	    if(remotePos.y < 0) remotePos.y=0;
 
-	    if(remote_xpos >= framebuffer_size.GetWidth())
-	      remote_xpos=framebuffer_size.GetWidth()-1;
+	    if(remotePos.x >= framebuffer_size.GetWidth())
+	      remotePos.x=framebuffer_size.GetWidth()-1;
 
-	    if(remote_ypos >= framebuffer_size.GetHeight())
-	      remote_ypos=framebuffer_size.GetHeight()-1;
+	    if(remotePos.y >= framebuffer_size.GetHeight())
+	      remotePos.y=framebuffer_size.GetHeight()-1;
 
-	    event.m_x = remote_xpos;
-	    event.m_y = remote_ypos;
+	    event.m_x = remotePos.x;
+	    event.m_y = remotePos.y;
 	    conn->sendPointerEvent(event);
 	  }
 
@@ -364,8 +362,8 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
     }
 
   // a non-moving event (button, wheel, whatever...)
-  event.m_x = remote_xpos;
-  event.m_y = remote_ypos;
+  event.m_x = remotePos.x;
+  event.m_y = remotePos.y;
   conn->sendPointerEvent(event);
   return;
 }
@@ -505,12 +503,12 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
   ( ((Y)-EDGE(edge==EDGE_NORTH))*(framebuffer_size.GetHeight()-1)/(display_size.GetHeight()-1-EDGE(EDGE_NS)) )
 
       /* Whut? How can this be right? */
-      remote_xpos=SCALEX(x);
-      remote_ypos=SCALEY(y);
+      remotePos.x=SCALEX(x);
+      remotePos.y=SCALEY(y);
       wxMouseEvent evt;
-      evt.m_x = remote_xpos;
-      evt.m_y = remote_ypos;
-      //sendpointerevent(remote_xpos, remote_ypos, (state & 0x1f00) >> 8);
+      evt.m_x = remotePos.x;
+      evt.m_y = remotePos.y;
+      //sendpointerevent(remotePos.x, remotePos.y, (state & 0x1f00) >> 8);
       conn->sendPointerEvent(evt);
     }
 
@@ -1253,16 +1251,16 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	     offset.x*offset.x + offset.y*offset.y < 
 	     pointer_warp_threshold)
 	    {
-	      remote_xpos+=offset.x;
-	      remote_ypos+=offset.y;
+	      remotePos.x+=offset.x;
+	      remotePos.y+=offset.y;
 	    }else{
-	    remote_xpos+=offset.x * pointer_speed;
-	    remote_ypos+=offset.y * pointer_speed;
+	    remotePos.x+=offset.x * pointer_speed;
+	    remotePos.y+=offset.y * pointer_speed;
 	  }
 
 #if 0
 	  fprintf(stderr," ==> {%f, %f} (%d,%d)\n",
-		  remote_xpos, remote_ypos,
+		  remotePos.x, remotePos.y,
 		  framebuffer_size.GetWidth(),
 		  framebuffer_size.GetHeight());
 #endif
@@ -1274,24 +1272,24 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	      switch(edge)
 		{
 		case EDGE_NORTH: 
-		  d=remote_ypos >= framebuffer_size.GetHeight();
+		  d=remotePos.y >= framebuffer_size.GetHeight();
 		  y = edge_width;  /* FIXME */
-		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
+		  x = remotePos.x * display_size.GetWidth() / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_SOUTH:
-		  d=remote_ypos < 0;
+		  d=remotePos.y < 0;
 		  y = display_size.GetHeight() - edge_width -1; /* FIXME */
-		  x = remote_xpos * display_size.GetWidth() / framebuffer_size.GetWidth();
+		  x = remotePos.x * display_size.GetWidth() / framebuffer_size.GetWidth();
 		  break;
 		case EDGE_EAST:
-		  d=remote_xpos < 0;
+		  d=remotePos.x < 0;
 		  x = display_size.GetWidth() -  edge_width -1;  /* FIXME */
-		  y = remote_ypos * display_size.GetHeight() /framebuffer_size.GetHeight() ;
+		  y = remotePos.y * display_size.GetHeight() /framebuffer_size.GetHeight() ;
 		  break;
 		case EDGE_WEST:
-		  d=remote_xpos > framebuffer_size.GetWidth();
+		  d=remotePos.x > framebuffer_size.GetWidth();
 		  x = edge_width;  /* FIXME */
-		  y = remote_ypos * display_size.GetHeight() / framebuffer_size.GetHeight();
+		  y = remotePos.y * display_size.GetHeight() / framebuffer_size.GetHeight();
 		  break;
 		}
 	    }
@@ -1306,17 +1304,17 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	      ungrabit(x, y, warpWindow);
 	      return 1;
 	    }else{
-	    if(remote_xpos < 0) remote_xpos=0;
-	    if(remote_ypos < 0) remote_ypos=0;
+	    if(remotePos.x < 0) remotePos.x=0;
+	    if(remotePos.y < 0) remotePos.y=0;
 
-	    if(remote_xpos >= framebuffer_size.GetWidth())
-	      remote_xpos=framebuffer_size.GetWidth()-1;
+	    if(remotePos.x >= framebuffer_size.GetWidth())
+	      remotePos.x=framebuffer_size.GetWidth()-1;
 
-	    if(remote_ypos >= framebuffer_size.GetHeight())
-	      remote_ypos=framebuffer_size.GetHeight()-1;
+	    if(remotePos.y >= framebuffer_size.GetHeight())
+	      remotePos.y=framebuffer_size.GetHeight()-1;
 
-	    i=sendpointerevent((int)remote_xpos,
-			       (int)remote_ypos,
+	    i=sendpointerevent((int)remotePos.x,
+			       (int)remotePos.y,
 			       (ev->xmotion.state & 0x1f00) >> 8);
 	  }
 
@@ -1333,8 +1331,8 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 		      ~(1 << (ev->xbutton.button - 1)));
       }
       
-      return sendpointerevent(remote_xpos,
-			      remote_ypos,
+      return sendpointerevent(remotePos.x,
+			      remotePos.y,
 			      buttonMask);
 	
     case KeyPress:
