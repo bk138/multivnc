@@ -86,8 +86,8 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
 
 
   topLevel = 0;
-  runtimer.SetOwner(this, 666);
-  runtimer.Start(5);
+  //runtimer.SetOwner(this, 666);
+  //runtimer.Start(5);
   
 
 
@@ -228,7 +228,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 
   int x,y;
 
-
+  doWarp();
 
   if(event.Entering())
     {
@@ -366,8 +366,11 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 
 void VNCSeamlessConnector::handleKey(wxKeyEvent& evt)
 {
+  doWarp(); 
   fprintf(stderr, "got some key event\n");
 
+
+ 
 }
 
 
@@ -672,6 +675,9 @@ void VNCSeamlessConnectorCanvas::onFocusLoss(wxFocusEvent &event)
 
 void VNCSeamlessConnector::onRuntimer(wxTimerEvent& event)
 {
+  //doWarp();
+
+
   HandleXEvents();
 }
 
@@ -917,6 +923,9 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 
 Bool VNCSeamlessConnector::HandleXEvents(void)
 {
+  
+
+    
   XEvent ev;
 
  
@@ -938,6 +947,7 @@ Bool VNCSeamlessConnector::HandleXEvents(void)
 	      XRefreshKeyboardMapping(&ev.xmapping);
 	      }*/
     }
+
 
   doWarp();
 
