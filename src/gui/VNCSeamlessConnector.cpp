@@ -1,5 +1,6 @@
 
 #include <wx/log.h>
+#include <wx/display.h>
 #ifdef __WXGTK__
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
@@ -109,8 +110,26 @@ VNCSeamlessConnector::~VNCSeamlessConnector()
 
 void VNCSeamlessConnector::adjustSize()
 {
+  // use the biggest screen
+  size_t biggest_index = 0;
+  wxSize biggest_size;
+  for(size_t dpy_index=0; dpy_index < wxDisplay::GetCount(); ++dpy_index)
+    {
+      wxSize this_size = wxDisplay(dpy_index).GetGeometry().GetSize();
+
+      if(this_size.GetWidth() * this_size.GetHeight() >
+	 biggest_size.GetWidth() * biggest_size.GetHeight())
+	{
+	  biggest_size = this_size;
+	  biggest_index = dpy_index;
+	}
+    }
+  // set offset accordingly
+  multiscreen_offset = wxDisplay(biggest_index).GetGeometry().GetPosition();
+
   // get local display size
-  display_size = wxGetDisplaySize();
+  display_size = wxDisplay(biggest_index).GetGeometry().GetSize();
+
 
   saved_remote_xpos = display_size.GetWidth() / 2;
   saved_remote_ypos = display_size.GetHeight() / 2;
