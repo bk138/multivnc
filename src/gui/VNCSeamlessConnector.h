@@ -77,6 +77,7 @@ private:
   // these are called by the canvas
   void handleMouse(wxMouseEvent& evt);
   void handleKey(wxKeyEvent& evt);
+  void handleFocusLoss();
 
 
 

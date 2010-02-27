@@ -381,6 +381,22 @@ void VNCSeamlessConnector::handleKey(wxKeyEvent& evt)
 
 
 
+void VNCSeamlessConnector::handleFocusLoss()
+{
+  wxLogDebug(wxT("VNCSeamlessConnector %p: lost focus, upping key modifiers"), this);
+ 
+  fprintf(stderr, "-> lost focus, upping key modifiers\n");
+
+  wxKeyEvent key_event;
+
+  key_event.m_keyCode = WXK_SHIFT;
+  conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_ALT;
+  conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_CONTROL;
+  conn->sendKeyEvent(key_event, false, false);
+}
+
 
 void VNCSeamlessConnector::doWarp(void)
 {
@@ -646,18 +662,7 @@ void VNCSeamlessConnectorCanvas::onChar(wxKeyEvent &event)
 
 void VNCSeamlessConnectorCanvas::onFocusLoss(wxFocusEvent &event)
 {
-  wxLogDebug(wxT("VNCSeamlessConnector %p: lost focus, upping key modifiers"), this);
- 
-  fprintf(stderr, "-> lost focus, upping key modifiers\n");
-
-  wxKeyEvent key_event;
-
-  key_event.m_keyCode = WXK_SHIFT;
-  p->conn->sendKeyEvent(key_event, false, false);
-  key_event.m_keyCode = WXK_ALT;
-  p->conn->sendKeyEvent(key_event, false, false);
-  key_event.m_keyCode = WXK_CONTROL;
-  p->conn->sendKeyEvent(key_event, false, false);
+  p->handleFocusLoss();
 }
 
 
