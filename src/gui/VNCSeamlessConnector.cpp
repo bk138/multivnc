@@ -369,8 +369,14 @@ void VNCSeamlessConnector::handleKey(wxKeyEvent& evt)
   doWarp(); 
   fprintf(stderr, "got some key event\n");
 
+  if(evt.GetEventType() == wxEVT_KEY_DOWN)
+    conn->sendKeyEvent(evt, true, false);
 
- 
+  if(evt.GetEventType() == wxEVT_KEY_UP)
+    conn->sendKeyEvent(evt, false, false);
+
+  if(evt.GetEventType() == wxEVT_CHAR)
+    conn->sendKeyEvent(evt, true, true);
 }
 
 
