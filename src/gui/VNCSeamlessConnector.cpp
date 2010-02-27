@@ -33,21 +33,23 @@ END_EVENT_TABLE();
 #define EDGE_NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
 
 
-VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, size_t ew)
+VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, size_t ew, float accel)
   : wxFrame(parent, wxID_ANY, c->getDesktopName(), wxDefaultPosition, wxDefaultSize,
 	    wxFRAME_SHAPED | wxBORDER_NONE | wxFRAME_NO_TASKBAR | wxSTAY_ON_TOP)
 {
   conn = c;
   edge = e;
   edge_width = ew;
+  acceleration = accel;
 
+  pointer_warp_threshold=5;
+
+  pointer_speed = 0.0;
   grabbed = false;
   
-  // init all x stuff start
+  // init all x2vnc stuff start
   x_offset=0; y_offset=0;
-  pointer_warp_threshold=5;
   grabCursor=0;
-  pointer_speed = 0.0;
   hidden=0;
   client_selection_text=0;
   client_selection_text_length=0;
@@ -55,15 +57,11 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
   saved_ypos=-1;
   debug = true;
   resurface = false;
-  acceleration=1.0;
-  // init all x stuff end
+  // init all x2vnc stuff end
 
 
   adjustSize(); 
-
-
-    
-  
+   
 #ifdef __WXGTK__
   gtk_window_set_type_hint(GTK_WINDOW(GetHandle()), GDK_WINDOW_TYPE_HINT_DOCK);
   gtk_window_set_keep_above(GTK_WINDOW(GetHandle()), true);	

@@ -5,8 +5,6 @@
 
 
 #include <X11/Xlib.h>
-#include <X11/X.h>
-#include <X11/Xutil.h>
 #include <X11/Xatom.h>
 
 #include <wx/frame.h>
@@ -33,7 +31,7 @@ class VNCSeamlessConnectorCanvas;
 class VNCSeamlessConnector: public wxFrame
 {
 public:
-  VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int edge, size_t edge_width=5);
+  VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int edge, size_t edge_width=5, float acceleration=1.0);
   ~VNCSeamlessConnector();
 
   void adjustSize(); 
@@ -59,6 +57,10 @@ private:
   wxPoint * current_origo;
   int origo_separation;
 
+  float acceleration;
+  float pointer_speed;
+
+  int pointer_warp_threshold;
   wxPoint current_location;
   wxPoint current_speed;
 
@@ -86,52 +88,35 @@ private:
 
 
 
+  // x2vnc stuff
+  int x_offset, y_offset;
+  int motion_events;
 
 
   wxTimer runtimer;
-
   Display *dpy;
-
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
-
 #ifdef HAVE_XRANDR
 #include <X11/extensions/Xrandr.h>
-
   int server_has_randr=0;
   int xrandr_event_base;
   int xrandr_error_base;
 #endif
-
-
-  float acceleration;
   Bool resurface;
-  
-
   Window topLevel;
-
-
   Atom wmProtocols, wmDeleteWindow, wmState;
   Bool modifierPressed[256];
-
-  int x_offset, y_offset;
-
-  int pointer_warp_threshold;
   Cursor  grabCursor;
 
-
-  float pointer_speed;
-
-  int motion_events;
-
- 
   int hidden;
   int debug;
 
   char *client_selection_text;
   size_t client_selection_text_length;
 
+  // seems to have to do with hotkey warping
   int saved_xpos;
   int saved_ypos;
   int saved_remote_xpos;
