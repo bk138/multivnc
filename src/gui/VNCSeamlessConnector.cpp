@@ -225,6 +225,10 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 {
   wxPoint evt_root_pos = ClientToScreen(event.GetPosition());
   fprintf(stderr, "new mouse evt:: x: %d y: %d\n", evt_root_pos.x, evt_root_pos.y);
+  fprintf(stderr, "new mouse evt:: moving: %d \n", event.Moving());
+  fprintf(stderr, "new mouse evt:: button: %d \n", event.IsButton());
+  fprintf(stderr, "new mouse evt:: dragin: %d \n", event.Dragging());
+
 
   int x,y;
 
@@ -246,7 +250,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
       return;
     }
 
-  if(event.Moving())
+  if(event.Moving() || event.Dragging())
     {
       fprintf(stderr, "mouse moving!\n");
       if(grabbed)
@@ -359,6 +363,11 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
       return;
     }
 
+  // a non-moving event (button, wheel, whatever...)
+  event.m_x = remote_xpos;
+  event.m_y = remote_ypos;
+  conn->sendPointerEvent(event);
+  return;
 }
 
 
