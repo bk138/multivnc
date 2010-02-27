@@ -48,7 +48,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
   grabbed = false;
   
   // init all x2vnc stuff start
-  x_offset=0; y_offset=0;
+  multiscreen_offset.x=0; multiscreen_offset.y=0;
   grabCursor=0;
   hidden=0;
   client_selection_text=0;
@@ -158,14 +158,14 @@ void VNCSeamlessConnector::adjustSize()
       origo2=wxPoint(display_size.GetWidth()-N,display_size.GetHeight()-N);
       origo_separation=N;
     }
-  origo1.x+=x_offset;
-  origo1.y+=y_offset;
-  origo2.x+=x_offset;
-  origo2.y+=y_offset;
+  origo1.x+=multiscreen_offset.x;
+  origo1.y+=multiscreen_offset.y;
+  origo2.x+=multiscreen_offset.x;
+  origo2.y+=multiscreen_offset.y;
 
   fprintf(stderr, "{%d, %d}\n", origo1.x,origo1.y);
   fprintf(stderr, "{%d, %d}\n", origo2.x,origo2.y);
-  fprintf(stderr,"multiscreen offset=%d, %d\n",x_offset,y_offset);
+  fprintf(stderr,"multiscreen offset=%d, %d\n",multiscreen_offset.x,multiscreen_offset.y);
 
   
 
@@ -176,16 +176,16 @@ void VNCSeamlessConnector::adjustSize()
 
   int width=ew;
   int height=ew;
-  int x = x_offset;
-  int y = y_offset;
+  int x = multiscreen_offset.x;
+  int y = multiscreen_offset.y;
   
   switch(edge)
     {
-    case EDGE_EAST: x = display_size.GetWidth() - ew + x_offset;
+    case EDGE_EAST: x = display_size.GetWidth() - ew + multiscreen_offset.x;
     case EDGE_WEST: height = display_size.GetHeight();
       break;
       
-    case EDGE_SOUTH: y = display_size.GetHeight() - ew + y_offset;
+    case EDGE_SOUTH: y = display_size.GetHeight() - ew + multiscreen_offset.y;
     case EDGE_NORTH: width = display_size.GetWidth();
       break;
     }
@@ -237,8 +237,8 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
       if(!grabbed)
 	{
 	  fprintf(stderr, "mouse entering!, grabbing\n");
-	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (evt_root_pos.x - x_offset)),
-		 enter_translate(EDGE_NS,display_size.GetHeight(), (evt_root_pos.y - y_offset)),
+	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (evt_root_pos.x - multiscreen_offset.x)),
+		 enter_translate(EDGE_NS,display_size.GetHeight(), (evt_root_pos.y - multiscreen_offset.y)),
 		 0);
 	  //	     ev->xcrossing.state); //FIXME buttons
 	}
@@ -538,10 +538,10 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 
   if(x > -1 && y > -1 )
     {
-      //XWarpPointer(dpy,None, warpWindow, 0,0,0,0, x_offset + x, y_offset + y);
+      //XWarpPointer(dpy,None, warpWindow, 0,0,0,0, multiscreen_offset.x + x, multiscreen_offset.y + y);
       //XFlush(dpy);
       
-      wxPoint warp_pos= ScreenToClient(wxPoint(x_offset+x, y_offset+y));
+      wxPoint warp_pos= ScreenToClient(wxPoint(multiscreen_offset.x+x, multiscreen_offset.y+y));
       WarpPointer(warp_pos.x, warp_pos.y);
 
       fprintf(stderr, "ungrab warp!\n");
@@ -771,12 +771,12 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
 	    printf("Xinerama detected, x2vnc will use screen %d.\n",
 		   besthead+1);
 
-	    x_offset = heads[besthead].x_org;
-	    y_offset = heads[besthead].y_org;
+	    multiscreen_offset.x = heads[besthead].x_org;
+	    multiscreen_offset.y = heads[besthead].y_org;
 	    display_size.SetWidth(heads[besthead].width);
 	    display_size.SetHeight(heads[besthead].height);
 #if 0
-	    fprintf(stderr,"[%d,%d-%d,%d]\n",x_offset,y_offset,
+	    fprintf(stderr,"[%d,%d-%d,%d]\n",multiscreen_offset.x,multiscreen_offset.y,
 		    display_size.GetWidth(),display_size.GetHeight());
 #endif
 	  }
@@ -789,16 +789,16 @@ Bool VNCSeamlessConnector::CreateXWindow(void)
   if(!ew) ew=1;
   topLevelWidth=ew;
   topLevelHeight=ew;
-  wmHints.x=x_offset;
-  wmHints.y=y_offset;
+  wmHints.x=multiscreen_offset.x;
+  wmHints.y=multiscreen_offset.y;
   
   switch(edge)
     {
-    case EDGE_EAST: wmHints.x=display_size.GetWidth()-ew+x_offset;
+    case EDGE_EAST: wmHints.x=display_size.GetWidth()-ew+multiscreen_offset.x;
     case EDGE_WEST: topLevelHeight=display_size.GetHeight();
       break;
       
-    case EDGE_SOUTH: wmHints.y=display_size.GetHeight()-ew+y_offset;
+    case EDGE_SOUTH: wmHints.y=display_size.GetHeight()-ew+multiscreen_offset.y;
     case EDGE_NORTH: topLevelWidth=display_size.GetWidth();
       break;
     }
@@ -1025,10 +1025,10 @@ void VNCSeamlessConnector::dumpMotionEvent(XEvent *ev)
   fprintf(stderr,"{ %d, %d } -> { %d, %d } = %d, %d\n",
 	  current_location.x,
 	  current_location.y,
-	  ev->xmotion.x_root - x_offset,
-	  ev->xmotion.y_root- y_offset,
-	  (ev->xmotion.x_root - x_offset) - current_location.x,
-	  (ev->xmotion.y_root - y_offset)-current_location.y);
+	  ev->xmotion.x_root - multiscreen_offset.x,
+	  ev->xmotion.y_root- multiscreen_offset.y,
+	  (ev->xmotion.x_root - multiscreen_offset.x) - current_location.x,
+	  (ev->xmotion.y_root - multiscreen_offset.y)-current_location.y);
 }
 
 
@@ -1201,8 +1201,8 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
     case EnterNotify:
       if(!grabbed && ev->xcrossing.mode==NotifyNormal)
 	{
-	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (ev->xcrossing.x_root - x_offset)),
-		 enter_translate(EDGE_NS,display_size.GetHeight(), (ev->xcrossing.y_root - y_offset)),
+	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (ev->xcrossing.x_root - multiscreen_offset.x)),
+		 enter_translate(EDGE_NS,display_size.GetHeight(), (ev->xcrossing.y_root - multiscreen_offset.y)),
 		 ev->xcrossing.state);
 	}
       return 1;
@@ -1415,8 +1415,8 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 
 	if(ev->xkey.keycode)
 	  {
-	    saved_xpos=(ev->xkey.x_root - x_offset);
-	    saved_ypos=(ev->xkey.y_root - y_offset);
+	    saved_xpos=(ev->xkey.x_root - multiscreen_offset.x);
+	    saved_ypos=(ev->xkey.y_root - multiscreen_offset.y);
 	    grabit(saved_remote_xpos, saved_remote_ypos, 0);
 	  }
 	break;
@@ -1448,11 +1448,11 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 	     * 
 	     * - GRM
 	     */
-	    x = (ev->xcrossing.x_root - x_offset);
-	    y = (ev->xcrossing.y_root - y_offset);
+	    x = (ev->xcrossing.x_root - multiscreen_offset.x);
+	    y = (ev->xcrossing.y_root - multiscreen_offset.y);
 	    if (!nowOnScreen) {
-	      x = enter_translate(EDGE_EW,display_size.GetWidth(),(ev->xcrossing.x_root - x_offset));
-	      y = enter_translate(EDGE_NS,display_size.GetHeight(),(ev->xcrossing.y_root - y_offset));
+	      x = enter_translate(EDGE_EW,display_size.GetWidth(),(ev->xcrossing.x_root - multiscreen_offset.x));
+	      y = enter_translate(EDGE_NS,display_size.GetHeight(),(ev->xcrossing.y_root - multiscreen_offset.y));
 	    }
 	    switch(edge)
 	      {
@@ -1481,8 +1481,8 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
        */
       if(grab && ev->xcrossing.mode == NotifyNormal)
 	{
-	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() ,(ev->xcrossing.x_root - x_offset)),
-		 enter_translate(EDGE_NS,display_size.GetHeight(),(ev->xcrossing.y_root - y_offset)),
+	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() ,(ev->xcrossing.x_root - multiscreen_offset.x)),
+		 enter_translate(EDGE_NS,display_size.GetHeight(),(ev->xcrossing.y_root - multiscreen_offset.y)),
 		 ev->xcrossing.state);
 	}
       break;

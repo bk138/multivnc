@@ -50,6 +50,8 @@ private:
   int edge;
   int edge_width;
 
+  wxPoint multiscreen_offset;
+
   bool grabbed;
   
   wxPoint origo1, origo2;
@@ -89,7 +91,6 @@ private:
 
 
   // x2vnc stuff
-  int x_offset, y_offset;
   int motion_events;
 
 
