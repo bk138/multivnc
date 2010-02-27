@@ -1,10 +1,12 @@
 
+#include <wx/clipbrd.h>
 #include <wx/log.h>
 #include <wx/display.h>
 #ifdef __WXGTK__
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 #endif
+#include "MultiVNCApp.h"
 #include "VNCSeamlessConnector.h"
 
 
@@ -23,7 +25,7 @@
 
 
 BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxFrame)
-  EVT_MOUSE_EVENTS(VNCSeamlessConnector::handleMouse)
+//EVT_MOUSE_EVENTS(VNCSeamlessConnector::handleMouse)
   EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
 END_EVENT_TABLE();
 
@@ -253,6 +255,24 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
       //  if(!HasCapture())
       fprintf(stderr, "mouse entering!\n");
 
+      // set cuttext from clipboard
+      {
+	wxCriticalSectionLocker lock(wxGetApp().mutex_theclipboard); 
+	if(wxTheClipboard->Open()) 
+	  {
+	    if(wxTheClipboard->IsSupported(wxDF_TEXT))
+	      {
+		wxTextDataObject data;
+		wxTheClipboard->GetData(data);
+		wxString text = data.GetText();
+		wxLogDebug(wxT("VNCSeamlessConnector %p: setting cuttext: '%s'"), this, text.c_str());
+		fprintf(stderr, "VNCSeamlessConnector %p: setting cuttext: '%s'\n", this, strdup(text.mb_str()));
+		conn->setCuttext(text);
+	      }
+	    wxTheClipboard->Close();
+	  }
+      }
+
       if(!grabbed)
 	{
 	  fprintf(stderr, "mouse entering!, grabbing\n");
@@ -443,8 +463,8 @@ void VNCSeamlessConnector::doWarp(void)
 		   next_origo->y);*/
       
 
-      wxPoint warp_pos= ScreenToClient(*next_origo);
-      WarpPointer(warp_pos.x, warp_pos.y);
+      wxPoint warp_pos= canvas->ScreenToClient(*next_origo);
+      canvas->WarpPointer(warp_pos.x, warp_pos.y);
 
       motion_events=0;
     }
@@ -486,7 +506,7 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
   if(!topLevel)
     {
       canvas->SetFocus();
-      CaptureMouse();
+      canvas->CaptureMouse();
       canvas->SetFocus();
 #ifdef __WXGTK__     
       gdk_keyboard_grab(canvas->GetHandle()->window, False, GDK_CURRENT_TIME);
@@ -561,7 +581,7 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
       //XFlush(dpy);
       
       wxPoint warp_pos= ScreenToClient(wxPoint(multiscreen_offset.x+x, multiscreen_offset.y+y));
-      WarpPointer(warp_pos.x, warp_pos.y);
+      canvas->WarpPointer(warp_pos.x, warp_pos.y);
 
       fprintf(stderr, "ungrab warp!\n");
     }
@@ -576,7 +596,7 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 #ifdef __WXGTK__    
       gdk_keyboard_ungrab(GDK_CURRENT_TIME);
 #endif
-      ReleaseMouse();
+      canvas->ReleaseMouse();
     }
 
 
