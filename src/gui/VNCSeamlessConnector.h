@@ -33,7 +33,7 @@ class VNCSeamlessConnectorCanvas;
 class VNCSeamlessConnector: public wxFrame
 {
 public:
-  VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e);
+  VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int edge, size_t edge_width=5);
   ~VNCSeamlessConnector();
 
   void adjustSize(); 
@@ -51,6 +51,8 @@ private:
 
   int edge;
   int edge_width;
+
+  bool grabbed;
   
   wxPoint origo1, origo2;
   wxPoint * next_origo;
@@ -114,7 +116,7 @@ private:
   Bool modifierPressed[256];
 
   int x_offset, y_offset;
-  int grabbed;
+
   int pointer_warp_threshold;
   Cursor  grabCursor;
 

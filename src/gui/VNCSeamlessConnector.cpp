@@ -33,27 +33,26 @@ END_EVENT_TABLE();
 #define EDGE_NS (edge == EDGE_NORTH || edge==EDGE_SOUTH)
 
 
-VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e)
+VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, size_t ew)
   : wxFrame(parent, wxID_ANY, c->getDesktopName(), wxDefaultPosition, wxDefaultSize,
 	    wxFRAME_SHAPED | wxBORDER_NONE | wxFRAME_NO_TASKBAR | wxSTAY_ON_TOP)
 {
   conn = c;
   edge = e;
+  edge_width = ew;
 
-  grabbed = 0;
+  grabbed = false;
   
   // init all x stuff start
   x_offset=0; y_offset=0;
   pointer_warp_threshold=5;
   grabCursor=0;
   pointer_speed = 0.0;
-  edge_width=5;
   hidden=0;
   client_selection_text=0;
   client_selection_text_length=0;
   saved_xpos=-1;
   saved_ypos=-1;
-
   debug = true;
   resurface = false;
   acceleration=1.0;
