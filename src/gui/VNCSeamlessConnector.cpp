@@ -90,6 +90,9 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
 
 
   canvas = new VNCSeamlessConnectorCanvas(this);
+#ifndef __WXDEBUG__
+  canvas->SetCursor(wxCursor(wxCURSOR_BLANK));
+#endif
 
 
   this->Show(true);
@@ -505,12 +508,10 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 
   if(!topLevel)
     {
-      canvas->SetFocus();
       canvas->CaptureMouse();
       canvas->SetFocus();
 #ifdef __WXGTK__     
       gdk_keyboard_grab(canvas->GetHandle()->window, False, GDK_CURRENT_TIME);
-      canvas->SetFocus();
 #endif
     }
   else
