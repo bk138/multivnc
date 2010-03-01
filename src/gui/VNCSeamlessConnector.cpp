@@ -23,10 +23,11 @@
   public members
 */
 
-
+/*
 BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxFrame)
   EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
 END_EVENT_TABLE();
+*/
 
 
 #define EDGE_EW (edge == EDGE_EAST || edge==EDGE_WEST)
@@ -48,7 +49,8 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
 
   pointer_speed = 0.0;
   grabbed = false;
-  
+
+  /*
   // init all x2vnc stuff start
   grabCursor=0;
   hidden=0;
@@ -59,7 +61,23 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
   debug = true;
   resurface = false;
   // init all x2vnc stuff end
+ for (int i = 0; i < 256; i++)
+    modifierPressed[i] = False;
+ 
+  if (!(dpy = XOpenDisplay(NULL))) 
+    fprintf(stderr," unable to open display %s\n",  XDisplayName(NULL));
 
+  
+  // this sets: topLevel, deskopt atoms
+  //if(CreateXWindow())
+  // fprintf(stderr, "sucessfully created xwindow!\n");
+  // topLevel = GDK_WINDOW_XID(GetHandle()->window);
+
+
+  topLevel = 0;
+  //runtimer.SetOwner(this, 666);
+  //runtimer.Start(5);
+  */
 
   adjustSize(); 
    
@@ -69,23 +87,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
 #endif  
 
  
-  for (int i = 0; i < 256; i++)
-    modifierPressed[i] = False;
  
-  if (!(dpy = XOpenDisplay(NULL))) 
-    fprintf(stderr," unable to open display %s\n",  XDisplayName(NULL));
-  
-  // this sets: topLevel, deskopt atoms
-  /*if(CreateXWindow())
-   fprintf(stderr, "sucessfully created xwindow!\n");
-   topLevel = GDK_WINDOW_XID(GetHandle()->window);*/
-
-
-  topLevel = 0;
-  //runtimer.SetOwner(this, 666);
-  //runtimer.Start(5);
-  
-
 
   canvas = new VNCSeamlessConnectorCanvas(this);
 #ifndef __WXDEBUG__
@@ -102,11 +104,12 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
 
 VNCSeamlessConnector::~VNCSeamlessConnector()
 {
+  /*
   runtimer.Stop();
   
-  //close window
   if(topLevel)
     XDestroyWindow(dpy,  topLevel);
+  */
 }
 
 
@@ -134,9 +137,10 @@ void VNCSeamlessConnector::adjustSize()
   // get local display size
   display_size = wxDisplay(biggest_index).GetGeometry().GetSize();
 
-
+  /*
   saved_remote_xpos = display_size.GetWidth() / 2;
   saved_remote_ypos = display_size.GetHeight() / 2;
+  */
   
   // get remote display size
   framebuffer_size.SetWidth(conn->getFrameBufferWidth());
@@ -288,7 +292,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	{
 	  wxLogDebug(wxT("VNCSeamlessConnector %p: mouse moving/dragging while grabbed!"), this);
 	  int d=0;
-	  Window warpWindow;
+	  
 	  wxPoint offset(0,0);
 		
 	  wxPoint new_location(evt_root_pos.x, evt_root_pos.y);
@@ -327,7 +331,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	  if(!event.Dragging());
 	    {
 	      wxLogDebug(wxT("VNCSeamlessConnector %p: d gets set!"), this);
- 	      warpWindow = DefaultRootWindow(dpy);
+
 	      switch(edge)
 		{
 		case EDGE_NORTH: 
@@ -360,7 +364,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	      if(y<0) y=0;
 	      if(y>=display_size.GetHeight()) y=display_size.GetHeight()-1;
 	      if(x>=display_size.GetWidth()) x=display_size.GetWidth()-1;
-	      ungrabit(x, y, warpWindow);
+	      ungrabit(x, y);
 	      return;
 	    }else{
 	    if(remotePos.x < 0) remotePos.x=0;
@@ -479,7 +483,8 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
   //Window selection_owner;
 
   wxLogDebug(wxT("VNCSeamlessConnector %p: GRAB!"), this);
-  
+
+  /*
   if(hidden)
     {
       XMapRaised(dpy, topLevel);
@@ -487,6 +492,7 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
     }
 
   if(!topLevel)
+  */
     {
       canvas->CaptureMouse();
       canvas->SetFocus();
@@ -494,6 +500,7 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
       gdk_keyboard_grab(canvas->GetHandle()->window, False, GDK_CURRENT_TIME);
 #endif
     }
+    /*
   else
     {
       XGrabPointer(dpy, topLevel, True,
@@ -504,6 +511,7 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 		    GrabModeAsync, GrabModeAsync,
 		    CurrentTime);
     }
+    */
 
   grabbed=1;
   next_origo=NULL;
@@ -530,7 +538,8 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
     }
 
 
-  mouseOnScreen = 1;
+  //  mouseOnScreen = 1;
+
 
   /*
   selection_owner=XGetSelectionOwner(dpy, XA_PRIMARY);
@@ -543,12 +552,12 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 			topLevel, CurrentTime);
 			}
   */
-  XSync(dpy, False);
+  //  XSync(dpy, False);
 }
 
-void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
+void VNCSeamlessConnector::ungrabit(int x, int y)
 {
-  int i;
+  // int i;
 
   wxMouseEvent e;
   e.m_x = remoteParkingPos.x;
@@ -570,12 +579,12 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
       wxLogDebug(wxT("VNCSeamlessConnector %p: UNGRAB  WARP!"), this);
     }
 
- if(topLevel)
+  /* if(topLevel)
     {
       XUngrabKeyboard(dpy, CurrentTime);
       XUngrabPointer(dpy, CurrentTime);
     }
-  else
+    else*/
     {
 #ifdef __WXGTK__    
       gdk_keyboard_ungrab(GDK_CURRENT_TIME);
@@ -583,12 +592,12 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
       canvas->ReleaseMouse();
     }
 
-
+    /*
   mouseOnScreen = warpWindow == DefaultRootWindow(dpy);
   XFlush(dpy);
-  
+    */
 
-  
+    /*  
   for (i = 255; i >= 0; i--)
     {
       if (modifierPressed[i]) 
@@ -607,10 +616,10 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
 	  modifierPressed[i]=False;
 	}
     }
+    */
 
 
-
-  if(!edge_width) hidewindow();
+    //if(!edge_width) hidewindow();
   
   grabbed=0;
 }
@@ -700,7 +709,7 @@ void VNCSeamlessConnectorCanvas::onFocusLoss(wxFocusEvent &event)
 
 
 
-
+#if 0
 
 
 /*
@@ -1545,5 +1554,5 @@ void VNCSeamlessConnector::handle_cut_text(char *str, size_t len)
   XSelectInput(dpy, RootWindow(dpy, 0), attrs.your_event_mask);
 }
 
-
+#endif
 

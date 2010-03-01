@@ -3,9 +3,10 @@
 #ifndef VNCSEAMLESSCONNECTOR_H
 #define VNCSEAMLESSCONNECTOR_H
 
-
+/*
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+*/
 
 #include <wx/frame.h>
 #include <wx/panel.h>
@@ -39,7 +40,7 @@ public:
 
 
 protected:
-  DECLARE_EVENT_TABLE();
+  // DECLARE_EVENT_TABLE();
 
 private:
   VNCConn* conn;
@@ -73,7 +74,7 @@ private:
   int enter_translate(int isedge, int width, int pos);
   int leave_translate(int isedge, int width, int pos);
   void grabit(int x, int y, int state);
-  void ungrabit(int x, int y, Window warpWindow);
+  void ungrabit(int x, int y);
   int coord_dist_sq(wxPoint a, wxPoint b);
   int coord_dist_from_edge(wxPoint a);
 
@@ -93,7 +94,7 @@ private:
   // x2vnc stuff
   int motion_events;
 
-
+  /*
   wxTimer runtimer;
   Display *dpy;
 #ifdef HAVE_XINERAMA
@@ -123,11 +124,11 @@ private:
   int saved_remote_xpos;
   int saved_remote_ypos;
 
-  /*
-   * This variable is true (1) if the mouse is on the same screen as the one
-   * we're monitoring, or if there is only one screen on the X server.
-   * - GRM
-   */
+ 
+ //   This variable is true (1) if the mouse is on the same screen as the one
+  //  we're monitoring, or if there is only one screen on the X server.
+  //  - GRM
+   
   Bool mouseOnScreen;
 
   void onRuntimer(wxTimerEvent& event);
@@ -140,6 +141,7 @@ private:
   void handle_cut_text(char *str, size_t len);
   Bool HandleTopLevelEvent(XEvent *ev);
   Bool HandleRootEvent(XEvent *ev); 
+*/
 };
 
 
