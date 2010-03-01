@@ -25,7 +25,6 @@
 
 
 BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxFrame)
-//EVT_MOUSE_EVENTS(VNCSeamlessConnector::handleMouse)
   EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
 END_EVENT_TABLE();
 
@@ -51,7 +50,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
   grabbed = false;
   
   // init all x2vnc stuff start
-  multiscreen_offset.x=0; multiscreen_offset.y=0;
   grabCursor=0;
   hidden=0;
   client_selection_text=0;
@@ -107,7 +105,8 @@ VNCSeamlessConnector::~VNCSeamlessConnector()
   runtimer.Stop();
   
   //close window
-  XDestroyWindow(dpy,  topLevel);
+  if(topLevel)
+    XDestroyWindow(dpy,  topLevel);
 }
 
 
@@ -156,7 +155,7 @@ void VNCSeamlessConnector::adjustSize()
   // calc pointer speed from sizes
   pointer_speed = acceleration * pow( (framebuffer_size.GetWidth() * framebuffer_size.GetHeight()) / (float)(display_size.GetWidth() * display_size.GetHeight()), 0.25 );
 
-  fprintf(stderr," pointer multiplier: %f\n",pointer_speed);
+  wxLogDebug(wxT("VNCSeamlessConnector %p: pointer multiplier %f"), this, pointer_speed);
 
 
 
@@ -187,9 +186,9 @@ void VNCSeamlessConnector::adjustSize()
   origo2.x+=multiscreen_offset.x;
   origo2.y+=multiscreen_offset.y;
 
-  fprintf(stderr, "{%d, %d}\n", origo1.x,origo1.y);
-  fprintf(stderr, "{%d, %d}\n", origo2.x,origo2.y);
-  fprintf(stderr,"multiscreen offset=%d, %d\n",multiscreen_offset.x,multiscreen_offset.y);
+  wxLogDebug(wxT("VNCSeamlessConnector %p: Origo1 (%d, %d)"), this, origo1.x,origo1.y);
+  wxLogDebug(wxT("VNCSeamlessConnector %p: Origo2 (%d, %d)"), this, origo2.x,origo2.y);
+  wxLogDebug(wxT("VNCSeamlessConnector %p: multiscreen offset: (%d, %d)"), this, multiscreen_offset.x,multiscreen_offset.y);
 
   
 
@@ -243,11 +242,7 @@ void VNCSeamlessConnector::adjustSize()
 void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 {
   wxPoint evt_root_pos = ClientToScreen(event.GetPosition());
-  fprintf(stderr, "new mouse evt:: x: %d y: %d\n", evt_root_pos.x, evt_root_pos.y);
-  fprintf(stderr, "new mouse evt:: moving: %d \n", event.Moving());
-  fprintf(stderr, "new mouse evt:: button: %d \n", event.IsButton());
-  fprintf(stderr, "new mouse evt:: dragin: %d \n", event.Dragging());
-
+  wxLogDebug(wxT("VNCSeamLessConnector %p: new mouse evt: (%d, %d)"), this, evt_root_pos.x, evt_root_pos.y);
 
   int x,y;
 
@@ -256,7 +251,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
   if(event.Entering())
     {
       //  if(!HasCapture())
-      fprintf(stderr, "mouse entering!\n");
+      wxLogDebug(wxT("VNCSeamlessConnector %p: mouse entering!"), this);
 
       // set cuttext from clipboard
       {
@@ -269,7 +264,6 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 		wxTheClipboard->GetData(data);
 		wxString text = data.GetText();
 		wxLogDebug(wxT("VNCSeamlessConnector %p: setting cuttext: '%s'"), this, text.c_str());
-		fprintf(stderr, "VNCSeamlessConnector %p: setting cuttext: '%s'\n", this, strdup(text.mb_str()));
 		conn->setCuttext(text);
 	      }
 	    wxTheClipboard->Close();
@@ -278,7 +272,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 
       if(!grabbed)
 	{
-	  fprintf(stderr, "mouse entering!, grabbing\n");
+	  wxLogDebug(wxT("VNCSeamlessConnector %p: mouse entering, grabbing!"), this);
 	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (evt_root_pos.x - multiscreen_offset.x)),
 		 enter_translate(EDGE_NS,display_size.GetHeight(), (evt_root_pos.y - multiscreen_offset.y)),
 		 0);
@@ -289,22 +283,15 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 
   if(event.Moving() || event.Dragging())
     {
-      fprintf(stderr, "mouse moving!\n");
+      wxLogDebug(wxT("VNCSeamlessConnector %p: mouse moving/dragging!"), this);
       if(grabbed)
 	{
-	  fprintf(stderr, "mouse moving and grabbed!\n");
+	  wxLogDebug(wxT("VNCSeamlessConnector %p: mouse moving/dragging while grabbed!"), this);
 	  int d=0;
 	  Window warpWindow;
 	  wxPoint offset(0,0);
 		
 	  wxPoint new_location(evt_root_pos.x, evt_root_pos.y);
-	  if(debug) 
-	    {
-	      //dumpMotionEvent(ev);
-	      
-	      if(next_origo)
-		fprintf(stderr," {%d} <? {%d}\n",coord_dist_sq(new_location, *next_origo), coord_dist_sq(new_location, current_location));
-	    }
 	    
 	  motion_events++;
 	    
@@ -335,18 +322,12 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	    remotePos.y+=offset.y * pointer_speed;
 	  }
 
-#if 0
-	  fprintf(stderr," ==> {%f, %f} (%d,%d)\n",
-		  remotePos.x, remotePos.y,
-		  framebuffer_size.GetWidth(),
-		  framebuffer_size.GetHeight());
-#endif
 	
 	  // if(!(ev->xmotion.state & 0x1f00)) //FIXME
 	  if(!event.Dragging());
 	    {
-	      fprintf(stderr, "d gets set!!!\n");
-	      warpWindow = DefaultRootWindow(dpy);
+	      wxLogDebug(wxT("VNCSeamlessConnector %p: d gets set!"), this);
+ 	      warpWindow = DefaultRootWindow(dpy);
 	      switch(edge)
 		{
 		case EDGE_NORTH: 
@@ -374,7 +355,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 
 	  if(d)
 	    {
-	      fprintf(stderr, "d is set!!!\n");
+	      wxLogDebug(wxT("VNCSeamlessConnector %p: d is set!"), this);
 	      if(x<0) x=0;
 	      if(y<0) y=0;
 	      if(y>=display_size.GetHeight()) y=display_size.GetHeight()-1;
@@ -413,7 +394,8 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 void VNCSeamlessConnector::handleKey(wxKeyEvent& evt)
 {
   doWarp(); 
-  fprintf(stderr, "got some key event\n");
+		      
+  wxLogDebug(wxT("VNCSeamlessConnector %p: got some key event!"), this);
 
   if(evt.GetEventType() == wxEVT_KEY_DOWN)
     conn->sendKeyEvent(evt, true, false);
@@ -431,8 +413,6 @@ void VNCSeamlessConnector::handleFocusLoss()
 {
   wxLogDebug(wxT("VNCSeamlessConnector %p: lost focus, upping key modifiers"), this);
  
-  fprintf(stderr, "-> lost focus, upping key modifiers\n");
-
   wxKeyEvent key_event;
 
   key_event.m_keyCode = WXK_SHIFT;
@@ -458,8 +438,8 @@ void VNCSeamlessConnector::doWarp(void)
 	next_origo=&origo2;
       else
 	next_origo=&origo1;
-
-      fprintf(stderr,"X11 WARP: %d %d\n",next_origo->x, next_origo->y); 
+      
+      wxLogDebug(wxT("VNCSeamlessConnector %p: WARP to (%d, %d)"), this, next_origo->x, next_origo->y);
       /*XWarpPointer(dpy,None,
 		   DefaultRootWindow(dpy),0,0,0,0,
 		   next_origo->x,
@@ -498,7 +478,7 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
 {
   Window selection_owner;
 
-  fprintf(stderr, "grab! \n");
+  wxLogDebug(wxT("VNCSeamlessConnector %p: GRAB!"), this);
   
   if(hidden)
     {
@@ -576,6 +556,9 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
   
   conn->sendPointerEvent(e);
 
+  wxLogDebug(wxT("VNCSeamlessConnector %p: UNGRAB!"), this);
+    
+
   if(x > -1 && y > -1 )
     {
       //XWarpPointer(dpy,None, warpWindow, 0,0,0,0, multiscreen_offset.x + x, multiscreen_offset.y + y);
@@ -584,7 +567,7 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
       wxPoint warp_pos= ScreenToClient(wxPoint(multiscreen_offset.x+x, multiscreen_offset.y+y));
       canvas->WarpPointer(warp_pos.x, warp_pos.y);
 
-      fprintf(stderr, "ungrab warp!\n");
+      wxLogDebug(wxT("VNCSeamlessConnector %p: UNGRAB  WARP!"), this);
     }
 
  if(topLevel)
@@ -630,8 +613,6 @@ void VNCSeamlessConnector::ungrabit(int x, int y, Window warpWindow)
   if(!edge_width) hidewindow();
   
   grabbed=0;
-
-  fprintf(stderr, "ungrab!\n");
 }
 
 
@@ -681,7 +662,6 @@ VNCSeamlessConnectorCanvas::VNCSeamlessConnectorCanvas(VNCSeamlessConnector* par
 
 void VNCSeamlessConnectorCanvas::onMouse(wxMouseEvent &event)
 {
-  fprintf(stderr, " ---> mouse event rcvd by canvas!\n");
   p->handleMouse(event);
 }
 
