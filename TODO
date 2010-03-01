@@ -5,8 +5,10 @@ in order of importance:
  - (maybe) fix libvncclient calls bailing out with EINTR on
    UNIX because of SIGRT_1, which seems to be blockable on 
    some machines, on some not.
- - add collaboration features
+ - convert the seamless connector to pure wxwidgets,
+   in order to port it over to windows.
  - multiple connections at once, like the other multivnc
  - ability to choose encodings
  - more tooltips
  - translations
+

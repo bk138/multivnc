@@ -11,9 +11,14 @@
      for and serve multiple incoming connections.
    * Window sharing: You can beam one of your windows to the remote
      side if they support receiving windows (run a listening viewer).
+   * Seamless control of the remote side by moving pointer over the
+     (default upper) screen edge. Borrows heavily from x2vnc by
+     Fredrik Hübinette <hubbe@hubbe.net>, which in turn was based on
+     ideas from x2x and code from vncviewer.
    * Bookmarks.
    * Simple, loggable statistics 
    * Supports server framebuffer resize.
+
  
  For features that are planned, but not completed yet, look at the
  TODO file.

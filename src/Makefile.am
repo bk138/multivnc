@@ -37,6 +37,8 @@ multivnc_SOURCES = \
 	gui/MyFrameLog.h \
 	gui/VNCCanvas.cpp \
 	gui/VNCCanvas.h \
+	gui/VNCSeamlessConnector.cpp \
+	gui/VNCSeamlessConnector.h \
 	gui/DialogSettings.cpp \
 	gui/DialogSettings.h \
 	gui/MyDialogSettings.cpp \
