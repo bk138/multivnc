@@ -476,7 +476,7 @@ int VNCSeamlessConnector::leave_translate(int isedge, int width, int pos)
 
 void VNCSeamlessConnector::grabit(int x, int y, int state)
 {
-  Window selection_owner;
+  //Window selection_owner;
 
   wxLogDebug(wxT("VNCSeamlessConnector %p: GRAB!"), this);
   
@@ -1380,9 +1380,8 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
 	    }
 	}
 
-	if(debug)
-	  fprintf(stderr,"  --> %x (%c) name=%s (%s)\n",ks,ks,keyname,
-		  ev->type == KeyPress ? "down" : "up");
+	//	if(debug)
+	//  fprintf(stderr,"  --> %x (%c) name=%s (%s)\n",ks,ks,keyname,  ev->type == KeyPress ? "down" : "up");
 
 
 	//      return SendKeyEvent(ks, (ev->type == KeyPress));
@@ -1431,7 +1430,7 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
 	keyname[0] = '\0';
 	XLookupString(&ev->xkey, keyname, 256, &ks, NULL);
 
-	fprintf(stderr,"ROOT: Pressing %x (%c) name=%s  code=%d\n",ks,ks,keyname,ev->xkey.keycode);
+	//fprintf(stderr,"ROOT: Pressing %x (%c) name=%s  code=%d\n",ks,ks,keyname,ev->xkey.keycode);
 
 	if(ev->xkey.keycode)
 	  {

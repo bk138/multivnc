@@ -42,15 +42,6 @@ AC_ARG_WITH(wx-config,
 
 
 
-AC_MSG_CHECKING([wxWidgets version])
-if wxversion=`$WXCONFIG --version`; then
-    AC_MSG_RESULT([$wxversion])
-else
-    AC_MSG_RESULT([not found])
-    AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
-fi
-
-
 dnl Check if we have enabled debug support.
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE(debug, [  --enable-debug          enable debug build [[default=no]]],, enable_debug="no")
@@ -66,6 +57,15 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+
+
+AC_MSG_CHECKING([wxWidgets version])
+if wxversion=`$WXCONFIG --version`; then
+    AC_MSG_RESULT([$wxversion])
+else
+    AC_MSG_RESULT([not found])
+    AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
+fi
 
 
 dnl check for universal wx lib
