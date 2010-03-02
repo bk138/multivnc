@@ -86,6 +86,7 @@ private:
   void handleMouse(wxMouseEvent& evt);
   void handleKey(wxKeyEvent& evt);
   void handleFocusLoss();
+  void handleCaptureLoss();
 
 
 
@@ -169,6 +170,7 @@ private:
   void onKeyUp(wxKeyEvent &event);
   void onChar(wxKeyEvent &event);
   void onFocusLoss(wxFocusEvent &event);
+  void onCaptureLoss(wxMouseCaptureLostEvent &event);
 };
 
 

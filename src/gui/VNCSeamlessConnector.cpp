@@ -432,6 +432,15 @@ void VNCSeamlessConnector::handleFocusLoss()
 }
 
 
+void VNCSeamlessConnector::handleCaptureLoss()
+{
+  wxLogDebug(wxT("VNCSeamlessConnector %p: lost capture, emergency ungrab"), this);
+
+  ungrabit(display_size.x/2, display_size.y/2);
+  handleFocusLoss();
+}
+
+
 void VNCSeamlessConnector::doWarp(void)
 {
   if(grabbed)
@@ -662,6 +671,7 @@ BEGIN_EVENT_TABLE(VNCSeamlessConnectorCanvas, wxPanel)
   EVT_KEY_UP (VNCSeamlessConnectorCanvas::onKeyUp)
   EVT_CHAR (VNCSeamlessConnectorCanvas::onChar)
   EVT_KILL_FOCUS(VNCSeamlessConnectorCanvas::onFocusLoss)
+  EVT_MOUSE_CAPTURE_LOST(VNCSeamlessConnectorCanvas::onCaptureLoss)
 END_EVENT_TABLE();
 
 
@@ -702,6 +712,10 @@ void VNCSeamlessConnectorCanvas::onFocusLoss(wxFocusEvent &event)
   p->handleFocusLoss();
 }
 
+void VNCSeamlessConnectorCanvas::onCaptureLoss(wxMouseCaptureLostEvent &event)
+{
+  p->handleCaptureLoss();
+}
 
 
 
