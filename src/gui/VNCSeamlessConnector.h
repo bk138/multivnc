@@ -47,6 +47,7 @@ private:
 
   wxSize framebuffer_size;
   wxSize display_size;
+  size_t display_index;
 
   int edge;
   int edge_width;

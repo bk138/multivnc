@@ -80,13 +80,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
   */
 
   adjustSize(); 
-   
-#ifdef __WXGTK__
-  gtk_window_set_type_hint(GTK_WINDOW(GetHandle()), GDK_WINDOW_TYPE_HINT_DOCK);
-  gtk_window_set_keep_above(GTK_WINDOW(GetHandle()), true);	
-#endif  
 
- 
  
 
   canvas = new VNCSeamlessConnectorCanvas(this);
@@ -121,25 +115,26 @@ VNCSeamlessConnector::~VNCSeamlessConnector()
 
 void VNCSeamlessConnector::adjustSize()
 {
+  wxLogDebug(wxT("VNCSeamLessConnector %p: adjusting size"), this);
+
   // use the biggest screen
-  size_t biggest_index = 0;
   wxSize biggest_size;
-  for(size_t dpy_index=0; dpy_index < wxDisplay::GetCount(); ++dpy_index)
+  for(size_t i=0; i < wxDisplay::GetCount(); ++i)
     {
-      wxSize this_size = wxDisplay(dpy_index).GetGeometry().GetSize();
+      wxSize this_size = wxDisplay(i).GetGeometry().GetSize();
 
       if(this_size.GetWidth() * this_size.GetHeight() >
 	 biggest_size.GetWidth() * biggest_size.GetHeight())
 	{
 	  biggest_size = this_size;
-	  biggest_index = dpy_index;
+	  display_index = i;
 	}
     }
   // set offset accordingly
-  multiscreen_offset = wxDisplay(biggest_index).GetGeometry().GetPosition();
+  multiscreen_offset = wxDisplay(display_index).GetGeometry().GetPosition();
 
   // get local display size
-  display_size = wxDisplay(biggest_index).GetGeometry().GetSize();
+  display_size = wxDisplay(display_index).GetGeometry().GetSize();
 
   /*
   saved_remote_xpos = display_size.GetWidth() / 2;
@@ -225,6 +220,11 @@ void VNCSeamlessConnector::adjustSize()
   SetSize(width, height);
   Move(x, y);
 
+#ifdef __WXGTK__
+  gtk_window_set_type_hint(GTK_WINDOW(GetHandle()), GDK_WINDOW_TYPE_HINT_DOCK);
+  gtk_window_set_keep_above(GTK_WINDOW(GetHandle()), true);	
+#endif  
+
    /*
   if(edge_width)
     Raise();
@@ -278,6 +278,10 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	  }
       }
 
+      // check for a change of display size
+      if(display_size != wxDisplay(display_index).GetGeometry().GetSize())
+	adjustSize();
+
       if(!grabbed)
 	{
 	  wxLogDebug(wxT("VNCSeamlessConnector %p: mouse entering, grabbing!"), this);
@@ -325,17 +329,19 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	    {
 	      remotePos.x+=offset.x;
 	      remotePos.y+=offset.y;
-	    }else{
-	    remotePos.x+=offset.x * pointer_speed;
-	    remotePos.y+=offset.y * pointer_speed;
-	  }
+	      wxLogDebug(wxT("VNCSeamlessConnector %p: if: remotePos (%f, %f)"), this, remotePos.x, remotePos.y);
+	    }
+	  else
+	    {
+	      remotePos.x+=offset.x * pointer_speed;
+	      remotePos.y+=offset.y * pointer_speed;
+	      wxLogDebug(wxT("VNCSeamlessConnector %p: else: remotePos (%f, %f)"), this, remotePos.x, remotePos.y);
+	    }
 
 	
 	  // if(!(ev->xmotion.state & 0x1f00)) //FIXME
-	  if(!event.Dragging());
+	  if(!event.Dragging())
 	    {
-	      wxLogDebug(wxT("VNCSeamlessConnector %p: d gets set!"), this);
-
 	      switch(edge)
 		{
 		case EDGE_NORTH: 
@@ -370,20 +376,23 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 	      if(x>=display_size.GetWidth()) x=display_size.GetWidth()-1;
 	      ungrabit(x, y);
 	      return;
-	    }else{
-	    if(remotePos.x < 0) remotePos.x=0;
-	    if(remotePos.y < 0) remotePos.y=0;
-
-	    if(remotePos.x >= framebuffer_size.GetWidth())
-	      remotePos.x=framebuffer_size.GetWidth()-1;
-
-	    if(remotePos.y >= framebuffer_size.GetHeight())
-	      remotePos.y=framebuffer_size.GetHeight()-1;
-
-	    event.m_x = remotePos.x;
-	    event.m_y = remotePos.y;
-	    conn->sendPointerEvent(event);
-	  }
+	    }
+	  else
+	    {
+	      if(remotePos.x < 0) remotePos.x=0;
+	      if(remotePos.y < 0) remotePos.y=0;
+	      
+	      if(remotePos.x >= framebuffer_size.GetWidth())
+		remotePos.x=framebuffer_size.GetWidth()-1;
+	      
+	      if(remotePos.y >= framebuffer_size.GetHeight())
+		remotePos.y=framebuffer_size.GetHeight()-1;
+	      
+	      event.m_x = remotePos.x;
+	      event.m_y = remotePos.y;
+	      wxLogDebug(wxT("VNCSeamlessConnector %p: moving/dragging sending (%d, %d)"), this, event.m_x, event.m_y);
+	      conn->sendPointerEvent(event);
+	    }
 
 	}
       return;
@@ -464,6 +473,7 @@ void VNCSeamlessConnector::doWarp(void)
       
 
       wxPoint warp_pos= canvas->ScreenToClient(*next_origo);
+      wxLogDebug(wxT("VNCSeamlessConnector %p: WARP translated (%d, %d)"), this, warp_pos.x, warp_pos.y);
       canvas->WarpPointer(warp_pos.x, warp_pos.y);
 
       motion_events=0;
@@ -546,6 +556,8 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
       wxMouseEvent evt;
       evt.m_x = remotePos.x;
       evt.m_y = remotePos.y;
+      wxLogDebug(wxT("VNCSeamlessConnector %p: GRAB got position (%d, %d)"), this, x, y);
+      wxLogDebug(wxT("VNCSeamlessConnector %p: GRAB sending pointer event (%d, %d)"), this, evt.m_x, evt.m_y);
       //sendpointerevent(remotePos.x, remotePos.y, (state & 0x1f00) >> 8);
       conn->sendPointerEvent(evt);
     }
