@@ -41,10 +41,9 @@ protected:
     wxStaticText* label_recvbuf;
     wxSlider* slider_recvbuf;
     wxPanel* notebook_settings_pane_conn;
-    wxCheckBox* checkbox_stats_save;
-    wxPanel* notebook_settings_pane_stats;
     wxCheckBox* checkbox_logfile;
-    wxPanel* notebook_settings_pane_log;
+    wxCheckBox* checkbox_stats_save;
+    wxPanel* notebook_settings_pane_logging;
     wxNotebook* notebook_settings;
     // end wxGlade
 }; // wxGlade: end class
