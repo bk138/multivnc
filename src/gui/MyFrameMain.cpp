@@ -1231,6 +1231,17 @@ void MyFrameMain::view_seamless(wxCommandEvent &event)
   else
     show_seamless = EDGE_NONE;
 
+  //change for active connection
+  if(connections.size())
+    {
+      ConnBlob* cbp = &connections.at(notebook_connections->GetSelection());
+      if(cbp->seamlessconnector)
+	delete cbp->seamlessconnector;
+      if(show_seamless != EDGE_NONE)
+	cbp->seamlessconnector = new VNCSeamlessConnector(this, cbp->conn, show_seamless);
+    }
+  
+
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Write(K_SHOWSEAMLESS, show_seamless);
 }
