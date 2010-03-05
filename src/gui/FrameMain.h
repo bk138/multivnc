@@ -85,6 +85,7 @@ public:
     virtual void view_togglediscovered(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglebookmarks(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglestatistics(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void view_seamless(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglefullscreen(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_add(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_edit(wxCommandEvent &event); // wxGlade: <event_handler>

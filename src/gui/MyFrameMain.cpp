@@ -55,6 +55,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SHOWDISCOVERED, &show_discovered, V_SHOWDISCOVERED);
   pConfig->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
+  pConfig->Read(K_SHOWSEAMLESS, &show_seamless, V_SHOWSEAMLESS);
   pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
   pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
 
@@ -112,7 +113,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       SetToolBar(NULL);
     }
 
-  
   splitwinlayout();
 
   loadbookmarks();
@@ -125,6 +125,28 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     {
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
       stats_timer.Start(STATS_TIMER_INTERVAL);
+    }
+  switch(show_seamless)
+    {
+    case EDGE_NORTH:
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(0)->Check();
+      break;
+    case EDGE_EAST:
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(1)->Check();
+      break;
+    case EDGE_WEST:
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(2)->Check();
+      break;
+    case EDGE_SOUTH:
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(3)->Check();
+      break;
+    default:
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(5)->Check();
     }
 
   // setup clipboard
@@ -641,7 +663,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   VNCCanvas* canvas = new VNCCanvas(container, c);
   container->setCanvas(canvas);
 
-  VNCSeamlessConnector* sc = new VNCSeamlessConnector(this, c, EDGE_NORTH);
+  VNCSeamlessConnector* sc = new VNCSeamlessConnector(this, c, show_seamless);
 
   ConnBlob cb;
   cb.conn = c;
@@ -1175,10 +1197,6 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
 
 
 
-
-
-
-
 void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 {
   show_fullscreen = ! show_fullscreen;
@@ -1188,6 +1206,33 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 
   if(show_fullscreen)
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(5)->Check();
+}
+
+
+
+
+void MyFrameMain::view_seamless(wxCommandEvent &event)
+{
+  if(frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(0)->IsChecked())
+    show_seamless = EDGE_NORTH;
+  else if
+    (frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(1)->IsChecked())
+    show_seamless = EDGE_EAST;
+  else if 
+    (frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(2)->IsChecked())
+    show_seamless = EDGE_WEST;
+  else if
+    (frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(3)->IsChecked())
+    show_seamless = EDGE_SOUTH;
+  else
+    show_seamless = EDGE_NONE;
+
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  pConfig->Write(K_SHOWSEAMLESS, show_seamless);
 }
 
 

@@ -45,6 +45,14 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_2->Append(ID_DISCOVERED, _("Discovered Servers"), wxEmptyString, wxITEM_CHECK);
     wxglade_tmp_menu_2->Append(ID_BOOKMARKS, _("Bookmarks"), wxEmptyString, wxITEM_CHECK);
     wxglade_tmp_menu_2->Append(ID_STATISTICS, _("Statistics"), wxEmptyString, wxITEM_CHECK);
+    wxMenu* wxglade_tmp_menu_2_sub = new wxMenu();
+    wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_NORTH, _("North"), wxEmptyString, wxITEM_RADIO);
+    wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_EAST, _("East"), wxEmptyString, wxITEM_RADIO);
+    wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_WEST, _("West"), wxEmptyString, wxITEM_RADIO);
+    wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_SOUTH, _("South"), wxEmptyString, wxITEM_RADIO);
+    wxglade_tmp_menu_2_sub->AppendSeparator();
+    wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_DISABLED, _("Disabled"), wxEmptyString, wxITEM_RADIO);
+    wxglade_tmp_menu_2->Append(wxID_ANY, _("Edge Connector"), wxglade_tmp_menu_2_sub, wxEmptyString);
     wxglade_tmp_menu_2->AppendSeparator();
     wxglade_tmp_menu_2->Append(ID_FULLSCREEN, _("Fullscreen"), wxEmptyString, wxITEM_CHECK);
     frame_main_menubar->Append(wxglade_tmp_menu_2, _("&View"));
@@ -107,6 +115,11 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(ID_DISCOVERED, FrameMain::view_togglediscovered)
     EVT_MENU(ID_BOOKMARKS, FrameMain::view_togglebookmarks)
     EVT_MENU(ID_STATISTICS, FrameMain::view_togglestatistics)
+    EVT_MENU(ID_SEAMLESS_NORTH, FrameMain::view_seamless)
+    EVT_MENU(ID_SEAMLESS_EAST, FrameMain::view_seamless)
+    EVT_MENU(ID_SEAMLESS_WEST, FrameMain::view_seamless)
+    EVT_MENU(ID_SEAMLESS_SOUTH, FrameMain::view_seamless)
+    EVT_MENU(ID_SEAMLESS_DISABLED, FrameMain::view_seamless)
     EVT_MENU(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
     EVT_MENU(wxID_ADD, FrameMain::bookmarks_add)
     EVT_MENU(wxID_EDIT, FrameMain::bookmarks_edit)
@@ -222,6 +235,13 @@ void FrameMain::view_togglestatistics(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::view_togglestatistics) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::view_seamless(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::view_seamless) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 

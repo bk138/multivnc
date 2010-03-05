@@ -46,6 +46,7 @@ class MyFrameMain: public FrameMain
   bool show_bookmarks;
   bool show_stats;
   bool show_fullscreen;
+  int  show_seamless;
 
   // log window
   MyFrameLog* logwindow;
@@ -122,6 +123,7 @@ public:
   void view_togglebookmarks(wxCommandEvent &event);
   void view_togglestatistics(wxCommandEvent &event);
   void view_togglefullscreen(wxCommandEvent &event);
+  void view_seamless(wxCommandEvent &event);
 
   void bookmarks_add(wxCommandEvent &event); 
   void bookmarks_edit(wxCommandEvent &event); 

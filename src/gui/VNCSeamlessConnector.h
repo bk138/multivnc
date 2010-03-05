@@ -13,8 +13,9 @@
 #include <wx/timer.h>
 #include "VNCConn.h"
 
-#define EDGE_EAST 0
-#define EDGE_WEST 1
+#define EDGE_NONE -1
+#define EDGE_EAST  0
+#define EDGE_WEST  1
 #define EDGE_NORTH 2 
 #define EDGE_SOUTH 3
 

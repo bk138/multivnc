@@ -35,6 +35,8 @@
 #define V_SHOWBOOKMARKS true
 #define K_SHOWSTATS _T("ShowStats")
 #define V_SHOWSTATS false
+#define K_SHOWSEAMLESS _T("ShowSeamless")
+#define V_SHOWSEAMLESS EDGE_NONE
 #define K_SIZE_X _T("SizeX")
 #define V_SIZE_X 800
 #define K_SIZE_Y _T("SizeY")
