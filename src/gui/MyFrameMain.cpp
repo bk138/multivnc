@@ -1490,15 +1490,16 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
     return;
 
   bool isSharing = cb->windowshare_proc ? true : false;
-
   wxLogDebug(wxT("notebook_connections_pagechanged(): VNCConn %p sharing is %d"), cb->conn, isSharing);
-    
   // this is "share window"
   frame_main_menubar->GetMenu(frame_main_menubar->
 			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(!isSharing);
   // this is "stop share window"
   frame_main_menubar->GetMenu(frame_main_menubar->
 			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(isSharing);
+
+  if(cb->seamlessconnector)
+    cb->seamlessconnector->Raise();
 }
 
 
