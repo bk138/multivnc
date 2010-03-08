@@ -1205,7 +1205,7 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 		 wxFULLSCREEN_NOTOOLBAR | wxFULLSCREEN_NOSTATUSBAR | wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
 
   if(show_fullscreen)
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(5)->Check();
+    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(6)->Check();
 }
 
 
@@ -1370,7 +1370,7 @@ void MyFrameMain::help_contents(wxCommandEvent &e)
   wxLogMessage(_("\
 If there are VNC servers advertising themselves via ZeroConf, you can select a host in the\
 'Available VNC Servers' list. Otherwise, use the 'Connect' button or menu item.\
-When connected, a blue or green icon on the tab label shows if you are running in unicast \
+\n\nWhen connected, a blue or green icon on the tab label shows if you are running in unicast \
 or multicast mode."));
 }
 
