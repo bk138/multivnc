@@ -128,10 +128,10 @@ AC_SUBST(MULTIVNC_LIBS)
 dnl ***************************************************************************
 dnl Internatinalization
 dnl ***************************************************************************
-GETTEXT_PACKAGE=multivnc
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
-IT_PROG_INTLTOOL([0.35.0])
+#GETTEXT_PACKAGE=multivnc
+#AC_SUBST(GETTEXT_PACKAGE)
+#AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
+#IT_PROG_INTLTOOL([0.35.0])
 
 
 dnl ***************************************************************************
@@ -302,5 +302,4 @@ Makefile
 src/Makefile
 src/wxServDisc/Makefile
 src/libvncclient/Makefile
-po/Makefile.in
 ])
