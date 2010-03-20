@@ -87,8 +87,6 @@ VNCConn::VNCConn(void* p)
   parent = p;
   
   cl = 0;
-  framebuffer = 0;
-  fb_data = 0;
   multicastStatus = 0;
   multicastLossRatio = 0;
 
@@ -182,59 +180,13 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
   client->updateRect.x = client->updateRect.y = 0;
   client->updateRect.w = client->width; client->updateRect.h = client->height;
 
-  // setup framebuffer
-  if(conn->framebuffer)
-    {
-      if(conn->fb_data && client->frameBuffer)
-	conn->framebuffer->UngetRawData(*conn->fb_data);    
+  // free
+  if(client->frameBuffer)
+    free(client->frameBuffer);
 
-      delete conn->framebuffer;
-    }
-  conn->framebuffer = new wxBitmap(client->width, client->height, client->format.bitsPerPixel);
-  
+  // alloc, zeroed
+  client->frameBuffer = (uint8_t*)calloc(1, client->width*client->height*client->format.bitsPerPixel/8);
 
-  if(conn->fb_data)
-    delete conn->fb_data;
-  conn->fb_data = new wxAlphaPixelData(*conn->framebuffer);
-  if ( ! *conn->fb_data )
-    {
-      conn->err.Printf(_("Failed to gain raw access to framebuffer data!"));
-      delete conn->framebuffer;
-      return false;
-    }
-
- 
-  // zero it out
-  wxAlphaPixelData::Iterator fb_it(*conn->fb_data);
-  for ( int y = 0; y < client->height; ++y )
-    {
-      wxAlphaPixelData::Iterator rowStart = fb_it;
-
-      for ( int x = 0; x < client->width; ++x, ++fb_it )
-	{
-	  fb_it.Red() = 0;
-	  fb_it.Green() = 0;
-	  fb_it.Blue() = 0;
-	  fb_it.Alpha() = 255; // 255 is opaque
-	}
-      
-      fb_it = rowStart;
-      fb_it.OffsetY(*conn->fb_data, 1);
-    }
-
-
-  // connect the wxBitmap buffer to client's framebuffer so we write directly into
-  // the wxBitmap
-  // GetRawData returns NULL on failure
-  client->frameBuffer = (uint8_t*) conn->framebuffer->GetRawData(*conn->fb_data, client->format.bitsPerPixel);
-#ifdef __WIN32__
-  // under windows, the returned pointer points to the _end_ of the raw data,
-  // as windows DIBs are stored bottom to top, so rewind it.
-  // we end up with an upside down image, but later correct that in getFrameBufferRegion()...
-  if ( client->height > 1 )
-    client->frameBuffer -= (client->height - 1)* -conn->fb_data->m_stride;
-#endif
- 
   // notify our parent
   conn->thread_post_fbresize_notify();
  
@@ -629,7 +581,7 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   cl=rfbGetClient(BITSPERSAMPLE, SAMPLESPERPIXEL, BYTESPERPIXEL);
  
   rfbClientSetClientData(cl, VNCCONN_OBJ_ID, this); 
- 
+
   // callbacks
   cl->MallocFrameBuffer = alloc_framebuffer;
   cl->GotFrameBufferUpdate = thread_got_update;
@@ -688,7 +640,7 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool mu
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
 
-  if(fb_data || framebuffer || (GetThread() && GetThread()->IsRunning()))
+  if(cl->frameBuffer || (GetThread() && GetThread()->IsRunning()))
     {
       wxLogDebug(wxT("VNCConn %p: Init() already done. Call Shutdown() first!"), this);
       return false;
@@ -793,18 +745,12 @@ void VNCConn::Shutdown()
       // in case we called listen, canceled that, and now want to connect to some
       // host via Init()
       cl->listenSpecified = FALSE;
-    }
 
-  if(fb_data)
-    {
-      delete fb_data;
-      fb_data = 0;
-    }
- 
-  if(framebuffer)
-    {
-      delete framebuffer;
-      framebuffer = 0;
+      if(cl->frameBuffer)
+	{
+	  free(cl->frameBuffer);
+	  cl->frameBuffer = 0;
+	}
     }
 }
 
@@ -1011,83 +957,38 @@ void VNCConn::resetStats()
 
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
-#ifdef __WXDEBUG__
-  // save a picture only if the last is older than 5 seconds 
-  static time_t t0 = 0,t1;
-  t1 = time(NULL);
-  if(t1 - t0 > 5)
-    {
-      t0 = t1;
-      wxString fbdump( wxT("fb-dump-") + getServerName() + wxT("-") + getServerPort() + wxT(".bmp"));
-      framebuffer->SaveFile(fbdump, wxBITMAP_TYPE_BMP);
-      wxLogDebug(wxT("VNCConn %p: saved raw framebuffer to '%s'"), this, fbdump.c_str());
-    }
-#endif
+  int bytesPerPixel = cl->format.bitsPerPixel/8;
 
-  
-  // don't use getsubbitmap() here, instead
-  // copy directly from framebuffer into a new bitmap,
-  // saving one complete copy iteration
+  /*
+    copy directly from framebuffer into a new bitmap
+  */
   wxBitmap region(rect.width, rect.height, cl->format.bitsPerPixel);
   wxAlphaPixelData region_data(region);
   wxAlphaPixelData::Iterator region_it(region_data);
-#ifdef __WIN32__
-  // windows DIBs store data from bottom to top :-(
-  // so move iterator to the last row
-  region_it.OffsetY(region_data, rect.height-1);
-#endif
 
-
-
-  // get an wxAlphaPixelData from the framebuffer representing the subregion we want
-#ifdef __WIN32__
-  // windows DIBs store data from bottom to top, so sub-bitmap access like here
-  // is mirrored as well...
-  wxRect mirrorrect = rect;
-  mirrorrect.y = framebuffer->GetHeight() - rect.y - rect.height;
-  wxAlphaPixelData fbsub_data(*framebuffer, mirrorrect);
-#else
-  wxAlphaPixelData fbsub_data(*framebuffer, rect);
-#endif
-  if ( ! fbsub_data )
-    {
-      wxLogDebug(wxT("Failed to gain raw access to fb_sub data!"));
-      return region;
-    }
-  wxAlphaPixelData::Iterator fbsub_it(fbsub_data);
-
+  uint8_t *fbsub_it = cl->frameBuffer + rect.y*cl->width*bytesPerPixel + rect.x*bytesPerPixel;
 
   for( int y = 0; y < rect.height; ++y )
     {
       wxAlphaPixelData::Iterator region_it_rowStart = region_it;
-      wxAlphaPixelData::Iterator fbsub_it_rowStart = fbsub_it;
+      uint8_t *fbsub_it_rowStart = fbsub_it;
 
-      for( int x = 0; x < rect.width; ++x, ++region_it, ++fbsub_it )
+      for( int x = 0; x < rect.width; ++x, ++region_it, fbsub_it += bytesPerPixel)
 	{
-#ifdef __WIN32__
-	  // windows stores DIB data in BGRA, not RGBA.
-	  region_it.Red() = fbsub_it.Blue();
-	  region_it.Blue() = fbsub_it.Red();
-#else
-	  region_it.Red() = fbsub_it.Red();
-	  region_it.Blue() = fbsub_it.Blue();
-#endif	  
-	  region_it.Green() = fbsub_it.Green();	  
+	  region_it.Red() = *(fbsub_it+0);	  
+	  region_it.Green() = *(fbsub_it+1);	  
+	  region_it.Blue() = *(fbsub_it+2);	  
 	  region_it.Alpha() = 255; // 255 is opaque, libvncclient always sets this byte to 0
 	}
       
-      // this goes downwards
+      // CR
       region_it = region_it_rowStart;
-#ifdef __WIN32__
-      region_it.OffsetY(region_data, -1);
-#else
-      region_it.OffsetY(region_data, 1);
-#endif
-     
       fbsub_it = fbsub_it_rowStart;
-      fbsub_it.OffsetY(fbsub_data, 1);
+      
+      // LF
+      region_it.OffsetY(region_data, 1);
+      fbsub_it += cl->width * bytesPerPixel;
     }
-
 
   return region;
 }

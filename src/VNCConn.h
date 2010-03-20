@@ -159,10 +159,6 @@ private:
   // this counts the ms since Init()
   wxStopWatch conn_stopwatch;
 
-  // complete framebuffer
-  wxBitmap* framebuffer;
-  wxAlphaPixelData* fb_data;
-
   // blocking mode stuff
   bool blocking_mode;
   wxSemaphore* sema_unprocessed_upd;
