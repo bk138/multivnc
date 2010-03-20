@@ -1,5 +1,5 @@
 Source: multivnc
-Section: utils
+Section: net
 Priority: extra
 Maintainer: Christian Beier <dontmind@freeshell.org>
 Build-Depends: debhelper (>= 7), autotools-dev, libwxgtk2.8-dev
