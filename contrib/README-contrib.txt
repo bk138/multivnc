@@ -1,3 +1,6 @@
+x11vnc OS X binary built from x11 0.9.9 source, downloaded from
+http://www.karlrunge.com/x11vnc/#downloading.
+
 
 WinVNC.exe and VNCHooks.dll were built from windows source 1.3.9
 downloaded from http://www.tightvnc.com/download.html in January 2009.

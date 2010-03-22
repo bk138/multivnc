@@ -20,7 +20,7 @@ pixmap_DATA = src/gui/res/multivnc.xpm
 EXTRA_DIST = $(multivncdoc_DATA) \
              $(Applications_DATA) \
              $(pixmap_DATA)\
-	     contrib/WinVNC.exe contrib/VNCHooks.dll contrib/README-contrib.txt\
+	     contrib/x11vnc contrib/WinVNC.exe contrib/VNCHooks.dll contrib/README-contrib.txt\
              debian/changelog  debian/compat  debian/control  debian/copyright\
              debian/dirs  debian/docs  debian/menu  debian/rules  debian/watch
 
@@ -32,6 +32,7 @@ appbundle: src/multivnc
 	mkdir -p $(bundle_contents)/Resources
 	echo "APPL????" > $(bundle_contents)/PkgInfo
 	$(INSTALL_PROGRAM) $< $(bundle_contents)/MacOS/
+	cp contrib/x11vnc $(bundle_contents)/MacOS/
 	cp src/gui/res/icon.icns $(bundle_contents)/Resources
 	cp README  $(bundle_contents)/Resources
 	cp NEWS    $(bundle_contents)/Resources
