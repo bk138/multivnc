@@ -1,7 +1,8 @@
 
 MultiVNC 0.3 - "Collab me!"
 	* Implemented window sharing: You can now beam one of your 
-          windows to the remote side.	  
+          windows to the remote side.
+        * The Mac OS X version is now in a working state.
 	* Fixed a bug where a fast VNC server would make MultiVNC
 	  GUI unresponsive on a slow client.
 	* Fixed bug where saving log or screenshot would terminate
@@ -33,6 +34,4 @@ MultiVNC 0.1 - "In the beginning"
 	* simple, loggable statistics
         * discovery of VNC servers advertising themselves via ZeroConf
         * runs under UNIX and Windows
-	
 
-	
