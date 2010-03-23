@@ -12,12 +12,12 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
 {
     // begin wxGlade: FrameMain::FrameMain
     panel_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER|wxTAB_TRAVERSAL);
-    splitwin_main = new wxSplitterWindow(panel_top, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER|wxSP_LIVE_UPDATE);
+    splitwin_main = new wxSplitterWindow(panel_top, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE);
     splitwin_main_pane_2 = new wxPanel(splitwin_main, wxID_ANY);
     splitwin_main_pane_1 = new wxPanel(splitwin_main, wxID_ANY);
-    splitwin_left = new wxSplitterWindow(splitwin_main_pane_1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER|wxSP_LIVE_UPDATE);
+    splitwin_left = new wxSplitterWindow(splitwin_main_pane_1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE);
     splitwin_left_pane_2 = new wxPanel(splitwin_left, wxID_ANY);
-    splitwin_leftlower = new wxSplitterWindow(splitwin_left_pane_2, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_BORDER|wxSP_LIVE_UPDATE);
+    splitwin_leftlower = new wxSplitterWindow(splitwin_left_pane_2, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE);
     splitwin_leftlower_pane_2 = new wxPanel(splitwin_leftlower, wxID_ANY);
     splitwin_leftlower_pane_1 = new wxPanel(splitwin_leftlower, wxID_ANY);
     splitwin_left_pane_1 = new wxPanel(splitwin_left, wxID_ANY);
@@ -391,7 +391,7 @@ void FrameMain::do_layout()
     splitwin_main_pane_1->SetSizer(sizer_2);
     sizer_notebook->Add(notebook_connections, 1, wxALL|wxEXPAND, 3);
     splitwin_main_pane_2->SetSizer(sizer_notebook);
-    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 31);
+    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 105);
     sizer_splitwinmain->Add(splitwin_main, 1, wxALL|wxEXPAND, 3);
     panel_top->SetSizer(sizer_splitwinmain);
     sizer_top->Add(panel_top, 1, wxEXPAND, 0);
