@@ -51,7 +51,7 @@ struct wxSDEntry
 {
   wxString name;
   wxString ip;
-  uint16_t port;
+  int port;
   wxSDEntry() { port=0; }
 };
 
