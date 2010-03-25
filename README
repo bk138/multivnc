@@ -1,5 +1,5 @@
 
- MultiVNC is a cross-platform Multicast-enabled VNC client using
+ MultiVNC is a cross-platform Multicast-enabled VNC viewer using
  wxWidgets and libvncclient . It runs on Unix, Mac OS X and Windows.
 
  Features:
