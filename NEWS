@@ -2,7 +2,11 @@
 MultiVNC 0.3 - "Collab me!"
 	* Implemented window sharing: You can now beam one of your 
           windows to the remote side.
-        * The Mac OS X version is now in a working state.
+ 	* Implemented FastRequest feature: You can now set an interval
+ 	  at which MultiVNC continously asks the server for updates
+	  instead of just asking after each received server
+	  message. This should improve framerate on high latency
+	  links.
 	* Fixed a bug where a fast VNC server would make MultiVNC
 	  GUI unresponsive on a slow client.
 	* Fixed bug where saving log or screenshot would terminate

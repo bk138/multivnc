@@ -31,6 +31,10 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   checkbox_multicast->SetValue(value);
   pConfig->Read(K_MULTICASTRECVBUF, &value, V_MULTICASTRECVBUF);
   slider_recvbuf->SetValue(value);
+  pConfig->Read(K_FASTREQUEST, &value, V_FASTREQUEST);
+  checkbox_fastrequest->SetValue(value);
+  pConfig->Read(K_FASTREQUESTINTERVAL, &value, V_FASTREQUESTINTERVAL);
+  slider_fastrequest->SetValue(value);
 }
 
 

@@ -31,12 +31,16 @@ private:
 protected:
     // begin wxGlade: DialogSettings::attributes
     wxStaticBox* sizer_multicast_staticbox;
+    wxStaticBox* sizer_fastrequest_staticbox;
     wxStaticBox* sizer_quality_staticbox;
     wxStaticBox* sizer_compresslevel_staticbox;
     wxStaticText* label_compresslevel;
     wxSlider* slider_compresslevel;
     wxStaticText* label_quality;
     wxSlider* slider_quality;
+    wxCheckBox* checkbox_fastrequest;
+    wxStaticText* label_fastrequest;
+    wxSlider* slider_fastrequest;
     wxCheckBox* checkbox_multicast;
     wxStaticText* label_recvbuf;
     wxSlider* slider_recvbuf;

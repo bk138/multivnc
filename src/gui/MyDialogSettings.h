@@ -22,6 +22,8 @@ public:
   bool getLogSavetofile() const { return checkbox_logfile->GetValue(); };
   bool getDoMulticast() const { return checkbox_multicast->GetValue(); };
   int getMulticastRecvBuf() const { return slider_recvbuf->GetValue(); };
+  bool getDoFastRequest() const { return checkbox_fastrequest->GetValue(); };
+  int getFastRequestInterval() const { return slider_fastrequest->GetValue(); };
 };
 
 

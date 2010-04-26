@@ -51,6 +51,10 @@
 #define V_MULTICAST true
 #define K_MULTICASTRECVBUF wxT("MulticastRecvBufSize")
 #define V_MULTICASTRECVBUF 325
+#define K_FASTREQUEST wxT("FastRequest")
+#define V_FASTREQUEST false
+#define K_FASTREQUESTINTERVAL wxT("FastRequestInterval")
+#define V_FASTREQUESTINTERVAL 30
 
 // logging
 #define K_LOGSAVETOFILE wxT("LogFile")

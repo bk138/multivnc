@@ -599,13 +599,15 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   
 
   // get connection settings
-  int compresslevel, quality, multicast_recvbuf;
-  bool multicast;
+  int compresslevel, quality, multicast_recvbuf, fastrequest_interval;
+  bool multicast, fastrequest;
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
   pConfig->Read(K_MULTICAST, &multicast, V_MULTICAST);
   pConfig->Read(K_MULTICASTRECVBUF, &multicast_recvbuf, V_MULTICASTRECVBUF);
+  pConfig->Read(K_FASTREQUEST, &fastrequest, V_FASTREQUEST);
+  pConfig->Read(K_FASTREQUESTINTERVAL, &fastrequest_interval, V_FASTREQUESTINTERVAL);
 
 
   VNCConn* c = new VNCConn(this);
@@ -690,6 +692,8 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
       notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
     }
 
+  if(fastrequest)
+    c->doFastRequest(fastrequest_interval);
 
 
   // "end connection"
@@ -1030,6 +1034,8 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
       pConfig->Write(K_LOGSAVETOFILE, dialog_settings.getLogSavetofile());
       pConfig->Write(K_MULTICAST, dialog_settings.getDoMulticast());
       pConfig->Write(K_MULTICASTRECVBUF, dialog_settings.getMulticastRecvBuf());
+      pConfig->Write(K_FASTREQUEST, dialog_settings.getDoFastRequest());
+      pConfig->Write(K_FASTREQUESTINTERVAL, dialog_settings.getFastRequestInterval());
 
       VNCConn::doLogfile(dialog_settings.getLogSavetofile());
     }
