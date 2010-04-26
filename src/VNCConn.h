@@ -95,6 +95,13 @@ public:
   // call this to tell the VNCConn that a VNCConnUpdateNOTIFY was processed
   void UpdateProcessed();
 
+  /*
+    This is for usage on high latency links: Keep asking for framebuffer 
+    updates every 'interval' ms instead of asking after every received 
+    server message.
+    0 to disable. default: disabled
+  */
+  void doFastRequest(size_t interval);
 
   // get kind of VNCConn
   bool isReverse() const { return cl ? cl->listenSpecified : false; };
@@ -162,6 +169,10 @@ private:
   // blocking mode stuff
   bool blocking_mode;
   wxSemaphore* sema_unprocessed_upd;
+
+  // fastrequest stuff
+  size_t fastrequest_interval;
+  wxStopWatch fastrequest_stopwatch;
 
   // this contains cuttext we received or should send
   wxString cuttext;

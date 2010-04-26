@@ -114,6 +114,9 @@ VNCConn::VNCConn(void* p)
   // blocking mode
   blocking_mode = false;
   sema_unprocessed_upd = new wxSemaphore(1, 1);
+
+  // fastrequest stuff
+  fastrequest_interval = 0;
 }
 
 
@@ -229,6 +232,16 @@ wxThread::ExitCode VNCConn::Entry()
 	    thread_send_pointer_event(pe);
 	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
 	    thread_send_key_event(ke);
+
+	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval)
+	    {
+	      if(isMulticast())
+		SendMulticastFramebufferUpdateRequest(cl, TRUE);
+	      else
+		SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, TRUE);
+
+	      fastrequest_stopwatch.Start(); // restart
+	    }
 
 	  // request update and handle response 
 	  if(!rfbProcessServerMessage(cl, 500))
@@ -773,6 +786,11 @@ void VNCConn::UpdateProcessed()
     }
 }
 
+
+void VNCConn::doFastRequest(size_t interval)
+{
+  fastrequest_interval = interval;
+}
 
 
 // this simply posts the mouse event into the worker thread's input queue
