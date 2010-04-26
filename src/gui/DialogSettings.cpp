@@ -24,7 +24,7 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     slider_quality = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     checkbox_fastrequest = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Use FastRequest"));
     label_fastrequest = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Continously request updates at the specified milisecond interval:"));
-    slider_fastrequest = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
+    slider_fastrequest = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 1, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     checkbox_multicast = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Use MulticastVNC"));
     label_recvbuf = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Receive Buffer Size (kB):"));
     slider_recvbuf = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 65, 9750, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
