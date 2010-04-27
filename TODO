@@ -6,6 +6,7 @@ in order of importance:
    UNIX because of SIGRT_1, which seems to be blockable on 
    some machines, on some not.
  - fix the seamless connector for win32.
+ - make it work on OS X
  - multiple connections at once, like the other multivnc
  - ability to choose encodings
  - more tooltips
