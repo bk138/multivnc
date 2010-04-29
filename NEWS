@@ -1,12 +1,18 @@
 
 MultiVNC 0.3 - "Collab me!"
 	* Implemented window sharing: You can now beam one of your 
-          windows to the remote side.
+          windows to the remote side. Works on UNIX and Windows.
+        * Implemented Edge Connector: You can now tell MultiVNC that
+          one of your screen edges should be the border to the remote
+          display. When you move the pointer over this edge, MultiVNC
+          will take over your mouse and keyboard and send your input 
+          to the remote side. When the pointer is moved back towards 
+          the opposite edge on the remote screen, you're back on your
+          local desktop.
  	* Implemented FastRequest feature: You can now set an interval
  	  at which MultiVNC continously asks the server for updates
-	  instead of just asking after each received server
-	  message. This should improve framerate on high latency
-	  links.
+	  instead of just asking after each received server message.
+	  This should improve framerate on high latency links.
 	* Fixed a bug where a fast VNC server would make MultiVNC
 	  GUI unresponsive on a slow client.
 	* Fixed bug where saving log or screenshot would terminate
