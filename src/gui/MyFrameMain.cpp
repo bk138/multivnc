@@ -192,9 +192,11 @@ MyFrameMain::~MyFrameMain()
       for(int i = connections.size()-1; i >= 0; --i)
 	{
 	  VNCConn* c = connections.at(i).conn;
-	  if(!saveStats(c, i, c->getUpdRawByteStats(), _("frame buffer update"), true))
-	    wxLogError(_("Could not autosave framebuffer update statistics!"));    
-	  if(!saveStats(c, i, c->getPointerLatencyStats(), _("latency"), true))
+	  if(!saveStats(c, i, c->getUpdRawByteStats(), _("frame buffer update raw byte"), true))
+	    wxLogError(_("Could not autosave framebuffer update raw byte statistics!"));   
+	  if(!saveStats(c, i, c->getUpdLatencyStats(), _("frame buffer update latency"), true))
+	    wxLogError(_("Could not autosave framebuffer update latency statistics!"));    
+	  if(!saveStats(c, i, c->getPointerLatencyStats(), _("pointer latency"), true))
 	    wxLogError(_("Could not autosave pointer latency statistics!"));
 	  if(!saveStats(c, i, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
 	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
@@ -1075,24 +1077,35 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 
 
 
-void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
+void MyFrameMain::machine_save_stats_upd_rawbytes(wxCommandEvent &event)
 {
   if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getUpdRawByteStats(), _("framebuffer update"), false);
+      saveStats(c, sel, c->getUpdRawByteStats(), _("framebuffer update raw byte"), false);
     }
 }
 
 
-void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
+void MyFrameMain::machine_save_stats_upd_latencies(wxCommandEvent &event)
 {
  if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getPointerLatencyStats(), _("latency"), false);
+      saveStats(c, sel, c->getUpdLatencyStats(), _("framebuffer update latency"), false);
+    }
+}
+
+
+void MyFrameMain::machine_save_stats_pointer_latencies(wxCommandEvent &event)
+{
+ if(connections.size())
+    {
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel).conn;
+      saveStats(c, sel, c->getPointerLatencyStats(), _("pointer latency"), false);
     }
 }
 

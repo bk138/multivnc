@@ -33,8 +33,9 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_1->Append(wxID_PREFERENCES, wxEmptyString, _("Change preferences."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_SAVE, _("Take Screenshot"), wxEmptyString, wxITEM_NORMAL);
     wxMenu* wxglade_tmp_menu_1_sub = new wxMenu();
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD, _("Save Framebuffer Update Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LAT, _("Save Pointer Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_RAWBYTE, _("Save Framebuffer Update Data Rate Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_LAT, _("Save Framebuffer Update Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_POINTER_LAT, _("Save Pointer Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LOSSRATIO, _("Save Multicast Loss Ratio Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_ANY, _("Statistics"), wxglade_tmp_menu_1_sub, wxEmptyString);
     wxglade_tmp_menu_1->AppendSeparator();
@@ -107,8 +108,9 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_FILE, FrameMain::machine_showlog)
     EVT_MENU(wxID_PREFERENCES, FrameMain::machine_preferences)
     EVT_MENU(wxID_SAVE, FrameMain::machine_screenshot)
-    EVT_MENU(ID_STATS_SAVE_UPD, FrameMain::machine_save_stats_upd)
-    EVT_MENU(ID_STATS_SAVE_LAT, FrameMain::machine_save_stats_lat)
+    EVT_MENU(ID_STATS_SAVE_UPD_RAWBYTE, FrameMain::machine_save_stats_upd_rawbytes)
+    EVT_MENU(ID_STATS_SAVE_UPD_LAT, FrameMain::machine_save_stats_upd_latencies)
+    EVT_MENU(ID_STATS_SAVE_POINTER_LAT, FrameMain::machine_save_stats_pointer_latencies)
     EVT_MENU(ID_STATS_SAVE_LOSSRATIO, FrameMain::machine_save_stats_lossratio)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
     EVT_MENU(ID_TOOLBAR, FrameMain::view_toggletoolbar)
@@ -182,17 +184,24 @@ void FrameMain::machine_screenshot(wxCommandEvent &event)
 }
 
 
-void FrameMain::machine_save_stats_upd(wxCommandEvent &event)
+void FrameMain::machine_save_stats_upd_rawbytes(wxCommandEvent &event)
 {
     event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd_rawbytes) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 
-void FrameMain::machine_save_stats_lat(wxCommandEvent &event)
+void FrameMain::machine_save_stats_upd_latencies(wxCommandEvent &event)
 {
     event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_lat) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd_latencies) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_save_stats_pointer_latencies(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_pointer_latencies) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 
@@ -391,7 +400,7 @@ void FrameMain::do_layout()
     splitwin_main_pane_1->SetSizer(sizer_2);
     sizer_notebook->Add(notebook_connections, 1, wxALL|wxEXPAND, 3);
     splitwin_main_pane_2->SetSizer(sizer_notebook);
-    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 105);
+    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 31);
     sizer_splitwinmain->Add(splitwin_main, 1, wxALL|wxEXPAND, 3);
     panel_top->SetSizer(sizer_splitwinmain);
     sizer_top->Add(panel_top, 1, wxEXPAND, 0);
