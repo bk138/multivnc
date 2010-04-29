@@ -116,10 +116,17 @@ public:
   void doStats(bool yesno);
   // this clears internal statistics
   void resetStats();
-  // get stats, in format "timestamp, value"
-  const wxArrayString& getUpdateStats() const { const wxArrayString& ref = updates; return ref; };
-  const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
-  const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = mc_lossratios; return ref; };
+  /*
+    get stats, in format "timestamp, value"
+  */
+  // gets raw bytes updated per second
+  const wxArrayString& getUpdRawByteStats() const { const wxArrayString& ref = update_rawbytes; return ref; };
+  // gets time between updates from server
+  const wxArrayString& getUpdLatencyStats() const { const wxArrayString& ref = update_latencies; return ref; };
+  // gets time between aech pointer movement and update at corresponding position
+  const wxArrayString& getPointerLatencyStats() const { const wxArrayString& ref = pointer_latencies; return ref; };
+  // gets multicast loss ratio per second
+  const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = multicast_lossratios; return ref; };
 
   // cuttext
   const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
@@ -180,16 +187,19 @@ private:
 
   // statistics
   bool do_stats;
-  int updates_count; // counts raw bytes of updates
-  wxTimer updates_count_timer; // a timer to reset updates_count periodically
-  void on_updatescount_timer(wxTimerEvent& event);
+  wxTimer stats_timer; // a timer that samples stattistics every second
+  void on_stats_timer(wxTimerEvent& event);
+  int upd_rawbytes; // counts raw bytes of updates
+  int upd_latency;  // time between updates from server
+  wxLongLong upd_last_ts; // timestamp of last received update
   wxPoint pointer_pos;
-  wxStopWatch pointer_stopwatch;
-  wxCriticalSection mutex_latency_stats;
+  wxStopWatch pointerlatency_stopwatch;
+  wxCriticalSection mutex_stats;
   // string arrays to store values over time
-  wxArrayString updates;
-  wxArrayString latencies;
-  wxArrayString mc_lossratios;
+  wxArrayString update_rawbytes;
+  wxArrayString update_latencies;
+  wxArrayString pointer_latencies;
+  wxArrayString multicast_lossratios;
 
 
   // per-connection error string

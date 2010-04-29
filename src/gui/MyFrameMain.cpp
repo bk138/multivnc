@@ -192,9 +192,9 @@ MyFrameMain::~MyFrameMain()
       for(int i = connections.size()-1; i >= 0; --i)
 	{
 	  VNCConn* c = connections.at(i).conn;
-	  if(!saveStats(c, i, c->getUpdateStats(), _("frame buffer update"), true))
+	  if(!saveStats(c, i, c->getUpdRawByteStats(), _("frame buffer update"), true))
 	    wxLogError(_("Could not autosave framebuffer update statistics!"));    
-	  if(!saveStats(c, i, c->getLatencyStats(), _("latency"), true))
+	  if(!saveStats(c, i, c->getPointerLatencyStats(), _("latency"), true))
 	    wxLogError(_("Could not autosave pointer latency statistics!"));
 	  if(!saveStats(c, i, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
 	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
@@ -441,10 +441,10 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
       text_ctrl_latency->Clear();
       text_ctrl_lossratio->Clear();
       
-      if( ! c->getUpdateStats().IsEmpty() )
-	*text_ctrl_upd << wxAtoi(c->getUpdateStats().Last().AfterLast(wxT(',')))/1024;
-      if( ! c->getLatencyStats().IsEmpty() )
-	*text_ctrl_latency << c->getLatencyStats().Last().AfterLast(wxT(','));
+      if( ! c->getUpdRawByteStats().IsEmpty() )
+	*text_ctrl_upd << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
+      if( ! c->getPointerLatencyStats().IsEmpty() )
+	*text_ctrl_latency << c->getPointerLatencyStats().Last().AfterLast(wxT(','));
       if( ! c->getMCLossRatioStats().IsEmpty() )
 	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterLast(wxT(','));
     }
@@ -1081,7 +1081,7 @@ void MyFrameMain::machine_save_stats_upd(wxCommandEvent &event)
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getUpdateStats(), _("framebuffer update"), false);
+      saveStats(c, sel, c->getUpdRawByteStats(), _("framebuffer update"), false);
     }
 }
 
@@ -1092,7 +1092,7 @@ void MyFrameMain::machine_save_stats_lat(wxCommandEvent &event)
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getLatencyStats(), _("latency"), false);
+      saveStats(c, sel, c->getPointerLatencyStats(), _("latency"), false);
     }
 }
 

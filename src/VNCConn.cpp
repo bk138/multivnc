@@ -59,7 +59,7 @@ DEFINE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY);
 
 
 BEGIN_EVENT_TABLE(VNCConn, wxEvtHandler)
-    EVT_TIMER (wxID_ANY, VNCConn::on_updatescount_timer)
+    EVT_TIMER (wxID_ANY, VNCConn::on_stats_timer)
 END_EVENT_TABLE();
 
 
@@ -108,8 +108,8 @@ VNCConn::VNCConn(void* p)
 
   // statistics stuff
   do_stats = false;
-  updates_count = 0;
-  updates_count_timer.SetOwner(this);
+  upd_rawbytes = 0;
+  stats_timer.SetOwner(this);
 
   // blocking mode
   blocking_mode = false;
@@ -137,27 +137,27 @@ VNCConn::~VNCConn()
 */
 
 
-void VNCConn::on_updatescount_timer(wxTimerEvent& event)
+void VNCConn::on_stats_timer(wxTimerEvent& event)
 {
   if(do_stats)
     {
-      wxCriticalSectionLocker lock(mutex_latency_stats);
-      updates.Add((wxString() << wxGetUTCTime()) + 
+      wxCriticalSectionLocker lock(mutex_stats);
+      update_rawbytes.Add((wxString() << wxGetUTCTime()) + 
 		  wxT(", ") + 
 		  (wxString() << (int)conn_stopwatch.Time())
 		  + wxT(", ") +
-		  (wxString() << updates_count));
-      updates_count = 0;
+		  (wxString() << upd_rawbytes));
+      upd_rawbytes = 0;
 
       if(isMulticast())
 	{
 	  wxString lossratestring = wxString::Format(wxT("%.4f"), multicastLossRatio);
 	  lossratestring.Replace(wxT(","), wxT("."));
-	  mc_lossratios.Add((wxString() << wxGetUTCTime()) + 
-			    wxT(", ") + 
-			    (wxString() << (int)conn_stopwatch.Time())
-			    + wxT(", ") +
-			    lossratestring);
+	  multicast_lossratios.Add((wxString() << wxGetUTCTime()) + 
+				   wxT(", ") + 
+				   (wxString() << (int)conn_stopwatch.Time())
+				   + wxT(", ") +
+				   lossratestring);
 	}
 
     }
@@ -243,6 +243,7 @@ wxThread::ExitCode VNCConn::Entry()
 	      fastrequest_stopwatch.Start(); // restart
 	    }
 
+
 	  // request update and handle response 
 	  if(!rfbProcessServerMessage(cl, 500))
 	    {
@@ -252,6 +253,32 @@ wxThread::ExitCode VNCConn::Entry()
 	      thread_post_disconnect_notify();
 	      break;
 	    }
+
+
+	  // get time between updates from server
+	  if(do_stats)
+	    {
+	      wxCriticalSectionLocker lock(mutex_stats);
+
+	      if(upd_last_ts.ToLong() == 0) // init case
+		upd_last_ts = wxGetLocalTimeMillis();
+	      else
+		if(cl->serverMsg)
+		  {
+		    wxLongLong now = wxGetLocalTimeMillis();
+
+		    update_latencies.Add((wxString() << wxGetUTCTime()) + 
+					 wxT(", ") + 
+					 (wxString() << (int)conn_stopwatch.Time()) + 
+					 wxT(", ") + 
+					 (wxString() <<  (now-upd_last_ts).ToString()));
+
+		    wxLogDebug(wxT("VNCConn %p: got server msg after %ld ms"), this, (now-upd_last_ts).ToLong());
+
+		    upd_last_ts = now;
+		  }
+	    }
+
 
 	  if(isMulticast())
 	    {
@@ -330,10 +357,10 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
 
   if(do_stats)
     {
-      wxCriticalSectionLocker lock(mutex_latency_stats);
+      wxCriticalSectionLocker lock(mutex_stats);
       pointer_pos.x = event.m_x;
       pointer_pos.y = event.m_y;
-      pointer_stopwatch.Start();
+      pointerlatency_stopwatch.Start();
     }
 
   wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
@@ -395,20 +422,20 @@ void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
 
   if(do_stats)
     {
+      wxCriticalSectionLocker lock(mutex_stats);
       // raw byte updates/second
-      updates_count += w*h*BYTESPERPIXEL;
+      upd_rawbytes += w*h*BYTESPERPIXEL;
   
       // pointer latency
       // well, this is not neccessarily correct, but wtf
       if(event.rect.Contains(pointer_pos))
 	{
-	  pointer_stopwatch.Pause();
-	  wxCriticalSectionLocker lock(mutex_latency_stats);
-	  latencies.Add((wxString() << wxGetUTCTime()) + 
-			wxT(", ") + 
-			(wxString() << (int)conn_stopwatch.Time()) + 
-			wxT(", ") + 
-			(wxString() << (int)pointer_stopwatch.Time()));
+	  pointerlatency_stopwatch.Pause();
+	  pointer_latencies.Add((wxString() << wxGetUTCTime()) + 
+				wxT(", ") + 
+				(wxString() << (int)conn_stopwatch.Time()) + 
+				wxT(", ") + 
+				(wxString() << (int)pointerlatency_stopwatch.Time()));
 
 	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointer_stopwatch.Time());
 	}
@@ -953,20 +980,23 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 void VNCConn::doStats(bool yesno)
 {
   do_stats = yesno;
-  wxCriticalSectionLocker lock(mutex_latency_stats);
+  wxCriticalSectionLocker lock(mutex_stats);
   if(do_stats)
-    updates_count_timer.Start(1000);
+    stats_timer.Start(1000);
   else
-    updates_count_timer.Stop();
+    stats_timer.Stop();
+
+  upd_last_ts = 0; // set this to 0 if we start, stop or restart stats
 }
 
 
 void VNCConn::resetStats()
 {
-  wxCriticalSectionLocker lock(mutex_latency_stats);
-  latencies.Clear();
-  updates.Clear();
-  mc_lossratios.Clear();
+  wxCriticalSectionLocker lock(mutex_stats);
+  update_rawbytes.Clear();
+  update_latencies.Clear();
+  pointer_latencies.Clear();
+  multicast_lossratios.Clear();
 }
 
 
