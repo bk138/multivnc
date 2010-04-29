@@ -95,6 +95,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(false);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
@@ -706,6 +707,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(true);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
   // window sharing
@@ -762,6 +764,7 @@ void MyFrameMain::terminate_conn(int which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(false);
       // bookmarks
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
       // window sharing
