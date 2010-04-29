@@ -14,7 +14,7 @@
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
-#define STATS_TIMER_INTERVAL 50
+#define STATS_TIMER_INTERVAL 100
 #define STATS_TIMER_ID 0
 #define DISPLAY_TIMER_INTERVAL 30
 #define DISPLAY_TIMER_ID 1
@@ -445,8 +445,8 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
       
       if( ! c->getUpdRawByteStats().IsEmpty() )
 	*text_ctrl_upd << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
-      if( ! c->getPointerLatencyStats().IsEmpty() )
-	*text_ctrl_latency << c->getPointerLatencyStats().Last().AfterLast(wxT(','));
+      if( ! c->getUpdLatencyStats().IsEmpty() )
+	*text_ctrl_latency << c->getUpdLatencyStats().Last().AfterLast(wxT(','));
       if( ! c->getMCLossRatioStats().IsEmpty() )
 	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterLast(wxT(','));
     }
