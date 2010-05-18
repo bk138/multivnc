@@ -11,4 +11,4 @@ in order of importance:
  - ability to choose encodings
  - more tooltips
  - translations
-
+ - accelerated drawing via wxGLCanvas?
