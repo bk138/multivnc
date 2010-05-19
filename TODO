@@ -1,7 +1,7 @@
 
 in order of importance:
 
- - (probably) fix TLS on win32
+ - fix TLS on win32, this is a problem in libvncclient
  - (maybe) fix libvncclient calls bailing out with EINTR on
    UNIX because of SIGRT_1, which seems to be blockable on 
    some machines, on some not.
