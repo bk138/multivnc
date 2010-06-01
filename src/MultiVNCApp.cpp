@@ -27,7 +27,9 @@
 
 #include "MultiVNCApp.h"
 #include "gui/MyFrameMain.h"
-
+#ifdef __WXMAC__
+#include <ApplicationServices/ApplicationServices.h>
+#endif
 
 using namespace std;
 
@@ -72,6 +74,13 @@ bool MultiVNCApp::OnInit()
 
   SetTopWindow(frame_main);
   frame_main->Show();
+
+  // bring window to foreground in OS X
+#ifdef __WXMAC__
+  ProcessSerialNumber PSN;
+  GetCurrentProcess(&PSN);
+  TransformProcessType(&PSN,kProcessTransformToForegroundApplication);
+#endif
 
   return true;
 }
