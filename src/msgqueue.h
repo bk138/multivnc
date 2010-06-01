@@ -3,7 +3,7 @@
 // Purpose:     Message queues for inter-thread communication
 // Author:      Evgeniy Tarassov
 // Created:     2007-10-31
-// RCS-ID:      $Id: msgqueue.h 51377 2008-01-25 21:51:42Z VZ $
+// RCS-ID:      $Id$
 // Copyright:   (C) 2007 TT-Solutions SARL
 // Licence:     wxWindows licence
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,6 +68,22 @@ public:
         m_messages.push(msg);
 
         m_conditionNotEmpty.Signal();
+
+        return wxMSGQUEUE_NO_ERROR;
+    }
+
+    // Remove all messages from the queue.
+    //
+    // This method is meant to be called from the same thread(s) that call
+    // Post() to discard any still pending requests if they became unnecessary.
+    wxMessageQueueError Clear()
+    {
+        wxCHECK( IsOk(), wxMSGQUEUE_MISC_ERROR );
+
+        wxMutexLocker locker(m_mutex);
+
+        std::queue<T> empty;
+        std::swap(m_messages, empty);
 
         return wxMSGQUEUE_NO_ERROR;
     }
