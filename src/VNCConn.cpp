@@ -437,7 +437,7 @@ void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
 				wxT(", ") + 
 				(wxString() << (int)pointerlatency_stopwatch.Time()));
 
-	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointer_stopwatch.Time());
+	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointerlatency_stopwatch.Time());
 	}
     }
 }
