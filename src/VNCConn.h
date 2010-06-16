@@ -123,7 +123,7 @@ public:
   const wxArrayString& getUpdRawByteStats() const { const wxArrayString& ref = update_rawbytes; return ref; };
   // gets time between updates from server
   const wxArrayString& getUpdLatencyStats() const { const wxArrayString& ref = update_latencies; return ref; };
-  // gets time between aech pointer movement and update at corresponding position
+  // gets time between each pointer movement and update at corresponding position
   const wxArrayString& getPointerLatencyStats() const { const wxArrayString& ref = pointer_latencies; return ref; };
   // gets multicast loss ratio per second
   const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = multicast_lossratios; return ref; };
