@@ -1,3 +1,15 @@
+commit 440a8db90b543257594e82269a17ff3e89fd5c5f
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jul 5 18:16:22 2010 +0200
+
+    debian/changelog: update.
+
+commit 3588170f6119cf5ae76ab71dc02f738785adeeb3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jul 5 18:01:08 2010 +0200
+
+    Update Changelog
+
 commit 820fcebbcb0b15042a6d9f51ca723e2247892e2f
 Author: Christian Beier <dontmind@freeshell.org>
 Date:   Mon Jul 5 17:37:01 2010 +0200
