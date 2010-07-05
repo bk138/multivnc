@@ -214,6 +214,9 @@ void VNCSeamlessConnector::adjustSize()
     case EDGE_SOUTH: y = display_size.GetHeight() - ew + multiscreen_offset.y;
     case EDGE_NORTH: width = display_size.GetWidth();
       break;
+
+    default:
+      width = height = 0; 
     }
   
 

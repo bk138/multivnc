@@ -51,7 +51,6 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_EAST, _("East"), wxEmptyString, wxITEM_RADIO);
     wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_WEST, _("West"), wxEmptyString, wxITEM_RADIO);
     wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_SOUTH, _("South"), wxEmptyString, wxITEM_RADIO);
-    wxglade_tmp_menu_2_sub->AppendSeparator();
     wxglade_tmp_menu_2_sub->Append(ID_SEAMLESS_DISABLED, _("Disabled"), wxEmptyString, wxITEM_RADIO);
     wxglade_tmp_menu_2->Append(wxID_ANY, _("Edge Connector"), wxglade_tmp_menu_2_sub, wxEmptyString);
     wxglade_tmp_menu_2->AppendSeparator();
@@ -386,11 +385,11 @@ void FrameMain::do_layout()
     sizer_bookmarks->Add(list_box_bookmarks, 1, wxALL|wxEXPAND, 3);
     splitwin_leftlower_pane_1->SetSizer(sizer_bookmarks);
     sizer_3->Add(label_upd, 0, wxALL|wxEXPAND, 3);
-    sizer_3->Add(text_ctrl_upd, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_3->Add(text_ctrl_upd, 0, wxALL, 3);
     sizer_3->Add(label_latency, 0, wxALL, 3);
-    sizer_3->Add(text_ctrl_latency, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_3->Add(text_ctrl_latency, 0, wxALL, 3);
     sizer_3->Add(label_lossratio, 0, wxALL, 3);
-    sizer_3->Add(text_ctrl_lossratio, 0, wxALL|wxADJUST_MINSIZE, 3);
+    sizer_3->Add(text_ctrl_lossratio, 0, wxALL, 3);
     splitwin_leftlower_pane_2->SetSizer(sizer_3);
     splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2, 83);
     sizer_leftlower->Add(splitwin_leftlower, 1, wxALL|wxEXPAND, 3);

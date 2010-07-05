@@ -72,12 +72,12 @@ void FrameLog::do_layout()
     wxBoxSizer* sizer_log = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_buttons = new wxBoxSizer(wxHORIZONTAL);
     sizer_log->Add(text_ctrl_log, 1, wxALL|wxEXPAND, 3);
-    sizer_buttons->Add(button_clear, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND|wxADJUST_MINSIZE, 3);
-    sizer_buttons->Add(button_save, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND|wxADJUST_MINSIZE, 3);
-    sizer_buttons->Add(button_close, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND|wxADJUST_MINSIZE, 3);
+    sizer_buttons->Add(button_clear, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 3);
+    sizer_buttons->Add(button_save, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 3);
+    sizer_buttons->Add(button_close, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, 3);
     sizer_log->Add(sizer_buttons, 0, wxALIGN_RIGHT, 0);
     panel_top->SetSizer(sizer_log);
-    sizer_top->Add(panel_top, 2, wxEXPAND|wxADJUST_MINSIZE, 0);
+    sizer_top->Add(panel_top, 2, wxEXPAND, 0);
     SetSizer(sizer_top);
     sizer_top->Fit(this);
     Layout();

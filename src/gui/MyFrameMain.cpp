@@ -147,7 +147,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       break;
     default:
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(5)->Check();
+	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(4)->Check();
     }
 
   // setup clipboard
