@@ -1,1004 +1,1918 @@
-------------------------------------------------------------------------
-r188 | bk138 | 2010-02-15 23:02:44 +0100 (Mo, 15. Feb 2010) | 4 lines
+commit 820fcebbcb0b15042a6d9f51ca723e2247892e2f
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jul 5 17:37:01 2010 +0200
 
-Update libvncclient once again.
+    VNCConn.cpp: work around a wxwidgets bug in address resolving on win32.
 
-This change counts out-of-order packages as not-lost.
+commit 38dd9fc15a63f440eb939f9287269d7d7e1ec602
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jul 5 17:05:32 2010 +0200
 
-------------------------------------------------------------------------
-r187 | bk138 | 2010-02-15 21:10:55 +0100 (Mo, 15. Feb 2010) | 2 lines
+    Fix Edge Connector menu for Win32.
+    
+    Obviously it is not possible to have a separator in
+    a group of radio items.
 
-Calculate multicast lossratio in the client app.
+commit 96c3ba148b91c08e0abde932aaf0ad9c9b0af9aa
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jul 5 16:14:44 2010 +0200
 
-------------------------------------------------------------------------
-r186 | bk138 | 2010-02-15 21:07:56 +0100 (Mo, 15. Feb 2010) | 2 lines
+    Include TODO into win32 package.
 
-Some small gui tweaks.
+commit bf6f9a451379f153eb1392b41ba4cd7a00f57ee2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jul 5 15:39:38 2010 +0200
 
-------------------------------------------------------------------------
-r185 | bk138 | 2010-02-15 17:53:16 +0100 (Mo, 15. Feb 2010) | 2 lines
+    README: small typo fix.
 
-Use updated libvncclient.
+commit 038e72566b88408c9c03ffbb01efb66563acf145
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Jun 16 19:34:10 2010 +0200
 
-------------------------------------------------------------------------
-r184 | bk138 | 2010-02-15 15:31:13 +0100 (Mo, 15. Feb 2010) | 2 lines
+    Fix typo.
 
-Only prevent updating of log window when number of lines to be written > 50.
+commit 38f3e44158060d0fd31f3d8da552b9f1a8c09971
+Author: christian beier <beier@gruenau.informatik.hu-berlin.de>
+Date:   Tue Jun 1 14:43:20 2010 +0200
 
-------------------------------------------------------------------------
-r183 | bk138 | 2010-02-15 15:11:41 +0100 (Mo, 15. Feb 2010) | 2 lines
+    Update msgqueue.h from wxWidgets trunk.
 
-Display a busy cursor while log window is filled.
+commit 0c6fa55fb77299aa467a45ffb3a5db5dac081970
+Author: christian beier <beier@gruenau.informatik.hu-berlin.de>
+Date:   Tue Jun 1 14:17:05 2010 +0200
 
-------------------------------------------------------------------------
-r182 | bk138 | 2010-02-15 15:00:31 +0100 (Mo, 15. Feb 2010) | 2 lines
+    Fix debug build.
 
-Prevent redraw when log window is updated.
+commit 753dc195550919fdafe2b08f5454e4098900ebc4
+Author: christian beier <beier@gruenau.informatik.hu-berlin.de>
+Date:   Tue Jun 1 13:43:46 2010 +0200
 
-------------------------------------------------------------------------
-r181 | bk138 | 2010-02-12 17:23:10 +0100 (Fr, 12. Feb 2010) | 4 lines
+    Add workaround to activate window when started from shell in OS X.
 
-Fix 100% CPU on listen mode on windows.
+commit 4ceba4c0b0459e4e92c91d4b5839e7505282c1c1
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed May 19 21:13:16 2010 +0200
 
-Phew, this one was a real piece of shit...
+    Fix MingGW32 compilation with jpeglib.
+    
+    Tight encoding on Win32!
+    
+    Hopefully this gets merged upstream some time.
 
-------------------------------------------------------------------------
-r180 | bk138 | 2010-02-12 15:38:54 +0100 (Fr, 12. Feb 2010) | 2 lines
+commit e8f90ac421e4fcbebc587896a613def4caecd11b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed May 19 19:44:18 2010 +0200
 
-README: add pointer to multicastvnc sources.
+    Update TODO.
 
-------------------------------------------------------------------------
-r179 | bk138 | 2010-02-11 23:47:52 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 604c2ed6b83d86fa182e144dec979e44ad04e82b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue May 18 12:57:55 2010 +0200
 
-Increase listener timeout.
+    Add an idea to TODO.
 
-------------------------------------------------------------------------
-r178 | bk138 | 2010-02-11 22:08:54 +0100 (Do, 11. Feb 2010) | 2 lines
+commit e2d4f6e00e9e509c0718a8538c0605b4912ddefa
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Apr 29 22:05:31 2010 +0200
 
-Implement clearing of log window.
+    Update NEWS.
 
-------------------------------------------------------------------------
-r177 | bk138 | 2010-02-11 21:45:18 +0100 (Do, 11. Feb 2010) | 2 lines
+commit ab09cb10f43544c39373d0f91cb62415ce8b39a5
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Apr 29 17:10:25 2010 +0200
 
-Year++.
+    Properly enable/disable stats entries in GUI.
 
-------------------------------------------------------------------------
-r176 | bk138 | 2010-02-11 21:39:57 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 10c5ff6a01bd772bfc663a5a797f062c811e6bed
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Apr 29 17:05:24 2010 +0200
 
-Add license boilerplates where they're missing.
+    Use upd latency stats in the GUI as default.
 
-------------------------------------------------------------------------
-r175 | bk138 | 2010-02-11 21:19:03 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 778584f0fe5f31cfeded9ecc0876ab6b727bf728
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Apr 29 16:58:04 2010 +0200
 
-Implement multicast socket recv buffer size setting.
+    Incorporate fb upd latency stats into GUI.
 
-------------------------------------------------------------------------
-r174 | bk138 | 2010-02-11 19:40:24 +0100 (Do, 11. Feb 2010) | 2 lines
+commit e6fdca33b78d700df5a75c09325b79a15b6ff005
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Apr 29 16:37:49 2010 +0200
 
-Updated libvncclient.
+    VNCConn: rework stats and add update latency measurement.
 
-------------------------------------------------------------------------
-r173 | bk138 | 2010-02-11 18:46:37 +0100 (Do, 11. Feb 2010) | 2 lines
+commit a74b32d030f024eadd0e184bba92e94e781e0d64
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Apr 27 17:13:34 2010 +0200
 
-Use updated libvncclient.
+    Update TODO. MacOSX no wurkin.
 
-------------------------------------------------------------------------
-r172 | bk138 | 2010-02-11 18:17:31 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 531c78bfb4c77cefac602dd3c2871f9034354662
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Apr 26 19:34:49 2010 +0200
 
-Turn on optimizations in release build && fix some warnings.
+    Adjust fastrequest slider range to start at 1.
 
-------------------------------------------------------------------------
-r171 | bk138 | 2010-02-11 16:28:32 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 3996d708fd819030749eb33473d88781dc1ac161
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Apr 26 18:51:42 2010 +0200
 
-Some clarifications regarding getFramebufferRegion().
+    Incorporate FastRequest feature into GUI.
 
-------------------------------------------------------------------------
-r170 | bk138 | 2010-02-11 14:59:16 +0100 (Do, 11. Feb 2010) | 2 lines
+commit b8f6813d30f651794750e0a76932b328932003c9
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Apr 26 18:06:59 2010 +0200
 
-VNCCanvas: more debug tweaking.
+    VNCConn: Add support for making update requests at some interval.
+    
+    Instead of asking for framebuffer updates after a received server
+    message, we can now ask continously. This is especially useful on
+    high latency links.
 
-------------------------------------------------------------------------
-r169 | bk138 | 2010-02-11 14:42:28 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 2bbc41bf8bdb3b2adaf01d985a699770873d96b5
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Mar 25 19:30:36 2010 +0100
 
-VNCCanvas: add timing debug.
+    README: s/client/viewer.
 
-------------------------------------------------------------------------
-r168 | bk138 | 2010-02-11 12:47:28 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 1bc2a47065dc9b6e0d150fb37a555e2a6f0adf9a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Mar 24 16:29:12 2010 +0100
 
-Don't set page icon on each and every update.
+    Update debian changelog.
 
-------------------------------------------------------------------------
-r167 | bk138 | 2010-02-11 12:23:00 +0100 (Do, 11. Feb 2010) | 2 lines
+commit d83d40e7af6fe2083e5846bb148e71983dd44e0c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Mar 24 15:39:04 2010 +0100
 
-VNCConn.h: clarify what the events are for.
+    Auto-generate ltmain.sh.
 
-------------------------------------------------------------------------
-r166 | bk138 | 2010-02-11 11:26:59 +0100 (Do, 11. Feb 2010) | 2 lines
+commit faf726b76010e502f9fe38ba1c96c14c9b5bedae
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Mar 24 14:54:37 2010 +0100
 
-Really fix stats saving on windows this time.
+    Update wxServDisc.
 
-------------------------------------------------------------------------
-r165 | bk138 | 2010-02-11 10:34:38 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 369469a4653b90fe8ff371d96e25b0ca355a58aa
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Mar 23 23:55:58 2010 +0100
 
-Fix logfile writing.
+    Draw simple splitwin sashes.
 
-------------------------------------------------------------------------
-r164 | bk138 | 2010-02-11 10:12:56 +0100 (Do, 11. Feb 2010) | 2 lines
+commit c3ae9d4d684438eb0576b6a1a7bdccd747c39b32
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 22 19:55:09 2010 +0100
 
-Fix stats saving on windows.
+    Update NEWS.
 
-------------------------------------------------------------------------
-r163 | bk138 | 2010-02-11 09:55:28 +0100 (Do, 11. Feb 2010) | 2 lines
+commit 525dc5b23afc94381c2abad70030f4e26180e8b0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 22 16:53:29 2010 +0100
 
-Update wxServDisc.
+    Make OS X x11vnc executable.
 
-------------------------------------------------------------------------
-r162 | bk138 | 2010-02-10 18:07:01 +0100 (Mi, 10. Feb 2010) | 2 lines
+commit 0301b545c2e973e0303e5eb54293ba1161bd91f9
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 22 14:31:13 2010 +0100
 
-Tweak windows icon.
+    Add Mac OS X window share facility.
 
-------------------------------------------------------------------------
-r161 | bk138 | 2010-02-10 17:39:25 +0100 (Mi, 10. Feb 2010) | 2 lines
+commit 241025f44bfe6fcbc3fe1d1b8204589d7db04c3f
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Mar 20 21:33:18 2010 +0100
 
-Add multi-resolution windows icon.
+    VNCConn: use a char array instead of a wxBitmap as framebuffer.
+    
+    This simplifies things a bit (100 LOC less) and shuld fix the issues
+    on OS X. There was no real benefit of using a wxBitmap anyway...
 
-------------------------------------------------------------------------
-r160 | bk138 | 2010-02-10 16:52:22 +0100 (Mi, 10. Feb 2010) | 2 lines
+commit 4bf845f701a7970b57b277ca3b8e50ed064c0ce7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Mar 20 15:55:47 2010 +0100
 
-Update debug messages to follow new private method names.
+    Change debian section.
 
-------------------------------------------------------------------------
-r159 | bk138 | 2010-02-10 16:47:48 +0100 (Mi, 10. Feb 2010) | 2 lines
+commit 4487b3650f74432d860fcab29f5cca1d2cc31296
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Mar 19 18:38:39 2010 +0100
 
-Tweak settings dialog a bit.
+    get rid of this po/ mess for now.
 
-------------------------------------------------------------------------
-r158 | bk138 | 2010-02-09 13:17:18 +0100 (Di, 09. Feb 2010) | 2 lines
+commit 22df6ff273060dcb851cf53b72c56b4393c8d653
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 8 20:56:04 2010 +0100
 
-Tweak about dialog.
+    Fix regression with fullscreen toggle.
 
-------------------------------------------------------------------------
-r157 | bk138 | 2010-02-08 18:52:15 +0100 (Mo, 08. Feb 2010) | 2 lines
+commit 405a6b604c6f40bdef6ff29ad094941facfb7d47
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Mar 7 15:20:46 2010 +0100
 
-Updated libvncclient.
+    Raise connector of active connection.
 
-------------------------------------------------------------------------
-r156 | bk138 | 2010-02-08 16:15:23 +0100 (Mo, 08. Feb 2010) | 2 lines
+commit cf0bdefebadf017a16ac2bdb0464822ca80a7554
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Mar 5 20:19:13 2010 +0100
 
-Remove duplicate code.
+    Change VCNSeamlessConnector edge immediatly.
 
-------------------------------------------------------------------------
-r155 | bk138 | 2010-02-08 15:13:12 +0100 (Mo, 08. Feb 2010) | 2 lines
+commit 91e957401e66c0444af4825c863fd135a0354298
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Mar 5 20:07:20 2010 +0100
 
-Updated wxServDisc again.
+    Make VNCSeamlessConnector edge configurable.
 
-------------------------------------------------------------------------
-r154 | bk138 | 2010-02-08 15:05:51 +0100 (Mo, 08. Feb 2010) | 2 lines
+commit 9b9ebdad4f01d698492fd905e0d4aed0bce9e78b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Mar 5 19:15:53 2010 +0100
 
-VNCConn: move public block to the top of class declaration.
+    Simplify the preference dialog a bit.
 
-------------------------------------------------------------------------
-r153 | bk138 | 2010-02-08 15:03:23 +0100 (Mo, 08. Feb 2010) | 2 lines
+commit 47a5df07c1e0333d73fa96564191cf9dbaf5d168
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Mar 3 15:13:53 2010 +0100
 
-Move custom update event below VNCConn class.
+    VNCSeamlessConnector: change window size when display size changed.
+    
+    This still just checks when mouse is entering, as there is no wx
+    event indicating a display size change.
 
-------------------------------------------------------------------------
-r152 | bk138 | 2010-02-07 18:18:32 +0100 (So, 07. Feb 2010) | 2 lines
+commit 4e29c7767caf57fbf5915a22d7e3b02cc8106685
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Mar 2 15:05:51 2010 +0100
 
-update TODO.
+    VNCSeamlessConnector: handle capture loss to satisfy win32.
 
-------------------------------------------------------------------------
-r151 | bk138 | 2010-02-07 18:17:02 +0100 (So, 07. Feb 2010) | 4 lines
+commit 7bed80e959596350df75ad730fe14c42266ff0bf
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Mar 2 14:24:37 2010 +0100
 
-Replace that ugly update notify pointer stuff with a custom event.
+    VNCSeamlessConnector: properly expand canvas.
 
-Probably can be simplified a bit more...
+commit 10b697f8b6e5b2ac79d75f43687b95f817f61f6e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 1 13:51:22 2010 +0100
 
-------------------------------------------------------------------------
-r150 | bk138 | 2010-02-07 17:48:13 +0100 (So, 07. Feb 2010) | 2 lines
+    VNCSeamlessConnector: comment out old x2vnc stuff.
+    
+    Now win32 version builds again.
 
-Add connection id to saved stats filenames.
+commit a435b48b518bd7d9a6a144a23fc47d96c4132063
+Merge: a30895f... ec00f02...
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 1 13:21:45 2010 +0100
 
-------------------------------------------------------------------------
-r149 | bk138 | 2010-02-07 16:40:17 +0100 (So, 07. Feb 2010) | 2 lines
+    Merge branch 'seamlessconnector'
+    
+    Conflicts:
+    
+    	README (fixed)
 
-VNCConn: make all internal functions lowercase.
+commit ec00f025aa351d74303034c9db659a21d24c06fd
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 1 13:01:23 2010 +0100
 
-------------------------------------------------------------------------
-r148 | bk138 | 2010-02-07 16:32:38 +0100 (So, 07. Feb 2010) | 2 lines
+    VNCSeamlessConnector: fix warnings.
 
-A bit of textchat work.
+commit 0f5152a2ddf857b9c851297206720c31bca47f99
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Mar 1 12:51:07 2010 +0100
 
-------------------------------------------------------------------------
-r147 | bk138 | 2010-02-07 16:12:26 +0100 (So, 07. Feb 2010) | 2 lines
+    VNCSeamlessConnector: s/fprintf/wxLogDebug
 
-Update wxServDisc.
+commit b4c846c628a5809606c78e69f3127179932c50e6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 28 18:24:39 2010 +0100
 
-------------------------------------------------------------------------
-r146 | bk138 | 2010-02-07 16:00:33 +0100 (So, 07. Feb 2010) | 2 lines
+    VNCSeamlessConnector: implement blank cursor.
 
-Change app icon to sth more meaningful.
+commit 78766835bf0249deb068c2cd05da93077cfef8a0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 18:24:19 2010 +0100
 
-------------------------------------------------------------------------
-r145 | bk138 | 2010-02-07 15:43:46 +0100 (So, 07. Feb 2010) | 5 lines
+    VNCSeamlessConnector: implement cuttext handling.
+    
+    Also some event handler cleanup.
 
-Use raw byte equiv in update stats.
+commit a15304d1078ce3aed0dd303055594e5a314a0c34
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 18:03:14 2010 +0100
 
-This way the numbers are comparable between unicast and multicast
-and also more meaningful than the abstract updates/s count.
+    VNCSeamlessConnector: port x2vnc xinerama stuff.
 
-------------------------------------------------------------------------
-r144 | bk138 | 2010-02-07 02:30:31 +0100 (So, 07. Feb 2010) | 2 lines
+commit 2c40832796a88496d35222c626b599445e7dc566
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 17:19:35 2010 +0100
 
-Better listing of security types in about dlg.
+    VNCSeamlessConnector: merge the 2 offset vars into one.
 
-------------------------------------------------------------------------
-r143 | bk138 | 2010-02-07 02:18:20 +0100 (So, 07. Feb 2010) | 2 lines
+commit 25b4334164cebef3ae52af27b39c8a30ad50eba3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 16:48:34 2010 +0100
 
-Update TODO.
+    VNCSeamlessConnector: make pointer accel configurable, minor cleanups.
 
-------------------------------------------------------------------------
-r142 | bk138 | 2010-02-07 02:16:36 +0100 (So, 07. Feb 2010) | 2 lines
+commit 2ebf194bae37ceca55a0c8c7214e745b6e83ff1c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 16:33:42 2010 +0100
 
-Clear stats window on disconnect.
+    VNCSeamlessConnector: make edge width configurable.
+    
+    Also converted grabbed var to type bool.
 
-------------------------------------------------------------------------
-r141 | bk138 | 2010-02-07 00:54:51 +0100 (So, 07. Feb 2010) | 2 lines
+commit 193f408726e235c5a02f819137a8d9c3a1fc7eb7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 16:30:48 2010 +0100
 
-More locking fixes... this time right.
+    VNCSeamlessConnector: merge two vars into one.
 
-------------------------------------------------------------------------
-r140 | bk138 | 2010-02-07 00:45:10 +0100 (So, 07. Feb 2010) | 2 lines
+commit 50324b77c9062f67649a96602f01ddbb47f3fcf2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 16:21:56 2010 +0100
 
-More locking fixes.
+    VNCSeamlessConnector: make mouse buttons work.
 
-------------------------------------------------------------------------
-r139 | bk138 | 2010-02-07 00:40:34 +0100 (So, 07. Feb 2010) | 2 lines
+commit a9a06ba8072dfb32cfef922cddbb7db09a12cafd
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 16:04:27 2010 +0100
 
-Lock cuttext mutex when reading cuttext.
+    VNCSeamlessConnector: move focus loss handling into main class.
 
-------------------------------------------------------------------------
-r138 | bk138 | 2010-02-07 00:35:25 +0100 (So, 07. Feb 2010) | 2 lines
+commit fd6c34ce648e5b0867e147e6ad66bc015f219656
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 16:00:19 2010 +0100
 
-Fix pointer latency display.
+    VNCSeamlessConnector: make keys work, hooray!
 
-------------------------------------------------------------------------
-r137 | bk138 | 2010-02-07 00:08:59 +0100 (So, 07. Feb 2010) | 4 lines
+commit c086f9459374147537ef0d5afda3fec4850a9b12
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 15:55:47 2010 +0100
 
-Do not interact with the client* from different thread contexts.
+    VNCSeamlessConnector: Don't use the timer anymore.
 
-Fixes those TLS lockups.
+commit 4731aaa5c9ea3b96fc1f6c67be220a0fc053a9dc
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 27 15:45:46 2010 +0100
 
-------------------------------------------------------------------------
-r136 | bk138 | 2010-02-06 22:11:03 +0100 (Sa, 06. Feb 2010) | 5 lines
+    VNCSeamlessConnector: make key grabbing work, finally.
+    
+    works okee, some more cleanupm is definitly needed.
 
-Use updated wxServDisc class.
+commit 959e7130ef473e2a6fd831ddfa29b06709a8edbd
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 26 19:16:36 2010 +0100
 
-Implementation is now simpler and it properly closes sockets
-on object destruction.
+    VNCSeamlessConnector: fix segfault on second connect.
 
-------------------------------------------------------------------------
-r135 | bk138 | 2010-02-06 20:25:30 +0100 (Sa, 06. Feb 2010) | 2 lines
+commit 809e72b28333c10ff7e692ddf561c3109e6c06d0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 26 17:55:06 2010 +0100
 
-Remove debian/files.
+    VNCSeamlessConnector: use wx WarpPointer() instead of XWarpPointer().
 
-------------------------------------------------------------------------
-r134 | bk138 | 2010-02-05 00:38:43 +0100 (Fr, 05. Feb 2010) | 2 lines
+commit 13199164b80ca5c87f1598c407ca4b2866b1da49
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 26 17:50:28 2010 +0100
 
-Fix "about" display if built without GnuTLS.
+    VNCSeamlessConnector: single out sendpointerevent() use.
 
-------------------------------------------------------------------------
-r133 | bk138 | 2010-02-04 17:03:53 +0100 (Do, 04. Feb 2010) | 2 lines
+commit fa11f86effdfd3fee69e904f9faa0b0f0ed1d0b1
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 26 17:45:55 2010 +0100
 
-Implement display of multicast loss ratio.
+    VNCSeamlessConnector: remove desktop handling stuff.
 
-------------------------------------------------------------------------
-r132 | bk138 | 2010-02-04 15:43:15 +0100 (Do, 04. Feb 2010) | 2 lines
+commit 0c7066a0aee349c1fc18be5ea82be9c4f865f4d4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 26 17:43:24 2010 +0100
 
-Add info about builtin features to about dialog.
+    VNCSeamlessConnector: Some re-ordering. no functional changes.
 
-------------------------------------------------------------------------
-r131 | bk138 | 2010-02-04 14:57:19 +0100 (Do, 04. Feb 2010) | 2 lines
+commit f1f1cbff93678c3a0e0f3ed3d5b7986a75d4ea0e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 25 22:53:08 2010 +0100
 
-update TODO.
+    VNCSeamlessConnector: even more wx window work: seems to function now...
+    
+    this was it:
+    int ew = edge_width*2;//FIXME
 
-------------------------------------------------------------------------
-r130 | bk138 | 2010-02-04 14:49:02 +0100 (Do, 04. Feb 2010) | 4 lines
+commit 610c3d037af0063daa01b9ea42d1fb998deba39b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 25 22:18:57 2010 +0100
 
-Fix TLS, at least with UNIX.
+    VNCSeamlessConnector: more wx window work.
 
-TLS with threading under win32 probably needs some more love...
+commit 6d97b79be3019372dd745cffe502b0891d16afdf
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 25 21:16:42 2010 +0100
 
-------------------------------------------------------------------------
-r129 | bk138 | 2010-02-04 01:23:44 +0100 (Do, 04. Feb 2010) | 2 lines
+    VNCSeamlessConnector: sanitize macros a bit, remove exit()s.
 
-Strip executable before putting it into win32 installer.
+commit 2aa2e40a00c7b6cd30061781d3acbd4e857bd669
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 25 17:25:50 2010 +0100
 
-------------------------------------------------------------------------
-r128 | bk138 | 2010-02-04 01:06:20 +0100 (Do, 04. Feb 2010) | 2 lines
+    VNCSeamlessConnector: first stab at own wx window.
 
-Fix this darn Mingw32 compilation again.
+commit d59666fcdf58168bf145e5c4068f7001cd30f2ec
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 25 15:11:32 2010 +0100
 
-------------------------------------------------------------------------
-r127 | bk138 | 2010-02-03 22:39:10 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: some more refactoring.
 
-Update help text.
+commit 3362213637754f9e50d453ea1177d1d02ce8f38f
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 25 02:35:41 2010 +0100
 
-------------------------------------------------------------------------
-r126 | bk138 | 2010-02-03 22:30:47 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: make edge configurable.
+    
+    Why o why can't i pass an enum to the constructor?!?
 
-Update NEWS.
+commit e8b76df241b24cf666730a10640331fcac45d459
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 25 02:13:07 2010 +0100
 
-------------------------------------------------------------------------
-r125 | bk138 | 2010-02-03 20:40:21 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: use timer instead of threading.
 
-Add _all_ resource files to Makefile.am.
+commit 2f3d5201839f0f4293eb6720f6c0feb9c0a72853
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 23:58:44 2010 +0100
 
-------------------------------------------------------------------------
-r124 | bk138 | 2010-02-03 20:23:57 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: remove some more x2vnc hacks.
 
-Add icons indicating multicast connection.
+commit 4e26ced3e434785eb2ec6b74ecf7ead0e5526723
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 23:43:59 2010 +0100
 
-------------------------------------------------------------------------
-r123 | bk138 | 2010-02-03 20:03:17 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: even more removals.
 
-Enable -Wall by default.
+commit db78c4b796badfb60c252cd84f6c97ae9ea96755
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 18:53:51 2010 +0100
 
-------------------------------------------------------------------------
-r122 | bk138 | 2010-02-03 16:19:15 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: remove noblank stuff.
 
-Make use of MulticastVNC configurable.
+commit 0f3d48f5d351b5b30f0f14aa60f89575e98c3d7b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 18:38:41 2010 +0100
 
-------------------------------------------------------------------------
-r121 | bk138 | 2010-02-03 15:40:38 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: remove remote<->local warppointer hotkey.
 
-Fix bug where app would terminate on disconnect.
+commit cbfdafe81ca0cc4faab0a3e96fca2e8f91ee4b02
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 18:11:44 2010 +0100
 
-------------------------------------------------------------------------
-r120 | bk138 | 2010-02-03 14:56:15 +0100 (Mi, 03. Feb 2010) | 2 lines
+    VNCSeamlessConnector: use wxPoint instead of struct coord.
 
-Add default exception handler.
+commit 5260550f047519aefe089e209c336bf487e08a4a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 18:00:08 2010 +0100
 
-------------------------------------------------------------------------
-r119 | bk138 | 2010-02-02 17:19:31 +0100 (Di, 02. Feb 2010) | 2 lines
+    VNCSeamlessConnector: remove obsolete X extension support.
 
-Delete debian/watch.ex.
+commit f1493da4a5d8a031c83d8d5f4b28199aec6eb5fd
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 17:53:12 2010 +0100
 
-------------------------------------------------------------------------
-r118 | bk138 | 2010-02-02 15:20:25 +0100 (Di, 02. Feb 2010) | 2 lines
+    VNCSeamlessConnector: Fix key handling (almost).
 
-Sanitize NEWS, update README.
+commit 2d32a5f1c5e7106528d86292a22eca343b1a6e5c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 17:48:28 2010 +0100
 
-------------------------------------------------------------------------
-r117 | bk138 | 2010-02-02 14:48:25 +0100 (Di, 02. Feb 2010) | 2 lines
+    VNCSeamlessConnector: fix mouse buttons.
 
-Actually _use_ multicast.
+commit 64c7507e99381c21ba22661bfc50166c345f2721
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 17:34:50 2010 +0100
 
-------------------------------------------------------------------------
-r116 | bk138 | 2010-02-02 14:21:57 +0100 (Di, 02. Feb 2010) | 2 lines
+    Initial port of x2vnc. Seems to work okay.
+    
+    Now for some cleanup!
 
-Add multicast debug flags.
+commit a30895f0f453626c39b52e8e1258eb7be5ed232d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 24 14:44:09 2010 +0100
 
-------------------------------------------------------------------------
-r115 | bk138 | 2010-02-02 01:25:11 +0100 (Di, 02. Feb 2010) | 2 lines
+    Update README.
 
-Update libvncclient, now compiles under MinGW32.
+commit dc4ae6e067d2a6a1738de6179e05af9db4ea7227
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 23 00:27:33 2010 +0100
 
-------------------------------------------------------------------------
-r114 | bk138 | 2010-02-01 17:03:49 +0100 (Mo, 01. Feb 2010) | 2 lines
+    Update NEWS.
 
-Add multicast-enabled libvncclient.
+commit 563f6deee6f27aefc1e517e3f9a425e4cedf5126
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 23 00:20:29 2010 +0100
 
-------------------------------------------------------------------------
-r113 | bk138 | 2010-02-01 16:28:43 +0100 (Mo, 01. Feb 2010) | 2 lines
+    Circumvent wxWidget's DNS lookup a bit as it doesn't resolve mDNS addrs properly
 
-windows installer: properly delete directories.
+commit f739fabf7392727515b21a8fa370f5081ee7a704
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 22 23:28:15 2010 +0100
 
-------------------------------------------------------------------------
-r112 | bk138 | 2010-02-01 16:01:33 +0100 (Mo, 01. Feb 2010) | 2 lines
+    Implement window sharing. One step further on the road...
 
-Add support for building windows installer.
+commit da348abe1c021a61ca7da38b47399a09ed39d874
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 22 15:20:18 2010 +0100
 
-------------------------------------------------------------------------
-r111 | bk138 | 2010-02-01 15:30:19 +0100 (Mo, 01. Feb 2010) | 2 lines
+    po needs fixing!
 
-Add MinGW dll, needed to run win32 binaries.
+commit f6283d5b5052cc2b31507ed3dbc98624ad1423cf
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 22 15:18:34 2010 +0100
 
-------------------------------------------------------------------------
-r110 | bk138 | 2010-01-25 21:36:44 +0100 (Mo, 25. Jan 2010) | 2 lines
+    Revert "Remove unneeded files."
+    
+    This reverts commit 9836b68232e87cce7cd05d6d3e84713e86a9cf2a.
+    
+    Somehow these are needed. Really need to fix this later...
 
-add debian/watch file.
+commit 06c59345aef96fd01607e493f2cedbbf3004bc98
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 21 20:11:36 2010 +0100
 
-------------------------------------------------------------------------
-r109 | bk138 | 2010-01-25 21:33:37 +0100 (Mo, 25. Jan 2010) | 2 lines
+    Re-add po/Makefile, seems it's needed.
+    
+    The whole po stuff needs some reorganization later on.
 
-update TODO.
+commit 9836b68232e87cce7cd05d6d3e84713e86a9cf2a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 21 20:01:50 2010 +0100
 
-------------------------------------------------------------------------
-r108 | bk138 | 2010-01-25 21:30:47 +0100 (Mo, 25. Jan 2010) | 5 lines
+    Remove unneeded files.
 
-add resource files to SOURCES.
+commit 7d8d2120c55bce22cfc50225cda28cb3567afadc
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 19 23:28:15 2010 +0000
 
-This way they get properly included into the source
-tarball.
+    Update NEWS.
 
-------------------------------------------------------------------------
-r107 | bk138 | 2010-01-25 21:26:03 +0100 (Mo, 25. Jan 2010) | 2 lines
+commit 9ab8731d095c52d7baf230069db71cd035ab4eaa
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 19 23:19:46 2010 +0000
 
-don't install libvncclient, we link statically.
+    VNCConn: resolve server name only once, not everytime we get asked!
 
-------------------------------------------------------------------------
-r106 | bk138 | 2010-01-25 21:06:44 +0100 (Mo, 25. Jan 2010) | 2 lines
+commit 9e9b43af3195f91f26b41814b5e821eda0ec3ba4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 19 18:03:33 2010 +0000
 
-add debian packaging.
+    VNCConn: use wxThreadHelper. 60 LOC less.
+    
+    Also make the logger more secure.
 
-------------------------------------------------------------------------
-r105 | bk138 | 2010-01-25 20:42:57 +0100 (Mo, 25. Jan 2010) | 2 lines
+commit 0fb1b38e9cb2e54a29de4b74cb29392010aa4800
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 19 16:47:24 2010 +0000
 
-add desktop file.
+    Fix display of stats.
 
-------------------------------------------------------------------------
-r104 | bk138 | 2009-11-26 14:51:39 +0100 (Do, 26. Nov 2009) | 2 lines
+commit df6146d81e8c9ffc24cec9f23f0ee0fb6596f9a5
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 19 15:12:24 2010 +0000
 
-workaround segfault on exit.
+    Include absolute time (since epoch) in stats.
 
-------------------------------------------------------------------------
-r103 | bk138 | 2009-11-23 17:29:24 +0100 (Mo, 23. Nov 2009) | 2 lines
+commit 5efe35c0da6b54cec9c9d15346f5fdccc5f7224e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 20:23:06 2010 +0000
 
-disable bookmark menu items when bookmarks not shown.
+    Revert previous commit, bad idea.
 
-------------------------------------------------------------------------
-r102 | bk138 | 2009-11-23 17:07:01 +0100 (Mo, 23. Nov 2009) | 2 lines
+commit ccf75ea42db002d7876871034a97823c0241bff5
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 20:17:30 2010 +0000
 
-implement bookmarks.
+    VNCConn: Save framebuffer update logs in KB instead of bytes.
 
-------------------------------------------------------------------------
-r101 | bk138 | 2009-11-20 21:43:14 +0100 (Fr, 20. Nov 2009) | 2 lines
+commit 353f43e89d501d050370e5170b17d0a877728df2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 19:10:35 2010 +0000
 
-update NEWS.
+    Add windows VNC server contrib stuff.
 
-------------------------------------------------------------------------
-r100 | bk138 | 2009-11-20 21:37:31 +0100 (Fr, 20. Nov 2009) | 5 lines
+commit f6141ca0f3fef865339c2e4e69f937f224af84f4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 18:33:56 2010 +0000
 
-delete VNCConn object _after_ deleting canvas.
+    Update NEWS.
 
-fixes bug where canvas would try to call methods of a
-VNCConn instance not existing anymore.
+commit 2e004de2d66a508257e423dfdb43da3075e9b9da
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 18:27:50 2010 +0000
 
-------------------------------------------------------------------------
-r99 | bk138 | 2009-11-20 21:10:40 +0100 (Fr, 20. Nov 2009) | 7 lines
+    VNCConn: instead of blocking signals, which seems to not work everywhere, handle EINTR.
+    
+    This should actually go into libvncclient.
 
-up modifier keys if canvas loses focus.
+commit 0a1817837b93321687e185cec46b3195268b4bf6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 18:13:18 2010 +0000
 
-this fixes the case where ctrl or alt got pressed down, the 
-canvas loses focus, ctrl or alt are released, but that is not
-reported to the server, resulting ind ctrl or alt being stuck 
-at pressed down state.
+    VNCConn: cosmetical change.
 
-------------------------------------------------------------------------
-r98 | bk138 | 2009-11-20 19:26:33 +0100 (Fr, 20. Nov 2009) | 2 lines
+commit 9c80d2073394610a6e4096a7d87ebd90d8d2f090
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 18:04:03 2010 +0000
 
-add bookmarks stubs.
+    *** empty log message ***
 
-------------------------------------------------------------------------
-r97 | bk138 | 2009-11-20 18:56:52 +0100 (Fr, 20. Nov 2009) | 2 lines
+commit 4e6f0288a5e265a6f9507a2150ba954f4c11a4d2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 17:59:19 2010 +0000
 
-update NEWS.
+    VNCConn: fix segfault on disconnect.
 
-------------------------------------------------------------------------
-r96 | bk138 | 2009-11-16 16:40:52 +0100 (Mo, 16. Nov 2009) | 2 lines
+commit d53d5ae3066e3153d26318909a0cde30388335c1
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 18 17:35:29 2010 +0000
 
-add bookmark menu items.
+    Leave a note about this EINTR stuff in TODO.
 
-------------------------------------------------------------------------
-r95 | bk138 | 2009-11-12 14:09:39 +0100 (Do, 12. Nov 2009) | 2 lines
+commit 893197adde6733ad1223003484c21115dc27dc3d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 17 22:44:15 2010 +0000
 
-update to libvncclient master.
+    Enable blocking mode again if VNCConn becomes unicast.
 
-------------------------------------------------------------------------
-r94 | bk138 | 2009-11-12 14:07:20 +0100 (Do, 12. Nov 2009) | 4 lines
+commit d2ff41d6c61de9f3283663126174ccc883bb9f06
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 17 22:33:15 2010 +0000
 
-use a global mutex to protect clipboard access.
+    Fix bug where fast server would make GUI unresponsive on slow client.
+    
+    This uses VNCConn's blocking mode, so is probably not a good
+    thing to do in the multicast case (packet loss while blocking
+    because of full receive buffer).
 
-should fix these warnings now once and forever...
+commit a3d384c02e349e421fffa28501517aedb6e6abfb
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 17 21:18:20 2010 +0000
 
-------------------------------------------------------------------------
-r93 | bk138 | 2009-11-12 02:30:22 +0100 (Do, 12. Nov 2009) | 4 lines
+    VNCConn: add isBlocking().
 
-improve sendking of keysyms.
+commit 712fc8cd145353a32a08d93da319b8ad452594e5
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 17 20:02:27 2010 +0000
 
-now ctrl-c and friends should be working.
+    VNCConn: implement an optional blocking mode.
+    
+    When enabled, the worker thread blocks after sending an update
+    notify event until UpdateProcessed() is called from the main
+    thread. This way a slow drawing engine can be synchronized
+    with a fast VNCConn. Default is OFF.
 
-------------------------------------------------------------------------
-r92 | bk138 | 2009-11-12 01:19:37 +0100 (Do, 12. Nov 2009) | 2 lines
+commit 4322e8f3d7516250286f0fb4fb9ab078b7feb61e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 17 15:48:47 2010 +0000
 
-properly de/en-code cuttext to ISO-8859-1.
+    Hopefully fix these po configure errors.
 
-------------------------------------------------------------------------
-r91 | bk138 | 2009-11-11 23:27:50 +0100 (Mi, 11. Nov 2009) | 2 lines
+commit ec013f2af88e6065a8b7d266f2775b9536fe195a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 17 15:28:53 2010 +0000
 
-fix bug where canvas would be incorrectly centered in scrollwindow.
+    Add missing po file.
 
-------------------------------------------------------------------------
-r90 | bk138 | 2009-11-11 21:18:39 +0100 (Mi, 11. Nov 2009) | 3 lines
+commit 8faf9f35350f2f781039a5218734c22828c87ac4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 17 15:15:12 2010 +0000
 
-fix those warnings that clipboard is already open.
+    Oops, forgot OS X icon.
 
+commit 1019482a662dcb5e8bdaae80414cd4f49fbf9495
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 16 15:49:18 2010 +0000
 
-------------------------------------------------------------------------
-r89 | bk138 | 2009-11-11 20:42:35 +0100 (Mi, 11. Nov 2009) | 2 lines
+    Update TODO.
 
-don't try to get it's contents when the framebuffer is size zero.
+commit 94992b8c04a0a6a47d4b141a82c6e4ba04f85610
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 16 15:22:31 2010 +0000
 
-------------------------------------------------------------------------
-r88 | bk138 | 2009-11-11 20:33:25 +0100 (Mi, 11. Nov 2009) | 2 lines
+    Display server name in braces.
 
-get rid of some code duplication.
+commit 2ba9ddd271c46f762290eae2114f90ebd28afcb0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 16 15:16:29 2010 +0000
 
-------------------------------------------------------------------------
-r87 | bk138 | 2009-11-11 20:29:04 +0100 (Mi, 11. Nov 2009) | 4 lines
+    Really include all needed files in dist tarball && version up.
 
-rework handling of listening connection's port numbers.
+commit f0c557a51ba8390f758bbca4dcb1576522683ad4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 16 15:14:49 2010 +0000
 
-now it actually works.
+    libvncclient: s/IPV6_ADD_MEMBERSHIP/IPV6_JOIN_GROUP.
 
-------------------------------------------------------------------------
-r86 | bk138 | 2009-11-06 20:03:49 +0100 (Fr, 06. Nov 2009) | 2 lines
+commit c12c6a66c88485348972770893e60d1c6d22d6a3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 16 14:58:23 2010 +0000
 
-update to latest wxServDisc version.
+    Remove some unneeded files.
 
-------------------------------------------------------------------------
-r85 | bk138 | 2009-11-06 17:19:49 +0100 (Fr, 06. Nov 2009) | 2 lines
+commit 4e6ce03329c5f5c291f54aade031013bd9a2e8c9
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 16 14:22:59 2010 +0000
 
-update to latest wxServDisc.
+    Add debian dir to dist tarball, fix OS X compilation.
 
-------------------------------------------------------------------------
-r84 | bk138 | 2009-11-06 16:36:24 +0100 (Fr, 06. Nov 2009) | 2 lines
+commit 3439ce0deaa3531399d68a25725ed0806df14f35
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 23:41:19 2010 +0000
 
-also act on resizeFB for not currently active notebook pages.
+    Fix make dist.
 
-------------------------------------------------------------------------
-r83 | bk138 | 2009-11-06 16:24:01 +0100 (Fr, 06. Nov 2009) | 2 lines
+commit 4bba3506371c1a0bfa339c117ec9449943de1823
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 22:06:20 2010 +0000
 
-set page text for incoming connection.
+    Update Changelog.
 
-------------------------------------------------------------------------
-r82 | bk138 | 2009-11-05 15:24:18 +0100 (Do, 05. Nov 2009) | 2 lines
+commit e78ba0c3d440b090bf88a2d2d205263dc595efba
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 22:02:44 2010 +0000
 
-correctly count listening connections.
+    Update libvncclient once again.
+    
+    This change counts out-of-order packages as not-lost.
 
-------------------------------------------------------------------------
-r81 | bk138 | 2009-11-05 00:29:15 +0100 (Do, 05. Nov 2009) | 4 lines
+commit 8a03a83d64746b07bac781fc43dd363b7a7e0616
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 20:10:55 2010 +0000
 
-Add listen mode to VNCConn and GUI.
+    Calculate multicast lossratio in the client app.
 
-Maybe needs some more love, but right now it's working.
+commit eb1b55baeca07641583a7f84ef27334b9d7f802b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 20:07:56 2010 +0000
 
-------------------------------------------------------------------------
-r80 | bk138 | 2009-11-04 22:45:47 +0100 (Mi, 04. Nov 2009) | 2 lines
+    Some small gui tweaks.
 
-VNCCanvas: guard against repaint request for zero sized canvas.
+commit 96370e4189178c407f207fd35461a2dbbf5928f7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 16:53:16 2010 +0000
 
-------------------------------------------------------------------------
-r79 | bk138 | 2009-11-04 18:23:23 +0100 (Mi, 04. Nov 2009) | 4 lines
+    Use updated libvncclient.
 
-refactor Init() & Shutdown() to Init(), Shutdown(), Setup(), Cleanup().
+commit 2a60909cca51a7f94a20edd5b55547c6a755ebfd
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 14:31:13 2010 +0000
 
-This allows us to squeeze Listen() in.
+    Only prevent updating of log window when number of lines to be written > 50.
 
-------------------------------------------------------------------------
-r78 | bk138 | 2009-11-04 16:44:17 +0100 (Mi, 04. Nov 2009) | 4 lines
+commit d9e311192a8a7d98704d01d66e747c4b0f3f6e95
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 14:11:41 2010 +0000
 
-use newest libvncclient.
+    Display a busy cursor while log window is filled.
 
-this gives us a non-forking listen mode and TLS support.
+commit 769a2895c884b191c286a2a1e23e49649c614662
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 15 14:00:31 2010 +0000
 
-------------------------------------------------------------------------
-r77 | bk138 | 2009-10-13 13:09:58 +0200 (Di, 13. Okt 2009) | 2 lines
+    Prevent redraw when log window is updated.
 
-setup for 0.2 development.
+commit 8a8b459e43ecac00dd178ed7a577eb1e82480fc6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 12 16:23:10 2010 +0000
 
-------------------------------------------------------------------------
-r75 | bk138 | 2009-10-12 21:21:48 +0200 (Mo, 12. Okt 2009) | 2 lines
+    Fix 100% CPU on listen mode on windows.
+    
+    Phew, this one was a real piece of shit...
 
-update NEWS.
+commit bc30ce5b6a612f72c0597af00eda2d337e350c86
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Feb 12 14:38:54 2010 +0000
 
-------------------------------------------------------------------------
-r74 | bk138 | 2009-10-12 21:05:12 +0200 (Mo, 12. Okt 2009) | 2 lines
+    README: add pointer to multicastvnc sources.
 
-update TODO and ChangeLog.
+commit 0d82296ca4be112c475dda4ac8e7b3980830fa79
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 22:47:52 2010 +0000
 
-------------------------------------------------------------------------
-r73 | bk138 | 2009-10-12 17:13:39 +0200 (Mo, 12. Okt 2009) | 2 lines
+    Increase listener timeout.
 
-update help text.
+commit cf53d090bdd60cdf6b45d8eb6947b65e56527698
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 21:08:54 2010 +0000
 
-------------------------------------------------------------------------
-r72 | bk138 | 2009-10-12 16:44:25 +0200 (Mo, 12. Okt 2009) | 2 lines
+    Implement clearing of log window.
 
-remove some old comments.
+commit 2a8141ec27751dba161b09ffab6d85c0f298c21e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 20:45:18 2010 +0000
 
-------------------------------------------------------------------------
-r71 | bk138 | 2009-10-12 16:42:00 +0200 (Mo, 12. Okt 2009) | 2 lines
+    Year++.
 
-clipboard support in main frame and VNCCanvas, rework VNCCanvas to support resizes.
+commit a218c86a6fdaa2e44e3c0c946f64e7b96f0b48f3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 20:39:57 2010 +0000
 
-------------------------------------------------------------------------
-r70 | bk138 | 2009-10-07 16:34:03 +0200 (Mi, 07. Okt 2009) | 2 lines
+    Add license boilerplates where they're missing.
 
-implement VNCConn cuttext support.
+commit e0f98bb76bc3a3614b53bdcceae250023ee5d435
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 20:19:03 2010 +0000
 
-------------------------------------------------------------------------
-r69 | bk138 | 2009-10-06 18:54:54 +0200 (Di, 06. Okt 2009) | 4 lines
+    Implement multicast socket recv buffer size setting.
 
-framebuffer resize functionality for main frame and canvas.
+commit d868b0d154e545aabd2119f431d1e75db395b760
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 18:40:24 2010 +0000
 
-also fix some warnings in MyFrameMain.cpp.
+    Updated libvncclient.
 
-------------------------------------------------------------------------
-r68 | bk138 | 2009-10-06 02:00:35 +0200 (Di, 06. Okt 2009) | 2 lines
+commit d560a0e619f663bd84a43b147dcf0d9e103bb0cc
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 17:46:37 2010 +0000
 
-silence warnings.
+    Use updated libvncclient.
 
-------------------------------------------------------------------------
-r67 | bk138 | 2009-10-06 01:53:24 +0200 (Di, 06. Okt 2009) | 2 lines
+commit 64cedc50112f99105c58c9395a1196b95ac8e997
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 17:17:31 2010 +0000
 
-exclude unused parameters in compiler warnings.
+    Turn on optimizations in release build && fix some warnings.
 
-------------------------------------------------------------------------
-r66 | bk138 | 2009-10-06 01:24:41 +0200 (Di, 06. Okt 2009) | 2 lines
+commit 628dbce7800fdf5b12649a777de8a0b1b05e0592
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 15:28:32 2010 +0000
 
-add -Wall and -Wextra to CXXFLAGS in debug build.
+    Some clarifications regarding getFramebufferRegion().
 
-------------------------------------------------------------------------
-r65 | bk138 | 2009-10-06 00:14:13 +0200 (Di, 06. Okt 2009) | 2 lines
+commit a43311e0e3f474dc66c123ee026c4c84423fac97
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 13:59:16 2010 +0000
 
-framebuffer resize support in VNCConn.
+    VNCCanvas: more debug tweaking.
 
-------------------------------------------------------------------------
-r64 | bk138 | 2009-10-05 21:12:04 +0200 (Mo, 05. Okt 2009) | 2 lines
+commit a60c391e1351c489778f8c8c4ce37059c081d986
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 13:42:28 2010 +0000
 
-fill in port if empty.
+    VNCCanvas: add timing debug.
 
-------------------------------------------------------------------------
-r63 | bk138 | 2009-10-05 21:11:39 +0200 (Mo, 05. Okt 2009) | 2 lines
+commit bd17dfd7b013c42c35b27943bdcaa2eb1cf2a62a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 11:47:28 2010 +0000
 
-VNCConn: be a bit more talkative in error case.
+    Don't set page icon on each and every update.
 
-------------------------------------------------------------------------
-r62 | bk138 | 2009-10-05 21:02:37 +0200 (Mo, 05. Okt 2009) | 2 lines
+commit 15bb58b9a44cd5434becc6ea8914fe8d314496e3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 11:23:00 2010 +0000
 
-add functionality to specify host(s) on commandline.
+    VNCConn.h: clarify what the events are for.
 
-------------------------------------------------------------------------
-r61 | bk138 | 2009-10-05 16:38:31 +0200 (Mo, 05. Okt 2009) | 2 lines
+commit 22dd6c90cfda56246b36e590fd1709ebc57e96e3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 10:26:59 2010 +0000
 
-implement settings dialog and some settings.
+    Really fix stats saving on windows this time.
 
-------------------------------------------------------------------------
-r60 | bk138 | 2009-10-03 18:07:04 +0200 (Sa, 03. Okt 2009) | 4 lines
+commit 643949b5fe182c2da431ff185fffe79af526861a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 09:34:38 2010 +0000
 
-greatly simplify log frame.
+    Fix logfile writing.
 
-we now use a timer instead of a thread.
+commit 0dc20f838168f2818d214d42b3c466c4b854a1ea
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 09:12:56 2010 +0000
 
-------------------------------------------------------------------------
-r59 | bk138 | 2009-10-03 17:02:58 +0200 (Sa, 03. Okt 2009) | 2 lines
+    Fix stats saving on windows.
 
-use miliseconds since Init() in stats instead of wxNow().
+commit 22e822139cfc890daf16fd26e3b052d492f852b9
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 11 08:55:28 2010 +0000
 
-------------------------------------------------------------------------
-r58 | bk138 | 2009-10-02 17:44:26 +0200 (Fr, 02. Okt 2009) | 2 lines
+    Update wxServDisc.
 
-add functionality to save statistics.
+commit 85a5e37508cf863a0938ba50f0eb5177469beed1
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 10 17:07:01 2010 +0000
 
-------------------------------------------------------------------------
-r57 | bk138 | 2009-10-02 17:18:09 +0200 (Fr, 02. Okt 2009) | 2 lines
+    Tweak windows icon.
 
-update to newest libvnclient from git master.
+commit 020339f135b9f94a9916d0a7ed6cf83ecf2efa8d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 10 16:39:25 2010 +0000
 
-------------------------------------------------------------------------
-r56 | bk138 | 2009-10-01 22:30:49 +0200 (Do, 01. Okt 2009) | 5 lines
+    Add multi-resolution windows icon.
 
-delete all connections on frame destroy.
+commit 9973b43736c6a54ec03e9ecacc061e294c886142
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 10 15:52:22 2010 +0000
 
-terminate_conn resizes the connection vector!
+    Update debug messages to follow new private method names.
 
+commit 6a75d3fd9bc37fd82ebf624680e3c4c777505a79
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 10 15:47:48 2010 +0000
 
-------------------------------------------------------------------------
-r55 | bk138 | 2009-10-01 22:12:35 +0200 (Do, 01. Okt 2009) | 2 lines
+    Tweak settings dialog a bit.
 
-first stab at statistics for VNC connections.
+commit 5a602185ceada2122fabc403e1d2140a5915992c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 9 12:17:18 2010 +0000
 
-------------------------------------------------------------------------
-r54 | bk138 | 2009-09-29 21:49:38 +0200 (Di, 29. Sep 2009) | 2 lines
+    Tweak about dialog.
 
-minor gui tweak: better label.
+commit 7f2881a3d050266e57508eb1ed518d9312951009
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 8 17:52:15 2010 +0000
 
-------------------------------------------------------------------------
-r53 | bk138 | 2009-09-29 15:53:34 +0200 (Di, 29. Sep 2009) | 2 lines
+    Updated libvncclient.
 
-remove unused code.
+commit c90a48139e7e0591fb5a601da90f72351b07214a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 8 15:15:23 2010 +0000
 
-------------------------------------------------------------------------
-r52 | bk138 | 2009-09-28 19:14:11 +0200 (Mo, 28. Sep 2009) | 2 lines
+    Remove duplicate code.
 
-fix keyboard input for windows.
+commit a6aedf1190e23395da3edac8e1a116698babb3d6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 8 14:13:12 2010 +0000
 
-------------------------------------------------------------------------
-r51 | bk138 | 2009-09-28 17:48:05 +0200 (Mo, 28. Sep 2009) | 2 lines
+    Updated wxServDisc again.
 
-some gui tweaks, remember window size.
+commit 6bcde6af86072b4a3f2ff6bb08502420ab04565d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 8 14:05:51 2010 +0000
 
-------------------------------------------------------------------------
-r50 | bk138 | 2009-09-28 16:45:38 +0200 (Mo, 28. Sep 2009) | 2 lines
+    VNCConn: move public block to the top of class declaration.
 
-update help text.
+commit ed6d2e4cfb66e19168bae6046885cf7e3e974267
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 8 14:03:23 2010 +0000
 
-------------------------------------------------------------------------
-r49 | bk138 | 2009-09-28 16:36:16 +0200 (Mo, 28. Sep 2009) | 2 lines
+    Move custom update event below VNCConn class.
 
-implement keyboard input.
+commit 9a02cbdd32d1d05764651752400ff9b53171581c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 17:18:32 2010 +0000
 
-------------------------------------------------------------------------
-r48 | bk138 | 2009-09-25 21:08:54 +0200 (Fr, 25. Sep 2009) | 2 lines
+    update TODO.
 
-further tweaking of VNC cursor.
+commit a3331b3704bbfe7d05864e7f89cf6b9d131b9343
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 17:17:02 2010 +0000
 
-------------------------------------------------------------------------
-r47 | bk138 | 2009-09-25 14:51:28 +0200 (Fr, 25. Sep 2009) | 2 lines
+    Replace that ugly update notify pointer stuff with a custom event.
+    
+    Probably can be simplified a bit more...
 
-implement VNC-style cursor.
+commit 61c6105ae77f8c1f25fea99d40be2fb8d843d06b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 16:48:13 2010 +0000
 
-------------------------------------------------------------------------
-r46 | bk138 | 2009-09-24 21:34:14 +0200 (Do, 24. Sep 2009) | 2 lines
+    Add connection id to saved stats filenames.
 
-implement mouse input.
+commit 5061271d5440fafc6592eccdaed5a3f0307ce5e6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 15:40:17 2010 +0000
 
-------------------------------------------------------------------------
-r45 | bk138 | 2009-09-24 16:55:53 +0200 (Do, 24. Sep 2009) | 4 lines
+    VNCConn: make all internal functions lowercase.
 
-fix getFrameBufferRegion() for windows.
+commit 3c7cd02e07561c1c2dd282644bf030d77070ee96
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 15:32:38 2010 +0000
 
-btw, make some getters return non-const strings.
+    A bit of textchat work.
 
-------------------------------------------------------------------------
-r44 | bk138 | 2009-09-23 14:59:20 +0200 (Mi, 23. Sep 2009) | 2 lines
+commit 455efeb2c75b0768c02bdd4a307ea519ed0ae4d3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 15:12:26 2010 +0000
 
-some misc and layout fixes for windows.
+    Update wxServDisc.
 
-------------------------------------------------------------------------
-r43 | bk138 | 2009-09-23 01:26:54 +0200 (Mi, 23. Sep 2009) | 2 lines
+commit 05c6e03f6e7079ffa03c8d26c15b479f8b4b742a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 15:00:33 2010 +0000
 
-split out VNCCanvas class into seperate files.
+    Change app icon to sth more meaningful.
 
-------------------------------------------------------------------------
-r42 | bk138 | 2009-09-23 01:11:06 +0200 (Mi, 23. Sep 2009) | 2 lines
+commit 4542b3b776810b8f30db5850f65413cfeb10c3c3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 14:43:46 2010 +0000
 
-change to no-timestamp-mode of wxglade.
+    Use raw byte equiv in update stats.
+    
+    This way the numbers are comparable between unicast and multicast
+    and also more meaningful than the abstract updates/s count.
 
-------------------------------------------------------------------------
-r41 | bk138 | 2009-09-22 17:16:54 +0200 (Di, 22. Sep 2009) | 2 lines
+commit 7c2875d3776a86db5fc863c9b27842047880e054
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 01:30:31 2010 +0000
 
-sync withg wxServDisc svn. MDNS lookups are now fast again.
+    Better listing of security types in about dlg.
 
-------------------------------------------------------------------------
-r40 | bk138 | 2009-09-20 19:27:56 +0200 (So, 20. Sep 2009) | 2 lines
+commit a0823304eeeec8d771fd6a2b90dede599463bfad
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 01:18:20 2010 +0000
 
-':' is not allowed in windows filenames.
+    Update TODO.
 
-------------------------------------------------------------------------
-r39 | bk138 | 2009-09-20 17:03:10 +0200 (So, 20. Sep 2009) | 5 lines
+commit 0a5d2099a1942f0d5dcd3ab9dcae384870b87286
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Feb 7 01:16:36 2010 +0000
 
-work around an issue with wxFileSelector.
+    Clear stats window on disconnect.
 
-this would cause a signal to be generated, which in turn would
-make the WaitforMessage() call fail.
+commit 6f4ee083071d1b55ad89b6f4b6853fd756e5f18d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 6 23:54:51 2010 +0000
 
-------------------------------------------------------------------------
-r38 | bk138 | 2009-09-20 16:58:12 +0200 (So, 20. Sep 2009) | 2 lines
+    More locking fixes... this time right.
 
-implement screenshot function.
+commit 0e43702d887c464305cc17e6ef8805862abb132e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 6 23:45:10 2010 +0000
 
-------------------------------------------------------------------------
-r37 | bk138 | 2009-09-17 16:51:04 +0200 (Do, 17. Sep 2009) | 2 lines
+    More locking fixes.
 
-use remote desktop name instead of hostname.
+commit 8cc31366e6e64bd4868fc806eef2afe022c07103
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 6 23:40:34 2010 +0000
 
-------------------------------------------------------------------------
-r36 | bk138 | 2009-09-16 18:22:14 +0200 (Mi, 16. Sep 2009) | 2 lines
+    Lock cuttext mutex when reading cuttext.
 
-some layout fixes.
+commit 91670ee80031a2ee97220655189c13dde3ecad77
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 6 23:35:25 2010 +0000
 
-------------------------------------------------------------------------
-r35 | bk138 | 2009-09-16 17:36:16 +0200 (Mi, 16. Sep 2009) | 4 lines
+    Fix pointer latency display.
 
-ladies and gentleman: we have something to see!
+commit c93b2bbb8cdd51a47f25a1586fbefdbe62758ea0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 6 23:08:59 2010 +0000
 
-implement viewer only functionality.
+    Do not interact with the client* from different thread contexts.
+    
+    Fixes those TLS lockups.
 
-------------------------------------------------------------------------
-r34 | bk138 | 2009-09-15 23:36:17 +0200 (Di, 15. Sep 2009) | 2 lines
+commit 97e237870894cdfc6dcfc906a3785c8c2dc49b15
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 6 21:11:03 2010 +0000
 
-add support to specify compresslevel and quality.
+    Use updated wxServDisc class.
+    
+    Implementation is now simpler and it properly closes sockets
+    on object destruction.
 
-------------------------------------------------------------------------
-r33 | bk138 | 2009-09-15 22:05:57 +0200 (Di, 15. Sep 2009) | 5 lines
+commit 2b44427dd0cc6287232c0d8672ef5db3132f99ee
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Feb 6 19:25:30 2010 +0000
 
-fix thinko with update notifies.
+    Remove debian/files.
 
-before, it would only return the last updated region, 
-which obviously is not really what we want...
+commit d51de077c73d126c072340cbaf45b5fd1700a34d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 4 23:38:43 2010 +0000
 
-------------------------------------------------------------------------
-r32 | bk138 | 2009-09-15 20:29:27 +0200 (Di, 15. Sep 2009) | 7 lines
+    Fix "about" display if built without GnuTLS.
 
-use custom bitmap copy instead of GetSubBitmap().
+commit 67b43db46c7364c4ea4502c0ed51ec56a9f7ac7b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 4 16:03:53 2010 +0000
 
-even on non-windows platforms we have to adjust the alpha
-channel to fully opaque, as libvncclient always sets this 
-to zero and therefore fully transparent, i.e. invisible on
-a wxDC.
+    Implement display of multicast loss ratio.
 
-------------------------------------------------------------------------
-r31 | bk138 | 2009-09-15 17:51:44 +0200 (Di, 15. Sep 2009) | 2 lines
+commit 46db93a9e0d2dec8867bc2d4d0aa69228178080c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 4 14:43:15 2010 +0000
 
-implement handling of multiple connections.
+    Add info about builtin features to about dialog.
 
-------------------------------------------------------------------------
-r30 | bk138 | 2009-09-15 17:32:04 +0200 (Di, 15. Sep 2009) | 2 lines
+commit 834eeae06f0d5c4fcc15f2ab1e0e62e8b85ee5a8
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 4 13:57:19 2010 +0000
 
-implement getters for server hostname, address and port.
+    update TODO.
 
-------------------------------------------------------------------------
-r29 | bk138 | 2009-09-15 15:33:46 +0200 (Di, 15. Sep 2009) | 2 lines
+commit 227c9a9155d85ccea4212f64a81e341f3a767239
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 4 13:49:02 2010 +0000
 
-make framebuffer dump names host specific.
+    Fix TLS, at least with UNIX.
+    
+    TLS with threading under win32 probably needs some more love...
 
-------------------------------------------------------------------------
-r28 | bk138 | 2009-09-05 19:33:05 +0200 (Sa, 05. Sep 2009) | 2 lines
+commit c6a131af6663ed997ffc5f9a845254f1649e0859
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 4 00:23:44 2010 +0000
 
-wait for thread deletion to finish.
+    Strip executable before putting it into win32 installer.
 
-------------------------------------------------------------------------
-r27 | bk138 | 2009-09-05 19:28:47 +0200 (Sa, 05. Sep 2009) | 2 lines
+commit 38972721ff7c8f0b788c244ef4c871c5b96ac418
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Feb 4 00:06:20 2010 +0000
 
-simplify save dialog: use wx builtin overwrite prompt.
+    Fix this darn Mingw32 compilation again.
 
-------------------------------------------------------------------------
-r26 | bk138 | 2009-09-05 18:59:55 +0200 (Sa, 05. Sep 2009) | 2 lines
+commit ad1bdb71ba52245cf47e94056af17ff428e655f8
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 21:39:10 2010 +0000
 
-implement getters for width and height.
+    Update help text.
 
-------------------------------------------------------------------------
-r25 | bk138 | 2009-09-04 18:57:36 +0200 (Fr, 04. Sep 2009) | 2 lines
+commit fa8e6b66156019ebd11404031ec2ee699f7f4ec4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 21:30:47 2010 +0000
 
-implement framebuffer update with proper notification of the main app.
+    Update NEWS.
 
-------------------------------------------------------------------------
-r24 | bk138 | 2009-09-02 21:35:06 +0200 (Mi, 02. Sep 2009) | 2 lines
+commit 846e7599d8bdf0e0cccbe3c70fd48ed6c1e5ec1b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 19:40:21 2010 +0000
 
-delete service scanner on exit.
+    Add _all_ resource files to Makefile.am.
 
-------------------------------------------------------------------------
-r23 | bk138 | 2009-09-02 21:31:42 +0200 (Mi, 02. Sep 2009) | 5 lines
+commit c089529ef88af1a174957ab2809e0ff2790c8e22
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 19:23:57 2010 +0000
 
-add updated wxServDisc module from http://sourceforge.net/projects/wxservdisc
+    Add icons indicating multicast connection.
 
-this includes better debug output and some object deletion fixes.
+commit c54e1a41cb8a784ca9471a7e7c48a6b607f98738
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 19:03:17 2010 +0000
 
+    Enable -Wall by default.
 
-------------------------------------------------------------------------
-r22 | bk138 | 2009-09-01 17:22:47 +0200 (Di, 01. Sep 2009) | 2 lines
+commit 5a32a70e3feb7de1c3965eae1c48dfe7bdaf0693
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 15:19:15 2010 +0000
 
-add another top panel to get rid of grey border under windows.
+    Make use of MulticastVNC configurable.
 
-------------------------------------------------------------------------
-r21 | bk138 | 2009-09-01 14:52:00 +0200 (Di, 01. Sep 2009) | 2 lines
+commit cb2d9026d411a7ec87ef8417a252be4851f34b62
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 14:40:38 2010 +0000
 
-rework debug config a bit so that it applies to a user given wx-config too.
+    Fix bug where app would terminate on disconnect.
 
-------------------------------------------------------------------------
-r20 | bk138 | 2009-09-01 13:31:36 +0200 (Di, 01. Sep 2009) | 5 lines
+commit 282e923aefb78cb7499baafa1adabd6884f01e45
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Feb 3 13:56:15 2010 +0000
 
-change to use stabs debugger format when compiling for windows.
+    Add default exception handler.
 
-seems gdb under windows mingw only does backtraces with stabs...
+commit 788a78277d4bcffe542dbcd29c5f73d4af38eb58
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 2 16:19:31 2010 +0000
 
+    Delete debian/watch.ex.
 
-------------------------------------------------------------------------
-r18 | bk138 | 2009-08-29 15:38:52 +0200 (Sa, 29. Aug 2009) | 2 lines
+commit 3ad3cdd2cb75897c088777e8c457f3c7372aa789
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 2 14:20:25 2010 +0000
 
-stat() returns 0 on success! should fix bogus IsUnixSocket() return values.
+    Sanitize NEWS, update README.
 
-------------------------------------------------------------------------
-r17 | bk138 | 2009-08-28 15:37:27 +0200 (Fr, 28. Aug 2009) | 2 lines
+commit b9ffea2cece52e3c98766b37a357cd4cdaae51ae
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 2 13:48:25 2010 +0000
 
-set button id's properly plus some changes to display properly under win32.
+    Actually _use_ multicast.
 
-------------------------------------------------------------------------
-r16 | bk138 | 2009-08-28 15:07:13 +0200 (Fr, 28. Aug 2009) | 2 lines
+commit 6a8c3af1a22a6c175b7d72cfaaebcd5b2664ec12
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 2 13:21:57 2010 +0000
 
-change order of includes. darn windows...
+    Add multicast debug flags.
 
-------------------------------------------------------------------------
-r15 | bk138 | 2009-08-27 18:29:42 +0200 (Do, 27. Aug 2009) | 2 lines
+commit 41de452675db26f72f9a463881576ac9f69ee349
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Feb 2 00:25:11 2010 +0000
 
-add support for doing debug builds.
+    Update libvncclient, now compiles under MinGW32.
 
-------------------------------------------------------------------------
-r14 | bk138 | 2009-08-24 16:53:40 +0200 (Mo, 24. Aug 2009) | 5 lines
+commit f4e83c768269013bb6eab832bb40d11d6909c5ee
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 1 16:03:49 2010 +0000
 
-don't update the gui grom another thread.
+    Add multicast-enabled libvncclient.
 
-we instead post an update event to ourselves. should fix those
-segfaults..
+commit ea9e9bc350a5c4b579c2d0b0495ad9ef769d2c5a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 1 15:28:43 2010 +0000
 
-------------------------------------------------------------------------
-r13 | bk138 | 2009-08-24 16:52:06 +0200 (Mo, 24. Aug 2009) | 4 lines
+    windows installer: properly delete directories.
 
-change user info back to 3 lines as this fits into the messagebox.
+commit fac92b244e09a14c5c1c79405f633925bbe5a291
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 1 15:01:33 2010 +0000
 
-otherwise the user would have to scroll down to see what happened.
+    Add support for building windows installer.
 
-------------------------------------------------------------------------
-r12 | bk138 | 2009-08-22 18:10:57 +0200 (Sa, 22. Aug 2009) | 2 lines
+commit d4f311402bbd709761f9cbb14f5515e5d3e54e71
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Feb 1 14:30:19 2010 +0000
 
-implement proper logging support.
+    Add MinGW dll, needed to run win32 binaries.
 
-------------------------------------------------------------------------
-r11 | bk138 | 2009-08-11 22:53:00 +0200 (Di, 11. Aug 2009) | 2 lines
+commit c28284a72dcf25d9612c9b2c044f8d1bbedf5b57
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jan 25 20:36:44 2010 +0000
 
-make VNCConn::getlog() static.
+    add debian/watch file.
 
-------------------------------------------------------------------------
-r10 | bk138 | 2009-08-11 22:27:38 +0200 (Di, 11. Aug 2009) | 2 lines
+commit adc97d4cf5eb09a1010333e1e36131704a73715d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jan 25 20:33:37 2010 +0000
 
-remove debug output, be more verbose when connection terminates.
+    update TODO.
 
-------------------------------------------------------------------------
-r9 | bk138 | 2009-08-11 22:15:22 +0200 (Di, 11. Aug 2009) | 2 lines
+commit 802317f5641df1995ed65ab255ee1636bdc7f95e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jan 25 20:30:47 2010 +0000
 
-implement starting/stopping VNC connection. nothing to see yet.
+    add resource files to SOURCES.
+    
+    This way they get properly included into the source
+    tarball.
 
-------------------------------------------------------------------------
-r8 | bk138 | 2009-08-11 19:21:27 +0200 (Di, 11. Aug 2009) | 2 lines
+commit 3ed987ff89257c3f22b66a88cbb9f8ff56b191a2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jan 25 20:26:03 2010 +0000
 
-add jpeglib hints to README.
+    don't install libvncclient, we link statically.
 
-------------------------------------------------------------------------
-r7 | bk138 | 2009-08-11 18:19:52 +0200 (Di, 11. Aug 2009) | 2 lines
+commit bce720cf180dcbe6a59053bc8545357badb37c92
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jan 25 20:06:44 2010 +0000
 
-add some hints how to compile to README.
+    add debian packaging.
 
-------------------------------------------------------------------------
-r6 | bk138 | 2009-08-06 15:05:17 +0200 (Do, 06. Aug 2009) | 2 lines
+commit e36a0e65c51350414e29c1ecc02c32482fac5635
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Jan 25 19:42:57 2010 +0000
 
-mingw32 compile fixes.
+    add desktop file.
 
-------------------------------------------------------------------------
-r5 | bk138 | 2009-08-06 15:03:10 +0200 (Do, 06. Aug 2009) | 2 lines
+commit 31fb375a8d3ae768c968ca0302a5c932533887c4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Nov 26 13:51:39 2009 +0000
 
-add some missing checks and macros.
+    workaround segfault on exit.
 
-------------------------------------------------------------------------
-r4 | bk138 | 2009-08-04 16:40:32 +0200 (Di, 04. Aug 2009) | 2 lines
+commit aef09b1b7e9322a8f3e21f7374f7455150265806
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Nov 23 16:29:24 2009 +0000
 
-properly include libvncclient into build system.
+    disable bookmark menu items when bookmarks not shown.
 
-------------------------------------------------------------------------
-r3 | bk138 | 2009-08-02 20:44:18 +0200 (So, 02. Aug 2009) | 2 lines
+commit a9df218cdf8e38de1812b7359bd7259deb55a1ed
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Nov 23 16:07:01 2009 +0000
 
-add libvncclient to source tree.
+    implement bookmarks.
 
-------------------------------------------------------------------------
-r2 | bk138 | 2009-08-01 18:49:03 +0200 (Sa, 01. Aug 2009) | 2 lines
+commit 839d081aef9dede6648e2d652f83aab73938ded5
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 20 20:43:14 2009 +0000
 
-some cleanup.
+    update NEWS.
 
-------------------------------------------------------------------------
-r1 | bk138 | 2009-08-01 18:38:53 +0200 (Sa, 01. Aug 2009) | 2 lines
+commit 2f37bfc8aa140b0bcdea9a24c51e03bdfd9ed141
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 20 20:37:31 2009 +0000
 
-initial commit. the gui without noteworthy functionality.
+    delete VNCConn object _after_ deleting canvas.
+    
+    fixes bug where canvas would try to call methods of a
+    VNCConn instance not existing anymore.
 
-------------------------------------------------------------------------
+commit 019572810c43a926bdd99ee18c02cd21bb79c301
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 20 20:10:40 2009 +0000
+
+    up modifier keys if canvas loses focus.
+    
+    this fixes the case where ctrl or alt got pressed down, the
+    canvas loses focus, ctrl or alt are released, but that is not
+    reported to the server, resulting ind ctrl or alt being stuck
+    at pressed down state.
+
+commit 3a04890378681bd50f8fdf09b35ba764bd1facad
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 20 18:26:33 2009 +0000
+
+    add bookmarks stubs.
+
+commit f6b82308c9cd2ffc12fd312c0a59a3edda9006a0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 20 17:56:52 2009 +0000
+
+    update NEWS.
+
+commit 030cfe2e84872d21e67342df1c2494abb24b2e21
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Nov 16 15:40:52 2009 +0000
+
+    add bookmark menu items.
+
+commit 9726f8dbb8c2104c5c1c078944595c1b8c9d1897
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Nov 12 13:09:39 2009 +0000
+
+    update to libvncclient master.
+
+commit e4090b0bc522a967c773212bd89ae8e35a782bd2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Nov 12 13:07:20 2009 +0000
+
+    use a global mutex to protect clipboard access.
+    
+    should fix these warnings now once and forever...
+
+commit a198a6fd4ec8030f2bfe334b230704550bced8d8
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Nov 12 01:30:22 2009 +0000
+
+    improve sendking of keysyms.
+    
+    now ctrl-c and friends should be working.
+
+commit a36e0e2b542c15f49683979f13314f8b066398eb
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Nov 12 00:19:37 2009 +0000
+
+    properly de/en-code cuttext to ISO-8859-1.
+
+commit bbc2c53498122ba5f6003f6a91a2295056319dd7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 11 22:27:50 2009 +0000
+
+    fix bug where canvas would be incorrectly centered in scrollwindow.
+
+commit 429aa1917639fa31ed6a19e1a1b1a5115b5d26e7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 11 20:18:39 2009 +0000
+
+    fix those warnings that clipboard is already open.
+
+commit ac84c7f8fc9632d4d4e4d2c844e87104e7363083
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 11 19:42:35 2009 +0000
+
+    don't try to get it's contents when the framebuffer is size zero.
+
+commit b9455d779aaa6bb4da833d404334087c0d353a79
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 11 19:33:25 2009 +0000
+
+    get rid of some code duplication.
+
+commit b8e1229b49f88157b6ca7a54297468f137e36705
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 11 19:29:04 2009 +0000
+
+    rework handling of listening connection's port numbers.
+    
+    now it actually works.
+
+commit 4fead5fef7f5cce74ebaf7c7902bfc34b8484f15
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 6 19:03:49 2009 +0000
+
+    update to latest wxServDisc version.
+
+commit cabb2f01952d979635d0361b2364a602149a3f16
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 6 16:19:49 2009 +0000
+
+    update to latest wxServDisc.
+
+commit b91d18b19afdaa8c9a86751954adaea3abaac5f6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 6 15:36:24 2009 +0000
+
+    also act on resizeFB for not currently active notebook pages.
+
+commit c94a4979e3d6dc16569d41a3dc8503b71ea876dc
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Nov 6 15:24:01 2009 +0000
+
+    set page text for incoming connection.
+
+commit 585ddb87796d4bb8b3bf94c5e03455b1dca52ee0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Nov 5 14:24:18 2009 +0000
+
+    correctly count listening connections.
+
+commit 2ead16507b0c47b74e5013da9998f9a06321ee8d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 4 23:29:15 2009 +0000
+
+    Add listen mode to VNCConn and GUI.
+    
+    Maybe needs some more love, but right now it's working.
+
+commit 9ee16d8237bed9358440bb37a8a08f54ab3d7b19
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 4 21:45:47 2009 +0000
+
+    VNCCanvas: guard against repaint request for zero sized canvas.
+
+commit 2e038dff929bbbdb062d6ba37042a30c86ecaa3a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 4 17:23:23 2009 +0000
+
+    refactor Init() & Shutdown() to Init(), Shutdown(), Setup(), Cleanup().
+    
+    This allows us to squeeze Listen() in.
+
+commit 345efb2aede9b1f817e2313f46ef8f26048e7445
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Nov 4 15:44:17 2009 +0000
+
+    use newest libvncclient.
+    
+    this gives us a non-forking listen mode and TLS support.
+
+commit 8249f15a3bf9a5a7e40119a9418da61687ec0daf
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Oct 13 11:09:58 2009 +0000
+
+    setup for 0.2 development.
+
+commit 5d841108dfc1a348987068f95d2742c6aeb55449
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 12 19:21:48 2009 +0000
+
+    update NEWS.
+
+commit 26b0c0ce60a7dd0dc5168aaee25ce54df73c8a5e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 12 19:05:12 2009 +0000
+
+    update TODO and ChangeLog.
+
+commit fc84b17ddc14cd81f9716f669f6fbd8c35aaf6d9
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 12 15:13:39 2009 +0000
+
+    update help text.
+
+commit 075a49f130a5e35dd913c15be14962d2bc5ef08b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 12 14:44:25 2009 +0000
+
+    remove some old comments.
+
+commit 59c7d36fd294626de5c053eb34f8cbe0b6516548
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 12 14:42:00 2009 +0000
+
+    clipboard support in main frame and VNCCanvas, rework VNCCanvas to support resizes.
+
+commit 0fc3fb2ecd3780c369dea32fce39ca924d9489e0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Oct 7 14:34:03 2009 +0000
+
+    implement VNCConn cuttext support.
+
+commit 7f1db53a280442769dda822a566df89f2749a599
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Oct 6 16:54:54 2009 +0000
+
+    framebuffer resize functionality for main frame and canvas.
+    
+    also fix some warnings in MyFrameMain.cpp.
+
+commit a1b78c1c5d4705f22660e54e70bd2c11f74a7e8f
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Oct 6 00:00:35 2009 +0000
+
+    silence warnings.
+
+commit 093f035fa055fe5b485ad5450321ad72c768f50c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 5 23:53:24 2009 +0000
+
+    exclude unused parameters in compiler warnings.
+
+commit 00ac7b61e645de44ece5e2cacc3aee9bfdb8c106
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 5 23:24:41 2009 +0000
+
+    add -Wall and -Wextra to CXXFLAGS in debug build.
+
+commit a189ecba38902932d5d8d52314fb6d49c1fc0ef9
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 5 22:14:13 2009 +0000
+
+    framebuffer resize support in VNCConn.
+
+commit 0d82967ddcb4561f5f5140374fd6c68bfe60c9e4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 5 19:12:04 2009 +0000
+
+    fill in port if empty.
+
+commit 1687c331a0771452060aaacc46ed38c3a4d8e5dc
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 5 19:11:39 2009 +0000
+
+    VNCConn: be a bit more talkative in error case.
+
+commit d35ae0d140bf6dde4b0998385b7e0330acff908d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 5 19:02:37 2009 +0000
+
+    add functionality to specify host(s) on commandline.
+
+commit ff6a2e3b87f2c6413c1c4a50fe9bb44977b76832
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Oct 5 14:38:31 2009 +0000
+
+    implement settings dialog and some settings.
+
+commit e3ca4eed07f25c27e8a83bdfaa86ba09c7c7a0e4
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Oct 3 16:07:04 2009 +0000
+
+    greatly simplify log frame.
+    
+    we now use a timer instead of a thread.
+
+commit e168eb13de2be62cbdd87d57c61eee6345417f4b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Oct 3 15:02:58 2009 +0000
+
+    use miliseconds since Init() in stats instead of wxNow().
+
+commit 9176f1a1a2c097efdf5c73d240608b30352c8ac0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Oct 2 15:44:26 2009 +0000
+
+    add functionality to save statistics.
+
+commit 1ff2e4d724ed78ff2931c8797f350eb39e5b794b
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Oct 2 15:18:09 2009 +0000
+
+    update to newest libvnclient from git master.
+
+commit 376f89481bc96024a4802395971cd1c05b2cd196
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Oct 1 20:30:49 2009 +0000
+
+    delete all connections on frame destroy.
+    
+    terminate_conn resizes the connection vector!
+
+commit 66278c50bb63166fd7f69ae57e001081bb1ee8d5
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Oct 1 20:12:35 2009 +0000
+
+    first stab at statistics for VNC connections.
+
+commit 7d34dfc9d04b3107fb5d351384313f6462d1a21c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 29 19:49:38 2009 +0000
+
+    minor gui tweak: better label.
+
+commit b422ab1dadf374b59176aef4ff78e53871abb119
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 29 13:53:34 2009 +0000
+
+    remove unused code.
+
+commit 23bda87095782c3b3294b1e18969e8713959ff20
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Sep 28 17:14:11 2009 +0000
+
+    fix keyboard input for windows.
+
+commit 3c2662cf36e1feba529b42d71144eabf55f33b90
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Sep 28 15:48:05 2009 +0000
+
+    some gui tweaks, remember window size.
+
+commit fc4403ea17f87b7a01d1b750286fa130d9056b7f
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Sep 28 14:45:38 2009 +0000
+
+    update help text.
+
+commit 926e1517538f44ba3b06690282cf3f4c59ab0ec6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Sep 28 14:36:16 2009 +0000
+
+    implement keyboard input.
+
+commit e5ff3c8d0cfebe0621c8351e653ee4719ae03730
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Sep 25 19:08:54 2009 +0000
+
+    further tweaking of VNC cursor.
+
+commit 6b1265c32190a652ee5b282ef8e6a5dacdc9b724
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Sep 25 12:51:28 2009 +0000
+
+    implement VNC-style cursor.
+
+commit ceb69ae7b7e6440b3c6c44f3e94ee26c3806ac55
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Sep 24 19:34:14 2009 +0000
+
+    implement mouse input.
+
+commit 7b1b3fa690151ff9f17e435ada34ff790c351d74
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Sep 24 14:55:53 2009 +0000
+
+    fix getFrameBufferRegion() for windows.
+    
+    btw, make some getters return non-const strings.
+
+commit 17c64914f5b02d41e4e864145b108c31f08e9e89
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Sep 23 12:59:20 2009 +0000
+
+    some misc and layout fixes for windows.
+
+commit 5ce48d88acd092e82d8e902725db76d9f3c91d0c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 22 23:26:54 2009 +0000
+
+    split out VNCCanvas class into seperate files.
+
+commit e5937150072b64bd487052551e105031f95d7bc8
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 22 23:11:06 2009 +0000
+
+    change to no-timestamp-mode of wxglade.
+
+commit 3fa2f9f077374d27c6d051d2b46dc8069d09f340
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 22 15:16:54 2009 +0000
+
+    sync withg wxServDisc svn. MDNS lookups are now fast again.
+
+commit c0c252ec6bbdf73516f1c44c4439b70a732e269f
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Sep 20 17:27:56 2009 +0000
+
+    ':' is not allowed in windows filenames.
+
+commit ad3f09eb7fa00a8b44a84f50287923dbe29f63e2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Sep 20 15:03:10 2009 +0000
+
+    work around an issue with wxFileSelector.
+    
+    this would cause a signal to be generated, which in turn would
+    make the WaitforMessage() call fail.
+
+commit cee5d178272a969916324019c0fc028c6996e546
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Sep 20 14:58:12 2009 +0000
+
+    implement screenshot function.
+
+commit 6e13eb6ec9c81fda1dae686f38eef04a0a281503
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Sep 17 14:51:04 2009 +0000
+
+    use remote desktop name instead of hostname.
+
+commit 9d4bc2c44e5ae633b560a8e43c02d4141c954585
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Sep 16 16:22:14 2009 +0000
+
+    some layout fixes.
+
+commit 64a9c22e17dc38e884e5c6fdab7087879c185c00
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Sep 16 15:36:16 2009 +0000
+
+    ladies and gentleman: we have something to see!
+    
+    implement viewer only functionality.
+
+commit e36d33a2779b31a22c8205a85d88a0cd85f0e7a7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 15 21:36:17 2009 +0000
+
+    add support to specify compresslevel and quality.
+
+commit ee14c9c45e99e9bf9cce472732932a6cc080f3a0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 15 20:05:57 2009 +0000
+
+    fix thinko with update notifies.
+    
+    before, it would only return the last updated region,
+    which obviously is not really what we want...
+
+commit cc61a8f0d10f51cc823a69b4d472e65927a3a6c6
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 15 18:29:27 2009 +0000
+
+    use custom bitmap copy instead of GetSubBitmap().
+    
+    even on non-windows platforms we have to adjust the alpha
+    channel to fully opaque, as libvncclient always sets this
+    to zero and therefore fully transparent, i.e. invisible on
+    a wxDC.
+
+commit ab604f0e04364aa91a934ec04fa9714c02c05a5a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 15 15:51:44 2009 +0000
+
+    implement handling of multiple connections.
+
+commit 071f123d45a87b5027607a691af967d6058d953d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 15 15:32:04 2009 +0000
+
+    implement getters for server hostname, address and port.
+
+commit fba250964aa8f24578e14aa77ca0aa74447aec91
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 15 13:33:46 2009 +0000
+
+    make framebuffer dump names host specific.
+
+commit 338a0f33169230780df1b05c095902a18d1abd0e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Sep 5 17:33:05 2009 +0000
+
+    wait for thread deletion to finish.
+
+commit b04b4b1b05a9d6bba802be3749d86f3bc4099850
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Sep 5 17:28:47 2009 +0000
+
+    simplify save dialog: use wx builtin overwrite prompt.
+
+commit 760f5f55e90949c65a64583c35df8087895622e2
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Sep 5 16:59:55 2009 +0000
+
+    implement getters for width and height.
+
+commit 90177a290c205a68342b18a8ba133dafa5f261bb
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Sep 4 16:57:36 2009 +0000
+
+    implement framebuffer update with proper notification of the main app.
+
+commit 6efe6ea2dabd7c549427b1bfeb547439dc572804
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Sep 2 19:35:06 2009 +0000
+
+    delete service scanner on exit.
+
+commit 9ac1ae757d75b7e9223c2a821062d448503134fb
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Wed Sep 2 19:31:42 2009 +0000
+
+    add updated wxServDisc module from http://sourceforge.net/projects/wxservdisc
+    
+    this includes better debug output and some object deletion fixes.
+
+commit aabcd506205c25e4caad4a054ae477fb43429bb7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 1 15:22:47 2009 +0000
+
+    add another top panel to get rid of grey border under windows.
+
+commit f3e87b77b40d9460c1e03035f68ec661b8e47a62
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 1 12:52:00 2009 +0000
+
+    rework debug config a bit so that it applies to a user given wx-config too.
+
+commit 4a0877b1a168c7f4238fa67618c59e3d2d7929de
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Sep 1 11:31:36 2009 +0000
+
+    change to use stabs debugger format when compiling for windows.
+    
+    seems gdb under windows mingw only does backtraces with stabs...
+
+commit f59931983ecf599403d864aa1a708d3ba68d7f06
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Aug 29 13:38:52 2009 +0000
+
+    stat() returns 0 on success! should fix bogus IsUnixSocket() return values.
+
+commit 996d64ec5fd2b44533ef8570c8c327f4716e3518
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Aug 28 13:37:27 2009 +0000
+
+    set button id's properly plus some changes to display properly under win32.
+
+commit 063710d47d3ba6fbe3fdac15ad5b5c6da2f67ed7
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Fri Aug 28 13:07:13 2009 +0000
+
+    change order of includes. darn windows...
+
+commit d5de2d80352d8cf92aaa2d1ac9a6461aa9fab490
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Aug 27 16:29:42 2009 +0000
+
+    add support for doing debug builds.
+
+commit 1caa50077ba594a3cca4fc19fe6384d5bedc8a62
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Aug 24 14:53:40 2009 +0000
+
+    don't update the gui grom another thread.
+    
+    we instead post an update event to ourselves. should fix those
+    segfaults..
+
+commit f73ced6a77f4a1c2a16e2bc8d6c9195882732530
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Mon Aug 24 14:52:06 2009 +0000
+
+    change user info back to 3 lines as this fits into the messagebox.
+    
+    otherwise the user would have to scroll down to see what happened.
+
+commit b5d43d9fa36c1a7f7b81fc2cbfd0300d9099170d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Aug 22 16:10:57 2009 +0000
+
+    implement proper logging support.
+
+commit f720d6f0fe915040e445c4e74b63a28a513aa9f3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Aug 11 20:53:00 2009 +0000
+
+    make VNCConn::getlog() static.
+
+commit c45ebfb41246c1ff2e867eb27896710a6bb1684a
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Aug 11 20:27:38 2009 +0000
+
+    remove debug output, be more verbose when connection terminates.
+
+commit 882ff4bf9102ff8522a6bf3947a071699389af0c
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Aug 11 20:15:22 2009 +0000
+
+    implement starting/stopping VNC connection. nothing to see yet.
+
+commit eeb52e7283f7b347a1f3d1d8894a8f6eb27d138d
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Aug 11 17:21:27 2009 +0000
+
+    add jpeglib hints to README.
+
+commit 33bb8fa159d7b86fff11cfd77afe6cd6ede7b38e
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Aug 11 16:19:52 2009 +0000
+
+    add some hints how to compile to README.
+
+commit 95aea62840c37ee98ed54ef63d86ffab4e6c18a0
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Aug 6 13:05:17 2009 +0000
+
+    mingw32 compile fixes.
+
+commit da31fa1be86dc48ee7c4e348c9edfd79c47eefc1
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Thu Aug 6 13:03:10 2009 +0000
+
+    add some missing checks and macros.
+
+commit 09bf04bd17009b8dedbe232dea87ea57f3467152
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Tue Aug 4 14:40:32 2009 +0000
+
+    properly include libvncclient into build system.
+
+commit c86d146003b3f2740c2fca61a40c73b3558fc8d3
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sun Aug 2 18:44:18 2009 +0000
+
+    add libvncclient to source tree.
+
+commit 356996b26c3823b241ed30f9bbf5508ed5e6bd13
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Aug 1 16:49:03 2009 +0000
+
+    some cleanup.
+
+commit a398fa874ba12c28faa0b5fb6816a63c0ccca9e1
+Author: Christian Beier <dontmind@freeshell.org>
+Date:   Sat Aug 1 16:38:53 2009 +0000
+
+    initial commit. the gui without noteworthy functionality.
