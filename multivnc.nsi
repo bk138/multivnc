@@ -24,6 +24,7 @@ Section ""
   File contrib\README-contrib.txt
   File NEWS.TXT	
   File README.TXT
+  File TODO.TXT
 
   writeUninstaller $INSTDIR\multivnc-uninstall.exe
 
@@ -32,6 +33,7 @@ Section ""
   createShortCut  "$SMPROGRAMS\MultiVNC\Multivnc.lnk" "$INSTDIR\multivnc.exe"
   createShortCut  "$SMPROGRAMS\MultiVNC\Readme.lnk" "$INSTDIR\README.TXT"
   createShortCut  "$SMPROGRAMS\MultiVNC\News.lnk" "$INSTDIR\NEWS.TXT"
+  createShortCut  "$SMPROGRAMS\MultiVNC\Todo.lnk" "$INSTDIR\TODO.TXT"
   createShortCut  "$SMPROGRAMS\MultiVNC\Uninstall MultiVNC.lnk" "$INSTDIR\multivnc-uninstall.exe"
 
 SectionEnd 
@@ -49,12 +51,14 @@ section "Uninstall"
   delete $INSTDIR\README-contrib.txt
   delete $INSTDIR\NEWS.TXT
   delete $INSTDIR\README.TXT
+  delete $INSTDIR\TODO.TXT
   RMDir  $INSTDIR
  
   # delete shortcuts
   delete "$SMPROGRAMS\MultiVNC\Multivnc.lnk"
   delete "$SMPROGRAMS\MultiVNC\Readme.lnk"
   delete "$SMPROGRAMS\MultiVNC\News.lnk"
+  delete "$SMPROGRAMS\MultiVNC\Todo.lnk"
   delete "$SMPROGRAMS\MultiVNC\Uninstall MultiVNC.lnk"
   RMDir  "$SMPROGRAMS\MultiVNC"
   

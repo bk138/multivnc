@@ -69,6 +69,7 @@ if MINGW
 nsis_installer: all multivnc.nsi README NEWS COPYING
 	cat README | unix2dos > README.TXT
 	cat NEWS | unix2dos > NEWS.TXT
+	cat TODO | unix2dos > TODO.TXT
 	cat COPYING | unix2dos > COPYING.TXT
 	$(STRIP) src/multivnc.exe
 	makensis multivnc.nsi 
