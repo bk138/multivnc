@@ -732,7 +732,12 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality, bool mu
     serverName = wxString(cl->serverHost, wxConvUTF8);
   else
     serverName = a.Hostname();
-  serverAddress = a.IPAddress();
+#ifdef __WIN32__ 
+  serverAddress = wxString(cl->serverHost, wxConvUTF8); // wxwidgets bug, ah well ...
+#else 
+  serverAddress = a.IPAddress();  
+#endif 
+  
   wxLogDebug(wxT("VNCConn %p: Init() done resolving hostname/address."), this);
 
   
