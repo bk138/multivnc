@@ -1,15 +1,17 @@
 multivnc (0.3-1) unstable; urgency=low
 
   * New release 0.3.
-    - Implemented window sharing.
+    - Implemented window sharing
+    - Implemented Edge Connector
+    - Implemented FastRequest feature
     - Fixed a bug where a fast VNC server would make MultiVNC
       GUI unresponsive on a slow client.
     - Fixed bug where saving log or screenshot would terminate
       the connection or even crash on some machines.
     - Fixed bug where setting up connection would take very long
-      due to unnecessary DNS lookups.	
+      due to unnecessary DNS lookups.
 
- -- Christian Beier <bk@bunker2.kifferkolonie>  Wed, 24 Mar 2010 16:26:56 +0100
+ -- Christian Beier <dontmind@freeshell.org>  Mon, 05 Jul 2010 16:26:56 +0100
 
 multivnc (0.2-1) unstable; urgency=low
 
