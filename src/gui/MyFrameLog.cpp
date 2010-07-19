@@ -76,10 +76,9 @@ void MyFrameLog::onUpdateTimer(wxTimerEvent& event)
     }
 
   if(IsFrozen())
-    {
-      Thaw();
-      wxEndBusyCursor();
-    }
+    Thaw();
+
+  wxEndBusyCursor();
 }
 
 
