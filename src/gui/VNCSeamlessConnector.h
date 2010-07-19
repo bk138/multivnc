@@ -37,7 +37,7 @@ public:
   ~VNCSeamlessConnector();
 
   void adjustSize(); 
-
+  int getEdge() { return edge; };
 
 
 protected:

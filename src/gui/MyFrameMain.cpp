@@ -733,7 +733,7 @@ void MyFrameMain::terminate_conn(int which)
   // this deletes the CanvasContainer plus canvas   
   notebook_connections->DeletePage(which);
   // this deletes the seamless connector
-  if(cb->seamlessconnector)
+  if(cb->seamlessconnector) 
     delete cb->seamlessconnector;
   // this deletes the VNCConn
   delete cb->conn;
@@ -1528,8 +1528,36 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
   frame_main_menubar->GetMenu(frame_main_menubar->
 			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(isSharing);
 
-  if(cb->seamlessconnector)
-    cb->seamlessconnector->Raise();
+  if(cb->seamlessconnector) 
+    {
+      switch(cb->seamlessconnector->getEdge())
+	{
+	case EDGE_NORTH:
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(0)->Check();
+	  break;
+	case EDGE_EAST:
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(1)->Check();
+	  break;
+	case EDGE_WEST:
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(2)->Check();
+	  break;
+	case EDGE_SOUTH:
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(3)->Check();
+	  break;
+	default:
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(4)->Check();
+	}
+
+      cb->seamlessconnector->Raise();
+    }
+  else // no object, i.e. disabled
+    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
+      FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(4)->Check();
 }
 
 
