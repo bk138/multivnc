@@ -81,7 +81,7 @@ public:
   void Cleanup();
   bool Listen(int port);
   bool Init(const wxString& host, int compresslevel = 1, int quality = 5,
-	    bool multicast = true, int multicastRecvBuf = 325);
+	    bool multicast = true, bool multicastNACK = true, int multicastRecvBuf = 325);
   void Shutdown();
 
 

@@ -603,11 +603,12 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
   // get connection settings
   int compresslevel, quality, multicast_recvbuf, fastrequest_interval;
-  bool multicast, fastrequest;
+  bool multicast, multicastNACK, fastrequest;
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
   pConfig->Read(K_MULTICAST, &multicast, V_MULTICAST);
+  pConfig->Read(K_MULTICASTNACK, &multicastNACK, V_MULTICASTNACK);
   pConfig->Read(K_MULTICASTRECVBUF, &multicast_recvbuf, V_MULTICASTRECVBUF);
   pConfig->Read(K_FASTREQUEST, &fastrequest, V_FASTREQUEST);
   pConfig->Read(K_FASTREQUESTINTERVAL, &fastrequest_interval, V_FASTREQUESTINTERVAL);
@@ -647,7 +648,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
 
       wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
-      if(!c->Init(hostname + wxT(":") + port, compresslevel, quality, multicast, multicast_recvbuf))
+      if(!c->Init(hostname + wxT(":") + port, compresslevel, quality, multicast, multicastNACK, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -668,7 +669,9 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   VNCCanvas* canvas = new VNCCanvas(container, c);
   container->setCanvas(canvas);
 
-  VNCSeamlessConnector* sc = new VNCSeamlessConnector(this, c, show_seamless);
+  VNCSeamlessConnector* sc = 0;
+  if(show_seamless != EDGE_NONE)
+    sc = new VNCSeamlessConnector(this, c, show_seamless);
 
   ConnBlob cb;
   cb.conn = c;
@@ -730,7 +733,8 @@ void MyFrameMain::terminate_conn(int which)
   // this deletes the CanvasContainer plus canvas   
   notebook_connections->DeletePage(which);
   // this deletes the seamless connector
-  delete cb->seamlessconnector;
+  if(cb->seamlessconnector)
+    delete cb->seamlessconnector;
   // this deletes the VNCConn
   delete cb->conn;
   // this deletes the windowsharer, if there's any
@@ -1038,6 +1042,7 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
       pConfig->Write(K_STATSAUTOSAVE, dialog_settings.getStatsAutosave());
       pConfig->Write(K_LOGSAVETOFILE, dialog_settings.getLogSavetofile());
       pConfig->Write(K_MULTICAST, dialog_settings.getDoMulticast());
+      pConfig->Write(K_MULTICASTNACK, dialog_settings.getDoMulticastNACK());
       pConfig->Write(K_MULTICASTRECVBUF, dialog_settings.getMulticastRecvBuf());
       pConfig->Write(K_FASTREQUEST, dialog_settings.getDoFastRequest());
       pConfig->Write(K_FASTREQUESTINTERVAL, dialog_settings.getFastRequestInterval());
@@ -1257,8 +1262,11 @@ void MyFrameMain::view_seamless(wxCommandEvent &event)
   if(connections.size())
     {
       ConnBlob* cbp = &connections.at(notebook_connections->GetSelection());
-      if(cbp->seamlessconnector)
-	delete cbp->seamlessconnector;
+      if(cbp->seamlessconnector) 
+	{
+	  delete cbp->seamlessconnector;
+	  cbp->seamlessconnector = 0;
+	}
       if(show_seamless != EDGE_NONE)
 	cbp->seamlessconnector = new VNCSeamlessConnector(this, cbp->conn, show_seamless);
     }

@@ -3,6 +3,8 @@ MultiVNC 0.4 -
         * MulticastVNC now incorporates a NACK mechanism which makes
           multicasting a lot more reliable: Lost packets are 
           retransmitted if the server supports it.
+        * Fixed bug where changing edge connector settings would
+          crash MultiVNC.
 
 MultiVNC 0.3 - "Collab me!"
 	* Implemented window sharing: You can now beam one of your 
