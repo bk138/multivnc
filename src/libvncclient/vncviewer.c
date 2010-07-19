@@ -231,12 +231,12 @@ static rfbBool rfbInitConnection(rfbClient* client)
   if (!InitialiseRFBConnection(client))
     return FALSE;
 
-  if (!SetFormatAndEncodings(client))
-    return FALSE;
-
   client->width=client->si.framebufferWidth;
   client->height=client->si.framebufferHeight;
   client->MallocFrameBuffer(client);
+
+  if (!SetFormatAndEncodings(client))
+    return FALSE;
 
   if (client->updateRect.x < 0) {
     client->updateRect.x = client->updateRect.y = 0;
@@ -288,6 +288,7 @@ rfbBool rfbInitClient(rfbClient* client,int* argc,char** argv) {
 	j++;
       } else if (strcmp(argv[i], "-multicast") == 0) {
 	client->canHandleMulticastVNC = TRUE;
+	client->multicastVNCdoNACK = TRUE;
 	j++;
       } else if (i+1<*argc && strcmp(argv[i], "-encodings") == 0) {
 	client->appData.encodingsString = argv[i+1];
@@ -371,7 +372,9 @@ void rfbClientCleanup(rfbClient* client) {
 #endif
 #endif
 
+#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
   FreeTLS(client);
+#endif
   if (client->sock >= 0)
     close(client->sock);
   if (client->listenSock >= 0)

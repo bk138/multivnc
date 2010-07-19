@@ -358,6 +358,7 @@ DefaultSupportedMessagesMulticastVNC(rfbClient* client)
 {
     DefaultSupportedMessages(client);
     SetClient2Server(client, rfbMulticastFramebufferUpdateRequest);
+    SetClient2Server(client, rfbMulticastFramebufferUpdateNACK);
     /* technically, we only care what we can *send* to the server */
     SetServer2Client(client, rfbMulticastFramebufferUpdate);
 }
@@ -381,8 +382,6 @@ IsUnixSocket(const char *name)
 rfbBool
 ConnectToRFBServer(rfbClient* client,const char *hostname, int port)
 {
-  unsigned int host;
-
   if (client->serverPort==-1) {
     /* serverHost is a file recorded by vncrec. */
     const char* magic="vncLog0.0";
@@ -417,12 +416,20 @@ ConnectToRFBServer(rfbClient* client,const char *hostname, int port)
   else
 #endif
   {
-    /* serverHost is a hostname */
-    if (!StringToIPAddr(hostname, &host)) {
-      rfbClientLog("Couldn't convert '%s' to host address\n", hostname);
-      return FALSE;
+#ifdef LIBVNCSERVER_IPv6
+    client->sock = ConnectClientToTcpAddr6(hostname, port);
+    if (client->sock == -1)
+#endif
+    {
+      unsigned int host;
+
+      /* serverHost is a hostname */
+      if (!StringToIPAddr(hostname, &host)) {
+        rfbClientLog("Couldn't convert '%s' to host address\n", hostname);
+        return FALSE;
+      }
+      client->sock = ConnectClientToTcpAddr(host, port);
     }
-    client->sock = ConnectClientToTcpAddr(host, port);
   }
 
   if (client->sock < 0) {
@@ -439,17 +446,23 @@ ConnectToRFBServer(rfbClient* client,const char *hostname, int port)
 
 rfbBool ConnectToRFBRepeater(rfbClient* client,const char *repeaterHost, int repeaterPort, const char *destHost, int destPort)
 {
-  unsigned int host;
   rfbProtocolVersionMsg pv;
   int major,minor;
   char tmphost[250];
 
-  if (!StringToIPAddr(repeaterHost, &host)) {
-    rfbClientLog("Couldn't convert '%s' to host address\n", repeaterHost);
-    return FALSE;
-  }
+#ifdef LIBVNCSERVER_IPv6
+  client->sock = ConnectClientToTcpAddr6(repeaterHost, repeaterPort);
+  if (client->sock == -1)
+#endif
+  {
+    unsigned int host;
+    if (!StringToIPAddr(repeaterHost, &host)) {
+      rfbClientLog("Couldn't convert '%s' to host address\n", repeaterHost);
+      return FALSE;
+    }
 
-  client->sock = ConnectClientToTcpAddr(host, repeaterPort);
+    client->sock = ConnectClientToTcpAddr(host, repeaterPort);
+  }
 
   if (client->sock < 0) {
     rfbClientLog("Unable to connect to VNC repeater\n");
@@ -933,6 +946,10 @@ InitialiseRFBConnection(rfbClient* client)
     break;
 
   case rfbTLS:
+#ifndef LIBVNCSERVER_WITH_CLIENT_TLS
+    rfbClientLog("TLS support was not compiled in\n");
+    return FALSE;
+#else
     if (!HandleAnonTLSAuth(client)) return FALSE;
     /* After the TLS session is established, sub auth types are expected.
      * Note that all following reading/writing are through the TLS session from here.
@@ -962,10 +979,15 @@ InitialiseRFBConnection(rfbClient* client)
             (int)subAuthScheme);
         return FALSE;
     }
+#endif
 
     break;
 
   case rfbVeNCrypt:
+#ifndef LIBVNCSERVER_WITH_CLIENT_TLS
+    rfbClientLog("TLS support was not compiled in\n");
+    return FALSE;
+#else
     if (!HandleVeNCryptAuth(client)) return FALSE;
 
     switch (client->subAuthScheme) {
@@ -991,7 +1013,7 @@ InitialiseRFBConnection(rfbClient* client)
             client->subAuthScheme);
         return FALSE;
     }
-
+#endif
     break;
 
   default:
@@ -1308,6 +1330,28 @@ SendMulticastFramebufferUpdateRequest(rfbClient* client, rfbBool incremental)
 }
 
 
+/*
+ * SendMulticastFramebufferUpdateNACK.
+ */
+
+rfbBool
+SendMulticastFramebufferUpdateNACK(rfbClient* client, uint32_t idPartialUpd, uint16_t nPartialUpds)
+{
+  rfbMulticastFramebufferUpdateNACKMsg mfun;
+
+  if (!SupportsClient2Server(client, rfbMulticastFramebufferUpdateNACK)) return TRUE;
+
+  mfun.type = rfbMulticastFramebufferUpdateNACK;
+  mfun.idPartialUpd = rfbClientSwap32IfLE(idPartialUpd);
+  mfun.nPartialUpds = rfbClientSwap16IfLE(nPartialUpds);
+
+  if (!WriteToRFBServer(client, (char *)&mfun, sz_rfbMulticastFramebufferUpdateNACKMsg))
+    return FALSE;
+
+  return TRUE;
+}
+
+
 
 /*
  * SendScaleSetting.
@@ -1522,31 +1566,51 @@ HandleRFBServerMessage(rfbClient* client)
 	      msg.mfu.idPartialUpd = rfbClientSwap32IfLE(msg.mfu.idPartialUpd);
 	      msg.mfu.nRects = rfbClientSwap16IfLE(msg.mfu.nRects);	      
 	      
-	      /* calculate lost packets from sequence numbers */
+	      /* calculate lost partial updates from sequence numbers */
 	      client->multicastRcvd++;
 	      if(client->multicastLastWholeUpd >= 0) /* only check on the second and later runs */
 		{
-		  /* it can happen that we get a mis-ordered packet 
+		  /* it can happen that we get a mis-ordered partial update 
 		     with a sequence number near to overflow, consider a succession of
 		     (1021, 0, 1022, 1) in a [0...1023] example seq.no. range */
 		  if(msg.mfu.idPartialUpd - client->multicastLastPartialUpd > 0x0FFF0000)
 		    client->multicastLastPartialUpd = msg.mfu.idPartialUpd;
 
-		  /* packets missing */
-		  if(msg.mfu.idPartialUpd - client->multicastLastPartialUpd > 1)
+		  /* partial update missing */
+		  if(msg.mfu.idPartialUpd - client->multicastLastPartialUpd > 1) {
 		    client->multicastLost += msg.mfu.idPartialUpd-(client->multicastLastPartialUpd+1);
 
-		  /* if a packet arrives out of order (with a lower sequence number than the last, 
-		     but not _much_ lower, as this would be a wrap-around), it was counted as lost 
-		     before, so revert this  */
+		    /* tell server about missing partial updates */
+		    if(client->multicastVNCdoNACK) 
+		      SendMulticastFramebufferUpdateNACK(client, 
+							 client->multicastLastPartialUpd+1,
+							 msg.mfu.idPartialUpd-(client->multicastLastPartialUpd+1));
+		  }
+
+		  /* if a partial update arrives out of order (with a lower sequence number than the 
+		     last, but not _much_ lower, as this would be a wrap-around), it was counted as 
+		     lost before, so revert this  */
 		  if(msg.mfu.idPartialUpd < client->multicastLastPartialUpd &&
-		     client->multicastLastPartialUpd - msg.mfu.idPartialUpd < 0x0FFF0000)
+		     client->multicastLastPartialUpd - msg.mfu.idPartialUpd < 0x0FFF0000 &&
+		     client->multicastLost > 0)
 		    client->multicastLost--;
 		}
-	      client->multicastLastPartialUpd = msg.mfu.idPartialUpd;
-	      client->multicastLastWholeUpd = msg.mfu.idWholeUpd;
+	      
+	      /* save last received highest sequence numbers, care for wrap-around */
+	      if(msg.mfu.idPartialUpd > client->multicastLastPartialUpd || 
+		 client->multicastLastPartialUpd - msg.mfu.idPartialUpd > 0x0FFF0000)
+		client->multicastLastPartialUpd = msg.mfu.idPartialUpd;
+
+	      if(msg.mfu.idWholeUpd > client->multicastLastWholeUpd || 
+		 client->multicastLastWholeUpd - msg.mfu.idWholeUpd > 0x7FFF) {
+		client->multicastLastWholeUpd = msg.mfu.idWholeUpd;
+		/* old one done */
+		if (client->FinishedFrameBufferUpdate)
+		  client->FinishedFrameBufferUpdate(client);
+	      }
 
 #ifdef MULTICAST_DEBUG
+	      rfbClientLog("MulticastVNC DEBUG: --got message--\n");
 	      rfbClientLog("MulticastVNC DEBUG: id whole:    %d\n", msg.mfu.idWholeUpd);
 	      rfbClientLog("MulticastVNC DEBUG: id partial:  %d\n", msg.mfu.idPartialUpd);
 	      rfbClientLog("MulticastVNC DEBUG: received:    %d\n", client->multicastRcvd);
@@ -1619,10 +1683,6 @@ HandleRFBServerMessage(rfbClient* client)
 		  client->GotFrameBufferUpdate(client, rect.r.x, rect.r.y, rect.r.w, rect.r.h);
 		}
 	    }
-
-	  /* FIXME this gets called after each partial update, not a whole one. Is this problematic? */
-	  if (client->FinishedFrameBufferUpdate)
-	    client->FinishedFrameBufferUpdate(client);
 	}
       else
 	{
@@ -1727,6 +1787,9 @@ HandleRFBServerMessage(rfbClient* client)
       if (rect.encoding == rfbEncodingNewFBSize) {
 	client->width = rect.r.w;
 	client->height = rect.r.h;
+	client->updateRect.x = client->updateRect.y = 0;
+	client->updateRect.w = client->width;
+	client->updateRect.h = client->height;
 	client->MallocFrameBuffer(client);
 	SendFramebufferUpdateRequest(client, 0, 0, rect.r.w, rect.r.h, FALSE);
 	rfbClientLog("Got new framebuffer size: %dx%d\n", rect.r.w, rect.r.h);
@@ -1842,7 +1905,10 @@ HandleRFBServerMessage(rfbClient* client)
 	client->multicastUpdInterval = rect.r.w;
   	client->multicastPixelformatId = rect.r.x;
 
-	rfbClientLog("Enabling MulticastVNC specific messages\n");
+	if(client->multicastVNCdoNACK)
+	  rfbClientLog("MulticastVNC: NACK'ing of lost messages enabled\n");
+
+	rfbClientLog("MulticastVNC: Enabling multicast specific messages\n");
 	DefaultSupportedMessagesMulticastVNC(client);
  	
 	continue;
@@ -2224,6 +2290,9 @@ HandleRFBServerMessage(rfbClient* client)
       return FALSE;
     client->width = rfbClientSwap16IfLE(msg.rsfb.framebufferWidth);
     client->height = rfbClientSwap16IfLE(msg.rsfb.framebufferHeigth);
+    client->updateRect.x = client->updateRect.y = 0;
+    client->updateRect.w = client->width;
+    client->updateRect.h = client->height;
     client->MallocFrameBuffer(client);
     SendFramebufferUpdateRequest(client, 0, 0, client->width, client->height, FALSE);
     rfbClientLog("Got new framebuffer size: %dx%d\n", client->width, client->height);
@@ -2237,6 +2306,9 @@ HandleRFBServerMessage(rfbClient* client)
       return FALSE;
     client->width = rfbClientSwap16IfLE(msg.prsfb.buffer_w);
     client->height = rfbClientSwap16IfLE(msg.prsfb.buffer_h);
+    client->updateRect.x = client->updateRect.y = 0;
+    client->updateRect.w = client->width;
+    client->updateRect.h = client->height;
     client->MallocFrameBuffer(client);
     SendFramebufferUpdateRequest(client, 0, 0, client->width, client->height, FALSE);
     rfbClientLog("Got new framebuffer size: %dx%d\n", client->width, client->height);

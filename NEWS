@@ -1,3 +1,8 @@
+MultiVNC 0.4 -
+        * MultiVNC can now connect to IPv6 servers!
+        * MulticastVNC now incorporates a NACK mechanism which makes
+          multicasting a lot more reliable: Lost packets are 
+          retransmitted if the server supports it.
 
 MultiVNC 0.3 - "Collab me!"
 	* Implemented window sharing: You can now beam one of your 

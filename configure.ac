@@ -254,9 +254,28 @@ if test "x$with_gnutls" != "xno"; then
 	fi
 fi
 
+
+# IPv6
+AH_TEMPLATE(IPv6, [Enable IPv6 support])
+AC_ARG_WITH(ipv6,
+[  --without-ipv6          disable IPv6 support],,)
+if test "x$with_ipv6" != "xno"; then
+	AC_CHECK_FUNC(getaddrinfo, AC_DEFINE(IPv6,1),
+		AC_CHECK_LIB(socket, getaddrinfo, AC_DEFINE(IPv6,1), [
+			AC_MSG_CHECKING([for getaddrinfo in -lws2_32])
+		        LIBS="$LIBS -lws2_32"
+		        AC_TRY_LINK([#include <ws2tcpip.h>], [getaddrinfo(0, 0, 0, 0);], [
+				      AC_DEFINE(IPv6,1)
+		                      AC_MSG_RESULT([yes])
+				      ],
+				    AC_MSG_RESULT([no]))
+                   ]))
+fi
+
+
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h netdb.h netinet/in.h stdlib.h string.h sys/socket.h sys/time.h sys/timeb.h syslog.h unistd.h ws2tcpip.h])
 
 
 # Checks for typedefs, structures, and compiler characteristics.

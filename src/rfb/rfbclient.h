@@ -321,6 +321,7 @@ typedef struct _rfbClient {
 
         /* all the multicast stuff */
         rfbBool canHandleMulticastVNC;
+        rfbBool multicastVNCdoNACK;
         int maxMulticastTimeouts;
         int multicastRcvBufSize;
         int multicastSock;
@@ -365,6 +366,7 @@ extern rfbBool SendFramebufferUpdateRequest(rfbClient* client,
 					 int x, int y, int w, int h,
 					 rfbBool incremental);
 extern rfbBool SendMulticastFramebufferUpdateRequest(rfbClient* client, rfbBool incremental);
+extern rfbBool SendMulticastFramebufferUpdateNACK(rfbClient* client, uint32_t idPartialUpd, uint16_t nPartialUpds);
 extern rfbBool SendScaleSetting(rfbClient* client,int scaleSetting);
 extern rfbBool SendPointerEvent(rfbClient* client,int x, int y, int buttonMask);
 extern rfbBool SendKeyEvent(rfbClient* client,uint32_t key, rfbBool down);
@@ -412,6 +414,7 @@ extern rfbBool WriteToRFBServer(rfbClient* client, char *buf, int n);
 extern int FindFreeTcpPort(void);
 extern int ListenAtTcpPort(int port);
 extern int ConnectClientToTcpAddr(unsigned int host, int port);
+extern int ConnectClientToTcpAddr6(const char *hostname, int port);
 extern int ConnectClientToUnixSock(const char *sockFile);
 extern int AcceptTcpConnection(int listenSock);
 extern rfbBool SetNonBlocking(int sock);
