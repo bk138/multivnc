@@ -105,7 +105,11 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
 
   if(show_toolbar)
-     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
+    {
+      GetToolBar()->EnableTool(wxID_STOP, false); // disconnect
+      GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
+    }
   else
     {
       // disable the toolbar
@@ -716,6 +720,9 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   // window sharing
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+
+  GetToolBar()->EnableTool(wxID_STOP, true); // disconnect
+  GetToolBar()->EnableTool(wxID_SAVE, true); // screenshot
   
   return true;
 }
@@ -774,6 +781,9 @@ void MyFrameMain::terminate_conn(int which)
       // window sharing
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+
+      GetToolBar()->EnableTool(wxID_STOP, false); // disconnect
+      GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
 
       // clear stats
       text_ctrl_upd->Clear();
