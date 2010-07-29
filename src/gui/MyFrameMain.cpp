@@ -652,7 +652,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
 
       wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
-      if(!c->Init(hostname + wxT(":") + port, compresslevel, quality, multicast, multicastNACK, multicast_recvbuf))
+      if(!c->Init(addr + wxT(":") + port, compresslevel, quality, multicast, multicastNACK, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
