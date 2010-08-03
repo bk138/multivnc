@@ -263,16 +263,8 @@ void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
     {
       VNCConn* selected_conn = connections.at(sel).conn;
       if(selected_conn == sending_conn)
-	connections.at(sel).canvas->drawRegion(event.rect);
+	wxPostEvent((wxEvtHandler*)connections.at(sel).canvas, event);
     }
-
-  // call this in any case, even if we don't draw anything
-  for(vector<ConnBlob>::iterator it = connections.begin(); it != connections.end(); it++)
-    if(it->conn == sending_conn)
-      {
-	sending_conn->UpdateProcessed();
-	break;
-      }
 }
 
 

@@ -24,6 +24,7 @@ BEGIN_EVENT_TABLE(VNCCanvas, wxPanel)
     EVT_KEY_UP (VNCCanvas::onKeyUp)
     EVT_CHAR (VNCCanvas::onChar)
     EVT_KILL_FOCUS(VNCCanvas::onFocusLoss)
+    EVT_VNCCONNUPDATENOTIFY (wxID_ANY, VNCCanvas::onVNCConnUpdateNotify)
 END_EVENT_TABLE();
 
 
@@ -145,6 +146,17 @@ void VNCCanvas::onFocusLoss(wxFocusEvent &event)
   conn->sendKeyEvent(key_event, false, false);
   key_event.m_keyCode = WXK_CONTROL;
   conn->sendKeyEvent(key_event, false, false);
+}
+
+
+
+void VNCCanvas::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
+{
+  VNCConn* sending_conn = static_cast<VNCConn*>(event.GetEventObject());
+
+  // only do something if this is our VNCConn
+  if(sending_conn == conn)
+    drawRegion(event.rect);
 }
 
 
