@@ -113,7 +113,7 @@ VNCConn::VNCConn(void* p)
 
   // blocking mode
   blocking_mode = false;
-  sema_unprocessed_upd = new wxSemaphore(10, 10);
+  sema_unprocessed_upd = new wxSemaphore(1, 1);
 
   // fastrequest stuff
   fastrequest_interval = 0;
