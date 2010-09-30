@@ -17,6 +17,7 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     sizer_quality_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("JPEG Quality"));
     sizer_fastrequest_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("FastRequest"));
     sizer_multicast_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("MulticastVNC"));
+    sizer_qos_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("Quality of Service"));
     sizer_compresslevel_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("Compression Level"));
     label_compresslevel = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Use specified compression level for \"Tight\" and \"Zlib\" encodings:"));
     slider_compresslevel = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
@@ -29,6 +30,7 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     checkbox_multicastNACK = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Disable asking for retransmit of lost messages"));
     label_recvbuf = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Receive Buffer Size (kB):"));
     slider_recvbuf = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 65, 9750, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
+    checkbox_qos_ef = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Use Expedited Forwarding tagging for sent data"));
     checkbox_logfile = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Write VNC log to logfile (MultiVNC.log)"));
     checkbox_stats_save = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Autosave statistics on close"));
 
@@ -55,6 +57,7 @@ void DialogSettings::do_layout()
     wxBoxSizer* sizer_top = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_logging = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_conn = new wxBoxSizer(wxVERTICAL);
+    wxStaticBoxSizer* sizer_qos = new wxStaticBoxSizer(sizer_qos_staticbox, wxHORIZONTAL);
     wxStaticBoxSizer* sizer_multicast = new wxStaticBoxSizer(sizer_multicast_staticbox, wxVERTICAL);
     wxStaticBoxSizer* sizer_fastrequest = new wxStaticBoxSizer(sizer_fastrequest_staticbox, wxVERTICAL);
     wxStaticBoxSizer* sizer_quality = new wxStaticBoxSizer(sizer_quality_staticbox, wxVERTICAL);
@@ -74,6 +77,8 @@ void DialogSettings::do_layout()
     sizer_multicast->Add(label_recvbuf, 0, wxALL, 3);
     sizer_multicast->Add(slider_recvbuf, 0, wxALL|wxEXPAND, 3);
     sizer_conn->Add(sizer_multicast, 0, wxALL|wxEXPAND, 3);
+    sizer_qos->Add(checkbox_qos_ef, 0, wxALL|wxEXPAND, 3);
+    sizer_conn->Add(sizer_qos, 0, wxALL|wxEXPAND, 3);
     notebook_settings_pane_conn->SetSizer(sizer_conn);
     sizer_logging->Add(checkbox_logfile, 0, wxALL, 6);
     sizer_logging->Add(checkbox_stats_save, 0, wxALL, 6);
