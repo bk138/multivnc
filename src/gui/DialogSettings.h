@@ -33,8 +33,7 @@ protected:
     wxStaticBox* sizer_qos_staticbox;
     wxStaticBox* sizer_multicast_staticbox;
     wxStaticBox* sizer_fastrequest_staticbox;
-    wxStaticBox* sizer_quality_staticbox;
-    wxStaticBox* sizer_compresslevel_staticbox;
+    wxStaticBox* sizer_tightsettings_staticbox;
     wxStaticText* label_compresslevel;
     wxSlider* slider_compresslevel;
     wxStaticText* label_quality;
