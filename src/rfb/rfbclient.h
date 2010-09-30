@@ -319,6 +319,9 @@ typedef struct _rfbClient {
 	char *destHost;
 	int destPort;
 
+        /* the QoS IP DSCP for this client */
+        int QoS_DSCP;
+
         /* all the multicast stuff */
         rfbBool canHandleMulticastVNC;
         rfbBool multicastVNCdoNACK;
@@ -418,6 +421,7 @@ extern int ConnectClientToTcpAddr6(const char *hostname, int port);
 extern int ConnectClientToUnixSock(const char *sockFile);
 extern int AcceptTcpConnection(int listenSock);
 extern rfbBool SetNonBlocking(int sock);
+extern rfbBool SetDSCP(int sock, int dscp);
 extern int CreateMulticastSocket(struct sockaddr_storage multicastSockAddr, int so_recvbuf);
 
 extern rfbBool StringToIPAddr(const char *str, unsigned int *addr);

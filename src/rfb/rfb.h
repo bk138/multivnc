@@ -718,6 +718,7 @@ extern int rfbListenOnTCPPort(int port, in_addr_t iface);
 extern int rfbListenOnUDPPort(int port, in_addr_t iface);
 extern int rfbCreateMulticastSocket(char* addr, int port, int ttl, in_addr_t iface, struct sockaddr_storage* sockAddrSave);
 extern int rfbStringToAddr(char* string,in_addr_t* addr);
+extern rfbBool rfbSetNonBlocking(int sock);
 
 /* rfbserver.c */
 

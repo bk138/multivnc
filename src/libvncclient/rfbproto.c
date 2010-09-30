@@ -437,6 +437,9 @@ ConnectToRFBServer(rfbClient* client,const char *hostname, int port)
     return FALSE;
   }
 
+  if(client->QoS_DSCP && !SetDSCP(client->sock, client->QoS_DSCP))
+     return FALSE;
+
   return SetNonBlocking(client->sock);
 }
 
