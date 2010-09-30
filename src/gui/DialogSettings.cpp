@@ -22,14 +22,14 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     slider_compresslevel = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     label_quality = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("JPEG quality level for \"Tight\" encoding:"));
     slider_quality = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
-    checkbox_fastrequest = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Use FastRequest"));
+    checkbox_fastrequest = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Enable FastRequest"));
     label_fastrequest = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Continously request updates at the specified milisecond interval:"));
     slider_fastrequest = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 1, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
-    checkbox_multicast = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Use MulticastVNC"));
+    checkbox_multicast = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Enable MulticastVNC"));
     checkbox_multicastNACK = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Disable asking for retransmit of lost messages"));
     label_recvbuf = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Receive Buffer Size (kB):"));
     slider_recvbuf = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 65, 9750, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
-    checkbox_qos_ef = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Use Expedited Forwarding tagging for sent data"));
+    checkbox_qos_ef = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Enable Expedited Forwarding tagging for sent data"));
     checkbox_logfile = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Write VNC log to logfile (MultiVNC.log)"));
     checkbox_stats_save = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Autosave statistics on close"));
 
