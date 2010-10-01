@@ -822,9 +822,17 @@ void VNCConn::UpdateProcessed()
 }
 
 
-void VNCConn::doFastRequest(size_t interval)
+void VNCConn::setFastRequest(size_t interval)
 {
   fastrequest_interval = interval;
+}
+
+bool VNCConn::setDSCP(uint8_t dscp)
+{
+  if(cl && cl->sock >= 0)
+    return SetDSCP(cl->sock, dscp);
+  else
+    return false;
 }
 
 

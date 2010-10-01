@@ -101,7 +101,12 @@ public:
     server message.
     0 to disable. default: disabled
   */
-  void doFastRequest(size_t interval);
+  void setFastRequest(size_t interval);
+
+  /*
+    enables marking the DSCP/Traffic Class of outgoing IP/IPv6 packets
+  */
+  bool setDSCP(uint8_t dscp);
 
   // get kind of VNCConn
   bool isReverse() const { return cl ? cl->listenSpecified : false; };

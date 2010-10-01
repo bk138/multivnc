@@ -37,6 +37,8 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   checkbox_fastrequest->SetValue(value);
   pConfig->Read(K_FASTREQUESTINTERVAL, &value, V_FASTREQUESTINTERVAL);
   slider_fastrequest->SetValue(value);
+  pConfig->Read(K_QOS_EF, &value, V_QOS_EF);
+  checkbox_qos_ef->SetValue(value);
 }
 
 

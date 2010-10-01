@@ -25,6 +25,7 @@ public:
   int getMulticastRecvBuf() const { return slider_recvbuf->GetValue(); };
   bool getDoFastRequest() const { return checkbox_fastrequest->GetValue(); };
   int getFastRequestInterval() const { return slider_fastrequest->GetValue(); };
+  bool getQoS_EF() const { return checkbox_qos_ef->GetValue(); };
 };
 
 

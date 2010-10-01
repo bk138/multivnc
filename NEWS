@@ -3,6 +3,8 @@ MultiVNC 0.4 -
         * MulticastVNC now incorporates a NACK mechanism which makes
           multicasting a lot more reliable: Lost packets are 
           retransmitted if the server supports it.
+        * MultiVNC now supports QoS: data sent to a VNC server can be
+          marked for expedited forwarding!
         * Fixed bug where changing edge connector settings would
           crash MultiVNC.
 

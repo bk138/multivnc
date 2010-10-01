@@ -597,7 +597,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
   // get connection settings
   int compresslevel, quality, multicast_recvbuf, fastrequest_interval;
-  bool multicast, multicastNACK, fastrequest;
+  bool multicast, multicastNACK, fastrequest, qos_ef;
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
@@ -606,6 +606,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   pConfig->Read(K_MULTICASTRECVBUF, &multicast_recvbuf, V_MULTICASTRECVBUF);
   pConfig->Read(K_FASTREQUEST, &fastrequest, V_FASTREQUEST);
   pConfig->Read(K_FASTREQUESTINTERVAL, &fastrequest_interval, V_FASTREQUESTINTERVAL);
+  pConfig->Read(K_QOS_EF, &qos_ef, V_QOS_EF);
 
 
   VNCConn* c = new VNCConn(this);
@@ -687,7 +688,10 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
     notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
 
   if(fastrequest)
-    c->doFastRequest(fastrequest_interval);
+    c->setFastRequest(fastrequest_interval);
+
+  if(qos_ef)
+    c->setDSCP(184); // 184 == 0xb8 == expedited forwarding
 
 
   // "end connection"
@@ -1040,6 +1044,7 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
       pConfig->Write(K_MULTICASTRECVBUF, dialog_settings.getMulticastRecvBuf());
       pConfig->Write(K_FASTREQUEST, dialog_settings.getDoFastRequest());
       pConfig->Write(K_FASTREQUESTINTERVAL, dialog_settings.getFastRequestInterval());
+      pConfig->Write(K_QOS_EF, dialog_settings.getQoS_EF());
 
       VNCConn::doLogfile(dialog_settings.getLogSavetofile());
     }
