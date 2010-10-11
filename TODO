@@ -7,6 +7,8 @@ in order of importance:
    some machines, on some not.
  - fix the seamless connector for win32.
  - make it work on OS X
+ - textchat
+ - server side scaling
  - multiple connections at once, like the other multivnc
  - ability to choose encodings
  - more tooltips
