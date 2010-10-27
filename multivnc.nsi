@@ -1,4 +1,4 @@
-!define VERSION "0.3"
+!define VERSION "0.4"
 
 Name "MultiVNC ${VERSION}"
 
