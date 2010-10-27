@@ -1,4 +1,4 @@
-MultiVNC 0.4 -
+MultiVNC 0.4 - "One for the road"
         * MultiVNC can now connect to IPv6 servers!
         * MulticastVNC now incorporates a NACK mechanism which makes
           multicasting a lot more reliable: Lost packets are 
