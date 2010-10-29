@@ -128,6 +128,8 @@ public:
   const wxArrayString& getUpdRawByteStats() const { const wxArrayString& ref = update_rawbytes; return ref; };
   // gets number of updates per second 
   const wxArrayString& getUpdCountStats() const { const wxArrayString& ref = update_counts; return ref; };
+  // gets latencies
+  const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
   // gets time between each pointer movement and update at corresponding position
   const wxArrayString& getPointerLatencyStats() const { const wxArrayString& ref = pointer_latencies; return ref; };
   // gets multicast loss ratio per second
@@ -194,17 +196,24 @@ private:
   bool do_stats;
   wxTimer stats_timer; // a timer that samples stattistics every second
   void on_stats_timer(wxTimerEvent& event);
-  int upd_rawbytes; // counts raw bytes of updates
-  int upd_count;  // counts updates 
+  wxCriticalSection mutex_stats;
+  // counts raw bytes of updates
+  int upd_rawbytes;
+  wxArrayString update_rawbytes;
+  // counts updates 
+  int upd_count; 
+  wxArrayString update_counts;
+  // check latency by requesting a certain test rect as non-incremental
+#define LATENCY_TEST_RECT 0,0,1,1
+  bool latency_testrect_sent;
+  wxStopWatch latency_stopwatch;
+  wxArrayString latencies;
+  // check latency of pointer event -> update at pointer pos 
   wxPoint pointer_pos;
   wxStopWatch pointerlatency_stopwatch;
-  wxCriticalSection mutex_stats;
-  // string arrays to store values over time
-  wxArrayString update_rawbytes;
-  wxArrayString update_counts;
   wxArrayString pointer_latencies;
+  // mc loss ratios
   wxArrayString multicast_lossratios;
-
 
   // per-connection error string
   wxString err;

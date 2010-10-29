@@ -109,6 +109,7 @@ VNCConn::VNCConn(void* p)
   // statistics stuff
   do_stats = false;
   upd_rawbytes = 0;
+  upd_count = 0;
   stats_timer.SetOwner(this);
 
   // blocking mode
@@ -240,6 +241,15 @@ wxThread::ExitCode VNCConn::Entry()
 	    thread_send_pointer_event(pe);
 	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
 	    thread_send_key_event(ke);
+
+	  // do latency check?
+	  if(do_stats && !latency_testrect_sent) 
+	    {
+	      wxCriticalSectionLocker lock(mutex_stats);
+	      SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
+	      latency_testrect_sent = true;
+	      latency_stopwatch.Start();
+	    }
 
 	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval)
 	    {
@@ -408,6 +418,21 @@ void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
       wxCriticalSectionLocker lock(mutex_stats);
       // raw byte updates/second
       upd_rawbytes += w*h*BYTESPERPIXEL;
+
+      // latency
+      if(latency_testrect_sent && event.rect.Contains(wxRect(LATENCY_TEST_RECT)))
+	{
+	  latency_stopwatch.Pause();
+	  latencies.Add((wxString() << wxGetUTCTime()) + 
+			wxT(", ") + 
+			(wxString() << (int)conn_stopwatch.Time()) + 
+			wxT(", ") + 
+			(wxString() << (int)latency_stopwatch.Time()));
+
+	  latency_testrect_sent = false;
+
+	  wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), this, latency_stopwatch.Time());
+	}
 
       // pointer latency
       // well, this is not neccessarily correct, but wtf
@@ -992,7 +1017,10 @@ void VNCConn::doStats(bool yesno)
   do_stats = yesno;
   wxCriticalSectionLocker lock(mutex_stats);
   if(do_stats)
-    stats_timer.Start(1000);
+    {
+      stats_timer.Start(1000);
+      latency_testrect_sent = false; // to start sending one
+    }
   else
     stats_timer.Stop();
 }
