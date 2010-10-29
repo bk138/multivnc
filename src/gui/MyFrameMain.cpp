@@ -543,9 +543,10 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
       return true;
     }
   
-  wxString filename = c->getDesktopName() + wxString::Format(wxT("(%i)"), conn_index) +
-    wxT(" ") + desc + wxT(" stats-") + wxNow() + wxT(".txt");
+  wxString header = wxGetHostName() + wxT(" to ") + c->getDesktopName() + wxString::Format(wxT("(%i)"), conn_index) +
+    wxT(" ") + desc + wxT(" stats on ") + wxNow();
   
+  wxString filename = header + wxT(".csv");
 #ifdef __WIN32__
   // windows doesn't like ':'s
   filename.Replace(wxString(wxT(":")), wxString(wxT("-")));
@@ -556,7 +557,7 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 			      wxEmptyString,
 			      filename, 
 			      wxT(".txt"), 
-			      _("TXT files|*.txt"), 
+			      _("CSV files|*.csv"), 
 			      wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
  
   wxLogDebug(wxT("About to save stats to ") + filename);
@@ -571,6 +572,9 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 	  wxLogError(_("Could not save file!"));
 	  return false;
 	}
+      // write header
+      ostream << header.char_str() << endl;
+      // and entries
       for(size_t i=0; i < stats.GetCount(); ++i)
 	ostream << stats[i].char_str() << endl;
     }
