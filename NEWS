@@ -1,3 +1,7 @@
+MultiVNC 0.4.1 - "Fix me up"
+        * Changed default MulticastVNC receive buffer size to 5120 KB
+          to play it safe.
+
 MultiVNC 0.4 - "One for the road"
         * MultiVNC can now connect to IPv6 servers!
         * MulticastVNC now incorporates a NACK mechanism which makes
