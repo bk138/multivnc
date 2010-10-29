@@ -142,12 +142,20 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
   if(do_stats)
     {
       wxCriticalSectionLocker lock(mutex_stats);
+
       update_rawbytes.Add((wxString() << wxGetUTCTime()) + 
 		  wxT(", ") + 
 		  (wxString() << (int)conn_stopwatch.Time())
 		  + wxT(", ") +
 		  (wxString() << upd_rawbytes));
       upd_rawbytes = 0;
+
+      update_counts.Add((wxString() << wxGetUTCTime()) + 
+			wxT(", ") + 
+			(wxString() << (int)conn_stopwatch.Time())
+			+ wxT(", ") +
+			(wxString() << upd_count));
+      upd_count = 0;
 
       if(isMulticast())
 	{
@@ -252,31 +260,6 @@ wxThread::ExitCode VNCConn::Entry()
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), this);
 	      thread_post_disconnect_notify();
 	      break;
-	    }
-
-
-	  // get time between updates from server
-	  if(do_stats)
-	    {
-	      wxCriticalSectionLocker lock(mutex_stats);
-
-	      if(upd_last_ts.ToLong() == 0) // init case
-		upd_last_ts = wxGetLocalTimeMillis();
-	      else
-		if(cl->serverMsg)
-		  {
-		    wxLongLong now = wxGetLocalTimeMillis();
-
-		    update_latencies.Add((wxString() << wxGetUTCTime()) + 
-					 wxT(", ") + 
-					 (wxString() << (int)conn_stopwatch.Time()) + 
-					 wxT(", ") + 
-					 (wxString() <<  (now-upd_last_ts).ToString()));
-
-		    wxLogDebug(wxT("VNCConn %p: got server msg after %ld ms"), this, (now-upd_last_ts).ToLong());
-
-		    upd_last_ts = now;
-		  }
 	    }
 
 
@@ -425,7 +408,7 @@ void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
       wxCriticalSectionLocker lock(mutex_stats);
       // raw byte updates/second
       upd_rawbytes += w*h*BYTESPERPIXEL;
-  
+
       // pointer latency
       // well, this is not neccessarily correct, but wtf
       if(event.rect.Contains(pointer_pos))
@@ -496,6 +479,16 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
       if(conn->blocking_mode)
 	conn->sema_unprocessed_upd->Wait();
     }
+}
+
+
+
+
+void VNCConn::thread_update_finished(rfbClient* client)
+{
+  VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
+  wxCriticalSectionLocker lock(conn->mutex_stats);
+  conn->upd_count++;
 }
 
 
@@ -625,6 +618,7 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   // callbacks
   cl->MallocFrameBuffer = alloc_framebuffer;
   cl->GotFrameBufferUpdate = thread_got_update;
+  cl->FinishedFrameBufferUpdate = thread_update_finished;
   cl->GetPassword = getpasswdfunc;
   cl->HandleKeyboardLedState = thread_kbd_leds;
   cl->HandleTextChat = thread_textchat;
@@ -1001,8 +995,6 @@ void VNCConn::doStats(bool yesno)
     stats_timer.Start(1000);
   else
     stats_timer.Stop();
-
-  upd_last_ts = 0; // set this to 0 if we start, stop or restart stats
 }
 
 
@@ -1010,7 +1002,7 @@ void VNCConn::resetStats()
 {
   wxCriticalSectionLocker lock(mutex_stats);
   update_rawbytes.Clear();
-  update_latencies.Clear();
+  update_counts.Clear();
   pointer_latencies.Clear();
   multicast_lossratios.Clear();
 }

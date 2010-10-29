@@ -199,8 +199,8 @@ MyFrameMain::~MyFrameMain()
 	  VNCConn* c = connections.at(i).conn;
 	  if(!saveStats(c, i, c->getUpdRawByteStats(), _("frame buffer update raw byte"), true))
 	    wxLogError(_("Could not autosave framebuffer update raw byte statistics!"));   
-	  if(!saveStats(c, i, c->getUpdLatencyStats(), _("frame buffer update latency"), true))
-	    wxLogError(_("Could not autosave framebuffer update latency statistics!"));    
+	  if(!saveStats(c, i, c->getUpdCountStats(), _("frame buffer update count"), true))
+	    wxLogError(_("Could not autosave framebuffer update count statistics!"));    
 	  if(!saveStats(c, i, c->getPointerLatencyStats(), _("pointer latency"), true))
 	    wxLogError(_("Could not autosave pointer latency statistics!"));
 	  if(!saveStats(c, i, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
@@ -434,14 +434,14 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
     {
       VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
 
-      text_ctrl_upd->Clear();
-      text_ctrl_latency->Clear();
+      text_ctrl_updrawbytes->Clear();
+      text_ctrl_updcount->Clear();
       text_ctrl_lossratio->Clear();
       
       if( ! c->getUpdRawByteStats().IsEmpty() )
-	*text_ctrl_upd << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
-      if( ! c->getUpdLatencyStats().IsEmpty() )
-	*text_ctrl_latency << c->getUpdLatencyStats().Last().AfterLast(wxT(','));
+	*text_ctrl_updrawbytes << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
+      if( ! c->getUpdCountStats().IsEmpty() )
+	*text_ctrl_updcount << c->getUpdCountStats().Last().AfterLast(wxT(','));
       if( ! c->getMCLossRatioStats().IsEmpty() )
 	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterLast(wxT(','));
     }
@@ -774,8 +774,8 @@ void MyFrameMain::terminate_conn(int which)
       GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
 
       // clear stats
-      text_ctrl_upd->Clear();
-      text_ctrl_latency->Clear();
+      text_ctrl_updrawbytes->Clear();
+      text_ctrl_updcount->Clear();
       text_ctrl_lossratio->Clear();
     }
 
@@ -1095,13 +1095,13 @@ void MyFrameMain::machine_save_stats_upd_rawbytes(wxCommandEvent &event)
 }
 
 
-void MyFrameMain::machine_save_stats_upd_latencies(wxCommandEvent &event)
+void MyFrameMain::machine_save_stats_upd_count(wxCommandEvent &event)
 {
  if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getUpdLatencyStats(), _("framebuffer update latency"), false);
+      saveStats(c, sel, c->getUpdCountStats(), _("framebuffer update count"), false);
     }
 }
 
@@ -1205,8 +1205,8 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
   else
     stats_timer.Stop();
 
-  text_ctrl_upd->Clear();
-  text_ctrl_latency->Clear();
+  text_ctrl_updrawbytes->Clear();
+  text_ctrl_updcount->Clear();
   text_ctrl_lossratio->Clear();
 
   // for now, toggle all VNCConn instances

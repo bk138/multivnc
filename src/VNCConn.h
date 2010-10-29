@@ -126,8 +126,8 @@ public:
   */
   // gets raw bytes updated per second
   const wxArrayString& getUpdRawByteStats() const { const wxArrayString& ref = update_rawbytes; return ref; };
-  // gets time between updates from server
-  const wxArrayString& getUpdLatencyStats() const { const wxArrayString& ref = update_latencies; return ref; };
+  // gets number of updates per second 
+  const wxArrayString& getUpdCountStats() const { const wxArrayString& ref = update_counts; return ref; };
   // gets time between each pointer movement and update at corresponding position
   const wxArrayString& getPointerLatencyStats() const { const wxArrayString& ref = pointer_latencies; return ref; };
   // gets multicast loss ratio per second
@@ -195,14 +195,13 @@ private:
   wxTimer stats_timer; // a timer that samples stattistics every second
   void on_stats_timer(wxTimerEvent& event);
   int upd_rawbytes; // counts raw bytes of updates
-  int upd_latency;  // time between updates from server
-  wxLongLong upd_last_ts; // timestamp of last received update
+  int upd_count;  // counts updates 
   wxPoint pointer_pos;
   wxStopWatch pointerlatency_stopwatch;
   wxCriticalSection mutex_stats;
   // string arrays to store values over time
   wxArrayString update_rawbytes;
-  wxArrayString update_latencies;
+  wxArrayString update_counts;
   wxArrayString pointer_latencies;
   wxArrayString multicast_lossratios;
 
@@ -245,6 +244,7 @@ private:
   // libvncclient callbacks
   static rfbBool alloc_framebuffer(rfbClient* client);
   static void thread_got_update(rfbClient* cl,int x,int y,int w,int h);
+  static void thread_update_finished(rfbClient* client);
   static void thread_kbd_leds(rfbClient* cl, int value, int pad);
   static void thread_textchat(rfbClient* cl, int value, char *text);
   static void thread_got_cuttext(rfbClient *cl, const char *text, int len);

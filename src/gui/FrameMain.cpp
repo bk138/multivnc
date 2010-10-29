@@ -34,7 +34,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_1->Append(wxID_SAVE, _("Take Screenshot"), wxEmptyString, wxITEM_NORMAL);
     wxMenu* wxglade_tmp_menu_1_sub = new wxMenu();
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_RAWBYTE, _("Save Framebuffer Update Data Rate Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_LAT, _("Save Framebuffer Update Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_COUNT, _("Save Framebuffer Update Count Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_POINTER_LAT, _("Save Pointer Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LOSSRATIO, _("Save Multicast Loss Ratio Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_ANY, _("Statistics"), wxglade_tmp_menu_1_sub, wxEmptyString);
@@ -85,10 +85,10 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     list_box_services = new wxListBox(splitwin_left_pane_1, ID_LISTBOX_SERVICES, wxDefaultPosition, wxDefaultSize, 0, list_box_services_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
     const wxString *list_box_bookmarks_choices = NULL;
     list_box_bookmarks = new wxListBox(splitwin_leftlower_pane_1, ID_LISTBOX_BOOKMARKS, wxDefaultPosition, wxDefaultSize, 0, list_box_bookmarks_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
-    label_upd = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Update KB/s:"));
-    text_ctrl_upd = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-    label_latency = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Latency (ms):"));
-    text_ctrl_latency = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    label_updrawbytes = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Updated raw KB/s:"));
+    text_ctrl_updrawbytes = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    label_updcount = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("Updates/s:"));
+    text_ctrl_updcount = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     label_lossratio = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("MC loss ratio:"));
     text_ctrl_lossratio = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     notebook_connections = new wxNotebook(splitwin_main_pane_2, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
@@ -108,7 +108,7 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_PREFERENCES, FrameMain::machine_preferences)
     EVT_MENU(wxID_SAVE, FrameMain::machine_screenshot)
     EVT_MENU(ID_STATS_SAVE_UPD_RAWBYTE, FrameMain::machine_save_stats_upd_rawbytes)
-    EVT_MENU(ID_STATS_SAVE_UPD_LAT, FrameMain::machine_save_stats_upd_latencies)
+    EVT_MENU(ID_STATS_SAVE_UPD_COUNT, FrameMain::machine_save_stats_upd_count)
     EVT_MENU(ID_STATS_SAVE_POINTER_LAT, FrameMain::machine_save_stats_pointer_latencies)
     EVT_MENU(ID_STATS_SAVE_LOSSRATIO, FrameMain::machine_save_stats_lossratio)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
@@ -190,10 +190,10 @@ void FrameMain::machine_save_stats_upd_rawbytes(wxCommandEvent &event)
 }
 
 
-void FrameMain::machine_save_stats_upd_latencies(wxCommandEvent &event)
+void FrameMain::machine_save_stats_upd_count(wxCommandEvent &event)
 {
     event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd_latencies) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd_count) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 
@@ -384,10 +384,10 @@ void FrameMain::do_layout()
     splitwin_left_pane_1->SetSizer(sizer_services);
     sizer_bookmarks->Add(list_box_bookmarks, 1, wxALL|wxEXPAND, 3);
     splitwin_leftlower_pane_1->SetSizer(sizer_bookmarks);
-    sizer_3->Add(label_upd, 0, wxALL|wxEXPAND, 3);
-    sizer_3->Add(text_ctrl_upd, 0, wxALL, 3);
-    sizer_3->Add(label_latency, 0, wxALL, 3);
-    sizer_3->Add(text_ctrl_latency, 0, wxALL, 3);
+    sizer_3->Add(label_updrawbytes, 0, wxALL|wxEXPAND, 3);
+    sizer_3->Add(text_ctrl_updrawbytes, 0, wxALL, 3);
+    sizer_3->Add(label_updcount, 0, wxALL, 3);
+    sizer_3->Add(text_ctrl_updcount, 0, wxALL, 3);
     sizer_3->Add(label_lossratio, 0, wxALL, 3);
     sizer_3->Add(text_ctrl_lossratio, 0, wxALL, 3);
     splitwin_leftlower_pane_2->SetSizer(sizer_3);

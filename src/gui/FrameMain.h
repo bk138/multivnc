@@ -51,10 +51,10 @@ protected:
     wxPanel* splitwin_left_pane_1;
     wxListBox* list_box_bookmarks;
     wxPanel* splitwin_leftlower_pane_1;
-    wxStaticText* label_upd;
-    wxTextCtrl* text_ctrl_upd;
-    wxStaticText* label_latency;
-    wxTextCtrl* text_ctrl_latency;
+    wxStaticText* label_updrawbytes;
+    wxTextCtrl* text_ctrl_updrawbytes;
+    wxStaticText* label_updcount;
+    wxTextCtrl* text_ctrl_updcount;
     wxStaticText* label_lossratio;
     wxTextCtrl* text_ctrl_lossratio;
     wxPanel* splitwin_leftlower_pane_2;
@@ -78,7 +78,7 @@ public:
     virtual void machine_preferences(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_screenshot(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_upd_rawbytes(wxCommandEvent &event); // wxGlade: <event_handler>
-    virtual void machine_save_stats_upd_latencies(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_save_stats_upd_count(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_pointer_latencies(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_lossratio(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_exit(wxCommandEvent &event); // wxGlade: <event_handler>
