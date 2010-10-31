@@ -48,6 +48,8 @@ DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
 // sent when new cuttext is available
 DECLARE_EVENT_TYPE(VNCConnCuttextNOTIFY, -1) 
+// sent when bell message received
+DECLARE_EVENT_TYPE(VNCConnBellNOTIFY, -1) 
 // sent framebuffer update, event's rect is set to region
 DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 // sent when status changes from/to uni/-multicast. 
@@ -247,6 +249,7 @@ private:
   void thread_post_update_notify(int x, int y, int w, int h);
   void thread_post_fbresize_notify();
   void thread_post_cuttext_notify();
+  void thread_post_bell_notify();
   void thread_post_unimultichanged_notify();
 
 
@@ -257,6 +260,7 @@ private:
   static void thread_kbd_leds(rfbClient* cl, int value, int pad);
   static void thread_textchat(rfbClient* cl, int value, char *text);
   static void thread_got_cuttext(rfbClient *cl, const char *text, int len);
+  static void thread_bell(rfbClient *cl);
   static void thread_logger(const char *format, ...);
 };
 

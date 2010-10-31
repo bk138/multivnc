@@ -81,6 +81,7 @@ class MyFrameMain: public FrameMain
   void onVNCConnDisconnectNotify(wxCommandEvent& event);
   void onVNCConnIncomingConnectionNotify(wxCommandEvent& event);
   void onVNCConnCuttextNotify(wxCommandEvent& event);
+  void onVNCConnBellNotify(wxCommandEvent& event);
   void onSDNotify(wxCommandEvent& event);
 
   static char* getpasswd(rfbClient* client);

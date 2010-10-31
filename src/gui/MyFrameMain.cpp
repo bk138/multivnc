@@ -30,6 +30,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnUniMultiChangedNOTIFY, MyFrameMain::onVNCConnUniMultiChangedNotify)
   EVT_COMMAND (wxID_ANY, VNCConnFBResizeNOTIFY, MyFrameMain::onVNCConnFBResizeNotify)
   EVT_COMMAND (wxID_ANY, VNCConnCuttextNOTIFY, MyFrameMain::onVNCConnCuttextNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnBellNOTIFY, MyFrameMain::onVNCConnBellNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
   EVT_TIMER   (STATS_TIMER_ID, MyFrameMain::onStatsTimer)
@@ -335,6 +336,13 @@ void MyFrameMain::onVNCConnCuttextNotify(wxCommandEvent& event)
       wxTheClipboard->SetData(new wxTextDataObject(c->getCuttext()));
       wxTheClipboard->Close();
     }
+}
+
+
+
+void MyFrameMain::onVNCConnBellNotify(wxCommandEvent& event)
+{ 
+  wxBell();
 }
 
 

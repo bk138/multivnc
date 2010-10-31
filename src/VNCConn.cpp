@@ -55,6 +55,7 @@ DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnCuttextNOTIFY) 
+DEFINE_EVENT_TYPE(VNCConnBellNOTIFY) 
 DEFINE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY);
 
 
@@ -480,6 +481,18 @@ void VNCConn::thread_post_cuttext_notify()
 
 
 
+void VNCConn::thread_post_bell_notify()
+{
+  // new NOTIFY event, we got no window id
+  wxCommandEvent event(VNCConnBellNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+
 void VNCConn::thread_post_unimultichanged_notify()
 {
   wxCommandEvent event(VNCConnUniMultiChangedNOTIFY, wxID_ANY);
@@ -555,6 +568,15 @@ void VNCConn::thread_got_cuttext(rfbClient *cl, const char *text, int len)
   conn->cuttext = wxString(text, wxCSConv(wxT("iso-8859-1")));
   conn->thread_post_cuttext_notify();
 }
+
+
+void VNCConn::thread_bell(rfbClient *cl)
+{
+  VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
+  wxLogDebug(wxT("VNCConn %p: bell"), conn);
+  conn->thread_post_bell_notify();
+}
+
 
 
 
@@ -648,6 +670,7 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   cl->HandleKeyboardLedState = thread_kbd_leds;
   cl->HandleTextChat = thread_textchat;
   cl->GotXCutText = thread_got_cuttext;
+  cl->Bell = thread_bell;
 
   cl->canHandleNewFBSize = TRUE;
 
