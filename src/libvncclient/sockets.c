@@ -150,6 +150,11 @@ ReadFromRFBServer(rfbClient* client, char *out, unsigned int n)
 	  errno=WSAGetLastError();
 #endif
 	  if (errno == EWOULDBLOCK || errno == EAGAIN) {
+#ifndef WIN32
+        usleep (10000);
+#else
+	 Sleep (10);
+#endif
 	    /* TODO:
 	       ProcessXtEvents();
 	    */
@@ -191,6 +196,11 @@ ReadFromRFBServer(rfbClient* client, char *out, unsigned int n)
 	  errno=WSAGetLastError();
 #endif
 	  if (errno == EWOULDBLOCK || errno == EAGAIN) {
+#ifndef WIN32
+        usleep (10000);
+#else
+	 Sleep (10);
+#endif
 	    /* TODO:
 	       ProcessXtEvents();
 	    */
@@ -661,7 +671,7 @@ SetDSCP(int sock, int dscp)
 
   switch(addr.sa_family)
     {
-#ifdef LIBVNCSERVER_IPv6
+#if defined LIBVNCSERVER_IPv6 && defined IPV6_TCLASS
     case AF_INET6:
       level = IPPROTO_IPV6;
       cmd = IPV6_TCLASS;

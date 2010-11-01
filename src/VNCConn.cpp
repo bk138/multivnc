@@ -244,12 +244,28 @@ wxThread::ExitCode VNCConn::Entry()
 	    thread_send_key_event(ke);
 
 	  // do latency check?
-	  if(do_stats && !latency_testrect_sent) 
+	  if(do_stats)
 	    {
 	      wxCriticalSectionLocker lock(mutex_stats);
-	      SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
-	      latency_testrect_sent = true;
-	      latency_stopwatch.Start();
+	      // favor xvp over the other check
+	      if(SupportsClient2Server(cl, rfbXvp))
+		{
+		  if(!latency_test_xvpmsg_sent)
+		    {
+		      SendXvpMsg(cl, LATENCY_TEST_XVP_VER, 2);
+		      latency_test_xvpmsg_sent = true;
+		      latency_stopwatch.Start();
+		    }
+		}
+	      else 
+		{
+		  if(!latency_test_rect_sent)
+		    {
+		      SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
+		      latency_test_rect_sent = true;
+		      latency_stopwatch.Start();
+		    }
+		}
 	    }
 
 	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval)
@@ -420,8 +436,8 @@ void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
       // raw byte updates/second
       upd_rawbytes += w*h*BYTESPERPIXEL;
 
-      // latency
-      if(latency_testrect_sent && event.rect.Contains(wxRect(LATENCY_TEST_RECT)))
+      // latency check, rect case
+      if(latency_test_rect_sent && event.rect.Contains(wxRect(LATENCY_TEST_RECT)))
 	{
 	  latency_stopwatch.Pause();
 	  latencies.Add((wxString() << wxGetUTCTime()) + 
@@ -430,7 +446,7 @@ void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
 			wxT(", ") + 
 			(wxString() << (int)latency_stopwatch.Time()));
 
-	  latency_testrect_sent = false;
+	  latency_test_rect_sent = false;
 
 	  wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), this, latency_stopwatch.Time());
 	}
@@ -578,6 +594,28 @@ void VNCConn::thread_bell(rfbClient *cl)
 }
 
 
+void VNCConn::thread_handle_xvp(rfbClient *cl, uint8_t ver, uint8_t code)
+{
+  VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
+  wxLogDebug(wxT("VNCConn %p: handling xvp msg version %d code %d"), conn, ver, code);
+
+  if(conn->latency_test_xvpmsg_sent && ver == LATENCY_TEST_XVP_VER && code == rfbXvp_Fail) 
+    {
+      wxCriticalSectionLocker lock(conn->mutex_stats);
+      conn->latency_stopwatch.Pause();
+      conn->latencies.Add((wxString() << wxGetUTCTime()) + 
+			  wxT(", ") + 
+			  (wxString() << (int)conn->conn_stopwatch.Time()) + 
+			  wxT(", ") + 
+			  (wxString() << (int)conn->latency_stopwatch.Time()));
+      
+      conn->latency_test_xvpmsg_sent = false;
+      
+      wxLogDebug(wxT("VNCConn %p: got latency test xvp message back, took %ims"), conn, conn->latency_stopwatch.Time());
+    }
+}
+
+
 
 
 // there's no per-connection log since we cannot find out which client
@@ -671,6 +709,7 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   cl->HandleTextChat = thread_textchat;
   cl->GotXCutText = thread_got_cuttext;
   cl->Bell = thread_bell;
+  cl->HandleXvpMsg = thread_handle_xvp;
 
   cl->canHandleNewFBSize = TRUE;
 
@@ -1042,7 +1081,7 @@ void VNCConn::doStats(bool yesno)
   if(do_stats)
     {
       stats_timer.Start(1000);
-      latency_testrect_sent = false; // to start sending one
+      latency_test_rect_sent = latency_test_xvpmsg_sent = false; // to start sending one
     }
   else
     stats_timer.Stop();

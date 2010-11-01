@@ -205,9 +205,12 @@ private:
   // counts updates 
   int upd_count; 
   wxArrayString update_counts;
-  // check latency by requesting a certain test rect as non-incremental
+  // check latency by isueing an xvp request with some unsupported version
+#define LATENCY_TEST_XVP_VER 42
+  bool latency_test_xvpmsg_sent;
+  // when xvp is not available, check latency by requesting a certain test rect as non-incremental
 #define LATENCY_TEST_RECT 0,0,1,1
-  bool latency_testrect_sent;
+  bool latency_test_rect_sent;
   wxStopWatch latency_stopwatch;
   wxArrayString latencies;
   // check latency of pointer event -> update at pointer pos 
@@ -261,6 +264,7 @@ private:
   static void thread_textchat(rfbClient* cl, int value, char *text);
   static void thread_got_cuttext(rfbClient *cl, const char *text, int len);
   static void thread_bell(rfbClient *cl);
+  static void thread_handle_xvp(rfbClient *cl, uint8_t ver, uint8_t code);
   static void thread_logger(const char *format, ...);
 };
 
