@@ -145,13 +145,15 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
     {
       wxCriticalSectionLocker lock(mutex_stats);
 
+      // raw bytes sampling
       update_rawbytes.Add((wxString() << wxGetUTCTime()) + 
-		  wxT(", ") + 
-		  (wxString() << (int)conn_stopwatch.Time())
-		  + wxT(", ") +
-		  (wxString() << upd_rawbytes));
+			  wxT(", ") + 
+			  (wxString() << (int)conn_stopwatch.Time())
+			  + wxT(", ") +
+			  (wxString() << upd_rawbytes));
       upd_rawbytes = 0;
 
+      // number of updates sampling
       update_counts.Add((wxString() << wxGetUTCTime()) + 
 			wxT(", ") + 
 			(wxString() << (int)conn_stopwatch.Time())
@@ -159,6 +161,7 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 			(wxString() << upd_count));
       upd_count = 0;
 
+      // multicast lossratio sampling
       if(isMulticast())
 	{
 	  wxString lossratestring = wxString::Format(wxT("%.4f"), multicastLossRatio);
@@ -170,6 +173,25 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 				   lossratestring);
 	}
 
+      // latency check start
+      if(SupportsClient2Server(cl, rfbXvp)) // favor xvp over the rect check 
+	{
+	  if(!latency_test_xvpmsg_sent)
+	    {
+	      SendXvpMsg(cl, LATENCY_TEST_XVP_VER, 2);
+	      latency_test_xvpmsg_sent = true;
+	      latency_stopwatch.Start();
+	    }
+	}
+      else  // check using special rect
+	{
+	  if(!latency_test_rect_sent)
+	    {
+	      SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
+	      latency_test_rect_sent = true;
+	      latency_stopwatch.Start();
+	    }
+	}
     }
 }
 
@@ -243,31 +265,7 @@ wxThread::ExitCode VNCConn::Entry()
 	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
 	    thread_send_key_event(ke);
 
-	  // do latency check?
-	  if(do_stats)
-	    {
-	      wxCriticalSectionLocker lock(mutex_stats);
-	      // favor xvp over the other check
-	      if(SupportsClient2Server(cl, rfbXvp))
-		{
-		  if(!latency_test_xvpmsg_sent)
-		    {
-		      SendXvpMsg(cl, LATENCY_TEST_XVP_VER, 2);
-		      latency_test_xvpmsg_sent = true;
-		      latency_stopwatch.Start();
-		    }
-		}
-	      else 
-		{
-		  if(!latency_test_rect_sent)
-		    {
-		      SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
-		      latency_test_rect_sent = true;
-		      latency_stopwatch.Start();
-		    }
-		}
-	    }
-
+	 
 	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval)
 	    {
 	      if(isMulticast())
