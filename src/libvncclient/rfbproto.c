@@ -349,16 +349,6 @@ DefaultSupportedMessagesTightVNC(rfbClient* client)
 }
 
 
-void
-DefaultSupportedMessagesMulticastVNC(rfbClient* client)
-{
-    DefaultSupportedMessages(client);
-    SetClient2Server(client, rfbMulticastFramebufferUpdateRequest);
-    SetClient2Server(client, rfbMulticastFramebufferUpdateNACK);
-    /* technically, we only care what we can *send* to the server */
-    SetServer2Client(client, rfbMulticastFramebufferUpdate);
-}
-
 
 #ifndef WIN32
 static rfbBool
@@ -1245,7 +1235,6 @@ SetFormatAndEncodings(rfbClient* client)
     encs[se->nEncodings++] = rfbClientSwap32IfLE(rfbEncodingSupportedEncodings);
   if (se->nEncodings < MAX_ENCODINGS)
     encs[se->nEncodings++] = rfbClientSwap32IfLE(rfbEncodingServerIdentity);
-
   /* xvp */
   if (se->nEncodings < MAX_ENCODINGS)
     encs[se->nEncodings++] = rfbClientSwap32IfLE(rfbEncodingXvp);
@@ -1943,7 +1932,11 @@ HandleRFBServerMessage(rfbClient* client)
 	  rfbClientLog("MulticastVNC: NACK'ing of lost messages enabled\n");
 
 	rfbClientLog("MulticastVNC: Enabling multicast specific messages\n");
-	DefaultSupportedMessagesMulticastVNC(client);
+
+	SetClient2Server(client, rfbMulticastFramebufferUpdateRequest);
+	SetClient2Server(client, rfbMulticastFramebufferUpdateNACK);
+	/* technically, we only care what we can *send* to the server */
+	SetServer2Client(client, rfbMulticastFramebufferUpdate);
  	
 	continue;
       }
