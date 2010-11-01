@@ -181,6 +181,7 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 	      SendXvpMsg(cl, LATENCY_TEST_XVP_VER, 2);
 	      latency_test_xvpmsg_sent = true;
 	      latency_stopwatch.Start();
+	      wxLogDebug(wxT("VNCConn %p: xvp message sent to test latency"), conn);
 	    }
 	}
       else  // check using special rect
@@ -190,6 +191,7 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 	      SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
 	      latency_test_rect_sent = true;
 	      latency_stopwatch.Start();
+	      wxLogDebug(wxT("VNCConn %p: fb update request sent to test latency"), conn);
 	    }
 	}
     }
