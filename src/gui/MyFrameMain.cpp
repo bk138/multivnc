@@ -728,8 +728,11 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
 
-  GetToolBar()->EnableTool(wxID_STOP, true); // disconnect
-  GetToolBar()->EnableTool(wxID_SAVE, true); // screenshot
+  if(GetToolBar())
+    {
+      GetToolBar()->EnableTool(wxID_STOP, true); // disconnect
+      GetToolBar()->EnableTool(wxID_SAVE, true); // screenshot
+    }
   
   return true;
 }
@@ -790,8 +793,11 @@ void MyFrameMain::terminate_conn(int which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
 
-      GetToolBar()->EnableTool(wxID_STOP, false); // disconnect
-      GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
+      if(GetToolBar())
+	{
+	  GetToolBar()->EnableTool(wxID_STOP, false); // disconnect
+	  GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
+	}
 
       // clear stats
       text_ctrl_updrawbytes->Clear();
@@ -1182,16 +1188,20 @@ void MyFrameMain::view_toggletoolbar(wxCommandEvent &event)
     {
       // this is copied over from the FrameMain constructor
       // not nice, but wtf...
-      frame_main_statusbar = CreateStatusBar(2, 0);
       frame_main_toolbar = new wxToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxTB_DOCKABLE|wxTB_3DBUTTONS|wxTB_TEXT);
       SetToolBar(frame_main_toolbar);
       frame_main_toolbar->SetToolBitmapSize(wxSize(24, 24));
       frame_main_toolbar->AddTool(wxID_YES, _("Connect"), (bitmapFromMem(connect_png)), (bitmapFromMem(connect_png)), wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-      frame_main_toolbar->AddTool(wxID_CANCEL, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+      frame_main_toolbar->AddTool(wxID_STOP, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
       frame_main_toolbar->AddSeparator();
       frame_main_toolbar->AddTool(wxID_ZOOM_FIT, _("Fullscreen"), (bitmapFromMem(fullscreen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
       frame_main_toolbar->AddTool(wxID_SAVE, _("Take Screenshot"), (bitmapFromMem(screenshot_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
       frame_main_toolbar->Realize();
+      
+      bool enable = connections.size() != 0;
+	
+      frame_main_toolbar->EnableTool(wxID_STOP, enable); // disconnect
+      frame_main_toolbar->EnableTool(wxID_SAVE, enable); // screenshot
     }
   else
     {
