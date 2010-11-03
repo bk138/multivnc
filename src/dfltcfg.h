@@ -78,7 +78,7 @@
 #ifdef __WIN32__
 #define V_DFLTWINDOWSHARE _T("winvnc.exe -oneshot -sharewindow \"%w\" -connect %a")
 #else
-#define V_DFLTWINDOWSHARE _T("x11vnc -repeat -viewonly -sid pick -xrandr -connect_or_exit %a")
+#define V_DFLTWINDOWSHARE _T("x11vnc -repeat -viewonly -id pick -xrandr -connect_or_exit %a")
 #endif
 
 
