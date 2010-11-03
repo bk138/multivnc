@@ -28,6 +28,15 @@ Section ""
 
   writeUninstaller $INSTDIR\multivnc-uninstall.exe
 
+  # registry entries so this shows up in "Software"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${INSTALLATIONNAME}" "DisplayName" "MultiVNC"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${INSTALLATIONNAME}" "DisplayIcon" '"$INSTDIR\multivnc.exe"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${INSTALLATIONNAME}" "UninstallString" '"$INSTDIR\multivnc-uninstall.exe"'
+  # just display "Remove" button
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${INSTALLATIONNAME}" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${INSTALLATIONNAME}" "NoRepair" 1
+
+
   # now the shortcuts
   CreateDirectory "$SMPROGRAMS\MultiVNC"
   createShortCut  "$SMPROGRAMS\MultiVNC\Multivnc.lnk" "$INSTDIR\multivnc.exe"
@@ -36,7 +45,13 @@ Section ""
   createShortCut  "$SMPROGRAMS\MultiVNC\Todo.lnk" "$INSTDIR\TODO.TXT"
   createShortCut  "$SMPROGRAMS\MultiVNC\Uninstall MultiVNC.lnk" "$INSTDIR\multivnc-uninstall.exe"
 
-SectionEnd 
+SectionEnd
+
+Function .onInstSuccess
+    MessageBox MB_YESNO "Installation successful! Would you like to start MultiVNC now?" IDYES NoAbort
+      Abort ; causes uninstaller to quit.
+    NoAbort: Exec '"$INSTDIR\MultiVNC.exe"'
+FunctionEnd
 
 section "Uninstall"
  
@@ -53,7 +68,10 @@ section "Uninstall"
   delete $INSTDIR\README.TXT
   delete $INSTDIR\TODO.TXT
   RMDir  $INSTDIR
- 
+
+  # delete registry entries
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${INSTALLATIONNAME}"
+  
   # delete shortcuts
   delete "$SMPROGRAMS\MultiVNC\Multivnc.lnk"
   delete "$SMPROGRAMS\MultiVNC\Readme.lnk"
@@ -68,4 +86,4 @@ Function un.onInit
     MessageBox MB_YESNO "This will uninstall MultiVNC. Continue?" IDYES NoAbort
       Abort ; causes uninstaller to quit.
     NoAbort:
-  FunctionEnd
+FunctionEnd
