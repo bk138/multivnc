@@ -71,6 +71,7 @@ nsis_installer: all multivnc.nsi README NEWS COPYING
 	cat NEWS | unix2dos > NEWS.TXT
 	cat TODO | unix2dos > TODO.TXT
 	cat COPYING | unix2dos > COPYING.TXT
+	cp src/.libs/multivnc.exe src/multivnc.exe
 	$(STRIP) src/multivnc.exe
 	makensis multivnc.nsi 
 endif
