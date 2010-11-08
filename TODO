@@ -1,6 +1,8 @@
 
 in order of importance:
 
+ - make VNC server on win32 exit when window is closed,
+   disable tray icon
  - fix TLS on win32, this is a problem in libvncclient
  - fix the seamless connector for win32.
  - make it work on OS X
