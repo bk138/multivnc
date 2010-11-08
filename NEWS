@@ -4,10 +4,9 @@ MultiVNC 0.4.1 - "Fix me up"
         * Shared windows are now view-only. Having the local cursor 
           warped here and there is quite distracting.
         * Window sharing should be more stable now.
-	* Link latency measuring is way more exact now.
-	* Fixed crash on startup when toolbar was disabled.
+        * Link latency measuring is way more exact now.
+        * Fixed crash on startup when toolbar was disabled.
         * Fixed Windows build. MultiVNC 0.4 was unusable.
-
 
 MultiVNC 0.4 - "One for the road"
         * MultiVNC can now connect to IPv6 servers!
