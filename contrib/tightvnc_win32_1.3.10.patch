@@ -1,0 +1,151 @@
+diff -Naur vnc_winsrc.orig//winvnc/vncProperties.cpp vnc_winsrc/winvnc/vncProperties.cpp
+--- vnc_winsrc.orig//winvnc/vncProperties.cpp	2007-04-27 08:37:38.000000000 +0200
++++ vnc_winsrc/winvnc/vncProperties.cpp	2010-11-09 01:56:36.000000000 +0100
+@@ -817,7 +817,8 @@
+ 	vnclog.SetLevel(LoadInt(hkLocal, "DebugLevel", 0));
+ 
+ 	// Disable Tray Icon
+-	m_server->SetDisableTrayIcon(LoadInt(hkLocal, "DisableTrayIcon", false));
++	//m_server->SetDisableTrayIcon(LoadInt(hkLocal, "DisableTrayIcon", false));
++    m_server->SetDisableTrayIcon(1);
+ 
+ 	// Authentication required, loopback allowed, loopbackOnly
+ 	m_server->SetLoopbackOk(LoadInt(hkLocal, "AllowLoopback", false));
+@@ -849,7 +850,7 @@
+ 	vnclog.Print(LL_INTINFO, VNCLOG("clearing user settings\n"));
+ 	m_pref_AutoPortSelect=TRUE;
+ 	m_pref_PortNumber=RFB_PORT_OFFSET;
+-	m_pref_SockConnect=TRUE;
++	m_pref_SockConnect=FALSE;
+ 	m_pref_CORBAConn=FALSE;
+ 	{
+ 		vncPasswd::FromClear crypt;
+@@ -874,7 +875,7 @@
+ 	m_pref_DontSetHooks=FALSE;
+ 	m_pref_DontUseDriver=FALSE;
+ 	m_pref_DriverDirectAccess=TRUE;
+-	m_pref_RemoveWallpaper=TRUE;
++	m_pref_RemoveWallpaper=FALSE;
+ 	m_pref_BlankScreen = FALSE;
+ 	m_pref_EnableFileTransfers = TRUE;
+ 	m_alloweditclients = TRUE;
+diff -Naur vnc_winsrc.orig//winvnc/WinVNC.cpp vnc_winsrc/winvnc/WinVNC.cpp
+--- vnc_winsrc.orig//winvnc/WinVNC.cpp	2009-01-16 12:17:05.000000000 +0100
++++ vnc_winsrc/winvnc/WinVNC.cpp	2010-11-09 01:56:37.000000000 +0100
+@@ -53,6 +53,12 @@
+ const char	*szAppName = "WinVNC";
+ 
+ DWORD		mainthreadId;
++bool        bOneshot;
++HWND        hShareWindow;
++bool           cancelConnect;
++char        *connectName;
++int         connectPort;
++
+ 
+ // WinMain parses the command line and either calls the main App
+ // routine or, under NT, the main service routine.
+@@ -92,9 +98,6 @@
+ 	}
+ 
+ 	BOOL argfound = FALSE;
+-	char *connectName = NULL;
+-	int connectPort;
+-	bool cancelConnect = false;
+ 	bool silent = false;
+ 
+ 	for (i = 0; i < strlen(szCmdLine); i++)
+@@ -118,6 +121,15 @@
+ 			vncService::PostUserHelperMessage();
+ 			return 0;
+ 		}
++        if (strncmp(&szCmdLine[i], winvncRunAsUserAppOneshot, arglen) == 0 &&
++                       arglen == strlen(winvncRunAsUserAppOneshot))
++               {
++                       // WinVNC is being run in one-shot mode
++                       bOneshot = true;
++                       i += arglen;
++                       continue;
++               }
++
+ 		if (strncmp(&szCmdLine[i], winvncRunService, arglen) == 0 &&
+ 			arglen == strlen(winvncRunService))
+ 		{
+@@ -286,7 +298,11 @@
+ 					HWND hwndFound = vncService::FindWindowByTitle(title);
+ 					if (hwndFound != NULL)
+ 						cancelConnect = false;
+-					vncService::PostShareWindow(hwndFound);
++                        if(bOneshot)
++                           hShareWindow = hwndFound;
++                        else
++                          vncService::PostShareWindow(hwndFound);
++ 
+ 					delete [] title;
+ 				}
+ 			}
+@@ -339,13 +355,19 @@
+ 			VCard32 address = VSocket::Resolve(connectName);
+ 			if (address != 0) {
+ 				// Post the IP address to the server
+-				vncService::PostAddNewClient(address, connectPort);
++   		       if(!bOneshot)
++   				   vncService::PostAddNewClient(address, connectPort);
+ 			}
+ 		} else {
+ 			// Tell the server to show the Add New Client dialog
+ 			vncService::PostAddNewClient(0, 0);
+ 		}
+ 	}
++
++    if(bOneshot)
++         return WinVNCAppMain();
++
++
+ 	if (connectName != NULL)
+ 		delete[] connectName;
+ 
+@@ -386,6 +408,23 @@
+ 		PostQuitMessage(0);
+ 	}
+ 
++   if(bOneshot)
++       {
++          if(hShareWindow != NULL)
++             vncService::PostShareWindow(hShareWindow);
++
++          if (connectName != NULL && !cancelConnect)
++               {
++                   if (connectName[0] != '\0')
++                        {
++                            VCard32 address = VSocket::Resolve(connectName);
++                            if (address != 0) // Post the IP address to the server
++                                vncService::PostAddNewClient(address, connectPort);
++                        }
++               }
++       }
++
++
+ 	// Now enter the message handling loop until told to quit!
+ 	MSG msg;
+ 	while (GetMessage(&msg, NULL, 0,0) ) {
+diff -Naur vnc_winsrc.orig//winvnc/WinVNC.h vnc_winsrc/winvnc/WinVNC.h
+--- vnc_winsrc.orig//winvnc/WinVNC.h	2009-01-11 09:40:21.000000000 +0100
++++ vnc_winsrc/winvnc/WinVNC.h	2010-11-09 01:56:37.000000000 +0100
+@@ -62,6 +62,7 @@
+ const char winvncRunService[]		= "-service";
+ const char winvncRunServiceHelper[]	= "-servicehelper";
+ const char winvncRunAsUserApp[]		= "-run";
++const char winvncRunAsUserAppOneshot[] = "-oneshot";
+ 
+ const char winvncInstallService[]	= "-install";
+ const char winvncRemoveService[]	= "-remove";
+@@ -86,7 +87,7 @@
+ 
+ // Usage string
+ const char winvncUsageText[] =
+-	"winvnc [-run] [-kill] [-service] [-servicehelper]\n"
++    "winvnc [-run] [-oneshot] [-kill] [-service] [-servicehelper]\n"
+ 	" [-connect [host[:display]]] [-connect [host[::port]]]\n"
+ 	" [-install] [-remove] [-reinstall] [-reload]\n"
+ 	" [-settings] [-defaultsettings] [-killallclients]\n"
