@@ -1,9 +1,25 @@
+multivnc (0.4.1-1) unstable; urgency=low
+
+  * New release 0.4.1.
+     - Changed default MulticastVNC receive buffer size to 5120 KB
+       to play it safe.
+     - Shared windows are now view-only on Linux clients. Having
+       the local cursor warped here and there is quite distracting.
+     - Window sharing on Windows has no more trayicon and
+       distracting setup dialog.
+     - Window sharing should be more stable now.
+     - Link latency measuring is way more exact now.
+     - Fixed crash on startup when toolbar was disabled.
+     - Fixed Windows build. MultiVNC 0.4 was unusable.
+
+ -- Christian Beier <dontmind@freeshell.org>  Tue, 09 Nov 2010 11:16:29 +0100
+
 multivnc (0.4-1) unstable; urgency=low
 
   * New release 0.4.
      - MultiVNC can now connect to IPv6 servers!
      - MulticastVNC now incorporates a NACK mechanism which makes
-       multicasting a lot more reliable: Lost packets are 
+       multicasting a lot more reliable: Lost packets are
        retransmitted if the server supports it.
      - MultiVNC now supports QoS: data sent to a VNC server can be
        marked for expedited forwarding!
