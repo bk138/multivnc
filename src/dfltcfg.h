@@ -76,7 +76,7 @@
 // collab features
 #define K_WINDOWSHARE _T("WindowShareCmd")
 #ifdef __WIN32__
-#define V_DFLTWINDOWSHARE _T("winvnc.exe -oneshot -sharewindow \"%w\" -connect %a")
+#define V_DFLTWINDOWSHARE _T("windowshare.exe -oneshot -sharewindow \"%w\" -connect %a")
 #else
 #define V_DFLTWINDOWSHARE _T("x11vnc -repeat -viewonly -id pick -xrandr -connect_or_exit %a")
 #endif

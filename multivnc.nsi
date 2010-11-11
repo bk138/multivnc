@@ -19,7 +19,7 @@ Section ""
 
   File src\multivnc.exe
   File src\mingwm10.dll
-  File contrib\WinVNC.exe
+  File contrib\windowshare.exe
   File contrib\VNCHooks.dll
   File contrib\README-contrib.txt
   File NEWS.TXT	
@@ -62,7 +62,7 @@ section "Uninstall"
   # now delete installed files
   delete $INSTDIR\multivnc.exe
   delete $INSTDIR\mingwm10.dll
-  delete $INSTDIR\WinVNC.exe
+  delete $INSTDIR\windowshare.exe
   delete $INSTDIR\VNCHooks.dll
   delete $INSTDIR\README-contrib.txt
   delete $INSTDIR\NEWS.TXT
