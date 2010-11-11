@@ -20,7 +20,7 @@ pixmap_DATA = src/gui/res/multivnc.xpm
 EXTRA_DIST = $(multivncdoc_DATA) \
              $(Applications_DATA) \
              $(pixmap_DATA)\
-	     contrib/x11vnc contrib/WinVNC.exe contrib/VNCHooks.dll contrib/README-contrib.txt\
+	     contrib/x11vnc contrib/windowshare.exe contrib/VNCHooks.dll contrib/README-contrib.txt\
              debian/changelog  debian/compat  debian/control  debian/copyright\
              debian/dirs  debian/docs  debian/menu  debian/rules  debian/watch
 
@@ -74,6 +74,21 @@ nsis_installer: all multivnc.nsi README NEWS COPYING
 	cp src/.libs/multivnc.exe src/multivnc.exe
 	$(STRIP) src/multivnc.exe
 	makensis multivnc.nsi 
+	
+zip_package: all  README NEWS COPYING
+	mkdir -p @PACKAGE_NAME@-@PACKAGE_VERSION@
+	cat README | unix2dos > @PACKAGE_NAME@-@PACKAGE_VERSION@/README.TXT
+	cat NEWS | unix2dos > @PACKAGE_NAME@-@PACKAGE_VERSION@/NEWS.TXT
+	cat TODO | unix2dos > @PACKAGE_NAME@-@PACKAGE_VERSION@/TODO.TXT
+	cat COPYING | unix2dos > @PACKAGE_NAME@-@PACKAGE_VERSION@/COPYING.TXT
+	cp src/.libs/multivnc.exe @PACKAGE_NAME@-@PACKAGE_VERSION@
+	$(STRIP) @PACKAGE_NAME@-@PACKAGE_VERSION@/multivnc.exe
+	cp src/mingwm10.dll @PACKAGE_NAME@-@PACKAGE_VERSION@
+	cp contrib/windowshare.exe @PACKAGE_NAME@-@PACKAGE_VERSION@
+	cp contrib/VNCHooks.dll @PACKAGE_NAME@-@PACKAGE_VERSION@
+	cp contrib/README-contrib.txt @PACKAGE_NAME@-@PACKAGE_VERSION@
+	zip @PACKAGE_NAME@-@PACKAGE_VERSION@-win32-portable.zip -r @PACKAGE_NAME@-@PACKAGE_VERSION@
+	rm -rf @PACKAGE_NAME@-@PACKAGE_VERSION@
 endif
 
 

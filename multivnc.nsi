@@ -2,7 +2,7 @@
 
 Name "MultiVNC ${VERSION}"
 
-OutFile "multivnc_${VERSION}-setup.exe"
+OutFile "multivnc_${VERSION}-win32-setup.exe"
 
 InstallDir $PROGRAMFILES\MultiVNC
 
@@ -19,12 +19,13 @@ Section ""
 
   File src\multivnc.exe
   File src\mingwm10.dll
-  File contrib\WinVNC.exe
+  File contrib\windowshare.exe
   File contrib\VNCHooks.dll
   File contrib\README-contrib.txt
   File NEWS.TXT	
   File README.TXT
   File TODO.TXT
+  File COPYING.TXT
 
   writeUninstaller $INSTDIR\multivnc-uninstall.exe
 
@@ -61,7 +62,7 @@ section "Uninstall"
   # now delete installed files
   delete $INSTDIR\multivnc.exe
   delete $INSTDIR\mingwm10.dll
-  delete $INSTDIR\WinVNC.exe
+  delete $INSTDIR\windowshare.exe
   delete $INSTDIR\VNCHooks.dll
   delete $INSTDIR\README-contrib.txt
   delete $INSTDIR\NEWS.TXT
