@@ -2,7 +2,7 @@
 
 Name "MultiVNC ${VERSION}"
 
-OutFile "multivnc_${VERSION}-setup.exe"
+OutFile "multivnc_${VERSION}-win32-setup.exe"
 
 InstallDir $PROGRAMFILES\MultiVNC
 
@@ -25,6 +25,7 @@ Section ""
   File NEWS.TXT	
   File README.TXT
   File TODO.TXT
+  File COPYING.TXT
 
   writeUninstaller $INSTDIR\multivnc-uninstall.exe
 
