@@ -1,6 +1,6 @@
 
 in order of importance:
-
+ - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
  - fix TLS on win32, this is a problem in libvncclient
  - fix the seamless connector for win32.
