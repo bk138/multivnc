@@ -26,7 +26,6 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     label_fastrequest = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Continously request updates at the specified milisecond interval:"));
     slider_fastrequest = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 1, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     checkbox_multicast = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Enable MulticastVNC"));
-    checkbox_multicastNACK = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Disable asking for retransmit of lost messages"));
     label_recvbuf = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Receive Buffer Size (kB):"));
     slider_recvbuf = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 65, 9750, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
     checkbox_qos_ef = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Enable Expedited Forwarding tagging for sent data"));
@@ -70,7 +69,6 @@ void DialogSettings::do_layout()
     sizer_fastrequest->Add(slider_fastrequest, 0, wxALL|wxEXPAND, 3);
     sizer_conn->Add(sizer_fastrequest, 0, wxALL|wxEXPAND, 3);
     sizer_multicast->Add(checkbox_multicast, 0, wxALL|wxEXPAND, 3);
-    sizer_multicast->Add(checkbox_multicastNACK, 0, wxALL|wxEXPAND, 3);
     sizer_multicast->Add(label_recvbuf, 0, wxALL, 3);
     sizer_multicast->Add(slider_recvbuf, 0, wxALL|wxEXPAND, 3);
     sizer_conn->Add(sizer_multicast, 0, wxALL|wxEXPAND, 3);

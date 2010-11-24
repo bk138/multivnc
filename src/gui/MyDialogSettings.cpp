@@ -29,8 +29,6 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   checkbox_logfile->SetValue(value);
   pConfig->Read(K_MULTICAST, &value, V_MULTICAST);
   checkbox_multicast->SetValue(value);
-  pConfig->Read(K_MULTICASTNACK, &value, V_MULTICASTNACK);
-  checkbox_multicastNACK->SetValue(!value); // beware this is a "disable" checkbox!
   pConfig->Read(K_MULTICASTRECVBUF, &value, V_MULTICASTRECVBUF);
   slider_recvbuf->SetValue(value);
   pConfig->Read(K_FASTREQUEST, &value, V_FASTREQUEST);
