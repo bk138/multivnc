@@ -23,11 +23,11 @@
   public members
 */
 
-/*
+#define RAISETIMER_ID 666
 BEGIN_EVENT_TABLE(VNCSeamlessConnector, wxFrame)
-  EVT_TIMER   (666, VNCSeamlessConnector::onRuntimer)
+  EVT_TIMER   (RAISETIMER_ID, VNCSeamlessConnector::onRaiseTimer)
 END_EVENT_TABLE();
-*/
+
 
 
 #define EDGE_EW (edge == EDGE_EAST || edge==EDGE_WEST)
@@ -81,7 +81,12 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
 
   adjustSize(); 
 
- 
+#ifdef __WXGTK__
+  // this is needed cause since newer gtk version the gnome panel 
+  // raises above the connector sometimes...grrr
+  raisetimer.SetOwner(this, RAISETIMER_ID);
+  raisetimer.Start(333); 
+#endif
 
   canvas = new VNCSeamlessConnectorCanvas(this);
 #ifndef __WXDEBUG__
@@ -248,6 +253,11 @@ void VNCSeamlessConnector::adjustSize()
 /*
   private members
 */
+
+void VNCSeamlessConnector::onRaiseTimer(wxTimerEvent& event)
+{
+  Raise();
+}
 
 
 void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
@@ -676,7 +686,7 @@ int VNCSeamlessConnector::coord_dist_from_edge(wxPoint a)
 
 /********************************************
 
-  VNCSeamlessConnector class
+  VNCSeamlessConnectorCanvas class
 
 ********************************************/
 

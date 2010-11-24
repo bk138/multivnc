@@ -41,10 +41,13 @@ public:
 
 
 protected:
-  // DECLARE_EVENT_TABLE();
+  DECLARE_EVENT_TABLE();
 
 private:
   VNCConn* conn;
+
+  wxTimer raisetimer;
+  void onRaiseTimer(wxTimerEvent& event);
 
   wxSize framebuffer_size;
   wxSize display_size;
