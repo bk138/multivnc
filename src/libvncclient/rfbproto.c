@@ -31,11 +31,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <pwd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#else
-#include <ws2tcpip.h>
+#include <pwd.h>
 #endif
 #include <errno.h>
 #include <rfb/rfbclient.h>
@@ -222,9 +220,9 @@ static rfbBool HandleCoRRE32(rfbClient* client, int rx, int ry, int rw, int rh);
 static rfbBool HandleHextile8(rfbClient* client, int rx, int ry, int rw, int rh);
 static rfbBool HandleHextile16(rfbClient* client, int rx, int ry, int rw, int rh);
 static rfbBool HandleHextile32(rfbClient* client, int rx, int ry, int rw, int rh);
-static rfbBool HandleUltra8(rfbClient* client, int rx, int ry, int rw, int rh);
-static rfbBool HandleUltra16(rfbClient* client, int rx, int ry, int rw, int rh);
-static rfbBool HandleUltra32(rfbClient* client, int rx, int ry, int rw, int rh);
+static rfbBool HandleUltra8(rfbClient* client, rfbBool multicast, int rx, int ry, int rw, int rh);
+static rfbBool HandleUltra16(rfbClient* client, rfbBool multicast, int rx, int ry, int rw, int rh);
+static rfbBool HandleUltra32(rfbClient* client, rfbBool multicast, int rx, int ry, int rw, int rh);
 static rfbBool HandleUltraZip8(rfbClient* client, int rx, int ry, int rw, int rh);
 static rfbBool HandleUltraZip16(rfbClient* client, int rx, int ry, int rw, int rh);
 static rfbBool HandleUltraZip32(rfbClient* client, int rx, int ry, int rw, int rh);
@@ -348,6 +346,16 @@ DefaultSupportedMessagesTightVNC(rfbClient* client)
     SetServer2Client(client, rfbTextChat);
 }
 
+
+void
+DefaultSupportedMessagesMulticastVNC(rfbClient* client)
+{
+    DefaultSupportedMessages(client);
+    SetClient2Server(client, rfbMulticastFramebufferUpdateRequest);
+    SetClient2Server(client, rfbMulticastFramebufferUpdateNACK);
+    /* technically, we only care what we can *send* to the server */
+    SetServer2Client(client, rfbMulticastFramebufferUpdate);
+}
 
 
 #ifndef WIN32
@@ -1235,6 +1243,7 @@ SetFormatAndEncodings(rfbClient* client)
     encs[se->nEncodings++] = rfbClientSwap32IfLE(rfbEncodingSupportedEncodings);
   if (se->nEncodings < MAX_ENCODINGS)
     encs[se->nEncodings++] = rfbClientSwap32IfLE(rfbEncodingServerIdentity);
+
   /* xvp */
   if (se->nEncodings < MAX_ENCODINGS)
     encs[se->nEncodings++] = rfbClientSwap32IfLE(rfbEncodingXvp);
@@ -1332,6 +1341,10 @@ SendMulticastFramebufferUpdateNACK(rfbClient* client, uint32_t idPartialUpd, uin
   rfbMulticastFramebufferUpdateNACKMsg mfun;
 
   if (!SupportsClient2Server(client, rfbMulticastFramebufferUpdateNACK)) return TRUE;
+
+#ifdef MULTICAST_DEBUG
+  rfbClientLog("MulticastVNC DEBUG: sending NACK: start partial upd %d, count %d\n", idPartialUpd, nPartialUpds);
+#endif
 
   mfun.type = rfbMulticastFramebufferUpdateNACK;
   mfun.idPartialUpd = rfbClientSwap32IfLE(idPartialUpd);
@@ -1655,6 +1668,9 @@ HandleRFBServerMessage(rfbClient* client)
 		  rect.r.w = rfbClientSwap16IfLE(rect.r.w);
 		  rect.r.h = rfbClientSwap16IfLE(rect.r.h);
 
+#ifdef MULTICAST_DEBUG
+		  rfbClientLog("MulticastVNC DEBUG: got rect (%d, %d, %d, %d)\n", rect.r.x, rect.r.y, rect.r.w, rect.r.h);
+#endif
 		  client->SoftCursorLockArea(client, rect.r.x, rect.r.y, rect.r.w, rect.r.h);
       
 		  switch (rect.encoding) 
@@ -1681,6 +1697,25 @@ HandleRFBServerMessage(rfbClient* client)
 			}
 		      }
 		      break;
+
+		    case rfbEncodingUltra:
+		      {
+			switch (client->format.bitsPerPixel) {
+			case 8:
+			  if (!HandleUltra8(client, TRUE, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
+			    return FALSE;
+			  break;
+			case 16:
+			  if (!HandleUltra16(client, TRUE, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
+			    return FALSE;
+			  break;
+			case 32:
+			  if (!HandleUltra32(client, TRUE, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
+			    return FALSE;
+			  break;
+			}
+			break;
+		      }
    
 		    default:
 		      {
@@ -1932,11 +1967,7 @@ HandleRFBServerMessage(rfbClient* client)
 	  rfbClientLog("MulticastVNC: NACK'ing of lost messages enabled\n");
 
 	rfbClientLog("MulticastVNC: Enabling multicast specific messages\n");
-
-	SetClient2Server(client, rfbMulticastFramebufferUpdateRequest);
-	SetClient2Server(client, rfbMulticastFramebufferUpdateNACK);
-	/* technically, we only care what we can *send* to the server */
-	SetServer2Client(client, rfbMulticastFramebufferUpdate);
+	DefaultSupportedMessagesMulticastVNC(client);
  	
 	continue;
       }
@@ -2079,15 +2110,15 @@ HandleRFBServerMessage(rfbClient* client)
       {
         switch (client->format.bitsPerPixel) {
         case 8:
-          if (!HandleUltra8(client, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
+          if (!HandleUltra8(client, FALSE, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
             return FALSE;
           break;
         case 16:
-          if (!HandleUltra16(client, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
+          if (!HandleUltra16(client, FALSE, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
             return FALSE;
           break;
         case 32:
-          if (!HandleUltra32(client, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
+          if (!HandleUltra32(client, FALSE, rect.r.x,rect.r.y,rect.r.w,rect.r.h))
             return FALSE;
           break;
         }

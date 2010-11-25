@@ -1,6 +1,17 @@
 #ifndef RFBPROTO_H
 #define RFBPROTO_H
 
+/**
+ @mainpage
+ @li @ref libvncserver_api
+ @li @ref libvncserver_doc
+
+
+ @li @ref libvncclient_api
+ @li @ref libvncclient_doc
+
+*/
+
 /*
  *  Copyright (C) 2005 Rohit Kumar, Johannes E. Schindelin
  *  Copyright (C) 2000-2002 Constantin Kaplinsky.  All Rights Reserved.
@@ -381,7 +392,6 @@ typedef struct {
 #define rfbServerCutText 3
 /* Modif sf@2002 */
 #define rfbResizeFrameBuffer 4
-#define rfbKeyFrameUpdate 5
 #define rfbPalmVNCReSizeFrameBuffer 0xF
 #define rfbMulticastFramebufferUpdate 248
 
@@ -406,13 +416,12 @@ typedef struct {
 /* Modif sf@2002 - TextChat - Bidirectionnal */
 #define rfbTextChat	11
 /* Modif cs@2005 */
-#define rfbKeyFrameRequest 12
 /* PalmVNC 1.4 & 2.0 SetScale Factor message */
 #define rfbPalmVNCSetScaleFactor 0xF
-/* Xvp message - bidirectional */
-#define rfbXvp 250
 #define rfbMulticastFramebufferUpdateRequest 249
 #define rfbMulticastFramebufferUpdateNACK 247
+/* Xvp message - bidirectional */
+#define rfbXvp 250
 
 
 
@@ -565,18 +574,6 @@ typedef struct {
 } rfbMulticastFramebufferUpdateMsg;
 
 #define sz_rfbMulticastFramebufferUpdateMsg 12
-
-
-/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- * KeyFrameUpdate - Acknowledgment of a key frame request, it tells the client
- * that the next update received will be a key frame.
- */
-
-typedef struct {
-    uint8_t type;
-} rfbKeyFrameUpdateMsg;
-
-#define sz_rfbKeyFrameUpdateMsg 1
 
 
 /*
@@ -1120,7 +1117,7 @@ typedef struct _rfbTextChatMsg {
 /*-----------------------------------------------------------------------------
  * Xvp Message
  * Bidirectional message
- * A server which supports the xvp extension declares this by sending a message 
+ * A server which supports the xvp extension declares this by sending a message
  * with an Xvp_INIT xvp-message-code when it receives a request from the client
  * to use the xvp Pseudo-encoding. The server must specify in this message the
  * highest xvp-extension-version it supports: the client may assume that the
