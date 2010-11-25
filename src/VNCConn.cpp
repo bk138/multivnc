@@ -309,8 +309,8 @@ wxThread::ExitCode VNCConn::Entry()
 		}
 	      else if(multicastLossRatio > 0.2) 
 		{
-		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full unicast framebuffer update\n");
-		  SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
+		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full multicast framebuffer update\n");
+		  SendMulticastFramebufferUpdateRequest(cl, FALSE);
 		  cl->multicastLost -= cl->multicastLost/10;
 		}
 	    }
