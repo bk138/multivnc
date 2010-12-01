@@ -783,7 +783,6 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality,
     {
       cl->canHandleMulticastVNC = TRUE;
       cl->multicastRcvBufSize = multicast_recvbuf*1024;
-      cl->multicastVNCdoNACK = TRUE;
     }
   else
     cl->canHandleMulticastVNC = FALSE;
