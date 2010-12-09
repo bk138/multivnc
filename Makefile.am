@@ -1,5 +1,4 @@
 ## Process this file with automake to produce Makefile.in
-## Created by Anjuta
 
 SUBDIRS = src 
 
@@ -18,11 +17,14 @@ pixmap_DATA = src/gui/res/multivnc.xpm
 
 
 EXTRA_DIST = $(multivncdoc_DATA) \
-             $(Applications_DATA) \
-             $(pixmap_DATA)\
-	     contrib/x11vnc contrib/windowshare.exe contrib/VNCHooks.dll contrib/README-contrib.txt\
-             debian/changelog  debian/compat  debian/control  debian/copyright\
-             debian/dirs  debian/docs  debian/menu  debian/rules  debian/watch
+	     $(Applications_DATA) \
+	     $(pixmap_DATA)\
+	     multivnc.nsi\
+	     contrib/x11vnc contrib/windowshare.exe \
+	     contrib/VNCHooks.dll contrib/README-contrib.txt\
+	     contrib/tightvnc_win32_1.3.10.patch\
+	     debian/changelog  debian/compat  debian/control  debian/copyright\
+	     debian/dirs  debian/docs  debian/menu  debian/rules  debian/watch
 
 
 if DARWIN

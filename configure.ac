@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(multivnc, 0.4.1, http://sourceforge.net/projects/multivnc)
+AC_INIT(multivnc, 0.4.2, http://sourceforge.net/projects/multivnc)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
 dnl this one needs a prefix
@@ -320,4 +320,5 @@ Makefile
 src/Makefile
 src/wxServDisc/Makefile
 src/libvncclient/Makefile
+src/gui/Makefile
 ])
