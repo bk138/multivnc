@@ -1221,3 +1221,40 @@ void VNCConn::clearLog()
   wxCriticalSectionLocker lock(mutex_log);
   log.Clear();
 }
+
+
+
+// get the OS-dependent socket receive buffer size in KByte.
+// max returned value is 32MB, -1 on error
+int VNCConn::getMaxSocketRecvBufSize()
+{
+  int sock; 
+
+#ifdef WIN32
+  WSADATA trash;
+  WSAStartup(MAKEWORD(2,0),&trash);
+#endif
+
+  // create the test socket
+  if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    return -1;
+
+  // try with some high value and see what we get
+  int recv_buf_try = 33554432; // 32 MB
+  if(setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&recv_buf_try, sizeof(recv_buf_try)) < 0) 
+    {
+      close(sock);
+      return -1;
+    } 
+  int recv_buf_got = -1;
+  socklen_t recv_buf_got_len = sizeof(recv_buf_got);
+  if(getsockopt(sock, SOL_SOCKET, SO_RCVBUF,(char*)&recv_buf_got, &recv_buf_got_len) <0)
+    {
+      close(sock);
+      return -1;
+    } 
+
+  close(sock);
+
+  return recv_buf_got/1024;
+}

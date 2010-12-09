@@ -158,6 +158,7 @@ public:
   static void clearLog();
   static void doLogfile(bool yesno) { do_logfile = yesno; };
 
+  static int getMaxSocketRecvBufSize();
 
 protected:
   // thread execution starts here

@@ -46,8 +46,8 @@ void DialogSettings::set_properties()
     slider_compresslevel->SetToolTip(_("Use specified compression level (0..9) for \"tight\" and \"zlib\" encodings. Level 1 uses minimum of CPU time and achieves weak compression ratios, while level 9 offers best compression but is slow in terms of CPU time consumption on the server side. Use high levels with very slow network connections, and low levels when working over high-speed LANs."));
     slider_quality->SetToolTip(_("Use the specified JPEG quality level (0..9) for the \"Tight\" encoding. Quality level 0 denotes bad image quality but very impressive compression ratios, while level 9 offers very good image quality at lower compression ratios. Note that the \"tight\" encoder uses JPEG to encode only those screen areas that look suitable for lossy compression, so quality level 0 does not always mean unacceptable image quality."));
     slider_fastrequest->SetToolTip(_("Continously ask the server for updates instead of just asking after each received server message. Use this on high latency links."));
-    slider_socketrecvbuf->SetToolTip(_("Set the multicast socket receive buffer size. Increasing the value may help against packet loss. Note that depending on your OS, you may not always get the requested value. View the log to see what happened."));
-    slider_recvbuf->SetToolTip(_("Set the multicast receive buffer size. Increasing the value may help against packet loss. The size of this buffer is OS-indepent."));
+    slider_socketrecvbuf->SetToolTip(_("Set the multicast socket receive buffer size. Increasing the value may help against packet loss. Note that the maximum value is operating system dependent."));
+    slider_recvbuf->SetToolTip(_("Set the multicast receive buffer size. Increasing the value may help against packet loss. The size of this buffer is independent of the operating system."));
     // end wxGlade
 }
 

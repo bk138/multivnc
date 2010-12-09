@@ -1,7 +1,8 @@
 
 #include <wx/config.h>
 #include "MyDialogSettings.h"
-#include "../dfltcfg.h"
+#include "VNCConn.h"
+#include "dfltcfg.h"
 
 
 
@@ -39,6 +40,11 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   slider_fastrequest->SetValue(value);
   pConfig->Read(K_QOS_EF, &value, V_QOS_EF);
   checkbox_qos_ef->SetValue(value);
+
+  // adopt socket recv buf slider to OS-dependent max
+  int os_dependent_max = VNCConn::getMaxSocketRecvBufSize();
+  if(slider_socketrecvbuf->GetMax() > os_dependent_max)
+    slider_socketrecvbuf->SetRange(slider_socketrecvbuf->GetMin(), os_dependent_max);
 }
 
 
