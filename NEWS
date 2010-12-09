@@ -1,3 +1,8 @@
+MultiVNC 0.4.2 - 
+	* MulticastVNC now supports the Ultra encoding and features
+	  a freely sizeable receive buffer in addition to the 
+	  OS-dependent socket receive buffer.
+
 MultiVNC 0.4.1 - "Fix me up"
         * Changed default MulticastVNC receive buffer size to 5120 KB
           to play it safe.

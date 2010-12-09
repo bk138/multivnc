@@ -614,12 +614,13 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   
 
   // get connection settings
-  int compresslevel, quality, multicast_recvbuf, fastrequest_interval;
+  int compresslevel, quality, multicast_socketrecvbuf, multicast_recvbuf, fastrequest_interval;
   bool multicast, fastrequest, qos_ef;
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
   pConfig->Read(K_MULTICAST, &multicast, V_MULTICAST);
+  pConfig->Read(K_MULTICASTSOCKETRECVBUF, &multicast_socketrecvbuf, V_MULTICASTSOCKETRECVBUF);
   pConfig->Read(K_MULTICASTRECVBUF, &multicast_recvbuf, V_MULTICASTRECVBUF);
   pConfig->Read(K_FASTREQUEST, &fastrequest, V_FASTREQUEST);
   pConfig->Read(K_FASTREQUESTINTERVAL, &fastrequest_interval, V_FASTREQUESTINTERVAL);
@@ -660,7 +661,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
 
       wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
-      if(!c->Init(addr + wxT(":") + port, compresslevel, quality, multicast, multicast_recvbuf))
+      if(!c->Init(addr + wxT(":") + port, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -1066,6 +1067,7 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
       pConfig->Write(K_STATSAUTOSAVE, dialog_settings.getStatsAutosave());
       pConfig->Write(K_LOGSAVETOFILE, dialog_settings.getLogSavetofile());
       pConfig->Write(K_MULTICAST, dialog_settings.getDoMulticast());
+      pConfig->Write(K_MULTICASTSOCKETRECVBUF, dialog_settings.getMulticastSocketRecvBuf());
       pConfig->Write(K_MULTICASTRECVBUF, dialog_settings.getMulticastRecvBuf());
       pConfig->Write(K_FASTREQUEST, dialog_settings.getDoFastRequest());
       pConfig->Write(K_FASTREQUESTINTERVAL, dialog_settings.getFastRequestInterval());

@@ -758,7 +758,7 @@ bool VNCConn::Listen(int port)
 
 
 bool VNCConn::Init(const wxString& host, int compresslevel, int quality, 
-		   bool multicast, int multicast_recvbuf)
+		   bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
 
@@ -782,6 +782,7 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality,
   if(multicast)
     {
       cl->canHandleMulticastVNC = TRUE;
+      cl->multicastSocketRcvBufSize = multicast_socketrecvbuf*1024;
       cl->multicastRcvBufSize = multicast_recvbuf*1024;
     }
   else

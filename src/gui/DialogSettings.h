@@ -42,6 +42,8 @@ protected:
     wxStaticText* label_fastrequest;
     wxSlider* slider_fastrequest;
     wxCheckBox* checkbox_multicast;
+    wxStaticText* label_socketrecvbuf;
+    wxSlider* slider_socketrecvbuf;
     wxStaticText* label_recvbuf;
     wxSlider* slider_recvbuf;
     wxCheckBox* checkbox_qos_ef;

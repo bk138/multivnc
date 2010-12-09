@@ -335,14 +335,17 @@ typedef struct _rfbClient {
         /* all the multicast stuff */
         rfbBool canHandleMulticastVNC;
         int maxMulticastTimeouts;
-        int multicastRcvBufSize;
         int multicastSock;
-#define RFB_MULTICAST_BUF_SIZE 65507 /* max payload of one UDP packet */
-        char multicastbuf[RFB_MULTICAST_BUF_SIZE];
+        int multicastSocketRcvBufSize;
+        int multicastRcvBufSize;
+        void *multicastPacketBuf;
         char *multicastbufoutptr;
-        int multicastbuffered;
+        size_t multicastbuffered;
+#define MULTICAST_READBUF_SZ 65507 /* max UDP payload */
+        char multicastReadBuf[MULTICAST_READBUF_SZ];
         int multicastUpdInterval;
         struct timeval multicastRequestTimestamp; /* gets set when multicast framebuffer update was requested */
+        struct timeval multicastPendingRequestTimestamp; /* time when last unanswered request was sent */
         int multicastPixelformatId;
         rfbBool serverMsgMulticast; /* this flag is set by WaitForMessage() if there's multicast input */
         rfbBool serverMsg;          /* this flag is set by WaitForMessage() if there's unicast input */
@@ -432,7 +435,6 @@ extern int ConnectClientToUnixSock(const char *sockFile);
 extern int AcceptTcpConnection(int listenSock);
 extern rfbBool SetNonBlocking(int sock);
 extern rfbBool SetDSCP(int sock, int dscp);
-extern int CreateMulticastSocket(struct sockaddr_storage multicastSockAddr, int so_recvbuf);
 
 extern rfbBool StringToIPAddr(const char *str, unsigned int *addr);
 extern rfbBool SameMachine(int sock);
