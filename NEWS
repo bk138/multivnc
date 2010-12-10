@@ -1,4 +1,4 @@
-MultiVNC 0.4.2 - 
+MultiVNC 0.5 -
 	* MulticastVNC now supports the Ultra encoding and features
 	  a freely sizeable receive buffer in addition to the 
 	  OS-dependent socket receive buffer.
