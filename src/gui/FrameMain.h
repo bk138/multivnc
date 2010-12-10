@@ -59,6 +59,8 @@ protected:
     wxTextCtrl* text_ctrl_latency;
     wxStaticText* label_lossratio;
     wxTextCtrl* text_ctrl_lossratio;
+    wxStaticText* label_recvbuf;
+    wxGauge* gauge_recvbuf;
     wxPanel* splitwin_leftlower_pane_2;
     wxSplitterWindow* splitwin_leftlower;
     wxPanel* splitwin_left_pane_2;
@@ -84,6 +86,7 @@ public:
     virtual void machine_save_stats_latencies(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_pointer_latencies(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_lossratio(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_save_stats_recvbuf(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_exit(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_toggletoolbar(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglediscovered(wxCommandEvent &event); // wxGlade: <event_handler>

@@ -209,6 +209,8 @@ MyFrameMain::~MyFrameMain()
 	    wxLogError(_("Could not autosave pointer latency statistics!"));
 	  if(!saveStats(c, i, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
 	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
+	  if(!saveStats(c, i, c->getMCBufStats(), _("multicast receive buffer"),true))
+	    wxLogError(_("Could not autosave multicast receive buffer statistics!"));
 	}
     }
  
@@ -458,6 +460,9 @@ void MyFrameMain::onStatsTimer(wxTimerEvent& event)
 	*text_ctrl_latency << c->getLatencyStats().Last().AfterLast(wxT(','));
       if( ! c->getMCLossRatioStats().IsEmpty() )
 	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterLast(wxT(','));
+
+      gauge_recvbuf->SetRange(c->getMCBufSize());
+      gauge_recvbuf->SetValue(c->getMCBufFill());
     }
 }
 
@@ -722,6 +727,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(true);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(4)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(5)->Enable(true);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
   // window sharing
@@ -787,6 +793,7 @@ void MyFrameMain::terminate_conn(int which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(false);
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(4)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(5)->Enable(false);
       // bookmarks
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
       // window sharing
@@ -804,6 +811,7 @@ void MyFrameMain::terminate_conn(int which)
       text_ctrl_updcount->Clear();
       text_ctrl_latency->Clear();
       text_ctrl_lossratio->Clear();
+      gauge_recvbuf->SetValue(0);
     }
 
   wxLogStatus( _("Connection terminated."));
@@ -1167,6 +1175,17 @@ void MyFrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
 }
 
 
+void MyFrameMain::machine_save_stats_recvbuf(wxCommandEvent &event)
+{
+  if(connections.size())
+    {
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel).conn;
+      saveStats(c, sel, c->getMCBufStats(), _("multicast receive buffer"), false);
+    }
+}
+
+
 
 
 
@@ -1252,6 +1271,7 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
   text_ctrl_updcount->Clear();
   text_ctrl_latency->Clear();
   text_ctrl_lossratio->Clear();
+  gauge_recvbuf->SetValue(0);
 
   // for now, toggle all VNCConn instances
   for(size_t i=0; i < connections.size(); ++i)

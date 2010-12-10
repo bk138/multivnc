@@ -38,6 +38,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LATENCIES, _("Save Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_POINTER_LAT, _("Save Pointer Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LOSSRATIO, _("Save Multicast Loss Ratio Statistics"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_RECVBUF, _("Save Multicast Receive Buffer Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_ANY, _("Statistics"), wxglade_tmp_menu_1_sub, wxEmptyString);
     wxglade_tmp_menu_1->AppendSeparator();
     wxglade_tmp_menu_1->Append(wxID_EXIT, wxEmptyString, _("Exit MultiVNC."), wxITEM_NORMAL);
@@ -94,6 +95,8 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     text_ctrl_latency = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
     label_lossratio = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("MC loss ratio:"));
     text_ctrl_lossratio = new wxTextCtrl(splitwin_leftlower_pane_2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+    label_recvbuf = new wxStaticText(splitwin_leftlower_pane_2, wxID_ANY, _("MC Receive Buffer:"));
+    gauge_recvbuf = new wxGauge(splitwin_leftlower_pane_2, wxID_ANY, 10, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
     notebook_connections = new wxNotebook(splitwin_main_pane_2, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
 
     set_properties();
@@ -115,6 +118,7 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(ID_STATS_SAVE_LATENCIES, FrameMain::machine_save_stats_latencies)
     EVT_MENU(ID_STATS_SAVE_POINTER_LAT, FrameMain::machine_save_stats_pointer_latencies)
     EVT_MENU(ID_STATS_SAVE_LOSSRATIO, FrameMain::machine_save_stats_lossratio)
+    EVT_MENU(ID_STATS_SAVE_RECVBUF, FrameMain::machine_save_stats_recvbuf)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
     EVT_MENU(ID_TOOLBAR, FrameMain::view_toggletoolbar)
     EVT_MENU(ID_DISCOVERED, FrameMain::view_togglediscovered)
@@ -219,6 +223,13 @@ void FrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_lossratio) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_save_stats_recvbuf(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_recvbuf) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 
@@ -365,7 +376,7 @@ void FrameMain::set_properties()
     wxIcon _icon;
     _icon.CopyFromBitmap(wxICON(icon));
     SetIcon(_icon);
-    SetSize(wxSize(985, 766));
+    SetSize(wxSize(985, 852));
     int frame_main_statusbar_widths[] = { -1, 3 };
     frame_main_statusbar->SetStatusWidths(2, frame_main_statusbar_widths);
     const wxString frame_main_statusbar_fields[] = {
@@ -403,6 +414,8 @@ void FrameMain::do_layout()
     sizer_3->Add(text_ctrl_latency, 0, wxALL, 3);
     sizer_3->Add(label_lossratio, 0, wxALL, 3);
     sizer_3->Add(text_ctrl_lossratio, 0, wxALL, 3);
+    sizer_3->Add(label_recvbuf, 0, wxALL, 3);
+    sizer_3->Add(gauge_recvbuf, 0, wxALL, 3);
     splitwin_leftlower_pane_2->SetSizer(sizer_3);
     splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2, 83);
     sizer_leftlower->Add(splitwin_leftlower, 1, wxALL|wxEXPAND, 3);
@@ -412,7 +425,7 @@ void FrameMain::do_layout()
     splitwin_main_pane_1->SetSizer(sizer_2);
     sizer_notebook->Add(notebook_connections, 1, wxALL|wxEXPAND, 3);
     splitwin_main_pane_2->SetSizer(sizer_notebook);
-    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 342);
+    splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2, 31);
     sizer_splitwinmain->Add(splitwin_main, 1, wxALL|wxEXPAND, 3);
     panel_top->SetSizer(sizer_splitwinmain);
     sizer_top->Add(panel_top, 1, wxEXPAND, 0);

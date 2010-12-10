@@ -169,8 +169,16 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 	  multicast_lossratios.Add((wxString() << wxGetUTCTime()) + 
 				   wxT(", ") + 
 				   (wxString() << (int)conn_stopwatch.Time())
-				   + wxT(", ") +
-				   lossratestring);
+				   + wxT(", ") + lossratestring);
+
+	  multicast_bufferfills.Add((wxString() << wxGetUTCTime())
+				    + wxT(", ") 
+				    + (wxString() << (int)conn_stopwatch.Time())
+				    + wxT(", ") 
+				    + (wxString() << getMCBufSize())
+				    + wxT(", ") 
+				    + (wxString() << getMCBufFill())
+				    );
 	}
 
       // latency check start

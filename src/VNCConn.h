@@ -136,6 +136,8 @@ public:
   const wxArrayString& getPointerLatencyStats() const { const wxArrayString& ref = pointer_latencies; return ref; };
   // gets multicast loss ratio per second
   const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = multicast_lossratios; return ref; };
+  // gets multicast receive buf fill per second
+  const wxArrayString& getMCBufStats() const { const wxArrayString& ref = multicast_bufferfills; return ref; };
 
   // cuttext
   const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
@@ -150,6 +152,10 @@ public:
   wxString getServerName() const;
   wxString getServerAddr() const;
   wxString getServerPort() const;
+
+  // get current multicast receive buf state
+  int getMCBufSize() const { if(cl) return cl->multicastRcvBufSize; else return 0; };
+  int getMCBufFill() const { if(cl) return cl->multicastRcvBufLen; else return 0; };
  
   // get error string
   const wxString& getErr() const { const wxString& ref = err; return ref; };
@@ -220,6 +226,8 @@ private:
   wxArrayString pointer_latencies;
   // mc loss ratios
   wxArrayString multicast_lossratios;
+  // mc buffer stats
+  wxArrayString multicast_bufferfills;
 
   // per-connection error string
   wxString err;
