@@ -23,15 +23,28 @@
 
 
 #include <iostream>
-
-
-#include "MultiVNCApp.h"
-#include "gui/MyFrameMain.h"
+#include <csignal>
 #ifdef __WXMAC__
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 
+#include "MultiVNCApp.h"
+#include "gui/MyFrameMain.h"
+
+
 using namespace std;
+
+
+
+void handle_sig(int s)
+{
+  switch(s)
+    {
+    case SIGINT:
+      wxGetApp().ExitMainLoop();
+      break;
+    }
+}
 
 
 
@@ -45,6 +58,12 @@ bool MultiVNCApp::OnInit()
   locale = 0;
   
   setLocale(wxLANGUAGE_DEFAULT);
+
+  // setup signal handlers
+  signal(SIGINT, handle_sig);
+#if !defined __WXMSW__ || defined __BORLANDC__ || defined _MSC_VER // on win32, does only work with borland c++ or visual c++
+  wxHandleFatalExceptions(true); // enable ::OnFatalException() which handles fatal signals
+#endif
 
   // wxConfig:
   // application and vendor name are used by wxConfig to construct the name
@@ -101,9 +120,43 @@ int MultiVNCApp::OnExit()
 void MultiVNCApp::OnUnhandledException()
 {
   //this way it should work under both normal and debug builds
-  wxLogError(_("GAAH! Got an unhandled exception!"));  
-  wxLogDebug(_("GAAH! Got an unhandled exception!"));          
+  wxString msg = _("GAAH! Got an unhandled exception! This should not happen."); 
+  wxLogError(msg);
+  wxLogDebug(msg);
 }
+
+
+void MultiVNCApp::OnFatalException()
+{
+  int answer = wxMessageBox(_("Ouch! MultiVNC crashed. This should not happen. Do you want to generate a bug report?"), _("MultiVNC crashed"),
+			    wxICON_ERROR | wxYES_NO, NULL);
+  if(answer == wxYES)
+    genDebugReport(wxDebugReport::Context_Exception);
+}
+
+
+void MultiVNCApp::genDebugReport(wxDebugReport::Context ctx)
+{
+  wxDebugReportCompress *report = new wxDebugReportCompress;
+
+  // add all standard files: currently this means just a minidump and an
+  // XML file with system info and stack trace
+  report->AddAll(ctx);
+
+  // calling Show() is not mandatory, but is more polite
+  if(wxDebugReportPreviewStd().Show(*report))
+    {
+      if (report->Process())
+        {
+	  wxMessageBox(_("Report generated in \"") + report->GetCompressedFileName() + _T("\"."), _("Report generated successfully"),
+		       wxICON_INFORMATION | wxOK, NULL);
+	  report->Reset();
+	}
+    }
+  //else: user cancelled the report
+  delete report;
+}
+
 
 
 
@@ -132,3 +185,5 @@ bool MultiVNCApp::setLocale(int language)
 
   return true;
 }
+
+

@@ -29,7 +29,8 @@
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP 
 #include "wx/wx.h"       
-#endif  
+#endif
+#include "wx/debugrpt.h"
 #include "wx/config.h"
 #include "config.h"
 
@@ -41,10 +42,14 @@ class MultiVNCApp: public wxApp
   wxLocale *locale;
 public:
   
-  bool OnInit();
-  int  OnExit();
+  virtual bool OnInit();
+  virtual int  OnExit();
   virtual void OnUnhandledException();
- 
+  virtual void OnFatalException();
+  
+  // this is where we really generate the debug report
+  void genDebugReport(wxDebugReport::Context ctx);
+  
   bool setLocale(int language);
 
   // application-wide mutex protecting wxTheClipboard
