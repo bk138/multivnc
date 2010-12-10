@@ -36,6 +36,13 @@ multivnc_LDADD = \
 	$(WX_LIBS)
 
 if MINGW
+multivnc_SOURCES += winres.c
 multivnc_LDADD += -lws2_32
+
+.rc.o:
+	 $(WX_RESCOMP) -o $@ $<
 endif
 
+EXTRA_DIST = \
+	winres.rc\
+	icon.ico

@@ -35,8 +35,6 @@ libMultiVNCgui_a_SOURCES = \
 libMultiVNCgui_a_CPPFLAGS  = @WX_CPPFLAGS@ @GTK_CFLAGS@ -I..
 
 EXTRA_DIST = \
-	winres.rc\
-	res/icon.ico \
 	res/icon.icns \
 	res/about.png \
 	res/connect.png \
@@ -46,9 +44,4 @@ EXTRA_DIST = \
 	res/unicast.png \
 	res/multicast.png 
 
-if MINGW
-libMultiVNCgui_a_SOURCES += winres.rc
-.rc.o:
-	 $(WX_RESCOMP) -o $@ $<
-endif
 
