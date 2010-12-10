@@ -35,7 +35,6 @@ libMultiVNCgui_a_SOURCES = \
 libMultiVNCgui_a_CPPFLAGS  = @WX_CPPFLAGS@ @GTK_CFLAGS@ -I..
 
 EXTRA_DIST = \
-	res/icon.icns \
 	res/about.png \
 	res/connect.png \
 	res/disconnect.png \

@@ -35,7 +35,7 @@ appbundle: src/multivnc
 	echo "APPL????" > $(bundle_contents)/PkgInfo
 	$(INSTALL_PROGRAM) $< $(bundle_contents)/MacOS/
 	cp contrib/x11vnc $(bundle_contents)/MacOS/
-	cp src/gui/res/icon.icns $(bundle_contents)/Resources
+	cp src/icon.icns $(bundle_contents)/Resources
 	cp README  $(bundle_contents)/Resources
 	cp NEWS    $(bundle_contents)/Resources
 	cp COPYING $(bundle_contents)/Resources
