@@ -30,27 +30,28 @@ private:
 
 protected:
     // begin wxGlade: DialogSettings::attributes
-    wxStaticBox* sizer_qos_staticbox;
-    wxStaticBox* sizer_multicast_staticbox;
-    wxStaticBox* sizer_fastrequest_staticbox;
     wxStaticBox* sizer_tightsettings_staticbox;
-    wxStaticText* label_compresslevel;
-    wxSlider* slider_compresslevel;
-    wxStaticText* label_quality;
-    wxSlider* slider_quality;
+    wxStaticBox* sizer_multicast_staticbox;
+    wxStaticBox* sizer_qos_staticbox;
+    wxStaticBox* sizer_fastrequest_staticbox;
     wxCheckBox* checkbox_fastrequest;
     wxStaticText* label_fastrequest;
     wxSlider* slider_fastrequest;
+    wxCheckBox* checkbox_qos_ef;
     wxCheckBox* checkbox_multicast;
     wxStaticText* label_socketrecvbuf;
     wxSlider* slider_socketrecvbuf;
     wxStaticText* label_recvbuf;
     wxSlider* slider_recvbuf;
-    wxCheckBox* checkbox_qos_ef;
     wxPanel* notebook_settings_pane_conn;
     wxCheckBox* checkbox_logfile;
     wxCheckBox* checkbox_stats_save;
     wxPanel* notebook_settings_pane_logging;
+    wxStaticText* label_compresslevel;
+    wxSlider* slider_compresslevel;
+    wxStaticText* label_quality;
+    wxSlider* slider_quality;
+    wxPanel* notebook_settings_pane_encodings;
     wxNotebook* notebook_settings;
     // end wxGlade
 }; // wxGlade: end class
