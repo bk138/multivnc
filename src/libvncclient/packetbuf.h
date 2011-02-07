@@ -24,6 +24,7 @@
 #define PACKETBUF_H
 
 #include <stdlib.h>
+#include "rfb/rfbint.h"
 
 
 /*
@@ -32,6 +33,7 @@
 typedef struct _packet {
   char *data;
   size_t datalen;
+  uint32_t id;
   struct _packet *next;
 } packet;
 
@@ -61,6 +63,9 @@ int packetBufPush(packetBuf* b, packet *packet);
 
 /* Removes the first packet from buffer. */
 void packetBufPop(packetBuf* b);
+
+/* Get packet at index i. */
+packet* packetBufAt(packetBuf* b, size_t i);
 
 /* get number of buffered elements */
 size_t packetBufCount(packetBuf* b);
