@@ -43,10 +43,6 @@
 #define V_SIZE_Y 600
 
 // connection settings
-#define K_COMPRESSLEVEL wxT("CompressLevel")
-#define V_COMPRESSLEVEL 1
-#define K_QUALITY wxT("Quality")
-#define V_QUALITY 5
 #define K_MULTICAST wxT("MulticastVNC")
 #define V_MULTICAST true
 #define K_MULTICASTSOCKETRECVBUF wxT("MulticastSocketRecvBufSize")
@@ -59,6 +55,32 @@
 #define V_FASTREQUESTINTERVAL 30
 #define K_QOS_EF wxT("QOS_EF")
 #define V_QOS_EF true
+
+// encodings settings
+#define K_ENC_COPYRECT wxT("EncodingCopyRect")
+#define V_ENC_COPYRECT true
+#define K_ENC_RRE wxT("EncodingRRE")
+#define V_ENC_RRE true
+#define K_ENC_HEXTILE wxT("EncodingHextile")
+#define V_ENC_HEXTILE true
+#define K_ENC_CORRE wxT("EncodingCorre")
+#define V_ENC_CORRE true
+#define K_ENC_ZLIB wxT("EncodingZlib")
+#define V_ENC_ZLIB true
+#define K_ENC_ZLIBHEX wxT("EncodingZlibhex")
+#define V_ENC_ZLIBHEX true
+#define K_ENC_ZRLE wxT("EncodingZRLE")
+#define V_ENC_ZRLE true
+#define K_ENC_ZYWRLE wxT("EncodingZYWRLE")
+#define V_ENC_ZYWRLE true
+#define K_ENC_ULTRA wxT("EncodingUltra")
+#define V_ENC_ULTRA true
+#define K_ENC_TIGHT wxT("EncodingTight")
+#define V_ENC_TIGHT true
+#define K_COMPRESSLEVEL wxT("CompressLevel")
+#define V_COMPRESSLEVEL 1
+#define K_QUALITY wxT("Quality")
+#define V_QUALITY 5
 
 // logging
 #define K_LOGSAVETOFILE wxT("LogFile")

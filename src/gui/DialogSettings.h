@@ -31,6 +31,7 @@ private:
 protected:
     // begin wxGlade: DialogSettings::attributes
     wxStaticBox* sizer_tightsettings_staticbox;
+    wxStaticBox* sizer_encbox_staticbox;
     wxStaticBox* sizer_multicast_staticbox;
     wxStaticBox* sizer_qos_staticbox;
     wxStaticBox* sizer_fastrequest_staticbox;
@@ -47,6 +48,16 @@ protected:
     wxCheckBox* checkbox_logfile;
     wxCheckBox* checkbox_stats_save;
     wxPanel* notebook_settings_pane_logging;
+    wxCheckBox* checkbox_enc_copyrect;
+    wxCheckBox* checkbox_enc_hextile;
+    wxCheckBox* checkbox_enc_rre;
+    wxCheckBox* checkbox_enc_corre;
+    wxCheckBox* checkbox_enc_zlib;
+    wxCheckBox* checkbox_enc_zlibhex;
+    wxCheckBox* checkbox_enc_zrle;
+    wxCheckBox* checkbox_enc_zywrle;
+    wxCheckBox* checkbox_enc_ultra;
+    wxCheckBox* checkbox_enc_tight;
     wxStaticText* label_compresslevel;
     wxSlider* slider_compresslevel;
     wxStaticText* label_quality;

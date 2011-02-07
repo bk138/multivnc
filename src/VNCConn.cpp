@@ -765,7 +765,7 @@ bool VNCConn::Listen(int port)
 }
 
 
-bool VNCConn::Init(const wxString& host, int compresslevel, int quality, 
+bool VNCConn::Init(const wxString& host, const wxString& encodings, int compresslevel, int quality, 
 		   bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
@@ -795,6 +795,8 @@ bool VNCConn::Init(const wxString& host, int compresslevel, int quality,
     }
   else
     cl->canHandleMulticastVNC = FALSE;
+
+  cl->appData.encodingsString = strdup(encodings.mb_str());
 
   if(! rfbInitClient(cl, &argc, argv))
     {

@@ -391,11 +391,47 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
 
   // get connection settings
   int compresslevel, quality;
+  wxString encodings;
+  bool enc_enabled;
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
 
-  if(!c->Init(wxEmptyString, compresslevel, quality))
+  pConfig->Read(K_ENC_TIGHT, &enc_enabled, V_ENC_TIGHT);
+  if(enc_enabled) 
+    encodings += wxT(" tight");
+  pConfig->Read(K_ENC_ULTRA, &enc_enabled, V_ENC_ULTRA);
+  if(enc_enabled) 
+    encodings += wxT(" ultra");
+  pConfig->Read(K_ENC_ZLIBHEX, &enc_enabled, V_ENC_ZLIBHEX);
+  if(enc_enabled) 
+    encodings += wxT(" zlibhex");
+  pConfig->Read(K_ENC_ZLIB, &enc_enabled, V_ENC_ZLIB);
+  if(enc_enabled) 
+    encodings += wxT(" zlib");
+  pConfig->Read(K_ENC_ZYWRLE, &enc_enabled, V_ENC_ZYWRLE);
+  if(enc_enabled) 
+    encodings += wxT(" zywrle");
+  pConfig->Read(K_ENC_ZRLE, &enc_enabled, V_ENC_ZRLE);
+  if(enc_enabled) 
+    encodings += wxT(" zrle");
+  pConfig->Read(K_ENC_CORRE, &enc_enabled, V_ENC_CORRE);
+  if(enc_enabled) 
+    encodings += wxT(" corre");
+  pConfig->Read(K_ENC_RRE, &enc_enabled, V_ENC_RRE);
+  if(enc_enabled) 
+    encodings += wxT(" rre");
+  pConfig->Read(K_ENC_HEXTILE, &enc_enabled, V_ENC_HEXTILE);
+  if(enc_enabled) 
+    encodings += wxT(" hextile");
+  pConfig->Read(K_ENC_COPYRECT, &enc_enabled, V_ENC_COPYRECT);
+  if(enc_enabled) 
+    encodings += wxT(" copyrect");
+  // chomp leading space
+  encodings = encodings.AfterFirst(' '); 
+
+  
+  if(!c->Init(wxEmptyString, encodings, compresslevel, quality))
     {
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
@@ -621,10 +657,9 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
   // get connection settings
   int compresslevel, quality, multicast_socketrecvbuf, multicast_recvbuf, fastrequest_interval;
-  bool multicast, fastrequest, qos_ef;
+  bool multicast, fastrequest, qos_ef, enc_enabled;
+  wxString encodings;
   wxConfigBase *pConfig = wxConfigBase::Get();
-  pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
-  pConfig->Read(K_QUALITY, &quality, V_QUALITY);
   pConfig->Read(K_MULTICAST, &multicast, V_MULTICAST);
   pConfig->Read(K_MULTICASTSOCKETRECVBUF, &multicast_socketrecvbuf, V_MULTICASTSOCKETRECVBUF);
   pConfig->Read(K_MULTICASTRECVBUF, &multicast_recvbuf, V_MULTICASTRECVBUF);
@@ -632,6 +667,41 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   pConfig->Read(K_FASTREQUESTINTERVAL, &fastrequest_interval, V_FASTREQUESTINTERVAL);
   pConfig->Read(K_QOS_EF, &qos_ef, V_QOS_EF);
 
+  pConfig->Read(K_ENC_TIGHT, &enc_enabled, V_ENC_TIGHT);
+  if(enc_enabled) 
+    encodings += wxT(" tight");
+  pConfig->Read(K_ENC_ULTRA, &enc_enabled, V_ENC_ULTRA);
+  if(enc_enabled) 
+    encodings += wxT(" ultra");
+  pConfig->Read(K_ENC_ZLIBHEX, &enc_enabled, V_ENC_ZLIBHEX);
+  if(enc_enabled) 
+    encodings += wxT(" zlibhex");
+  pConfig->Read(K_ENC_ZLIB, &enc_enabled, V_ENC_ZLIB);
+  if(enc_enabled) 
+    encodings += wxT(" zlib");
+  pConfig->Read(K_ENC_ZYWRLE, &enc_enabled, V_ENC_ZYWRLE);
+  if(enc_enabled) 
+    encodings += wxT(" zywrle");
+  pConfig->Read(K_ENC_ZRLE, &enc_enabled, V_ENC_ZRLE);
+  if(enc_enabled) 
+    encodings += wxT(" zrle");
+  pConfig->Read(K_ENC_CORRE, &enc_enabled, V_ENC_CORRE);
+  if(enc_enabled) 
+    encodings += wxT(" corre");
+  pConfig->Read(K_ENC_RRE, &enc_enabled, V_ENC_RRE);
+  if(enc_enabled) 
+    encodings += wxT(" rre");
+  pConfig->Read(K_ENC_HEXTILE, &enc_enabled, V_ENC_HEXTILE);
+  if(enc_enabled) 
+    encodings += wxT(" hextile");
+  pConfig->Read(K_ENC_COPYRECT, &enc_enabled, V_ENC_COPYRECT);
+  if(enc_enabled) 
+    encodings += wxT(" copyrect");
+  // chomp leading space
+  encodings = encodings.AfterFirst(' '); 
+
+  pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
+  pConfig->Read(K_QUALITY, &quality, V_QUALITY);
 
   VNCConn* c = new VNCConn(this);
   c->Setup(getpasswd);
@@ -667,7 +737,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 
 
       wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
-      if(!c->Init(addr + wxT(":") + port, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
+      if(!c->Init(addr + wxT(":") + port, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -1071,8 +1141,6 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
   if(dialog_settings.ShowModal() == wxID_OK)
     {
       wxConfigBase *pConfig = wxConfigBase::Get();      
-      pConfig->Write(K_COMPRESSLEVEL, dialog_settings.getCompressLevel());
-      pConfig->Write(K_QUALITY, dialog_settings.getQuality());
       pConfig->Write(K_STATSAUTOSAVE, dialog_settings.getStatsAutosave());
       pConfig->Write(K_LOGSAVETOFILE, dialog_settings.getLogSavetofile());
       pConfig->Write(K_MULTICAST, dialog_settings.getDoMulticast());
@@ -1081,6 +1149,19 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
       pConfig->Write(K_FASTREQUEST, dialog_settings.getDoFastRequest());
       pConfig->Write(K_FASTREQUESTINTERVAL, dialog_settings.getFastRequestInterval());
       pConfig->Write(K_QOS_EF, dialog_settings.getQoS_EF());
+
+      pConfig->Write(K_ENC_COPYRECT, dialog_settings.getEncCopyRect());
+      pConfig->Write(K_ENC_HEXTILE, dialog_settings.getEncHextile());
+      pConfig->Write(K_ENC_RRE, dialog_settings.getEncRRE());
+      pConfig->Write(K_ENC_CORRE, dialog_settings.getEncCoRRE());
+      pConfig->Write(K_ENC_ZLIB, dialog_settings.getEncZlib());
+      pConfig->Write(K_ENC_ZLIBHEX, dialog_settings.getEncZlibHex());
+      pConfig->Write(K_ENC_ZRLE, dialog_settings.getEncZRLE());
+      pConfig->Write(K_ENC_ZYWRLE, dialog_settings.getEncZYWRLE());
+      pConfig->Write(K_ENC_ULTRA, dialog_settings.getEncUltra());
+      pConfig->Write(K_ENC_TIGHT, dialog_settings.getEncTight());
+      pConfig->Write(K_COMPRESSLEVEL, dialog_settings.getCompressLevel());
+      pConfig->Write(K_QUALITY, dialog_settings.getQuality());
 
       VNCConn::doLogfile(dialog_settings.getLogSavetofile());
     }

@@ -17,6 +17,7 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     notebook_settings_pane_conn = new wxPanel(notebook_settings, wxID_ANY);
     sizer_qos_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("Quality of Service"));
     sizer_multicast_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("MulticastVNC"));
+    sizer_encbox_staticbox = new wxStaticBox(notebook_settings_pane_encodings, -1, _("Enabled Encodings"));
     sizer_tightsettings_staticbox = new wxStaticBox(notebook_settings_pane_encodings, -1, _("TightVNC Settings"));
     sizer_fastrequest_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("FastRequest"));
     checkbox_fastrequest = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Enable FastRequest"));
@@ -30,6 +31,16 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     slider_recvbuf = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 65, 9750, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
     checkbox_logfile = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Write VNC log to logfile (MultiVNC.log)"));
     checkbox_stats_save = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Autosave statistics on close"));
+    checkbox_enc_copyrect = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("CopyRect"));
+    checkbox_enc_hextile = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("Hextile"));
+    checkbox_enc_rre = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("RRE"));
+    checkbox_enc_corre = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("CoRRE"));
+    checkbox_enc_zlib = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("Zlib"));
+    checkbox_enc_zlibhex = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("ZlibHex"));
+    checkbox_enc_zrle = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("ZRLE"));
+    checkbox_enc_zywrle = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("ZYWRLE"));
+    checkbox_enc_ultra = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("Ultra"));
+    checkbox_enc_tight = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("Tight"));
     label_compresslevel = new wxStaticText(notebook_settings_pane_encodings, wxID_ANY, _("Compression level for \"Tight\" and \"Zlib\" encodings:"));
     slider_compresslevel = new wxSlider(notebook_settings_pane_encodings, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     label_quality = new wxStaticText(notebook_settings_pane_encodings, wxID_ANY, _("JPEG quality level for \"Tight\" encoding:"));
@@ -57,8 +68,10 @@ void DialogSettings::do_layout()
 {
     // begin wxGlade: DialogSettings::do_layout
     wxBoxSizer* sizer_top = new wxBoxSizer(wxVERTICAL);
-    wxBoxSizer* sizer_encodings = new wxBoxSizer(wxHORIZONTAL);
+    wxBoxSizer* sizer_encodings = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* sizer_tightsettings = new wxStaticBoxSizer(sizer_tightsettings_staticbox, wxVERTICAL);
+    wxStaticBoxSizer* sizer_encbox = new wxStaticBoxSizer(sizer_encbox_staticbox, wxHORIZONTAL);
+    wxGridSizer* grid_sizer_encodings = new wxGridSizer(4, 3, 0, 0);
     wxBoxSizer* sizer_logging = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_conn = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* sizer_multicast = new wxStaticBoxSizer(sizer_multicast_staticbox, wxVERTICAL);
@@ -80,11 +93,23 @@ void DialogSettings::do_layout()
     sizer_logging->Add(checkbox_logfile, 0, wxALL, 6);
     sizer_logging->Add(checkbox_stats_save, 0, wxALL, 6);
     notebook_settings_pane_logging->SetSizer(sizer_logging);
+    grid_sizer_encodings->Add(checkbox_enc_copyrect, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_hextile, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_rre, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_corre, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_zlib, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_zlibhex, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_zrle, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_zywrle, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_ultra, 0, wxALL, 3);
+    grid_sizer_encodings->Add(checkbox_enc_tight, 0, wxALL, 3);
+    sizer_encbox->Add(grid_sizer_encodings, 1, 0, 3);
+    sizer_encodings->Add(sizer_encbox, 0, wxALL|wxEXPAND, 3);
     sizer_tightsettings->Add(label_compresslevel, 0, wxALL, 3);
     sizer_tightsettings->Add(slider_compresslevel, 0, wxALL|wxEXPAND, 3);
     sizer_tightsettings->Add(label_quality, 0, wxALL, 3);
     sizer_tightsettings->Add(slider_quality, 0, wxALL|wxEXPAND, 3);
-    sizer_encodings->Add(sizer_tightsettings, 1, wxALL|wxEXPAND, 3);
+    sizer_encodings->Add(sizer_tightsettings, 0, wxALL|wxEXPAND, 3);
     notebook_settings_pane_encodings->SetSizer(sizer_encodings);
     notebook_settings->AddPage(notebook_settings_pane_conn, _("Connections"));
     notebook_settings->AddPage(notebook_settings_pane_logging, _("Logging"));
