@@ -2,6 +2,11 @@ MultiVNC 0.5 -
 	* MulticastVNC now supports the Ultra encoding and features
 	  a freely sizeable receive buffer in addition to the 
 	  OS-dependent socket receive buffer.
+	* The new MulticastVNC flow control adapts the server's
+	  transmission rate to the capabilities of the network
+	  and clients.
+	* MultiVNC is now able to connect to Apple Remote Desktop
+	  servers.
 
 MultiVNC 0.4.1 - "Fix me up"
         * Changed default MulticastVNC receive buffer size to 5120 KB
