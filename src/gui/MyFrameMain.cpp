@@ -14,8 +14,6 @@
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
-#define DISPLAY_TIMER_INTERVAL 30
-#define DISPLAY_TIMER_ID 1
 
 using namespace std;
 
@@ -31,7 +29,6 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnBellNOTIFY, MyFrameMain::onVNCConnBellNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
-  EVT_TIMER   (DISPLAY_TIMER_ID, MyFrameMain::onDisplayTimer)
   EVT_END_PROCESS (ID_WINDOWSHARE_PROC_END, MyFrameMain::onWindowshareTerminate)
 END_EVENT_TABLE()
 
@@ -165,11 +162,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   // theres no log window at startup
   logwindow = 0;
-
-  display_timer.SetOwner(this, DISPLAY_TIMER_ID);
-  // disabled for now
-  //display_timer.Start(DISPLAY_TIMER_INTERVAL);
-
 
   // finally, our mdns service scanner
   servscan = new wxServDisc(this, wxT("_rfb._tcp.local."), QTYPE_PTR);
@@ -466,22 +458,6 @@ void MyFrameMain::onSDNotify(wxCommandEvent& event)
 	items.Add(it->name.Mid(0, it->name.Len() - qlen));
       
       list_box_services->Set(items, 0);
-    }
-}
-
-
-
-
-void MyFrameMain::onDisplayTimer(wxTimerEvent& event)
-{
-  // only draw something for the currently selected connection
-  int sel;
-  if((sel = notebook_connections->GetSelection()) != -1) 
-    {
-      VNCConn* conn = connections.at(sel).conn;
-      VNCCanvas* canvas = connections.at(sel).canvas;
-      wxRect complete_rect = wxRect(0, 0, conn->getFrameBufferWidth(), conn->getFrameBufferHeight());
-      canvas->drawRegion(complete_rect);
     }
 }
 

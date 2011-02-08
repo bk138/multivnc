@@ -52,10 +52,6 @@ class MyFrameMain: public FrameMain
   // log window
   MyFrameLog* logwindow;
 
-  // timer to perdiodically update display
-  wxTimer display_timer;
-  void onDisplayTimer(wxTimerEvent& event);
-
   void splitwinlayout();
 
   // array of bookmark strings
