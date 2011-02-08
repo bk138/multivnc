@@ -8,6 +8,8 @@ MultiVNC 0.5 -
 	* MultiVNC is now able to connect to Apple Remote Desktop
 	  servers.
 	* It is now possible to select the desired VNC encoding.
+	* This time really fixed the bug with the viewer becoming
+          unresponsive under high multicast loads.
 
 MultiVNC 0.4.1 - "Fix me up"
         * Changed default MulticastVNC receive buffer size to 5120 KB
