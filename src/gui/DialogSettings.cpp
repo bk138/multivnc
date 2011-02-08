@@ -12,8 +12,8 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
 {
     // begin wxGlade: DialogSettings::DialogSettings
     notebook_settings = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0);
-    notebook_settings_pane_encodings = new wxPanel(notebook_settings, wxID_ANY);
     notebook_settings_pane_logging = new wxPanel(notebook_settings, wxID_ANY);
+    notebook_settings_pane_encodings = new wxPanel(notebook_settings, wxID_ANY);
     notebook_settings_pane_conn = new wxPanel(notebook_settings, wxID_ANY);
     sizer_qos_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("Quality of Service"));
     sizer_multicast_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("MulticastVNC"));
@@ -29,8 +29,6 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     slider_socketrecvbuf = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 65, 9750, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
     label_recvbuf = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Receive Buffer Size (kB):"));
     slider_recvbuf = new wxSlider(notebook_settings_pane_conn, wxID_ANY, 0, 65, 9750, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS);
-    checkbox_logfile = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Write VNC log to logfile (MultiVNC.log)"));
-    checkbox_stats_save = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Autosave statistics on close"));
     checkbox_enc_copyrect = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("CopyRect"));
     checkbox_enc_hextile = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("Hextile"));
     checkbox_enc_rre = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("RRE"));
@@ -45,6 +43,8 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     slider_compresslevel = new wxSlider(notebook_settings_pane_encodings, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     label_quality = new wxStaticText(notebook_settings_pane_encodings, wxID_ANY, _("JPEG quality level for \"Tight\" encoding:"));
     slider_quality = new wxSlider(notebook_settings_pane_encodings, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
+    checkbox_logfile = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Write VNC log to logfile (MultiVNC.log)"));
+    checkbox_stats_save = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Autosave statistics on close"));
 
     set_properties();
     do_layout();
@@ -68,11 +68,11 @@ void DialogSettings::do_layout()
 {
     // begin wxGlade: DialogSettings::do_layout
     wxBoxSizer* sizer_top = new wxBoxSizer(wxVERTICAL);
+    wxBoxSizer* sizer_logging = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_encodings = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* sizer_tightsettings = new wxStaticBoxSizer(sizer_tightsettings_staticbox, wxVERTICAL);
     wxStaticBoxSizer* sizer_encbox = new wxStaticBoxSizer(sizer_encbox_staticbox, wxHORIZONTAL);
     wxGridSizer* grid_sizer_encodings = new wxGridSizer(4, 3, 0, 0);
-    wxBoxSizer* sizer_logging = new wxBoxSizer(wxVERTICAL);
     wxBoxSizer* sizer_conn = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* sizer_multicast = new wxStaticBoxSizer(sizer_multicast_staticbox, wxVERTICAL);
     wxStaticBoxSizer* sizer_qos = new wxStaticBoxSizer(sizer_qos_staticbox, wxHORIZONTAL);
@@ -90,9 +90,6 @@ void DialogSettings::do_layout()
     sizer_multicast->Add(slider_recvbuf, 0, wxALL|wxEXPAND, 3);
     sizer_conn->Add(sizer_multicast, 0, wxALL|wxEXPAND, 3);
     notebook_settings_pane_conn->SetSizer(sizer_conn);
-    sizer_logging->Add(checkbox_logfile, 0, wxALL, 6);
-    sizer_logging->Add(checkbox_stats_save, 0, wxALL, 6);
-    notebook_settings_pane_logging->SetSizer(sizer_logging);
     grid_sizer_encodings->Add(checkbox_enc_copyrect, 0, wxALL, 3);
     grid_sizer_encodings->Add(checkbox_enc_hextile, 0, wxALL, 3);
     grid_sizer_encodings->Add(checkbox_enc_rre, 0, wxALL, 3);
@@ -111,9 +108,12 @@ void DialogSettings::do_layout()
     sizer_tightsettings->Add(slider_quality, 0, wxALL|wxEXPAND, 3);
     sizer_encodings->Add(sizer_tightsettings, 0, wxALL|wxEXPAND, 3);
     notebook_settings_pane_encodings->SetSizer(sizer_encodings);
+    sizer_logging->Add(checkbox_logfile, 0, wxALL, 6);
+    sizer_logging->Add(checkbox_stats_save, 0, wxALL, 6);
+    notebook_settings_pane_logging->SetSizer(sizer_logging);
     notebook_settings->AddPage(notebook_settings_pane_conn, _("Connections"));
-    notebook_settings->AddPage(notebook_settings_pane_logging, _("Logging"));
     notebook_settings->AddPage(notebook_settings_pane_encodings, _("Encodings"));
+    notebook_settings->AddPage(notebook_settings_pane_logging, _("Logging"));
     sizer_top->Add(notebook_settings, 1, wxALL|wxEXPAND, 3);
     SetSizer(sizer_top);
     sizer_top->Fit(this);

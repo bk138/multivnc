@@ -45,9 +45,6 @@ protected:
     wxStaticText* label_recvbuf;
     wxSlider* slider_recvbuf;
     wxPanel* notebook_settings_pane_conn;
-    wxCheckBox* checkbox_logfile;
-    wxCheckBox* checkbox_stats_save;
-    wxPanel* notebook_settings_pane_logging;
     wxCheckBox* checkbox_enc_copyrect;
     wxCheckBox* checkbox_enc_hextile;
     wxCheckBox* checkbox_enc_rre;
@@ -63,6 +60,9 @@ protected:
     wxStaticText* label_quality;
     wxSlider* slider_quality;
     wxPanel* notebook_settings_pane_encodings;
+    wxCheckBox* checkbox_logfile;
+    wxCheckBox* checkbox_stats_save;
+    wxPanel* notebook_settings_pane_logging;
     wxNotebook* notebook_settings;
     // end wxGlade
 }; // wxGlade: end class
