@@ -18,7 +18,7 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     sizer_qos_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("Quality of Service"));
     sizer_multicast_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("MulticastVNC"));
     sizer_encbox_staticbox = new wxStaticBox(notebook_settings_pane_encodings, -1, _("Enabled Encodings"));
-    sizer_tightsettings_staticbox = new wxStaticBox(notebook_settings_pane_encodings, -1, _("TightVNC Settings"));
+    sizer_tightsettings_staticbox = new wxStaticBox(notebook_settings_pane_encodings, -1, _("Lossy Encodings Settings"));
     sizer_fastrequest_staticbox = new wxStaticBox(notebook_settings_pane_conn, -1, _("FastRequest"));
     checkbox_fastrequest = new wxCheckBox(notebook_settings_pane_conn, wxID_ANY, _("Enable FastRequest"));
     label_fastrequest = new wxStaticText(notebook_settings_pane_conn, wxID_ANY, _("Continously request updates at the specified milisecond interval:"));
@@ -39,9 +39,9 @@ DialogSettings::DialogSettings(wxWindow* parent, int id, const wxString& title, 
     checkbox_enc_zywrle = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("ZYWRLE"));
     checkbox_enc_ultra = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("Ultra"));
     checkbox_enc_tight = new wxCheckBox(notebook_settings_pane_encodings, wxID_ANY, _("Tight"));
-    label_compresslevel = new wxStaticText(notebook_settings_pane_encodings, wxID_ANY, _("Compression level for \"Tight\" and \"Zlib\" encodings:"));
+    label_compresslevel = new wxStaticText(notebook_settings_pane_encodings, wxID_ANY, _("Compression level for 'Tight' and 'Zlib' encodings:"));
     slider_compresslevel = new wxSlider(notebook_settings_pane_encodings, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
-    label_quality = new wxStaticText(notebook_settings_pane_encodings, wxID_ANY, _("JPEG quality level for \"Tight\" encoding:"));
+    label_quality = new wxStaticText(notebook_settings_pane_encodings, wxID_ANY, _("Quality level for 'Tight' and 'ZYWRLE' encoding:"));
     slider_quality = new wxSlider(notebook_settings_pane_encodings, wxID_ANY, 0, 0, 9, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS|wxSL_LABELS);
     checkbox_logfile = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Write VNC log to logfile (MultiVNC.log)"));
     checkbox_stats_save = new wxCheckBox(notebook_settings_pane_logging, wxID_ANY, _("Autosave statistics on close"));
@@ -58,8 +58,8 @@ void DialogSettings::set_properties()
     slider_fastrequest->SetToolTip(_("Continously ask the server for updates instead of just asking after each received server message. Use this on high latency links."));
     slider_socketrecvbuf->SetToolTip(_("Set the multicast socket receive buffer size. Increasing the value may help against packet loss. Note that the maximum value is operating system dependent."));
     slider_recvbuf->SetToolTip(_("Set the multicast receive buffer size. Increasing the value may help against packet loss. The size of this buffer is independent of the operating system."));
-    slider_compresslevel->SetToolTip(_("Use specified compression level (0..9) for \"tight\" and \"zlib\" encodings. Level 1 uses minimum of CPU time and achieves weak compression ratios, while level 9 offers best compression but is slow in terms of CPU time consumption on the server side. Use high levels with very slow network connections, and low levels when working over high-speed LANs."));
-    slider_quality->SetToolTip(_("Use the specified JPEG quality level (0..9) for the \"Tight\" encoding. Quality level 0 denotes bad image quality but very impressive compression ratios, while level 9 offers very good image quality at lower compression ratios. Note that the \"tight\" encoder uses JPEG to encode only those screen areas that look suitable for lossy compression, so quality level 0 does not always mean unacceptable image quality."));
+    slider_compresslevel->SetToolTip(_("Use specified compression level (0..9) for 'Tight' and 'Zlib' encodings. Level 1 uses minimum of CPU time and achieves weak compression ratios, while level 9 offers best compression but is slow in terms of CPU time consumption on the server side. Use high levels with very slow network connections, and low levels when working over high-speed LANs."));
+    slider_quality->SetToolTip(_("Use the specified quality level (0..9) for the 'Tight' and 'ZYWRLE' encodings. Quality level 0 denotes bad image quality but very impressive compression ratios, while level 9 offers very good image quality at lower compression ratios. Note that the \"tight\" encoder uses JPEG to encode only those screen areas that look suitable for lossy compression, so quality level 0 does not always mean unacceptable image quality."));
     // end wxGlade
 }
 
