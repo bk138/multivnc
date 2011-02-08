@@ -247,9 +247,9 @@ VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
   text_ctrl_updcount = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
   label_latency = new wxStaticText(this, wxID_ANY, _("Latency ms:"));
   text_ctrl_latency = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-  label_lossratio = new wxStaticText(this, wxID_ANY, _("MC loss ratio:"));
+  label_lossratio = new wxStaticText(this, wxID_ANY, _("Loss Ratio:"));
   text_ctrl_lossratio = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-  label_recvbuf = new wxStaticText(this, wxID_ANY, _("MC Receive Buffer:"));
+  label_recvbuf = new wxStaticText(this, wxID_ANY, _("Rcv Buffer:"));
   gauge_recvbuf = new wxGauge(this, wxID_ANY, 10, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
 
   dflt_fg = gauge_recvbuf->GetForegroundColour();
