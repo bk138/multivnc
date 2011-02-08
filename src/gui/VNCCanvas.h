@@ -54,6 +54,9 @@ class VNCCanvasContainer: public wxScrolledWindow
   wxTimer stats_timer;
   void onStatsTimer(wxTimerEvent& event);
 
+  // save default foreground colour to be able to flash when buffer full
+  wxColour dflt_fg;
+
 protected:
   wxStaticBox* sizer_stats_staticbox;
   wxStaticText* label_updrawbytes;

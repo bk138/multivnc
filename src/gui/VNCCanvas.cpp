@@ -252,6 +252,8 @@ VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
   label_recvbuf = new wxStaticText(this, wxID_ANY, _("MC Receive Buffer:"));
   gauge_recvbuf = new wxGauge(this, wxID_ANY, 10, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
 
+  dflt_fg = gauge_recvbuf->GetForegroundColour();
+
   sizer_stats->Add(label_updrawbytes, 0, wxALL|wxEXPAND, 3);
   sizer_stats->Add(text_ctrl_updrawbytes, 0, wxALL, 3);
   sizer_stats->Add(label_updcount, 0, wxALL, 3);
@@ -303,6 +305,12 @@ void VNCCanvasContainer::onStatsTimer(wxTimerEvent& event)
 
       gauge_recvbuf->SetRange(c->getMCBufSize());
       gauge_recvbuf->SetValue(c->getMCBufFill());
+
+      // flash red when buffer full
+      if(gauge_recvbuf->GetRange() == gauge_recvbuf->GetValue())
+	label_recvbuf->SetForegroundColour(*wxRED);
+      else
+	label_recvbuf->SetForegroundColour(dflt_fg);
     }
 }
 
