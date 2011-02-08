@@ -41,7 +41,6 @@ private:
 
 protected:
     // begin wxGlade: FrameMain::attributes
-    wxStaticBox* sizer_3_staticbox;
     wxStaticBox* sizer_bookmarks_staticbox;
     wxStaticBox* sizer_services_staticbox;
     wxMenuBar* frame_main_menubar;
@@ -50,19 +49,6 @@ protected:
     wxListBox* list_box_services;
     wxPanel* splitwin_left_pane_1;
     wxListBox* list_box_bookmarks;
-    wxPanel* splitwin_leftlower_pane_1;
-    wxStaticText* label_updrawbytes;
-    wxTextCtrl* text_ctrl_updrawbytes;
-    wxStaticText* label_updcount;
-    wxTextCtrl* text_ctrl_updcount;
-    wxStaticText* label_latency;
-    wxTextCtrl* text_ctrl_latency;
-    wxStaticText* label_lossratio;
-    wxTextCtrl* text_ctrl_lossratio;
-    wxStaticText* label_recvbuf;
-    wxGauge* gauge_recvbuf;
-    wxPanel* splitwin_leftlower_pane_2;
-    wxSplitterWindow* splitwin_leftlower;
     wxPanel* splitwin_left_pane_2;
     wxSplitterWindow* splitwin_left;
     wxPanel* splitwin_main_pane_1;

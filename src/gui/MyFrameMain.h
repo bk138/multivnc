@@ -21,6 +21,7 @@ struct ConnBlob
 {
   VNCConn* conn;
   VNCCanvas* canvas;
+  VNCCanvasContainer* container;
   VNCSeamlessConnector* seamlessconnector;
   wxProcess* windowshare_proc;
   long windowshare_proc_pid; // this should be saved in the wxProcess, but isn't
@@ -50,10 +51,6 @@ class MyFrameMain: public FrameMain
 
   // log window
   MyFrameLog* logwindow;
-
-  // timer to update stats win
-  wxTimer stats_timer;
-  void onStatsTimer(wxTimerEvent& event);
 
   // timer to perdiodically update display
   wxTimer display_timer;

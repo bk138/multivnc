@@ -8,7 +8,6 @@ in order of importance:
  - textchat
  - server side scaling
  - multiple connections at once, like the other multivnc
- - ability to choose encodings
  - more tooltips
  - translations
- - accelerated drawing via wxGLCanvas?
+ - accelerated drawing via wxGLCanvas? --> client side scaling

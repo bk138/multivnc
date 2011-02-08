@@ -217,6 +217,13 @@ void VNCCanvas::adjustSize()
 ********************************************/
 
 #define VNCCANVASCONTAINER_SCROLL_RATE 10
+#define VNCCANVASCONTAINER_STATS_TIMER_INTERVAL 100
+#define VNCCANVASCONTAINER_STATS_TIMER_ID 0
+
+// map recv of custom events to handler methods
+BEGIN_EVENT_TABLE(VNCCanvasContainer, wxScrolledWindow)
+  EVT_TIMER   (VNCCANVASCONTAINER_STATS_TIMER_ID, VNCCanvasContainer::onStatsTimer)
+END_EVENT_TABLE()
 
 
 /*
@@ -228,7 +235,35 @@ VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
 {
   canvas = 0;
   SetScrollRate(VNCCANVASCONTAINER_SCROLL_RATE, VNCCANVASCONTAINER_SCROLL_RATE);
-  SetSizer(new wxBoxSizer(wxHORIZONTAL));
+  SetSizer(new wxBoxSizer(wxVERTICAL));
+
+  sizer_stats_staticbox = new wxStaticBox(this, -1, _("Statistics"));
+  wxStaticBoxSizer* sizer_stats = new wxStaticBoxSizer(sizer_stats_staticbox, wxHORIZONTAL);
+  GetSizer()->Add(sizer_stats, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxALL, 3);
+
+  label_updrawbytes = new wxStaticText(this, wxID_ANY, _("Updated raw KB/s:"));
+  text_ctrl_updrawbytes = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+  label_updcount = new wxStaticText(this, wxID_ANY, _("Updates/s:"));
+  text_ctrl_updcount = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+  label_latency = new wxStaticText(this, wxID_ANY, _("Latency ms:"));
+  text_ctrl_latency = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+  label_lossratio = new wxStaticText(this, wxID_ANY, _("MC loss ratio:"));
+  text_ctrl_lossratio = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+  label_recvbuf = new wxStaticText(this, wxID_ANY, _("MC Receive Buffer:"));
+  gauge_recvbuf = new wxGauge(this, wxID_ANY, 10, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH);
+
+  sizer_stats->Add(label_updrawbytes, 0, wxALL|wxEXPAND, 3);
+  sizer_stats->Add(text_ctrl_updrawbytes, 0, wxALL, 3);
+  sizer_stats->Add(label_updcount, 0, wxALL, 3);
+  sizer_stats->Add(text_ctrl_updcount, 0, wxALL, 3);
+  sizer_stats->Add(label_latency, 0, wxALL|wxEXPAND, 3);
+  sizer_stats->Add(text_ctrl_latency, 0, wxALL, 3);
+  sizer_stats->Add(label_lossratio, 0, wxALL, 3);
+  sizer_stats->Add(text_ctrl_lossratio, 0, wxALL, 3);
+  sizer_stats->Add(label_recvbuf, 0, wxALL, 3);
+  sizer_stats->Add(gauge_recvbuf, 0, wxALL, 3);
+
+  stats_timer.SetOwner(this, VNCCANVASCONTAINER_STATS_TIMER_ID);
 }
 
 
@@ -242,14 +277,48 @@ VNCCanvasContainer::~VNCCanvasContainer()
 
 
 
+/*
+  private members
+*/
+
+void VNCCanvasContainer::onStatsTimer(wxTimerEvent& event)
+{
+  if(canvas && canvas->getConn())
+    {
+      const VNCConn* c = canvas->getConn();
+
+      text_ctrl_updrawbytes->Clear();
+      text_ctrl_updcount->Clear();
+      text_ctrl_latency->Clear();
+      text_ctrl_lossratio->Clear();
+      
+      if( ! c->getUpdRawByteStats().IsEmpty() )
+	*text_ctrl_updrawbytes << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
+      if( ! c->getUpdCountStats().IsEmpty() )
+	*text_ctrl_updcount << c->getUpdCountStats().Last().AfterLast(wxT(','));
+      if( ! c->getLatencyStats().IsEmpty() )
+	*text_ctrl_latency << c->getLatencyStats().Last().AfterLast(wxT(','));
+      if( ! c->getMCLossRatioStats().IsEmpty() )
+	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterLast(wxT(','));
+
+      gauge_recvbuf->SetRange(c->getMCBufSize());
+      gauge_recvbuf->SetValue(c->getMCBufFill());
+    }
+}
+
+
+
+/*
+  public members
+*/
 
 void VNCCanvasContainer::setCanvas(VNCCanvas* c)
 {
   canvas = c;
 
-  wxBoxSizer* sizer_vert = new wxBoxSizer(wxVERTICAL);
+  wxBoxSizer* sizer_vert = new wxBoxSizer(wxHORIZONTAL);
   sizer_vert->Add(c, 3, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
-  GetSizer()->Add(sizer_vert, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+  GetSizer()->Insert(0, sizer_vert, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
 }
 
 
@@ -257,4 +326,26 @@ void VNCCanvasContainer::setCanvas(VNCCanvas* c)
 VNCCanvas* VNCCanvasContainer::getCanvas() const
 {
   return canvas;
+}
+
+
+void VNCCanvasContainer::showStats(bool show_stats)
+{
+  if(show_stats)
+    {
+      stats_timer.Start(VNCCANVASCONTAINER_STATS_TIMER_INTERVAL);
+      GetSizer()->Show(1, true);
+    }
+  else
+    {
+      stats_timer.Stop();
+      GetSizer()->Show(1, false);
+    }
+  Layout();
+
+  text_ctrl_updrawbytes->Clear();
+  text_ctrl_updcount->Clear();
+  text_ctrl_latency->Clear();
+  text_ctrl_lossratio->Clear();
+  gauge_recvbuf->SetValue(0);
 }

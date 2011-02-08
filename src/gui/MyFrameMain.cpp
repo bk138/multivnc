@@ -14,8 +14,6 @@
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
-#define STATS_TIMER_INTERVAL 100
-#define STATS_TIMER_ID 0
 #define DISPLAY_TIMER_INTERVAL 30
 #define DISPLAY_TIMER_ID 1
 
@@ -33,7 +31,6 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnBellNOTIFY, MyFrameMain::onVNCConnBellNotify)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
-  EVT_TIMER   (STATS_TIMER_ID, MyFrameMain::onStatsTimer)
   EVT_TIMER   (DISPLAY_TIMER_ID, MyFrameMain::onDisplayTimer)
   EVT_END_PROCESS (ID_WINDOWSHARE_PROC_END, MyFrameMain::onWindowshareTerminate)
 END_EVENT_TABLE()
@@ -73,7 +70,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   SetMinSize(wxSize(640, 480));
   splitwin_main->SetMinimumPaneSize(160);
   splitwin_left->SetMinimumPaneSize(250);
-  splitwin_leftlower->SetMinimumPaneSize(160);
   SetSize(x, y);
 
   // assign image list to notebook_connections
@@ -130,10 +126,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   if(show_bookmarks)
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(2)->Check();
   if(show_stats)
-    {
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
-      stats_timer.Start(STATS_TIMER_INTERVAL);
-    }
+    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
+      
   switch(show_seamless)
     {
     case EDGE_NORTH:
@@ -172,7 +166,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // theres no log window at startup
   logwindow = 0;
 
-  stats_timer.SetOwner(this, STATS_TIMER_ID);
   display_timer.SetOwner(this, DISPLAY_TIMER_ID);
   // disabled for now
   //display_timer.Start(DISPLAY_TIMER_INTERVAL);
@@ -478,31 +471,6 @@ void MyFrameMain::onSDNotify(wxCommandEvent& event)
 
 
 
-void MyFrameMain::onStatsTimer(wxTimerEvent& event)
-{
-  if(connections.size())
-    {
-      VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
-
-      text_ctrl_updrawbytes->Clear();
-      text_ctrl_updcount->Clear();
-      text_ctrl_latency->Clear();
-      text_ctrl_lossratio->Clear();
-      
-      if( ! c->getUpdRawByteStats().IsEmpty() )
-	*text_ctrl_updrawbytes << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
-      if( ! c->getUpdCountStats().IsEmpty() )
-	*text_ctrl_updcount << c->getUpdCountStats().Last().AfterLast(wxT(','));
-      if( ! c->getLatencyStats().IsEmpty() )
-	*text_ctrl_latency << c->getLatencyStats().Last().AfterLast(wxT(','));
-      if( ! c->getMCLossRatioStats().IsEmpty() )
-	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterLast(wxT(','));
-
-      gauge_recvbuf->SetRange(c->getMCBufSize());
-      gauge_recvbuf->SetValue(c->getMCBufFill());
-    }
-}
-
 
 void MyFrameMain::onDisplayTimer(wxTimerEvent& event)
 {
@@ -757,6 +725,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   VNCCanvasContainer* container = new VNCCanvasContainer(notebook_connections);
   VNCCanvas* canvas = new VNCCanvas(container, c);
   container->setCanvas(canvas);
+  container->showStats(show_stats);
 
   VNCSeamlessConnector* sc = 0;
   if(show_seamless != EDGE_NONE)
@@ -765,6 +734,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   ConnBlob cb;
   cb.conn = c;
   cb.canvas = canvas;
+  cb.container = container;
   cb.seamlessconnector = sc;  
   cb.windowshare_proc = 0;
   cb.windowshare_proc_pid = 0;
@@ -876,13 +846,6 @@ void MyFrameMain::terminate_conn(int which)
 	  GetToolBar()->EnableTool(wxID_STOP, false); // disconnect
 	  GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
 	}
-
-      // clear stats
-      text_ctrl_updrawbytes->Clear();
-      text_ctrl_updcount->Clear();
-      text_ctrl_latency->Clear();
-      text_ctrl_lossratio->Clear();
-      gauge_recvbuf->SetValue(0);
     }
 
   wxLogStatus( _("Connection terminated."));
@@ -897,44 +860,20 @@ void MyFrameMain::splitwinlayout()
 {
   // setup layout in respect to every possible combination
   
-  if(!show_discovered && !show_bookmarks && !show_stats) // 000
+  if(!show_discovered && !show_bookmarks) // 00
     {
       splitwin_main->Unsplit(splitwin_main_pane_1);
     }
  
-  if(!show_discovered && !show_bookmarks && show_stats) // 001
+  if(!show_discovered && show_bookmarks)  // 01
     {
       splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2);
 
       splitwin_left->SplitHorizontally(splitwin_left_pane_1, splitwin_left_pane_2);
       splitwin_left->Unsplit(splitwin_left_pane_1);
-
-      splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2);
-      splitwin_leftlower->Unsplit(splitwin_leftlower_pane_1);
     }
  
-  if(!show_discovered && show_bookmarks && !show_stats)  // 010
-    {
-      splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2);
-
-      splitwin_left->SplitHorizontally(splitwin_left_pane_1, splitwin_left_pane_2);
-      splitwin_left->Unsplit(splitwin_left_pane_1);
-
-      splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2);
-      splitwin_leftlower->Unsplit(splitwin_leftlower_pane_2);
-    }
- 
-  if(!show_discovered && show_bookmarks && show_stats)  // 011
-    {
-      splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2);
-
-      splitwin_left->SplitHorizontally(splitwin_left_pane_1, splitwin_left_pane_2);
-      splitwin_left->Unsplit(splitwin_left_pane_1);
-
-      splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2);
-    }
- 
-  if(show_discovered && !show_bookmarks && !show_stats) // 100
+  if(show_discovered && !show_bookmarks) // 10
     {
       splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2);
 
@@ -942,46 +881,20 @@ void MyFrameMain::splitwinlayout()
       splitwin_left->Unsplit(splitwin_left_pane_2);
     }
  
-  if(show_discovered && !show_bookmarks && show_stats) // 101
+  if(show_discovered && show_bookmarks) // 11
     {
       splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2);
 
       splitwin_left->SplitHorizontally(splitwin_left_pane_1, splitwin_left_pane_2);
-
-      splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2);
-      splitwin_leftlower->Unsplit(splitwin_leftlower_pane_1);
     }
  
-  if(show_discovered && show_bookmarks && !show_stats) // 110
-    {
-      splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2);
-
-      splitwin_left->SplitHorizontally(splitwin_left_pane_1, splitwin_left_pane_2);
-      
-      splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2);
-      splitwin_leftlower->Unsplit(splitwin_leftlower_pane_2);
-    }
- 
-  if(show_discovered && show_bookmarks && show_stats) // 111
-    {
-      splitwin_main->SplitVertically(splitwin_main_pane_1, splitwin_main_pane_2);
-      splitwin_left->SplitHorizontally(splitwin_left_pane_1, splitwin_left_pane_2);
-      splitwin_leftlower->SplitHorizontally(splitwin_leftlower_pane_1, splitwin_leftlower_pane_2);
-    }
 
   // and set proportions
   int w,h;
   GetSize(&w, &h);
 
   splitwin_main->SetSashPosition(w * 0.1);
-
-  if(show_bookmarks)
-    splitwin_left->SetSashPosition(h * 0.4);
-  else
-    splitwin_left->SetSashPosition(h * 0.9);
-
-  splitwin_leftlower->SetSashPosition(h * 0.27);
-  
+  splitwin_left->SetSashPosition(h * 0.5);
   
   // finally if not shown, disable menu items
   if(!show_bookmarks)
@@ -1344,22 +1257,12 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
 {
   show_stats = !show_stats;
 
-  if(show_stats)
-    stats_timer.Start(STATS_TIMER_INTERVAL);
-  else
-    stats_timer.Stop();
-
-  text_ctrl_updrawbytes->Clear();
-  text_ctrl_updcount->Clear();
-  text_ctrl_latency->Clear();
-  text_ctrl_lossratio->Clear();
-  gauge_recvbuf->SetValue(0);
-
-  // for now, toggle all VNCConn instances
+  // for now, toggle all connections
   for(size_t i=0; i < connections.size(); ++i)
-    connections.at(i).conn->doStats(show_stats);
-
-  splitwinlayout();
+    {
+      connections.at(i).conn->doStats(show_stats);
+      connections.at(i).container->showStats(show_stats);
+    }
 
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Write(K_SHOWSTATS, show_stats);

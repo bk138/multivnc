@@ -35,6 +35,7 @@ public:
 
   void drawRegion(wxRect& rect);
   void adjustSize(); 
+  const VNCConn* getConn() const { return conn; };
 };
 	
 
@@ -49,6 +50,25 @@ class VNCCanvasContainer: public wxScrolledWindow
 {
   VNCCanvas* canvas;
 
+  // timer to update stats win
+  wxTimer stats_timer;
+  void onStatsTimer(wxTimerEvent& event);
+
+protected:
+  wxStaticBox* sizer_stats_staticbox;
+  wxStaticText* label_updrawbytes;
+  wxTextCtrl* text_ctrl_updrawbytes;
+  wxStaticText* label_updcount;
+  wxTextCtrl* text_ctrl_updcount;
+  wxStaticText* label_latency;
+  wxTextCtrl* text_ctrl_latency;
+  wxStaticText* label_lossratio;
+  wxTextCtrl* text_ctrl_lossratio;
+  wxStaticText* label_recvbuf;
+  wxGauge* gauge_recvbuf;
+
+  DECLARE_EVENT_TABLE();
+
 public:
   VNCCanvasContainer(wxWindow* parent);
   ~VNCCanvasContainer();
@@ -56,6 +76,7 @@ public:
   void setCanvas(VNCCanvas* c);
   VNCCanvas* getCanvas() const;
 
+  void showStats(bool yesno);
 };
 	
 
