@@ -293,6 +293,22 @@ void VNCCanvasContainer::onStatsTimer(wxTimerEvent& event)
       text_ctrl_updcount->Clear();
       text_ctrl_latency->Clear();
       text_ctrl_lossratio->Clear();
+
+      if(!c->isMulticast())
+	{
+	  label_lossratio->Show(false);
+	  text_ctrl_lossratio->Show(false);
+	  label_recvbuf->Show(false);
+	  gauge_recvbuf->Show(false);
+	}
+      else
+	{
+	  label_lossratio->Show(true);
+	  text_ctrl_lossratio->Show(true);
+	  label_recvbuf->Show(true);
+	  gauge_recvbuf->Show(true);
+	}
+      Layout();
       
       if( ! c->getUpdRawByteStats().IsEmpty() )
 	*text_ctrl_updrawbytes << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
