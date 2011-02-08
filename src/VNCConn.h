@@ -87,16 +87,6 @@ public:
   void Shutdown();
 
 
-  /* 
-     Turning blocking mode on makes a VNCConn block after it issued a 
-     VNCConnUpdateNOTIFY event until UpdateProcessed() is called.
-     This way a slow drawing engine can be synchronized with a fast VNCConn.
-     Default is OFF.
-  */
-  void SetBlocking(bool yesno);
-  // call this to tell the VNCConn that a VNCConnUpdateNOTIFY was processed
-  void UpdateProcessed();
-
   /*
     This is for usage on high latency links: Keep asking for framebuffer 
     updates every 'interval' ms instead of asking after every received 
@@ -113,7 +103,6 @@ public:
   // get kind of VNCConn
   bool isReverse() const { return cl ? cl->listenSpecified : false; };
   bool isMulticast() const;
-  bool isBlocking() const { return blocking_mode; };
 
   // send events
   void sendPointerEvent(wxMouseEvent &event);
@@ -188,10 +177,6 @@ private:
 
   // this counts the ms since Init()
   wxStopWatch conn_stopwatch;
-
-  // blocking mode stuff
-  bool blocking_mode;
-  wxSemaphore* sema_unprocessed_upd;
 
   // fastrequest stuff
   size_t fastrequest_interval;

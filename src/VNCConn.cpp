@@ -113,10 +113,6 @@ VNCConn::VNCConn(void* p)
   upd_count = 0;
   stats_timer.SetOwner(this);
 
-  // blocking mode
-  blocking_mode = false;
-  sema_unprocessed_upd = new wxSemaphore(1, 1);
-
   // fastrequest stuff
   fastrequest_interval = 0;
 }
@@ -128,7 +124,6 @@ VNCConn::~VNCConn()
 {
   Shutdown();
   Cleanup();
-  delete sema_unprocessed_upd;
   wxLogDebug(wxT("VNCConn %p: I'm dead!"), this);
 }
 
@@ -533,14 +528,7 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
   if(! conn->GetThread()->TestDestroy())
-    {
-      conn->thread_post_update_notify(x, y, w, h);
-      
-      // if we are in blocking mode,
-      // decrement semaphore if there's is something left and go on, else block
-      if(conn->blocking_mode)
-	conn->sema_unprocessed_upd->Wait();
-    }
+    conn->thread_post_update_notify(x, y, w, h);
 }
 
 
@@ -867,7 +855,7 @@ void VNCConn::Shutdown()
   if(GetThread() && GetThread()->IsRunning())
     {
       wxLogDebug(wxT( "VNCConn %p: Shutdown() before vncthread delete"), this);
-      sema_unprocessed_upd->Post(); // if the thread is currently blocking, unblock it
+
       GetThread()->Delete(); // this blocks if thread is joinable, i.e. on stack
       wxLogDebug(wxT("VNCConn %p: Shutdown() after vncthread delete"), this);
     }
@@ -889,25 +877,6 @@ void VNCConn::Shutdown()
 	  free(cl->frameBuffer);
 	  cl->frameBuffer = 0;
 	}
-    }
-}
-
-
-
-void VNCConn::SetBlocking(bool enable)
-{
-  blocking_mode = enable;
-  // in case the worker thread is currently blocked, unblock it
-  sema_unprocessed_upd->Post(); 
-}
-
-
-void VNCConn::UpdateProcessed()
-{
-  if(blocking_mode)
-    {
-      wxLogDebug(wxT("VNCConn %p: UpdateProcessed"), this);
-      sema_unprocessed_upd->Post();
     }
 }
 
