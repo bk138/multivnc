@@ -168,6 +168,8 @@ private:
   wxString serverName;
   wxString serverAddress;
 
+  wxRect updated_rect;
+
   int multicastStatus;
   double multicastLossRatio;
   
