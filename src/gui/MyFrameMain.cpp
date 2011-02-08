@@ -894,7 +894,7 @@ void MyFrameMain::splitwinlayout()
   GetSize(&w, &h);
 
   splitwin_main->SetSashPosition(w * 0.1);
-  splitwin_left->SetSashPosition(h * 0.5);
+  splitwin_left->SetSashPosition(h * 0.4);
   
   // finally if not shown, disable menu items
   if(!show_bookmarks)
