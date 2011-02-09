@@ -1306,14 +1306,20 @@ void MyFrameMain::view_seamless(wxCommandEvent &event)
 
 void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 {
+  VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
+  wxConfigBase *cfg = wxConfigBase::Get();
+
+  if(c->getServerAddr().IsSameAs(wxT("listening")))
+	{
+	  wxLogError(_("Cannot bookmark a reverse connection!"));
+	  return;
+	}
+
   wxString name = wxGetTextFromUser(_("Enter bookmark name:"),
 				    _("Saving bookmark"));
 				
   if(name != wxEmptyString)
     {
-      VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
-      wxConfigBase *cfg = wxConfigBase::Get();
-      
       if(cfg->Exists(G_BOOKMARKS + name))
 	{
 	  wxLogError(_("A bookmark with this name already exists!"));
@@ -1322,7 +1328,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 
       cfg->SetPath(G_BOOKMARKS + name);
 
-      cfg->Write(K_BOOKMARKS_HOST, c->getServerName());
+      cfg->Write(K_BOOKMARKS_HOST, c->getServerAddr());
       cfg->Write(K_BOOKMARKS_PORT, c->getServerPort());
 
       //reset path
