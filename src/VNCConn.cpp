@@ -827,22 +827,24 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
     }
   
 
-  wxLogDebug(wxT("VNCConn %p: Init() resolving hostname/address."), this);
-  wxIPV4address a;
-  a.Hostname(wxString(cl->serverHost, wxConvUTF8));
-  // if cl->serverHost is a hostname, not a dotted ip address, 
-  // use this, else resolve the address into a name
-  if(inet_addr(cl->serverHost) == INADDR_NONE) 
-    serverName = wxString(cl->serverHost, wxConvUTF8);
-  else
-    serverName = a.Hostname();
-#ifdef __WIN32__ 
-  serverAddress = wxString(cl->serverHost, wxConvUTF8); // wxwidgets bug, ah well ...
+  if(strlen(cl->serverHost)) // empty for a reverse connection
+    {
+      wxLogDebug(wxT("VNCConn %p: Init() resolving hostname/address."), this);
+      wxIPV4address a;
+      a.Hostname(wxString(cl->serverHost, wxConvUTF8));
+      // if cl->serverHost is a hostname, not a dotted ip address,
+      // use this, else resolve the address into a name
+      if(inet_addr(cl->serverHost) == INADDR_NONE)
+	serverName = wxString(cl->serverHost, wxConvUTF8);
+      else
+	serverName = a.Hostname();
+#ifdef __WIN32__
+      serverAddress = wxString(cl->serverHost, wxConvUTF8); // wxwidgets bug, ah well ...
 #else 
-  serverAddress = a.IPAddress();  
+      serverAddress = a.IPAddress();
 #endif 
-  
-  wxLogDebug(wxT("VNCConn %p: Init() done resolving hostname/address."), this);
+      wxLogDebug(wxT("VNCConn %p: Init() done resolving hostname/address."), this);
+    }
 
   
   // this is like our main loop
