@@ -258,21 +258,23 @@ VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
 
   dflt_fg = gauge_recvbuf->GetForegroundColour();
 
-  // create grid sizer 
-  wxGridSizer* grid_sizer_stats = new wxGridSizer(2, 5, 0, 0);
-  // insert widgets into grid sizer
-  grid_sizer_stats->Add(label_updrawbytes, 0, wxALL, 3);
-  grid_sizer_stats->Add(label_updcount, 0, wxALL, 3);
-  grid_sizer_stats->Add(label_latency, 0, wxALL, 3);
-  grid_sizer_stats->Add(label_lossratio, 0, wxALL, 3);
-  grid_sizer_stats->Add(label_recvbuf, 0, wxALL, 3);
-  grid_sizer_stats->Add(text_ctrl_updrawbytes, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
-  grid_sizer_stats->Add(text_ctrl_updcount, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
-  grid_sizer_stats->Add(text_ctrl_latency, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
-  grid_sizer_stats->Add(text_ctrl_lossratio, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
-  grid_sizer_stats->Add(gauge_recvbuf, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
+  // create grid sizers, two cause we wanna hide the multicast one sometimes
+  wxGridSizer* grid_sizer_stats_uni = new wxGridSizer(2, 3, 0, 0);
+  wxGridSizer* grid_sizer_stats_multi = new wxGridSizer(2, 2, 0, 0);
+  // insert widgets into grid sizers
+  grid_sizer_stats_uni->Add(label_updrawbytes, 0, wxALL, 3);
+  grid_sizer_stats_uni->Add(label_updcount, 0, wxALL, 3);
+  grid_sizer_stats_uni->Add(label_latency, 0, wxALL, 3);
+  grid_sizer_stats_uni->Add(text_ctrl_updrawbytes, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
+  grid_sizer_stats_uni->Add(text_ctrl_updcount, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
+  grid_sizer_stats_uni->Add(text_ctrl_latency, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
+  grid_sizer_stats_multi->Add(label_lossratio, 0, wxALL, 3);
+  grid_sizer_stats_multi->Add(label_recvbuf, 0, wxALL, 3);
+  grid_sizer_stats_multi->Add(text_ctrl_lossratio, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
+  grid_sizer_stats_multi->Add(gauge_recvbuf, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
   // insert grid sizer into static box sizer
-  sizer_stats->Add(grid_sizer_stats, 0, 0, 0); 
+  sizer_stats->Add(grid_sizer_stats_uni, 0, 0, 0); 
+  sizer_stats->Add(grid_sizer_stats_multi, 0, 0, 0); 
 
   stats_timer.SetOwner(this, VNCCANVASCONTAINER_STATS_TIMER_ID);
 }
