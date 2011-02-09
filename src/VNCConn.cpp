@@ -432,42 +432,6 @@ void VNCConn::thread_post_update_notify(int x, int y, int w, int h)
   
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
-
-  if(do_stats)
-    {
-      wxCriticalSectionLocker lock(mutex_stats);
-      // raw byte updates/second
-      upd_rawbytes += w*h*BYTESPERPIXEL;
-
-      // latency check, rect case
-      if(latency_test_rect_sent && event.rect.Contains(wxRect(LATENCY_TEST_RECT)))
-	{
-	  latency_stopwatch.Pause();
-	  latencies.Add((wxString() << wxGetUTCTime()) + 
-			wxT(", ") + 
-			(wxString() << (int)conn_stopwatch.Time()) + 
-			wxT(", ") + 
-			(wxString() << (int)latency_stopwatch.Time()));
-
-	  latency_test_rect_sent = false;
-
-	  wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), this, latency_stopwatch.Time());
-	}
-
-      // pointer latency
-      // well, this is not neccessarily correct, but wtf
-      if(event.rect.Contains(pointer_pos))
-	{
-	  pointerlatency_stopwatch.Pause();
-	  pointer_latencies.Add((wxString() << wxGetUTCTime()) + 
-				wxT(", ") + 
-				(wxString() << (int)conn_stopwatch.Time()) + 
-				wxT(", ") + 
-				(wxString() << (int)pointerlatency_stopwatch.Time()));
-
-	  wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), this, pointerlatency_stopwatch.Time());
-	}
-    }
 }
 
 
@@ -536,6 +500,43 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
       // thus, when multicasting, we only notify for logic (whole) framebuffer updates.
       if(!conn->isMulticast())
 	conn->thread_post_update_notify(x, y, w, h);
+
+      if(conn->do_stats)
+	{
+	  wxRect this_update_rect = wxRect(x,y,w,h);
+	  wxCriticalSectionLocker lock(conn->mutex_stats);
+	  // raw byte updates/second
+	  conn->upd_rawbytes += w*h*BYTESPERPIXEL;
+
+	  // latency check, rect case
+	  if(conn->latency_test_rect_sent && this_update_rect.Contains(wxRect(LATENCY_TEST_RECT)))
+	    {
+	      conn->latency_stopwatch.Pause();
+	      conn->latencies.Add((wxString() << wxGetUTCTime()) + 
+				  wxT(", ") + 
+				  (wxString() << (int)conn->conn_stopwatch.Time()) + 
+				  wxT(", ") + 
+				  (wxString() << (int)conn->latency_stopwatch.Time()));
+
+	      conn->latency_test_rect_sent = false;
+
+	      wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), conn, conn->latency_stopwatch.Time());
+	    }
+
+	  // pointer latency
+	  // well, this is not neccessarily correct, but wtf
+	  if(this_update_rect.Contains(conn->pointer_pos))
+	    {
+	      conn->pointerlatency_stopwatch.Pause();
+	      conn->pointer_latencies.Add((wxString() << wxGetUTCTime()) + 
+					  wxT(", ") + 
+					  (wxString() << (int)conn->conn_stopwatch.Time()) + 
+					  wxT(", ") + 
+					  (wxString() << (int)conn->pointerlatency_stopwatch.Time()));
+
+	      wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), conn, conn->pointerlatency_stopwatch.Time());
+	    }
+	}
     }
 }
 
