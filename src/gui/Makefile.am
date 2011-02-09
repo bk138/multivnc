@@ -22,6 +22,7 @@ libMultiVNCgui_a_SOURCES = \
 	bitmapFromMem.h\
 	res/about.png.h \
 	res/connect.png.h \
+	res/listen.png.h \
 	res/disconnect.png.h \
 	res/fullscreen.png.h \
 	res/screenshot.png.h \
@@ -37,6 +38,7 @@ libMultiVNCgui_a_CPPFLAGS  = @WX_CPPFLAGS@ @GTK_CFLAGS@ -I..
 EXTRA_DIST = \
 	res/about.png \
 	res/connect.png \
+	res/listen.png \
 	res/disconnect.png \
 	res/fullscreen.png \
 	res/screenshot.png \

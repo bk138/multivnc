@@ -18,6 +18,7 @@
 #include "res/multivnc.xpm"
 #endif
 #include "res/connect.png.h"
+#include "res/listen.png.h"
 #include "res/disconnect.png.h"
 #include "res/fullscreen.png.h"
 #include "res/screenshot.png.h"

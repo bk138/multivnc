@@ -74,6 +74,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     SetToolBar(frame_main_toolbar);
     frame_main_toolbar->SetToolBitmapSize(wxSize(24, 24));
     frame_main_toolbar->AddTool(wxID_YES, _("Connect"), (bitmapFromMem(connect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+    frame_main_toolbar->AddTool(wxID_REDO, _("Listen"), (bitmapFromMem(listen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->AddTool(wxID_STOP, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->AddSeparator();
     frame_main_toolbar->AddTool(ID_FULLSCREEN, _("Fullscreen"), (bitmapFromMem(fullscreen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
@@ -123,6 +124,8 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_CANCEL, FrameMain::windowshare_stop)
     EVT_MENU(wxID_HELP, FrameMain::help_contents)
     EVT_MENU(wxID_ABOUT, FrameMain::help_about)
+    EVT_TOOL(wxID_YES, FrameMain::machine_connect)
+    EVT_TOOL(wxID_REDO, FrameMain::machine_listen)
     EVT_TOOL(wxID_STOP, FrameMain::machine_disconnect)
     EVT_TOOL(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
     EVT_TOOL(wxID_SAVE, FrameMain::machine_screenshot)

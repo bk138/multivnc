@@ -1182,6 +1182,7 @@ void MyFrameMain::view_toggletoolbar(wxCommandEvent &event)
       SetToolBar(frame_main_toolbar);
       frame_main_toolbar->SetToolBitmapSize(wxSize(24, 24));
       frame_main_toolbar->AddTool(wxID_YES, _("Connect"), (bitmapFromMem(connect_png)), (bitmapFromMem(connect_png)), wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+      frame_main_toolbar->AddTool(wxID_REDO, _("Listen"), (bitmapFromMem(listen_png)), (bitmapFromMem(listen_png)), wxITEM_NORMAL, wxEmptyString, wxEmptyString);
       frame_main_toolbar->AddTool(wxID_STOP, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
       frame_main_toolbar->AddSeparator();
       frame_main_toolbar->AddTool(wxID_ZOOM_FIT, _("Fullscreen"), (bitmapFromMem(fullscreen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
