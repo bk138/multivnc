@@ -669,11 +669,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
 	      return false;
 	    }
 	  else
-#ifdef __WIN32__
-	  addr = host_addr.Hostname(); // wxwidgets bug, ah well ...
-#else
-	  addr = host_addr.IPAddress();
-#endif
+	    addr = host_addr.IPAddress();
 	}
 
 
