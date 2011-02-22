@@ -85,7 +85,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
   // this is needed cause since newer gtk version the gnome panel 
   // raises above the connector sometimes...grrr
   raisetimer.SetOwner(this, RAISETIMER_ID);
-  raisetimer.Start(333); 
+  raisetimer.Start(100);
 #endif
 
   canvas = new VNCSeamlessConnectorCanvas(this);
