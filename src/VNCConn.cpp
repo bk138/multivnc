@@ -368,14 +368,6 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
 	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
     }
 
-  if(do_stats)
-    {
-      wxCriticalSectionLocker lock(mutex_stats);
-      pointer_pos.x = event.m_x;
-      pointer_pos.y = event.m_y;
-      pointerlatency_stopwatch.Start();
-    }
-
   wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
   return SendPointerEvent(cl, event.m_x, event.m_y, buttonmask);
 }
@@ -503,8 +495,10 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 
       if(conn->do_stats)
 	{
-	  wxRect this_update_rect = wxRect(x,y,w,h);
 	  wxCriticalSectionLocker lock(conn->mutex_stats);
+
+	  wxRect this_update_rect = wxRect(x,y,w,h);
+
 	  // raw byte updates/second
 	  conn->upd_rawbytes += w*h*BYTESPERPIXEL;
 
@@ -521,20 +515,6 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 	      conn->latency_test_rect_sent = false;
 
 	      wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), conn, conn->latency_stopwatch.Time());
-	    }
-
-	  // pointer latency
-	  // well, this is not neccessarily correct, but wtf
-	  if(this_update_rect.Contains(conn->pointer_pos))
-	    {
-	      conn->pointerlatency_stopwatch.Pause();
-	      conn->pointer_latencies.Add((wxString() << wxGetUTCTime()) + 
-					  wxT(", ") + 
-					  (wxString() << (int)conn->conn_stopwatch.Time()) + 
-					  wxT(", ") + 
-					  (wxString() << (int)conn->pointerlatency_stopwatch.Time()));
-
-	      wxLogDebug(wxT("VNCConn %p: got update at pointer position, latency %ims"), conn, conn->pointerlatency_stopwatch.Time());
 	    }
 	}
     }
@@ -1096,7 +1076,7 @@ void VNCConn::resetStats()
   wxCriticalSectionLocker lock(mutex_stats);
   update_rawbytes.Clear();
   update_counts.Clear();
-  pointer_latencies.Clear();
+  latencies.Clear();
   multicast_lossratios.Clear();
 }
 

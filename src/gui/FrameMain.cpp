@@ -32,7 +32,6 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_RAWBYTE, _("Save Framebuffer Update Data Rate Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_COUNT, _("Save Framebuffer Update Count Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LATENCIES, _("Save Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_POINTER_LAT, _("Save Pointer Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LOSSRATIO, _("Save Multicast Loss Ratio Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_RECVBUF, _("Save Multicast Receive Buffer Statistics"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_ANY, _("Statistics"), wxglade_tmp_menu_1_sub, wxEmptyString);
@@ -103,7 +102,6 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(ID_STATS_SAVE_UPD_RAWBYTE, FrameMain::machine_save_stats_upd_rawbytes)
     EVT_MENU(ID_STATS_SAVE_UPD_COUNT, FrameMain::machine_save_stats_upd_count)
     EVT_MENU(ID_STATS_SAVE_LATENCIES, FrameMain::machine_save_stats_latencies)
-    EVT_MENU(ID_STATS_SAVE_POINTER_LAT, FrameMain::machine_save_stats_pointer_latencies)
     EVT_MENU(ID_STATS_SAVE_LOSSRATIO, FrameMain::machine_save_stats_lossratio)
     EVT_MENU(ID_STATS_SAVE_RECVBUF, FrameMain::machine_save_stats_recvbuf)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
@@ -198,13 +196,6 @@ void FrameMain::machine_save_stats_latencies(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_latencies) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
-}
-
-
-void FrameMain::machine_save_stats_pointer_latencies(wxCommandEvent &event)
-{
-    event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_pointer_latencies) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 

@@ -121,8 +121,6 @@ public:
   const wxArrayString& getUpdCountStats() const { const wxArrayString& ref = update_counts; return ref; };
   // gets latencies
   const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
-  // gets time between each pointer movement and update at corresponding position
-  const wxArrayString& getPointerLatencyStats() const { const wxArrayString& ref = pointer_latencies; return ref; };
   // gets multicast loss ratio per second
   const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = multicast_lossratios; return ref; };
   // gets multicast receive buf fill per second
@@ -207,10 +205,6 @@ private:
   bool latency_test_rect_sent;
   wxStopWatch latency_stopwatch;
   wxArrayString latencies;
-  // check latency of pointer event -> update at pointer pos 
-  wxPoint pointer_pos;
-  wxStopWatch pointerlatency_stopwatch;
-  wxArrayString pointer_latencies;
   // mc loss ratios
   wxArrayString multicast_lossratios;
   // mc buffer stats

@@ -71,7 +71,6 @@ public:
     virtual void machine_save_stats_upd_rawbytes(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_upd_count(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_latencies(wxCommandEvent &event); // wxGlade: <event_handler>
-    virtual void machine_save_stats_pointer_latencies(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_lossratio(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats_recvbuf(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_exit(wxCommandEvent &event); // wxGlade: <event_handler>
