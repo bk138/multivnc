@@ -40,12 +40,14 @@
 class MultiVNCApp: public wxApp 
 {
   wxLocale *locale;
+  
 public:
   
   virtual bool OnInit();
   virtual int  OnExit();
   virtual void OnUnhandledException();
   virtual void OnFatalException();
+  size_t nr_sigints;
   
   // this is where we really generate the debug report
   void genDebugReport(wxDebugReport::Context ctx);

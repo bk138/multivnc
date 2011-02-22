@@ -36,12 +36,19 @@ using namespace std;
 
 
 
-void handle_sig(int s)
+static void handle_sig(int s)
 {
   switch(s)
     {
     case SIGINT:
+      wxGetApp().nr_sigints++;
+      cerr << "Got SIGINT, shutting down\n";
       wxGetApp().ExitMainLoop();
+      if(wxGetApp().nr_sigints >= 3)
+	{
+	  cerr << "Got 3 SIGINTs, hard bailout\n";
+	  exit(666);
+	}
       break;
     }
 }
@@ -56,10 +63,11 @@ IMPLEMENT_APP(MultiVNCApp);
 bool MultiVNCApp::OnInit()
 {
   locale = 0;
-  
+
   setLocale(wxLANGUAGE_DEFAULT);
 
   // setup signal handlers
+  nr_sigints = 0;
   signal(SIGINT, handle_sig);
 #if !defined __WXMSW__ || defined __BORLANDC__ || defined _MSC_VER // on win32, does only work with borland c++ or visual c++
   wxHandleFatalExceptions(true); // enable ::OnFatalException() which handles fatal signals
