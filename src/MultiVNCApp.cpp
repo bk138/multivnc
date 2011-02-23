@@ -47,7 +47,11 @@ static void handle_sig(int s)
       if(wxGetApp().nr_sigints >= 3)
 	{
 	  cerr << "Got 3 SIGINTs, killing myse...\n";
+#ifndef __WXMSW__
 	  raise(SIGKILL);
+#else
+	  raise(SIGTERM);
+#endif
 	}
       break;
     }
