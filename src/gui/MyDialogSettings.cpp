@@ -67,13 +67,19 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   // but only show encodings we support in this build
 #ifndef LIBVNCSERVER_HAVE_LIBZ
   checkbox_enc_zrle->Disable();
+  checkbox_enc_zrle->SetValue(false);
   checkbox_enc_zywrle->Disable();
+  checkbox_enc_zywrle->SetValue(false);
   checkbox_enc_zlib->Disable();
+  checkbox_enc_zlib->SetValue(false);
   checkbox_enc_zlibhex->Disable();
+  checkbox_enc_zlibhex->SetValue(false);
   checkbox_enc_tight->Disable();
+  checkbox_enc_tight->SetValue(false);
 #endif
 #ifndef LIBVNCSERVER_HAVE_LIBJPEG
   checkbox_enc_tight->Disable();
+  checkbox_enc_tight->SetValue(false);
 #endif
 
 
