@@ -34,7 +34,7 @@
 #include "wx/config.h"
 #include "config.h"
 
-#define COPYRIGHT "Copyright (C) 2009, 2010 Christian Beier <dontmind@freeshell.org>"
+#define COPYRIGHT "Copyright (C) 2009-2011 Christian Beier <dontmind@freeshell.org>"
 
 
 class MultiVNCApp: public wxApp 
