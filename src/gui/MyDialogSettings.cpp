@@ -42,7 +42,7 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   if(slider_socketrecvbuf->GetMax() > os_dependent_max)
     slider_socketrecvbuf->SetRange(slider_socketrecvbuf->GetMin(), os_dependent_max);
 
-  // encodings settings
+  // read in encodings settings
   pConfig->Read(K_ENC_COPYRECT, &value, V_ENC_COPYRECT);
   checkbox_enc_copyrect->SetValue(value);
   pConfig->Read(K_ENC_RRE, &value, V_ENC_RRE);
@@ -63,6 +63,19 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
   checkbox_enc_ultra->SetValue(value);
   pConfig->Read(K_ENC_TIGHT, &value, V_ENC_TIGHT);
   checkbox_enc_tight->SetValue(value);
+
+  // but only show encodings we support in this build
+#ifndef LIBVNCSERVER_HAVE_LIBZ
+  checkbox_enc_zrle->Disable();
+  checkbox_enc_zywrle->Disable();
+  checkbox_enc_zlib->Disable();
+  checkbox_enc_zlibhex->Disable();
+  checkbox_enc_tight->Disable();
+#endif
+#ifndef LIBVNCSERVER_HAVE_LIBJPEG
+  checkbox_enc_tight->Disable();
+#endif
+
 
   pConfig->Read(K_COMPRESSLEVEL, &value, V_COMPRESSLEVEL);
   slider_compresslevel->SetValue(value);
