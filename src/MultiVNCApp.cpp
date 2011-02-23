@@ -46,8 +46,8 @@ static void handle_sig(int s)
       wxGetApp().ExitMainLoop();
       if(wxGetApp().nr_sigints >= 3)
 	{
-	  cerr << "Got 3 SIGINTs, hard bailout\n";
-	  exit(666);
+	  cerr << "Got 3 SIGINTs, killing myse...\n";
+	  raise(SIGKILL);
 	}
       break;
     }
