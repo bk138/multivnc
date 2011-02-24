@@ -806,25 +806,6 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
       return false;
     }
   
-
-  if(strlen(cl->serverHost)) // empty for a reverse connection
-    {
-      wxLogDebug(wxT("VNCConn %p: Init() resolving hostname/address."), this);
-      wxIPV4address a;
-      a.Hostname(wxString(cl->serverHost, wxConvUTF8));
-      // if cl->serverHost is a hostname, not a dotted ip address,
-      // use this, else resolve the address into a name
-      if(inet_addr(cl->serverHost) == INADDR_NONE)
-	serverName = wxString(cl->serverHost, wxConvUTF8);
-      else
-	serverName = a.Hostname();
-
-      serverAddress = a.IPAddress();
-
-      wxLogDebug(wxT("VNCConn %p: Init() done resolving hostname/address."), this);
-    }
-
-  
   // this is like our main loop
   thread_listenmode = false;
   if( Create() != wxTHREAD_NO_ERROR )
@@ -1151,31 +1132,20 @@ wxString VNCConn::getDesktopName() const
 }
 
 
-wxString VNCConn::getServerName() const
+wxString VNCConn::getServerHost() const
 {
   if(cl)
     {
       if(cl->listenSpecified)
-	return wxString(wxT("listening"));
+	return wxEmptyString;
       else
-	return serverName;
+	return wxString(cl->serverHost, wxConvUTF8);
     }
   else
     return wxEmptyString;
 }
 
-wxString VNCConn::getServerAddr() const
-{
-  if(cl)
-    {
-      if(cl->listenSpecified)
-	return wxString(wxT("listening"));
-      else
-	return serverAddress;
-    }
-  else
-    return wxEmptyString;
-}
+
 
 wxString VNCConn::getServerPort() const
 {

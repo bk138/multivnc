@@ -277,12 +277,12 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
       // update icon
       if(c->isMulticast())
 	{
-	  wxLogStatus( _("Connection to %s is now multicast."), c->getServerName().c_str());
+	  wxLogStatus( _("Connection to %s is now multicast."), c->getServerHost().c_str());
 	  notebook_connections->SetPageImage(index, 1);
 	}
       else
 	{
-	  wxLogStatus( _("Connection to %s is now unicast."), c->getServerName().c_str());
+	  wxLogStatus( _("Connection to %s is now unicast."), c->getServerHost().c_str());
 	  notebook_connections->SetPageImage(index, 0);
 	}
     }
@@ -339,13 +339,13 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
   // get sender
   VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
-  wxLogStatus( _("Connection to %s:%s terminated."), c->getServerName().c_str(), c->getServerPort().c_str());
+  wxLogStatus( _("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
  
   wxArrayString log = VNCConn::getLog();
   // show last 3 log strings
   for(size_t i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
     wxLogMessage(log[i]);
-  wxLogMessage( _("Connection to %s:%s terminated."), c->getServerName().c_str(), c->getServerPort().c_str() );
+  wxLogMessage( _("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str() );
     
   
   // find index of this connection
@@ -584,12 +584,12 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxString port)
+bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
 {
   wxBusyCursor busy;
-  wxIPV4address host_addr;
 
   // port can also be something like 'vnc', so look it up...
+  wxIPV4address host_addr;
   if(host_addr.Service(port))
     port = wxString() << host_addr.Service();
   else
@@ -659,22 +659,8 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
     }
   else // normal init without previous listen
     {
-      // look up addr if it's not given
-      if(addr.IsEmpty())
-	{
-	  if(! host_addr.Hostname(hostname))
-	    {
-	      wxLogError(_("Invalid hostname or IP address."));
-	      delete c;
-	      return false;
-	    }
-	  else
-	    addr = host_addr.IPAddress();
-	}
-
-
-      wxLogStatus(_("Connecting to ") + hostname + _T(":") + port + wxT(" ..."));
-      if(!c->Init(addr + wxT(":") + port, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
+      wxLogStatus(_("Connecting to ") + host + _T(":") + port + wxT(" ..."));
+      if(!c->Init(host + wxT(":") + port, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -713,7 +699,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString hostname, wxString addr, wxSt
   if(listen)
     notebook_connections->AddPage(container, _("Listening on port ") + port, true);    
   else
-    notebook_connections->AddPage(container, c->getDesktopName() + wxT(" (") + c->getServerName() + wxT(")") , true);
+    notebook_connections->AddPage(container, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")") , true);
 
   if(c->isMulticast())
     notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
@@ -965,7 +951,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 				 _("Connect to specific host"));
 				
   if(s != wxEmptyString)
-    spawn_conn(false, s.BeforeFirst(wxT(':')), wxEmptyString, s.AfterFirst(wxT(':')));
+    spawn_conn(false, s.BeforeFirst(wxT(':')), s.AfterFirst(wxT(':')));
 }
 
 
@@ -985,7 +971,7 @@ void MyFrameMain::machine_listen(wxCommandEvent &event)
     }
 
   listen_ports.insert(port);
-  spawn_conn(true, wxEmptyString, wxEmptyString, wxString() << port);
+  spawn_conn(true, wxEmptyString, wxString() << port);
 }
 
 
@@ -1290,7 +1276,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
   VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
   wxConfigBase *cfg = wxConfigBase::Get();
 
-  if(c->getServerAddr().IsSameAs(wxT("listening")))
+  if(c->getServerHost().IsEmpty())
 	{
 	  wxLogError(_("Cannot bookmark a reverse connection!"));
 	  return;
@@ -1309,7 +1295,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 
       cfg->SetPath(G_BOOKMARKS + name);
 
-      cfg->Write(K_BOOKMARKS_HOST, c->getServerAddr());
+      cfg->Write(K_BOOKMARKS_HOST, c->getServerHost());
       cfg->Write(K_BOOKMARKS_PORT, c->getServerPort());
 
       //reset path
@@ -1482,7 +1468,7 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
 void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
 {
   listbox_services_select(event); // get the actual values
-  spawn_conn(false, services_hostname, services_addr, services_port);
+  spawn_conn(false, services_addr, services_port);
 } 
  
 
@@ -1519,7 +1505,7 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
   if(event.m_callbackUserData)
     sel = wxAtoi(*(wxString*)event.m_callbackUserData);
       
-  spawn_conn(false, bookmarks[sel].BeforeFirst(wxT(':')), wxEmptyString, bookmarks[sel].AfterFirst(wxT(':')));
+  spawn_conn(false, bookmarks[sel].BeforeFirst(wxT(':')), bookmarks[sel].AfterFirst(wxT(':')));
 }
 
 
@@ -1576,7 +1562,7 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
 
 bool MyFrameMain::cmdline_connect(wxString& hostarg)
 {
-  return spawn_conn(false, hostarg.BeforeFirst(wxT(':')), wxEmptyString, hostarg.AfterFirst(wxT(':')));
+  return spawn_conn(false, hostarg.BeforeFirst(wxT(':')), hostarg.AfterFirst(wxT(':')));
 }
 
 
@@ -1606,7 +1592,7 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
 
   // handle %a and %p
   wxString cmd = windowshare_cmd_template;
-  cmd.Replace(wxT("%a"), cb->conn->getServerAddr());
+  cmd.Replace(wxT("%a"), cb->conn->getServerHost());
   //  cmd.Replace(_T("%p"), port); //unused by now
 #ifdef __WIN32__
   cmd.Replace(wxT("%w"), window);

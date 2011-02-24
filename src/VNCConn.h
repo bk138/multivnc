@@ -136,8 +136,7 @@ public:
   int getFrameBufferHeight() const;
 
   wxString getDesktopName() const;
-  wxString getServerName() const;
-  wxString getServerAddr() const;
+  wxString getServerHost() const;
   wxString getServerPort() const;
 
   // get current multicast receive buf state
@@ -163,8 +162,6 @@ private:
   void *parent;
 
   rfbClient* cl;
-  wxString serverName;
-  wxString serverAddress;
 
   wxRect updated_rect;
 
