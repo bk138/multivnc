@@ -10,6 +10,7 @@ MultiVNC 0.5 -
 	* It is now possible to select the desired VNC encoding.
 	* This time really fixed the bug with the viewer becoming
           unresponsive under high multicast loads.
+	* Fixed not being able to enter IPv6 addresses.
 
 MultiVNC 0.4.1 - "Fix me up"
         * Changed default MulticastVNC receive buffer size to 5120 KB
