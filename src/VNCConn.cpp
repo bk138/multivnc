@@ -1075,7 +1075,8 @@ void VNCConn::resetStats()
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
   // sanity check requested region
-  if(rect.x < 0 || rect.x >= getFrameBufferWidth() || rect.y < 0 || rect.y >= getFrameBufferHeight())
+  if(rect.x < 0 || rect.x + rect.width > getFrameBufferWidth()
+     || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight())
        return wxBitmap();
 
   /*

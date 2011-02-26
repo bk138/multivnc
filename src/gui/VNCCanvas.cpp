@@ -80,7 +80,8 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
       
     
       const wxBitmap& region = conn->getFrameBufferRegion(update_rect);
-      dc.DrawBitmap(region, update_rect.x, update_rect.y);
+      if(region.IsOk())
+	dc.DrawBitmap(region, update_rect.x, update_rect.y);
 	
       ++upd;
     }
