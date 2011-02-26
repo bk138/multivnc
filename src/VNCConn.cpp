@@ -1061,8 +1061,17 @@ void VNCConn::resetStats()
 
 
 
-
-
+/*
+  we could use a wxBitmap directly as the framebuffer, thus being more efficient
+  BUT:
+  - win32 expects DIB data in BGRA, not RGBA (can be solved by requesting another pixel format)
+  - win32 DIBs expect data from bottom to top (this means we HAVE to use a self made
+    framebuffer -> wxBitmap function instead of GetSubBitmap().)
+  - direct data access of a wxBitmap on Mac OS X does not seem to work
+  INSTEAD:
+  - we have an ordinary char array as framebuffer and copy the requested content into a
+    wxBitmap (the return of its copy is cheap cause wxBitmaps use copy-on-write)
+ */
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
   int bytesPerPixel = cl->format.bitsPerPixel/8;
