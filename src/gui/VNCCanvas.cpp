@@ -351,7 +351,7 @@ void VNCCanvasContainer::setCanvas(VNCCanvas* c)
 {
   canvas = c;
 
-  wxBoxSizer* sizer_vert = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer* sizer_vert = new wxBoxSizer(wxVERTICAL);
   sizer_vert->Add(c, 3, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
   GetSizer()->Insert(0, sizer_vert, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
 }

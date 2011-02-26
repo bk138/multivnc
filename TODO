@@ -1,5 +1,9 @@
 
 in order of importance:
+ - maximization on win32
+ - stutter when using stats on win32
+ - win32 stats not the same as on UNIX?
+ - rethink the drawing model
  - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
  - fix TLS on win32, this is a problem in libvncclient
