@@ -1074,15 +1074,19 @@ void VNCConn::resetStats()
  */
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
-  int bytesPerPixel = cl->format.bitsPerPixel/8;
+  // sanity check requested region
+  if(rect.x < 0 || rect.x >= getFrameBufferWidth() || rect.y < 0 || rect.y >= getFrameBufferHeight())
+       return wxBitmap();
 
   /*
     copy directly from framebuffer into a new bitmap
   */
+
   wxBitmap region(rect.width, rect.height, cl->format.bitsPerPixel);
   wxAlphaPixelData region_data(region);
   wxAlphaPixelData::Iterator region_it(region_data);
 
+  int bytesPerPixel = cl->format.bitsPerPixel/8;
   uint8_t *fbsub_it = cl->frameBuffer + rect.y*cl->width*bytesPerPixel + rect.x*bytesPerPixel;
 
   for( int y = 0; y < rect.height; ++y )
