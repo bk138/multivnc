@@ -1,7 +1,7 @@
 // -*- C++ -*- 
 
-#ifndef VNCCANVAS_H
-#define VNCCANVAS_H
+#ifndef VIEWERWINDOW_H
+#define VIEWERWINDOW_H
 
 #include <wx/scrolwin.h>
 #include <wx/dcclient.h>
@@ -42,12 +42,14 @@ public:
 
 
 /*
-  a scrollable container for a VNCCanvas that centers the
-  canvas in itself and takes care of deletion of its assigned 
-  VNCCanvas
+  consists of two scrollable windows, one a container for a VNCCanvas 
+  that centers the canvas in itself, the other one containing the stats window,
+  also centered
 */
-class VNCCanvasContainer: public wxScrolledWindow
+class ViewerWindow: public wxPanel
 {
+  wxScrolledWindow* canvas_container;
+  wxScrolledWindow* stats_container;
   VNCCanvas* canvas;
 
   // timer to update stats win
@@ -58,7 +60,6 @@ class VNCCanvasContainer: public wxScrolledWindow
   wxColour dflt_fg;
 
 protected:
-  wxStaticBox* sizer_stats_staticbox;
   wxStaticText* label_updrawbytes;
   wxTextCtrl* text_ctrl_updrawbytes;
   wxStaticText* label_updcount;
@@ -73,11 +74,11 @@ protected:
   DECLARE_EVENT_TABLE();
 
 public:
-  VNCCanvasContainer(wxWindow* parent);
-  ~VNCCanvasContainer();
+  ViewerWindow(wxWindow* parent);
+  ~ViewerWindow();
 
   void setCanvas(VNCCanvas* c);
-  VNCCanvas* getCanvas() const;
+  wxScrolledWindow* getContainer() const { return canvas_container; };
 
   void showStats(bool yesno);
 };

@@ -677,10 +677,10 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
   if(show_stats)
     c->doStats(true);
 
-  VNCCanvasContainer* container = new VNCCanvasContainer(notebook_connections);
-  VNCCanvas* canvas = new VNCCanvas(container, c);
-  container->setCanvas(canvas);
-  container->showStats(show_stats);
+  ViewerWindow* win = new ViewerWindow(notebook_connections);
+  VNCCanvas* canvas = new VNCCanvas(win->getContainer(), c);
+  win->setCanvas(canvas);
+  win->showStats(show_stats);
 
   VNCSeamlessConnector* sc = 0;
   if(show_seamless != EDGE_NONE)
@@ -689,7 +689,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
   ConnBlob cb;
   cb.conn = c;
   cb.canvas = canvas;
-  cb.container = container;
+  cb.viewerwindow = win;
   cb.seamlessconnector = sc;  
   cb.windowshare_proc = 0;
   cb.windowshare_proc_pid = 0;
@@ -697,9 +697,9 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
   connections.push_back(cb);
 
   if(listen)
-    notebook_connections->AddPage(container, _("Listening on port ") + port, true);    
+    notebook_connections->AddPage(win, _("Listening on port ") + port, true);    
   else
-    notebook_connections->AddPage(container, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")") , true);
+    notebook_connections->AddPage(win, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")") , true);
 
   if(c->isMulticast())
     notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
@@ -1204,7 +1204,7 @@ void MyFrameMain::view_togglestatistics(wxCommandEvent &event)
   for(size_t i=0; i < connections.size(); ++i)
     {
       connections.at(i).conn->doStats(show_stats);
-      connections.at(i).container->showStats(show_stats);
+      connections.at(i).viewerwindow->showStats(show_stats);
     }
 
   wxConfigBase *pConfig = wxConfigBase::Get();

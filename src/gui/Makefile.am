@@ -10,8 +10,8 @@ libMultiVNCgui_a_SOURCES = \
 	FrameLog.h \
 	MyFrameLog.cpp \
 	MyFrameLog.h \
-	VNCCanvas.cpp \
-	VNCCanvas.h \
+	ViewerWindow.cpp \
+	ViewerWindow.h \
 	VNCSeamlessConnector.cpp \
 	VNCSeamlessConnector.h \
 	DialogSettings.cpp \

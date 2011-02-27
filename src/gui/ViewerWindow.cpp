@@ -6,7 +6,7 @@
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 #include "MultiVNCApp.h"
-#include "VNCCanvas.h"
+#include "ViewerWindow.h"
 
 
 
@@ -213,7 +213,7 @@ void VNCCanvas::adjustSize()
 
 /********************************************
 
-  VNCCanvasContainer class
+  ViewerWindow class
 
 ********************************************/
 
@@ -222,8 +222,8 @@ void VNCCanvas::adjustSize()
 #define VNCCANVASCONTAINER_STATS_TIMER_ID 0
 
 // map recv of custom events to handler methods
-BEGIN_EVENT_TABLE(VNCCanvasContainer, wxScrolledWindow)
-  EVT_TIMER   (VNCCANVASCONTAINER_STATS_TIMER_ID, VNCCanvasContainer::onStatsTimer)
+BEGIN_EVENT_TABLE(ViewerWindow, wxPanel)
+  EVT_TIMER   (VNCCANVASCONTAINER_STATS_TIMER_ID, ViewerWindow::onStatsTimer)
 END_EVENT_TABLE()
 
 
@@ -231,31 +231,56 @@ END_EVENT_TABLE()
   constructor/destructor
  */
 
-VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
-  wxScrolledWindow(parent)
+ViewerWindow::ViewerWindow(wxWindow* parent):
+  wxPanel(parent)
 {
   canvas = 0;
-  SetScrollRate(VNCCANVASCONTAINER_SCROLL_RATE, VNCCANVASCONTAINER_SCROLL_RATE);
-
-  // a sizer dividing the container vertically
+  
+  /*
+    setup man window
+  */
+  // a sizer dividing the window vertically
   SetSizer(new wxBoxSizer(wxVERTICAL));
 
-  // insert a static box sizer into one slot
-  sizer_stats_staticbox = new wxStaticBox(this, -1, _("Statistics"));
-  wxStaticBoxSizer* sizer_stats = new wxStaticBoxSizer(sizer_stats_staticbox, wxHORIZONTAL);
-  GetSizer()->Add(sizer_stats, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxALL, 3);
+  // the upper subwindow
+  canvas_container = new wxScrolledWindow(this);
+  canvas_container->SetScrollRate(VNCCANVASCONTAINER_SCROLL_RATE, VNCCANVASCONTAINER_SCROLL_RATE);
+  GetSizer()->Add(canvas_container, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 3);
 
+  // the lower subwindow
+  stats_container = new wxScrolledWindow(this);
+  stats_container->SetScrollRate(VNCCANVASCONTAINER_SCROLL_RATE, VNCCANVASCONTAINER_SCROLL_RATE);
+  GetSizer()->Add(stats_container, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+  
+
+
+  /*
+    setup upper window
+  */
+  canvas_container->SetSizer(new wxBoxSizer(wxHORIZONTAL));
+
+
+  /*
+    setup lower window
+  */ 
+  // fill lower subwindow with a vertical sizer with a horizontal static box sizer in it so all is nicely centered
+  wxBoxSizer* sizer_vert = new wxBoxSizer(wxVERTICAL);
+  stats_container->SetSizer(sizer_vert);
+  wxStaticBoxSizer* sizer_stats = new wxStaticBoxSizer(new wxStaticBox(stats_container, -1, _("Statistics")), wxHORIZONTAL);
+  sizer_vert->Add(sizer_stats, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+
+ 
   // create statitistics widgets
-  label_updrawbytes = new wxStaticText(this, wxID_ANY, _("Raw KB/s:"));
-  text_ctrl_updrawbytes = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
-  label_updcount = new wxStaticText(this, wxID_ANY, _("Updates/s:"));
-  text_ctrl_updcount = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
-  label_latency = new wxStaticText(this, wxID_ANY, _("Latency ms:"));
-  text_ctrl_latency = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
-  label_lossratio = new wxStaticText(this, wxID_ANY, _("Loss Ratio:"));
-  text_ctrl_lossratio = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
-  label_recvbuf = new wxStaticText(this, wxID_ANY, _("Rcv Buffer:"));
-  gauge_recvbuf = new wxGauge(this, wxID_ANY, 10, wxDefaultPosition, wxSize(80,18), wxGA_HORIZONTAL|wxGA_SMOOTH);
+  label_updrawbytes = new wxStaticText(stats_container, wxID_ANY, _("Raw KB/s:"));
+  text_ctrl_updrawbytes = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  label_updcount = new wxStaticText(stats_container, wxID_ANY, _("Updates/s:"));
+  text_ctrl_updcount = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  label_latency = new wxStaticText(stats_container, wxID_ANY, _("Latency ms:"));
+  text_ctrl_latency = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  label_lossratio = new wxStaticText(stats_container, wxID_ANY, _("Loss Ratio:"));
+  text_ctrl_lossratio = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  label_recvbuf = new wxStaticText(stats_container, wxID_ANY, _("Rcv Buffer:"));
+  gauge_recvbuf = new wxGauge(stats_container, wxID_ANY, 10, wxDefaultPosition, wxSize(80,18), wxGA_HORIZONTAL|wxGA_SMOOTH);
 
   dflt_fg = gauge_recvbuf->GetForegroundColour();
 
@@ -264,7 +289,7 @@ VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
   wxGridSizer* grid_sizer_stats_multi = new wxGridSizer(2, 2, 0, 0);
   // insert widgets into grid sizers
   grid_sizer_stats_uni->Add(label_updrawbytes, 0, wxALL, 3);
-  grid_sizer_stats_uni->Add(label_updcount, 0, wxALL, 3);
+  grid_sizer_stats_uni->Add(label_updcount, 1, wxALL, 3);
   grid_sizer_stats_uni->Add(label_latency, 0, wxALL, 3);
   grid_sizer_stats_uni->Add(text_ctrl_updrawbytes, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
   grid_sizer_stats_uni->Add(text_ctrl_updcount, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
@@ -274,8 +299,12 @@ VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
   grid_sizer_stats_multi->Add(text_ctrl_lossratio, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
   grid_sizer_stats_multi->Add(gauge_recvbuf, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
   // insert grid sizer into static box sizer
-  sizer_stats->Add(grid_sizer_stats_uni, 0, 0, 0); 
-  sizer_stats->Add(grid_sizer_stats_multi, 0, 0, 0); 
+  sizer_stats->Add(grid_sizer_stats_uni, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxALL, 0);
+  sizer_stats->Add(grid_sizer_stats_multi, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxALL, 0);
+
+  // IMPORTANT: make sizer obey to size hints!
+  stats_container->GetSizer()->SetSizeHints(stats_container);
+
 
   stats_timer.SetOwner(this, VNCCANVASCONTAINER_STATS_TIMER_ID);
 }
@@ -283,7 +312,7 @@ VNCCanvasContainer::VNCCanvasContainer(wxWindow* parent):
 
 
 
-VNCCanvasContainer::~VNCCanvasContainer()
+ViewerWindow::~ViewerWindow()
 {
   if(canvas)
     delete canvas;
@@ -295,7 +324,7 @@ VNCCanvasContainer::~VNCCanvasContainer()
   private members
 */
 
-void VNCCanvasContainer::onStatsTimer(wxTimerEvent& event)
+void ViewerWindow::onStatsTimer(wxTimerEvent& event)
 {
   if(canvas && canvas->getConn())
     {
@@ -320,7 +349,7 @@ void VNCCanvasContainer::onStatsTimer(wxTimerEvent& event)
 	  label_recvbuf->Show(true);
 	  gauge_recvbuf->Show(true);
 	}
-      Layout();
+      stats_container->Layout();
       
       if( ! c->getUpdRawByteStats().IsEmpty() )
 	*text_ctrl_updrawbytes << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
@@ -348,24 +377,21 @@ void VNCCanvasContainer::onStatsTimer(wxTimerEvent& event)
   public members
 */
 
-void VNCCanvasContainer::setCanvas(VNCCanvas* c)
+void ViewerWindow::setCanvas(VNCCanvas* c)
 {
   canvas = c;
 
-  wxBoxSizer* sizer_vert = new wxBoxSizer(wxHORIZONTAL);
-  sizer_vert->Add(c, 3, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
-  GetSizer()->Insert(0, sizer_vert, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+  wxBoxSizer* sizer_vert = new wxBoxSizer(wxVERTICAL);
+  sizer_vert->Add(c, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+  canvas_container->GetSizer()->Add(sizer_vert, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+
+  Layout();
 }
 
 
 
-VNCCanvas* VNCCanvasContainer::getCanvas() const
-{
-  return canvas;
-}
 
-
-void VNCCanvasContainer::showStats(bool show_stats)
+void ViewerWindow::showStats(bool show_stats)
 {
   if(show_stats)
     {

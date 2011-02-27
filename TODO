@@ -1,6 +1,5 @@
 
 in order of importance:
- - maximization on win32
  - stutter when using stats on win32
  - win32 stats not the same as on UNIX?
  - fix hang when connection is disrupted
