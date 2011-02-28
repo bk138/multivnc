@@ -12,4 +12,15 @@ in order of importance:
  - multiple connections at once, like the other multivnc
  - more tooltips
  - translations
- - accelerated drawing via wxGLCanvas? --> client side scaling
+ - new drawing model:
+
+                  wxBitmap(per viewerwindow) -> (wxImage-> scaled wxImage -> wxBitmap) -> screen
+                /
+cl->framebuffer
+                \
+                  gl texture(per viewerwindow) -> screen (via wxGLCanvas -> FAST scaling)
+                  
+ read directly cl->framebuffer into wxBitmap/texture WITHOUT an intermediate wxBitmap object
+
+ per viewerwindow wxBitmap/texture to screen happens at fixed interval so no more overload of
+ drawing engine
