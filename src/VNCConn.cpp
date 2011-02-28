@@ -1057,6 +1057,7 @@ void VNCConn::resetStats()
   update_counts.Clear();
   latencies.Clear();
   multicast_lossratios.Clear();
+  multicast_bufferfills.Clear();
 }
 
 
