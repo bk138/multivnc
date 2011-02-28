@@ -177,27 +177,7 @@ MyFrameMain::~MyFrameMain()
   pConfig->Write(K_SIZE_X, x);
   pConfig->Write(K_SIZE_Y, y);
 
-  bool save_stats;
-  pConfig->Read(K_STATSAUTOSAVE, &save_stats, V_STATSAUTOSAVE);  
-  if(save_stats)
-    {
-      for(int i = connections.size()-1; i >= 0; --i)
-	{
-	  VNCConn* c = connections.at(i).conn;
-	  if(!saveStats(c, i, c->getUpdRawByteStats(), _("frame buffer update raw byte"), true))
-	    wxLogError(_("Could not autosave framebuffer update raw byte statistics!"));   
-	  if(!saveStats(c, i, c->getUpdCountStats(), _("frame buffer update count"), true))
-	    wxLogError(_("Could not autosave framebuffer update count statistics!"));
-	  if(!saveStats(c, i, c->getLatencyStats(), _("latency"), true))
-	    wxLogError(_("Could not autosave latency statistics!"));    
-	  if(!saveStats(c, i, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
-	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
-	  if(!saveStats(c, i, c->getMCBufStats(), _("multicast receive buffer"),true))
-	    wxLogError(_("Could not autosave multicast receive buffer statistics!"));
-	}
-    }
- 
-
+  // this has to be from end to start in order for stats autosave to assign right connection numbers!
   for(int i = connections.size()-1; i >= 0; --i)
     terminate_conn(i);
 
@@ -745,6 +725,38 @@ void MyFrameMain::terminate_conn(int which)
     return;
 
   ConnBlob* cb = &connections.at(which);
+
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  bool autosave_stats;
+  pConfig->Read(K_STATSAUTOSAVE, &autosave_stats, V_STATSAUTOSAVE);  
+  if(autosave_stats)
+    {
+      VNCConn* c = cb->conn;
+
+      // find index of this connection
+      vector<ConnBlob>::iterator it = connections.begin();
+      size_t index = 0;
+      while(it != connections.end() && it->conn != c)
+	{
+	  ++it;
+	  ++index;
+	}
+
+      if(index < connections.size()) // found
+	{
+	  if(!saveStats(c, index, c->getUpdRawByteStats(), _("frame buffer update raw byte"), true))
+	    wxLogError(_("Could not autosave framebuffer update raw byte statistics!"));   
+	  if(!saveStats(c, index, c->getUpdCountStats(), _("frame buffer update count"), true))
+	    wxLogError(_("Could not autosave framebuffer update count statistics!"));
+	  if(!saveStats(c, index, c->getLatencyStats(), _("latency"), true))
+	    wxLogError(_("Could not autosave latency statistics!"));    
+	  if(!saveStats(c, index, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
+	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
+	  if(!saveStats(c, index, c->getMCBufStats(), _("multicast receive buffer"),true))
+	    wxLogError(_("Could not autosave multicast receive buffer statistics!"));
+	}
+    }
+ 
 
   if(cb->conn->isReverse())
     listen_ports.erase(wxAtoi(cb->conn->getServerPort()));
