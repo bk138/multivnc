@@ -200,6 +200,7 @@ private:
   // when xvp is not available, check latency by requesting a certain test rect as non-incremental
 #define LATENCY_TEST_RECT 0,0,1,1
   bool latency_test_rect_sent;
+  bool latency_test_trigger;
   wxStopWatch latency_stopwatch;
   wxArrayString latencies;
   // mc loss ratios
@@ -231,6 +232,7 @@ private:
   bool thread_listenmode; 
   bool thread_send_pointer_event(pointerEvent &event);
   bool thread_send_key_event(keyEvent &event);
+  bool thread_send_latency_probe();
 
 
   // event dispatchers

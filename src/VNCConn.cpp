@@ -176,27 +176,8 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 				    );
 	}
 
-      // latency check start
-      if(SupportsClient2Server(cl, rfbXvp)) // favor xvp over the rect check 
-	{
-	  if(!latency_test_xvpmsg_sent)
-	    {
-	      SendXvpMsg(cl, LATENCY_TEST_XVP_VER, 2);
-	      latency_test_xvpmsg_sent = true;
-	      latency_stopwatch.Start();
-	      wxLogDebug(wxT("VNCConn %p: xvp message sent to test latency"), this);
-	    }
-	}
-      else  // check using special rect
-	{
-	  if(!latency_test_rect_sent)
-	    {
-	      SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
-	      latency_test_rect_sent = true;
-	      latency_stopwatch.Start();
-	      wxLogDebug(wxT("VNCConn %p: fb update request sent to test latency"), this);
-	    }
-	}
+      latency_test_trigger = true;
+
     }
 }
 
@@ -270,6 +251,11 @@ wxThread::ExitCode VNCConn::Entry()
 	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
 	    thread_send_key_event(ke);
 
+	  if(latency_test_trigger)
+	    {
+	      latency_test_trigger = false;
+	      thread_send_latency_probe();
+	    }
 	 
 	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval)
 	    {
@@ -381,6 +367,33 @@ bool VNCConn::thread_send_key_event(keyEvent &event)
 }
 
 
+
+bool VNCConn::thread_send_latency_probe()
+{
+  bool result = TRUE;
+  // latency check start
+  if(SupportsClient2Server(cl, rfbXvp)) // favor xvp over the rect check 
+    {
+      if(!latency_test_xvpmsg_sent)
+	{
+	  result = SendXvpMsg(cl, LATENCY_TEST_XVP_VER, 2);
+	  latency_test_xvpmsg_sent = true;
+	  latency_stopwatch.Start();
+	  wxLogDebug(wxT("VNCConn %p: xvp message sent to test latency"), this);
+	}
+    }
+  else  // check using special rect
+    {
+      if(!latency_test_rect_sent)
+	{
+	  result = SendFramebufferUpdateRequest(cl, LATENCY_TEST_RECT, FALSE);
+	  latency_test_rect_sent = true;
+	  latency_stopwatch.Start();
+	  wxLogDebug(wxT("VNCConn %p: fb update request sent to test latency"), this);
+	}
+    }
+  return result;
+}
 
 
 void VNCConn::thread_post_incomingconnection_notify() 
