@@ -51,9 +51,9 @@ if test "x$enable_debug" = "xyes"; then
 	WXCONFIG="$WXCONFIG --debug=yes"	
 	AC_MSG_RESULT(yes)
 else
-	WXCONFIG="$WXCONFIG --debug=no"	
-	CFLAGS="$CFLAGS -O3"	
-	CXXFLAGS="$CXXFLAGS -Wall -O3 -fno-strict-aliasing "	
+	WXCONFIG="$WXCONFIG --debug=no"
+	CFLAGS="$CFLAGS -O2"
+	CXXFLAGS="$CXXFLAGS -Wall -O2 -fno-strict-aliasing "
 	AC_MSG_RESULT(no)
 fi
 
