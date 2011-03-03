@@ -810,6 +810,19 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
       Shutdown();
       return false;
     }
+
+  // set the client sock to blocking again until libvncclient is fixed
+#ifdef WIN32
+  unsigned long block=0;
+  if(ioctlsocket(cl->sock, FIONBIO, &block) == SOCKET_ERROR) {
+    errno=WSAGetLastError();
+#else
+  int flags = fcntl(cl->sock, F_GETFL);
+  if(flags < 0 || fcntl(cl->sock, F_SETFL, flags & ~O_NONBLOCK) < 0) {
+#endif
+      rfbClientErr("Setting socket to blocking failed: %s\n",strerror(errno));
+    }
+
   
   // if there was an error in alloc_framebuffer(), catch that here
   // err is set by alloc_framebuffer()
