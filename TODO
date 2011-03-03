@@ -1,6 +1,5 @@
 
 in order of importance:
- - win32 stats not the same as on UNIX?
  - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
  - fix TLS on win32, this is a problem in libvncclient (read/write vs recv/send??)
