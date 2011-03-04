@@ -18,7 +18,10 @@
 class VNCCanvas: public wxPanel
 {
   VNCConn* conn;
+  wxTimer update_timer;
+  wxRegion updated_area;
 
+  void onUpdateTimer(wxTimerEvent& event);
   void onPaint(wxPaintEvent &event);
   void onMouseAction(wxMouseEvent &event);
   void onKeyDown(wxKeyEvent &event);
@@ -33,7 +36,6 @@ protected:
 public:
   VNCCanvas(wxWindow* parent, VNCConn* c);
 
-  void drawRegion(wxRect& rect);
   void adjustSize(); 
   const VNCConn* getConn() const { return conn; };
 };

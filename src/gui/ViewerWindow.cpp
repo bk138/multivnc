@@ -16,6 +16,8 @@
 
 ********************************************/
 
+#define VNCCANVAS_UPDATE_TIMER_ID 1
+#define VNCCANVAS_UPDATE_TIMER_INTERVAL 30
 
 BEGIN_EVENT_TABLE(VNCCanvas, wxPanel)
     EVT_PAINT  (VNCCanvas::onPaint)
@@ -25,13 +27,14 @@ BEGIN_EVENT_TABLE(VNCCanvas, wxPanel)
     EVT_CHAR (VNCCanvas::onChar)
     EVT_KILL_FOCUS(VNCCanvas::onFocusLoss)
     EVT_VNCCONNUPDATENOTIFY (wxID_ANY, VNCCanvas::onVNCConnUpdateNotify)
+    EVT_TIMER (VNCCANVAS_UPDATE_TIMER_ID, VNCCanvas::onUpdateTimer)
 END_EVENT_TABLE();
 
 
 
 /*
   constructor/destructor 
-  (make sure size is set to 0,0 ow win32 gets stuck sending 
+  (make sure size is set to 0,0 or win32 gets stuck sending 
   paint events in listen mode)
 */
 
@@ -49,6 +52,9 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
   vnccursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 8);
   vnccursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_Y, 8);
   SetCursor(wxCursor(vnccursor_image));
+
+  update_timer.SetOwner(this, VNCCANVAS_UPDATE_TIMER_ID);
+  update_timer.Start(VNCCANVAS_UPDATE_TIMER_INTERVAL);
 }
 
 
@@ -56,6 +62,54 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 /*
   private members
 */
+
+void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
+{
+#ifdef __WXDEBUG__
+  wxLongLong t0 = wxGetLocalTimeMillis();
+  size_t nr_rects = 0;
+  size_t nr_bytes = 0;
+#endif
+  
+  wxClientDC dc(this);
+  
+  // get the update rect list
+  wxRegionIterator upd(updated_area); 
+  while(upd)
+    {
+      wxRect update_rect(upd.GetRect());
+     
+      wxLogDebug(wxT("VNCCanvas %p: drawing updated rect: (%i,%i,%i,%i)"),
+		 this,
+		 update_rect.x,
+		 update_rect.y,
+		 update_rect.width,
+		 update_rect.height);
+#ifdef __WXDEBUG__      
+      ++nr_rects;
+      nr_bytes += update_rect.width * update_rect.height;
+#endif
+
+      const wxBitmap& region = conn->getFrameBufferRegion(update_rect);
+      if(region.IsOk())
+	dc.DrawBitmap(region, update_rect.x, update_rect.y);
+	
+      ++upd;
+    }
+
+  updated_area.Clear();
+
+
+#ifdef __WXDEBUG__
+  wxLongLong t1 = wxGetLocalTimeMillis();
+  wxLogDebug(wxT("VNCCanvas %p: updating %d rects (%d bytes) took %lld ms"),
+	     this,
+	     nr_rects,
+	     nr_bytes,
+	     (t1-t0).GetValue());
+#endif
+}
+
 
 void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 {
@@ -157,39 +211,13 @@ void VNCCanvas::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
 
   // only do something if this is our VNCConn
   if(sending_conn == conn)
-    drawRegion(event.rect);
+    updated_area.Union(event.rect);
 }
 
 
 /*
   public members
 */
-
-void VNCCanvas::drawRegion(wxRect& rect)
-{
-#ifdef __WXDEBUG__
-  wxLongLong t0 = wxGetLocalTimeMillis();
-#endif
-
-  wxClientDC dc(this);
-
-  const wxBitmap& region = conn->getFrameBufferRegion(rect);
-  dc.DrawBitmap(region, rect.x, rect.y);
-
-#ifdef __WXDEBUG__
-  wxLongLong t1 = wxGetLocalTimeMillis();
-  wxLogDebug(wxT("VNCCanvas %p: drawing region (%i,%i,%i,%i) size %d took %lld ms"),
-	     this,
-	     rect.x,
-	     rect.y,
-	     rect.width,
-	     rect.height,
-	     rect.width * rect.height,
-	     (t1-t0).GetValue());
-#endif
-
-}
-
 
 
 void VNCCanvas::adjustSize()
@@ -204,6 +232,7 @@ void VNCCanvas::adjustSize()
 
   CentreOnParent();
   GetParent()->Layout();
+
 }
 
 
@@ -217,13 +246,13 @@ void VNCCanvas::adjustSize()
 
 ********************************************/
 
-#define VNCCANVASCONTAINER_SCROLL_RATE 10
-#define VNCCANVASCONTAINER_STATS_TIMER_INTERVAL 100
-#define VNCCANVASCONTAINER_STATS_TIMER_ID 0
+#define VIEWERWINDOW_SCROLL_RATE 10
+#define VIEWERWINDOW_STATS_TIMER_INTERVAL 100
+#define VIEWERWINDOW_STATS_TIMER_ID 0
 
 // map recv of custom events to handler methods
 BEGIN_EVENT_TABLE(ViewerWindow, wxPanel)
-  EVT_TIMER   (VNCCANVASCONTAINER_STATS_TIMER_ID, ViewerWindow::onStatsTimer)
+  EVT_TIMER   (VIEWERWINDOW_STATS_TIMER_ID, ViewerWindow::onStatsTimer)
 END_EVENT_TABLE()
 
 
@@ -244,12 +273,12 @@ ViewerWindow::ViewerWindow(wxWindow* parent):
 
   // the upper subwindow
   canvas_container = new wxScrolledWindow(this);
-  canvas_container->SetScrollRate(VNCCANVASCONTAINER_SCROLL_RATE, VNCCANVASCONTAINER_SCROLL_RATE);
+  canvas_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
   GetSizer()->Add(canvas_container, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 3);
 
   // the lower subwindow
   stats_container = new wxScrolledWindow(this);
-  stats_container->SetScrollRate(VNCCANVASCONTAINER_SCROLL_RATE, VNCCANVASCONTAINER_SCROLL_RATE);
+  stats_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
   GetSizer()->Add(stats_container, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
   
 
@@ -306,7 +335,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent):
   stats_container->GetSizer()->SetSizeHints(stats_container);
 
 
-  stats_timer.SetOwner(this, VNCCANVASCONTAINER_STATS_TIMER_ID);
+  stats_timer.SetOwner(this, VIEWERWINDOW_STATS_TIMER_ID);
 }
 
 
@@ -395,7 +424,7 @@ void ViewerWindow::showStats(bool show_stats)
 {
   if(show_stats)
     {
-      stats_timer.Start(VNCCANVASCONTAINER_STATS_TIMER_INTERVAL);
+      stats_timer.Start(VIEWERWINDOW_STATS_TIMER_INTERVAL);
       GetSizer()->Show(1, true);
     }
   else
