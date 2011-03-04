@@ -1144,6 +1144,55 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 
 
 
+
+bool VNCConn::getFrameBufferRegion(const wxRect& rect, wxBitmap& dst) const
+{
+  // sanity check requested region against framebuffer
+  if(rect.x < 0 || rect.x + rect.width > getFrameBufferWidth()
+     || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight())
+       return false;
+
+  // check dst against framebuffer
+  if(dst.GetWidth() != getFrameBufferWidth() || dst.GetHeight() != getFrameBufferHeight())
+    return false;
+
+  /*
+    copy directly from framebuffer into the destination bitmap
+  */
+  wxAlphaPixelData dst_data(dst);
+  wxAlphaPixelData::Iterator dst_it(dst_data);
+  dst_it.Offset(dst_data, rect.x, rect.y);
+
+  int bytesPerPixel = cl->format.bitsPerPixel/8;
+  uint8_t *fbsub_it = cl->frameBuffer + rect.y*cl->width*bytesPerPixel + rect.x*bytesPerPixel;
+
+  for( int y = 0; y < rect.height; ++y )
+    {
+      wxAlphaPixelData::Iterator dst_it_rowStart = dst_it;
+      uint8_t *fbsub_it_rowStart = fbsub_it;
+
+      for( int x = 0; x < rect.width; ++x, ++dst_it, fbsub_it += bytesPerPixel)
+	{
+	  dst_it.Red() = *(fbsub_it+0);	  
+	  dst_it.Green() = *(fbsub_it+1);	  
+	  dst_it.Blue() = *(fbsub_it+2);	  
+	  dst_it.Alpha() = 255; // 255 is opaque, libvncclient always sets this byte to 0
+	}
+      
+      // CR
+      dst_it = dst_it_rowStart;
+      fbsub_it = fbsub_it_rowStart;
+      
+      // LF
+      dst_it.OffsetY(dst_data, 1);
+      fbsub_it += cl->width * bytesPerPixel;
+    }
+
+  return true;
+}
+
+
+
 int VNCConn::getFrameBufferWidth() const
 {
   if(cl)
@@ -1157,6 +1206,15 @@ int VNCConn::getFrameBufferHeight() const
 {
   if(cl)
     return cl->height;
+  else 
+    return 0;
+}
+
+
+int VNCConn::getFrameBufferDepth() const
+{
+  if(cl)
+    return cl->format.bitsPerPixel;
   else 
     return 0;
 }

@@ -132,8 +132,11 @@ public:
 
   // returns a wxBitmap (this uses COW, so is okay)
   wxBitmap getFrameBufferRegion(const wxRect& region) const;
+  // writes requested region directly into dst bitmap which must have the same dimensions as the framebuffer
+  bool getFrameBufferRegion(const wxRect& rect, wxBitmap& dst) const;
   int getFrameBufferWidth() const;
   int getFrameBufferHeight() const;
+  int getFrameBufferDepth() const;
 
   wxString getDesktopName() const;
   wxString getServerHost() const;
