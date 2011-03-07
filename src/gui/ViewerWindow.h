@@ -4,44 +4,10 @@
 #define VIEWERWINDOW_H
 
 #include <wx/scrolwin.h>
-#include <wx/dcclient.h>
 #include <wx/log.h>
 #include "VNCConn.h"
 
-
-
-/*
-  canvas that displays a VNCConn's framebuffer
-  and submits mouse and key events.
-
-*/
-class VNCCanvas: public wxPanel
-{
-  VNCConn* conn;
-  wxTimer update_timer;
-  wxRegion updated_area;
-
-  void onUpdateTimer(wxTimerEvent& event);
-  void onPaint(wxPaintEvent &event);
-  void onMouseAction(wxMouseEvent &event);
-  void onKeyDown(wxKeyEvent &event);
-  void onKeyUp(wxKeyEvent &event);
-  void onChar(wxKeyEvent &event);
-  void onFocusLoss(wxFocusEvent &event);
-  void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
-
-protected:
-  DECLARE_EVENT_TABLE();
-
-public:
-  VNCCanvas(wxWindow* parent, VNCConn* c);
-
-  void adjustSize(); 
-  const VNCConn* getConn() const { return conn; };
-};
-	
-
-
+class VNCCanvas;
 
 /*
   consists of two scrollable windows, one a container for a VNCCanvas 
@@ -57,6 +23,8 @@ class ViewerWindow: public wxPanel
   // timer to update stats win
   wxTimer stats_timer;
   void onStatsTimer(wxTimerEvent& event);
+
+  void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
 
   // save default foreground colour to be able to flash when buffer full
   wxColour dflt_fg;
@@ -76,11 +44,10 @@ protected:
   DECLARE_EVENT_TABLE();
 
 public:
-  ViewerWindow(wxWindow* parent);
+  ViewerWindow(wxWindow* parent, VNCConn* connection);
   ~ViewerWindow();
 
-  void setCanvas(VNCCanvas* c);
-  wxScrolledWindow* getContainer() const { return canvas_container; };
+  void adjustCanvasSize(); 
 
   void showStats(bool yesno);
 };

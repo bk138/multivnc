@@ -20,7 +20,6 @@
 struct ConnBlob
 {
   VNCConn* conn;
-  VNCCanvas* canvas;
   ViewerWindow* viewerwindow;
   VNCSeamlessConnector* seamlessconnector;
   wxProcess* windowshare_proc;

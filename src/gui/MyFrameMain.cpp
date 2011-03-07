@@ -232,7 +232,7 @@ void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
     {
       VNCConn* selected_conn = connections.at(sel).conn;
       if(selected_conn == sending_conn)
-	wxPostEvent((wxEvtHandler*)connections.at(sel).canvas, event);
+	wxPostEvent((wxEvtHandler*)connections.at(sel).viewerwindow, event);
     }
 }
 
@@ -285,7 +285,7 @@ void MyFrameMain::onVNCConnFBResizeNotify(wxCommandEvent& event)
     }
 
   if(index < connections.size()) // found
-    connections.at(index).canvas->adjustSize();
+    connections.at(index).viewerwindow->adjustCanvasSize();
 }
 
 
@@ -657,9 +657,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
   if(show_stats)
     c->doStats(true);
 
-  ViewerWindow* win = new ViewerWindow(notebook_connections);
-  VNCCanvas* canvas = new VNCCanvas(win->getContainer(), c);
-  win->setCanvas(canvas);
+  ViewerWindow* win = new ViewerWindow(notebook_connections, c);
   win->showStats(show_stats);
 
   VNCSeamlessConnector* sc = 0;
@@ -668,7 +666,6 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
 
   ConnBlob cb;
   cb.conn = c;
-  cb.canvas = canvas;
   cb.viewerwindow = win;
   cb.seamlessconnector = sc;  
   cb.windowshare_proc = 0;
@@ -760,7 +757,7 @@ void MyFrameMain::terminate_conn(int which)
 
   if(cb->conn->isReverse())
     listen_ports.erase(wxAtoi(cb->conn->getServerPort()));
-  // this deletes the CanvasContainer plus canvas   
+  // this deletes the ViewerWindow plus canvas   
   notebook_connections->DeletePage(which);
   // this deletes the seamless connector
   if(cb->seamlessconnector) 

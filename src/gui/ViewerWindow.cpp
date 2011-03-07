@@ -3,6 +3,7 @@
 #include <wx/sizer.h>
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
+#include <wx/dcclient.h>
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 #include "MultiVNCApp.h"
@@ -16,6 +17,35 @@
 
 ********************************************/
 
+
+/*
+  canvas that displays a VNCConn's framebuffer
+  and submits mouse and key events.
+
+*/
+class VNCCanvas: public wxPanel
+{
+  wxTimer update_timer;
+  void onUpdateTimer(wxTimerEvent& event);
+  void onPaint(wxPaintEvent &event);
+  void onMouseAction(wxMouseEvent &event);
+  void onKeyDown(wxKeyEvent &event);
+  void onKeyUp(wxKeyEvent &event);
+  void onChar(wxKeyEvent &event);
+  void onFocusLoss(wxFocusEvent &event);
+
+protected:
+  DECLARE_EVENT_TABLE();
+
+public:
+  VNCCanvas(wxWindow* parent, VNCConn* c);
+
+  VNCConn* conn;
+  wxRegion updated_area;
+};
+	
+
+
 #define VNCCANVAS_UPDATE_TIMER_ID 1
 #define VNCCANVAS_UPDATE_TIMER_INTERVAL 30
 
@@ -26,7 +56,6 @@ BEGIN_EVENT_TABLE(VNCCanvas, wxPanel)
     EVT_KEY_UP (VNCCanvas::onKeyUp)
     EVT_CHAR (VNCCanvas::onChar)
     EVT_KILL_FOCUS(VNCCanvas::onFocusLoss)
-    EVT_VNCCONNUPDATENOTIFY (wxID_ANY, VNCCanvas::onVNCConnUpdateNotify)
     EVT_TIMER (VNCCANVAS_UPDATE_TIMER_ID, VNCCanvas::onUpdateTimer)
 END_EVENT_TABLE();
 
@@ -42,7 +71,6 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
   wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(0,0), wxWANTS_CHARS)
 {
   conn = c;
-  adjustSize(); 
  
   // this kinda cursor creation works everywhere
   wxBitmap vnccursor_bitmap(vnccursor_bits, 16, 16);
@@ -55,6 +83,11 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
   update_timer.SetOwner(this, VNCCANVAS_UPDATE_TIMER_ID);
   update_timer.Start(VNCCANVAS_UPDATE_TIMER_INTERVAL);
+
+  // SetSize() isn't enough...
+  SetInitialSize(wxSize(c->getFrameBufferWidth(), c->getFrameBufferHeight()));
+  CentreOnParent();
+  parent->Layout();
 }
 
 
@@ -205,35 +238,10 @@ void VNCCanvas::onFocusLoss(wxFocusEvent &event)
 
 
 
-void VNCCanvas::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
-{
-  VNCConn* sending_conn = static_cast<VNCConn*>(event.GetEventObject());
-
-  // only do something if this is our VNCConn
-  if(sending_conn == conn)
-    updated_area.Union(event.rect);
-}
-
 
 /*
   public members
 */
-
-
-void VNCCanvas::adjustSize()
-{
-  wxLogDebug(wxT("VNCCanvas %p: adjusting size to (%i, %i)"),
-	     this,
-	     conn->getFrameBufferWidth(),
-	     conn->getFrameBufferHeight());
-
-  // SetSize() isn't enough...
-  SetInitialSize(wxSize(conn->getFrameBufferWidth(), conn->getFrameBufferHeight()));
-
-  CentreOnParent();
-  GetParent()->Layout();
-
-}
 
 
 
@@ -253,6 +261,7 @@ void VNCCanvas::adjustSize()
 // map recv of custom events to handler methods
 BEGIN_EVENT_TABLE(ViewerWindow, wxPanel)
   EVT_TIMER   (VIEWERWINDOW_STATS_TIMER_ID, ViewerWindow::onStatsTimer)
+  EVT_VNCCONNUPDATENOTIFY (wxID_ANY, ViewerWindow::onVNCConnUpdateNotify)
 END_EVENT_TABLE()
 
 
@@ -260,11 +269,9 @@ END_EVENT_TABLE()
   constructor/destructor
  */
 
-ViewerWindow::ViewerWindow(wxWindow* parent):
+ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   wxPanel(parent)
 {
-  canvas = 0;
-  
   /*
     setup man window
   */
@@ -275,6 +282,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent):
   canvas_container = new wxScrolledWindow(this);
   canvas_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
   GetSizer()->Add(canvas_container, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 3);
+
 
   // the lower subwindow
   stats_container = new wxScrolledWindow(this);
@@ -287,7 +295,10 @@ ViewerWindow::ViewerWindow(wxWindow* parent):
     setup upper window
   */
   canvas_container->SetSizer(new wxBoxSizer(wxHORIZONTAL));
-
+  canvas = new VNCCanvas(canvas_container, conn);
+  wxBoxSizer* sizer_vert_canvas = new wxBoxSizer(wxVERTICAL);
+  sizer_vert_canvas->Add(canvas, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
+  canvas_container->GetSizer()->Add(sizer_vert_canvas, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
 
   /*
     setup lower window
@@ -353,11 +364,22 @@ ViewerWindow::~ViewerWindow()
   private members
 */
 
+
+void ViewerWindow::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
+{
+  VNCConn* sending_conn = static_cast<VNCConn*>(event.GetEventObject());
+
+  // only do something if this is our VNCConn
+  if(sending_conn == canvas->conn)
+    canvas->updated_area.Union(event.rect);
+}
+
+
 void ViewerWindow::onStatsTimer(wxTimerEvent& event)
 {
-  if(canvas && canvas->getConn())
+  if(canvas && canvas->conn)
     {
-      const VNCConn* c = canvas->getConn();
+      const VNCConn* c = canvas->conn;
 
       text_ctrl_updrawbytes->Clear();
       text_ctrl_updcount->Clear();
@@ -406,15 +428,21 @@ void ViewerWindow::onStatsTimer(wxTimerEvent& event)
   public members
 */
 
-void ViewerWindow::setCanvas(VNCCanvas* c)
+
+void ViewerWindow::adjustCanvasSize()
 {
-  canvas = c;
+  if(canvas)
+    {
+      wxLogDebug(wxT("ViewerWindow %p: adjusting canvas size to (%i, %i)"),
+		 this,
+		 canvas->conn->getFrameBufferWidth(),
+		 canvas->conn->getFrameBufferHeight());
 
-  wxBoxSizer* sizer_vert = new wxBoxSizer(wxVERTICAL);
-  sizer_vert->Add(c, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
-  canvas_container->GetSizer()->Add(sizer_vert, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
-
-  Layout();
+      // SetSize() isn't enough...
+      canvas->SetInitialSize(wxSize(canvas->conn->getFrameBufferWidth(), canvas->conn->getFrameBufferHeight()));
+      canvas->CentreOnParent();
+      Layout();
+    }
 }
 
 
