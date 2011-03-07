@@ -783,14 +783,14 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
   // reset stats before doing new connection
   resetStats();
 
-  int argc = 6;
-  char* argv[argc];
-  argv[0] = strdup("VNCConn");
-  argv[1] = strdup(host.mb_str());
-  argv[2] = strdup("-compress");
-  argv[3] = strdup((wxString() << compresslevel).mb_str());
-  argv[4] = strdup("-quality");
-  argv[5] = strdup((wxString() << quality).mb_str());
+  cl->programName = "VNCConn";
+  cl->serverHost = strdup(host.BeforeFirst(':').mb_str()); // this one gets freed by the library
+  cl->serverPort = wxAtoi(host.AfterFirst(':'));
+  if(cl->serverPort < 5900)
+    cl->serverPort += 5900;
+  cl->appData.compressLevel = compresslevel;
+  cl->appData.qualityLevel = quality;
+  cl->appData.encodingsString = strdup(encodings.mb_str());
   if(multicast)
     {
       cl->canHandleMulticastVNC = TRUE;
@@ -800,9 +800,8 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
   else
     cl->canHandleMulticastVNC = FALSE;
 
-  cl->appData.encodingsString = strdup(encodings.mb_str());
 
-  if(! rfbInitClient(cl, &argc, argv))
+  if(! rfbInitClient(cl, 0, NULL))
     {
       cl = 0; //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
       err.Printf(_("Failure connecting to server at %s!"),  host.c_str());
@@ -887,6 +886,8 @@ void VNCConn::Shutdown()
 	  free(cl->frameBuffer);
 	  cl->frameBuffer = 0;
 	}
+      // this one was strdup'ed before
+      free((void*)cl->appData.encodingsString);
     }
 }
 
