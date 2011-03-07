@@ -141,7 +141,7 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
       wxCriticalSectionLocker lock(mutex_stats);
 
       // raw bytes sampling
-      update_rawbytes.Add((wxString() << wxGetUTCTime()) + 
+      update_rawbytes.Add((wxString() << (int)wxGetUTCTime()) + 
 			  wxT(", ") + 
 			  (wxString() << (int)conn_stopwatch.Time())
 			  + wxT(", ") +
@@ -149,7 +149,7 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
       upd_rawbytes = 0;
 
       // number of updates sampling
-      update_counts.Add((wxString() << wxGetUTCTime()) + 
+      update_counts.Add((wxString() << (int)wxGetUTCTime()) + 
 			wxT(", ") + 
 			(wxString() << (int)conn_stopwatch.Time())
 			+ wxT(", ") +
@@ -161,12 +161,12 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 	{
 	  wxString lossratestring = wxString::Format(wxT("%.4f"), multicastLossRatio);
 	  lossratestring.Replace(wxT(","), wxT("."));
-	  multicast_lossratios.Add((wxString() << wxGetUTCTime()) + 
+	  multicast_lossratios.Add((wxString() << (int)wxGetUTCTime()) + 
 				   wxT(", ") + 
 				   (wxString() << (int)conn_stopwatch.Time())
 				   + wxT(", ") + lossratestring);
 
-	  multicast_bufferfills.Add((wxString() << wxGetUTCTime())
+	  multicast_bufferfills.Add((wxString() << (int)wxGetUTCTime())
 				    + wxT(", ") 
 				    + (wxString() << (int)conn_stopwatch.Time())
 				    + wxT(", ") 
@@ -519,7 +519,7 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 	  if(conn->latency_test_rect_sent && this_update_rect.Contains(wxRect(LATENCY_TEST_RECT)))
 	    {
 	      conn->latency_stopwatch.Pause();
-	      conn->latencies.Add((wxString() << wxGetUTCTime()) + 
+	      conn->latencies.Add((wxString() << (int)wxGetUTCTime()) + 
 				  wxT(", ") + 
 				  (wxString() << (int)conn->conn_stopwatch.Time()) + 
 				  wxT(", ") + 
@@ -615,7 +615,7 @@ void VNCConn::thread_handle_xvp(rfbClient *cl, uint8_t ver, uint8_t code)
     {
       wxCriticalSectionLocker lock(conn->mutex_stats);
       conn->latency_stopwatch.Pause();
-      conn->latencies.Add((wxString() << wxGetUTCTime()) + 
+      conn->latencies.Add((wxString() << (int)wxGetUTCTime()) + 
 			  wxT(", ") + 
 			  (wxString() << (int)conn->conn_stopwatch.Time()) + 
 			  wxT(", ") + 
