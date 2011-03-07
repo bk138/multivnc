@@ -1381,6 +1381,9 @@ void MyFrameMain::help_about(wxCommandEvent &event)
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
   desc += wxT(", Anonymous TLS, VeNCrypt");
 #endif
+#ifdef LIBVNCSERVER_WITH_CLIENT_GCRYPT
+  desc += wxT(", Apple Remote Desktop");
+#endif
   desc += _("\n\nSupported Encodings:\n");
   desc += wxT("Raw, RRE, coRRE, CopyRect, Hextile, Ultra");
 #ifdef LIBVNCSERVER_HAVE_LIBZ 
