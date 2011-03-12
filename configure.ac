@@ -237,6 +237,21 @@ fi
 
 AM_CONDITIONAL(HAVE_LIBZ, test ! -z "$HAVE_ZLIB_H")
 
+# Check for libgcrypt
+AH_TEMPLATE(WITH_CLIENT_GCRYPT, [Enable support for libgcrypt in libvncclient])
+AC_ARG_WITH(gcrypt,
+[  --without-gcrypt        disable support for gcrypt],,)
+AC_ARG_WITH(client-gcrypt,
+[  --without-client-gcrypt disable support for gcrypt in libvncclient],,)
+
+if test "x$with_gcrypt" != "xno"; then
+       AM_PATH_LIBGCRYPT(1.4.0, , with_client_gcrypt=no)
+       CFLAGS="$CFLAGS $LIBGCRYPT_CFLAGS"
+       LIBS="$LIBS $LIBGCRYPT_LIBS"
+       if test "x$with_client_gcrypt" != "xno"; then
+               AC_DEFINE(WITH_CLIENT_GCRYPT)
+       fi
+fi
 
 # Checks for GnuTLS
 AH_TEMPLATE(WITH_CLIENT_TLS, [Enable support for gnutls in libvncclient])
