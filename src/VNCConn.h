@@ -121,6 +121,8 @@ public:
   const wxArrayString& getUpdCountStats() const { const wxArrayString& ref = update_counts; return ref; };
   // gets latencies
   const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
+  // gets multicast NACKed ratio per second
+  const wxArrayString& getMCNACKedRatioStats() const { const wxArrayString& ref = multicast_nackedratios; return ref; };
   // gets multicast loss ratio per second
   const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = multicast_lossratios; return ref; };
   // gets multicast receive buf fill per second
@@ -169,6 +171,7 @@ private:
   wxRect updated_rect;
 
   int multicastStatus;
+  double multicastNACKedRatio;
   double multicastLossRatio;
   
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
@@ -206,6 +209,8 @@ private:
   bool latency_test_trigger;
   wxStopWatch latency_stopwatch;
   wxArrayString latencies;
+  // mc NACKed ratios
+  wxArrayString multicast_nackedratios;
   // mc loss ratios
   wxArrayString multicast_lossratios;
   // mc buffer stats

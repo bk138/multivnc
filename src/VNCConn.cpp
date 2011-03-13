@@ -129,6 +129,7 @@ VNCConn::VNCConn(void* p)
   cl = 0;
   multicastStatus = 0;
   multicastLossRatio = 0;
+  multicastNACKedRatio = 0;
 
   rfbClientLog = rfbClientErr = thread_logger;
 
@@ -195,9 +196,16 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 			(wxString() << upd_count));
       upd_count = 0;
 
-      // multicast lossratio sampling
+      // multicast NACKed/loss ratio sampling
       if(isMulticast())
 	{
+	  wxString nackedratestring = wxString::Format(wxT("%.4f"), multicastNACKedRatio);
+	  nackedratestring.Replace(wxT(","), wxT("."));
+	  multicast_nackedratios.Add((wxString() << (int)wxGetUTCTime()) + 
+				     wxT(", ") + 
+				     (wxString() << (int)conn_stopwatch.Time())
+				     + wxT(", ") + nackedratestring);
+
 	  wxString lossratestring = wxString::Format(wxT("%.4f"), multicastLossRatio);
 	  lossratestring.Replace(wxT(","), wxT("."));
 	  multicast_lossratios.Add((wxString() << (int)wxGetUTCTime()) + 
@@ -320,11 +328,12 @@ wxThread::ExitCode VNCConn::Entry()
 
 	  if(isMulticast())
 	    {
-	      // compute loss ratio: the way we do it here is per 10000 packets
+	      // compute nacked/loss ratio: the way we do it here is per 10000 packets
 	      if(cl->multicastRcvd >= 10000 || (cl->multicastRcvd && cl->multicastTimeouts > 10))
 		{
+		  multicastNACKedRatio = cl->multicastNACKed/(double)(cl->multicastRcvd + cl->multicastNACKed);
 		  multicastLossRatio = cl->multicastLost/(double)(cl->multicastRcvd + cl->multicastLost);
-		  cl->multicastRcvd = cl->multicastLost = 0;
+		  cl->multicastRcvd = cl->multicastNACKed = cl->multicastLost = 0;
 		}
 
 	      // and act accordingly 
@@ -1122,6 +1131,7 @@ void VNCConn::resetStats()
   update_rawbytes.Clear();
   update_counts.Clear();
   latencies.Clear();
+  multicast_nackedratios.Clear();
   multicast_lossratios.Clear();
   multicast_bufferfills.Clear();
 }
