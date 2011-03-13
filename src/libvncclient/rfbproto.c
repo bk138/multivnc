@@ -54,6 +54,10 @@
 #include <time.h>
 
 #ifdef LIBVNCSERVER_WITH_CLIENT_GCRYPT
+#ifdef WIN32
+#undef SOCKET
+#undef socklen_t
+#endif
 #include <gcrypt.h>
 #endif
 
@@ -2170,7 +2174,7 @@ HandleRFBServerMessage(rfbClient* client)
 	rfbClientLog("MulticastVNC: received pixelformat,encoding identifier: %d\n", rect.r.x);
 
 	client->multicastSock = CreateMulticastSocket(multicastSockAddr, client->multicastRcvBufSize);
-	client->multicastUpdInterval = rect.r.w;
+	client->multicastUpdInterval = rect.r.w > 0 ? rect.r.w : 1;
 	client->multicastPixelformatEncId = rect.r.x;
 	client->multicastPacketBuf = packetBufCreate(client->multicastRcvBufSize);
 
