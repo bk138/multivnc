@@ -60,7 +60,7 @@
    --with-wx-config=<your win32 wx-config> \
    --with-zlib=<path to where zlib include and lib dirs are> \
    --with-jpeg=<path to where jpeglib include and lib dirs are> 
-   --without-gnutls
+   --with-libgcrypt-prefix=<path to where zlib include and lib dirs are>
 
  Then
 
