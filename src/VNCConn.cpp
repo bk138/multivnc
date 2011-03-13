@@ -196,7 +196,7 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 			(wxString() << upd_count));
       upd_count = 0;
 
-      // multicast NACKed/loss ratio sampling
+      // multicast NACKed/loss ratio and buffer fill sampling
       if(isMulticast())
 	{
 	  wxString nackedratestring = wxString::Format(wxT("%.4f"), multicastNACKedRatio);

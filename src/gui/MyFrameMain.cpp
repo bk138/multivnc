@@ -746,7 +746,9 @@ void MyFrameMain::terminate_conn(int which)
 	  if(!saveStats(c, index, c->getUpdCountStats(), _("frame buffer update count"), true))
 	    wxLogError(_("Could not autosave framebuffer update count statistics!"));
 	  if(!saveStats(c, index, c->getLatencyStats(), _("latency"), true))
-	    wxLogError(_("Could not autosave latency statistics!"));    
+	    wxLogError(_("Could not autosave latency statistics!"));
+	  if(!saveStats(c, index, c->getMCNACKedRatioStats(), _("multicast NACK ratio"),true))
+	    wxLogError(_("Could not autosave multicast NACK ratio statistics!"));    
 	  if(!saveStats(c, index, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
 	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
 	  if(!saveStats(c, index, c->getMCBufStats(), _("multicast receive buffer"),true))
@@ -1106,6 +1108,18 @@ void MyFrameMain::machine_save_stats_latencies(wxCommandEvent &event)
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
       saveStats(c, sel, c->getLatencyStats(), _("latency"), false);
+    }
+}
+
+
+
+void MyFrameMain::machine_save_stats_nackratio(wxCommandEvent &event)
+{
+  if(connections.size())
+    {
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel).conn;
+      saveStats(c, sel, c->getMCNACKedRatioStats(), _("multicast NACK ratio"), false);
     }
 }
 
