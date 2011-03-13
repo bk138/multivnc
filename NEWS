@@ -8,6 +8,7 @@ MultiVNC 0.5 -
 	* MultiVNC is now able to connect to Apple Remote Desktop
 	  servers.
 	* It is now possible to select the desired VNC encoding.
+	* Encrypted connections now work on Windows as well.
 	* This time really fixed the bug with the viewer becoming
           unresponsive under high multicast loads.
 	* Fixed not being able to enter IPv6 addresses.
