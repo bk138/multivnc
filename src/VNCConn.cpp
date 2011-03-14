@@ -328,12 +328,13 @@ wxThread::ExitCode VNCConn::Entry()
 
 	  if(isMulticast())
 	    {
-	      // compute nacked/loss ratio: the way we do it here is per 10000 packets
-	      if(cl->multicastRcvd >= 10000 || (cl->multicastRcvd && cl->multicastTimeouts > 10))
+	      // compute nacked/loss ratio: the way we do it here is per 1MB rcvd data
+	      if(cl->multicastBytesRcvd >= 1048576)
 		{
-		  multicastNACKedRatio = cl->multicastNACKed/(double)(cl->multicastRcvd + cl->multicastNACKed);
-		  multicastLossRatio = cl->multicastLost/(double)(cl->multicastRcvd + cl->multicastLost);
-		  cl->multicastRcvd = cl->multicastNACKed = cl->multicastLost = 0;
+		  multicastNACKedRatio = cl->multicastPktsNACKed/(double)(cl->multicastPktsRcvd + cl->multicastPktsNACKed);
+		  multicastLossRatio = cl->multicastPktsLost/(double)(cl->multicastPktsRcvd + cl->multicastPktsLost);
+		  cl->multicastPktsRcvd = cl->multicastPktsNACKed = cl->multicastPktsLost = 0;
+		  cl->multicastBytesRcvd = 0;
 		}
 
 	      // and act accordingly 
@@ -348,7 +349,7 @@ wxThread::ExitCode VNCConn::Entry()
 		{
 		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full multicast framebuffer update\n");
 		  SendMulticastFramebufferUpdateRequest(cl, FALSE);
-		  cl->multicastLost /= 2;
+		  cl->multicastPktsLost /= 2;
 		}
 	    }
 
