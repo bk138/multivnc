@@ -262,6 +262,12 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
 	}
       else
 	{
+	  wxArrayString log = VNCConn::getLog();
+	  // show last 3 log strings
+	  for(size_t i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
+	    wxLogMessage(log[i]);
+	  wxLogMessage( _("Connection to %s switched to unicast."), c->getServerHost().c_str());
+
 	  wxLogStatus( _("Connection to %s is now unicast."), c->getServerHost().c_str());
 	  notebook_connections->SetPageImage(index, 0);
 	}
