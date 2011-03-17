@@ -4,6 +4,7 @@
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/dcclient.h>
+#include <wx/tokenzr.h>
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 #include "MultiVNCApp.h"
@@ -401,15 +402,21 @@ void ViewerWindow::onStatsTimer(wxTimerEvent& event)
 	  gauge_recvbuf->Show(true);
 	}
       stats_container->Layout();
-      
-      if( ! c->getUpdRawByteStats().IsEmpty() )
-	*text_ctrl_updrawbytes << wxAtoi(c->getUpdRawByteStats().Last().AfterLast(wxT(',')))/1024;
-      if( ! c->getUpdCountStats().IsEmpty() )
-	*text_ctrl_updcount << c->getUpdCountStats().Last().AfterLast(wxT(','));
-      if( ! c->getLatencyStats().IsEmpty() )
-	*text_ctrl_latency << c->getLatencyStats().Last().AfterLast(wxT(','));
-      if( ! c->getMCLossRatioStats().IsEmpty() )
-	*text_ctrl_lossratio << c->getMCLossRatioStats().Last().AfterLast(wxT(','));
+
+      if( ! c->getStats().IsEmpty() )
+	{
+	  // it is imperative here to obey the format of the sample string!
+	  wxStringTokenizer tokenizer(c->getStats().Last(),  wxT(","));
+	  tokenizer.GetNextToken(); // skip UTC time
+	  tokenizer.GetNextToken(); // skip conn time
+	  *text_ctrl_updrawbytes << wxAtoi(tokenizer.GetNextToken())/1024;
+	  *text_ctrl_updcount << wxAtoi(tokenizer.GetNextToken());
+	  int latency =  wxAtoi(tokenizer.GetNextToken());
+	  if(latency >= 0)
+	    *text_ctrl_latency << latency;
+	  tokenizer.GetNextToken(); // skip nack ratio
+	  *text_ctrl_lossratio << wxAtoi(tokenizer.GetNextToken());
+	}
 
       gauge_recvbuf->SetRange(c->getMCBufSize());
       gauge_recvbuf->SetValue(c->getMCBufFill());

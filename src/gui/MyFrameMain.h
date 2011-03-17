@@ -106,13 +106,7 @@ public:
   void machine_preferences(wxCommandEvent &event);
   void machine_showlog(wxCommandEvent &event);
   void machine_screenshot(wxCommandEvent &event);
-  void machine_save_stats_upd_rawbytes(wxCommandEvent &event); 
-  void machine_save_stats_upd_count(wxCommandEvent &event); 
-  void machine_save_stats_latencies(wxCommandEvent &event); 
-  void machine_save_stats_pointer_latencies(wxCommandEvent &event); 
-  void machine_save_stats_nackratio(wxCommandEvent &event); 
-  void machine_save_stats_lossratio(wxCommandEvent &event); 
-  void machine_save_stats_recvbuf(wxCommandEvent &event); 
+  void machine_save_stats(wxCommandEvent &event); 
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);

@@ -3,7 +3,6 @@ in order of importance:
  - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
  - fix the seamless connector for win32.
- - all stats in one string array?
  - make it work on OS X
  - textchat
  - server side scaling

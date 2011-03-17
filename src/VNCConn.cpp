@@ -130,6 +130,7 @@ VNCConn::VNCConn(void* p)
   multicastStatus = 0;
   multicastLossRatio = 0;
   multicastNACKedRatio = 0;
+  latency = -1;
 
   rfbClientLog = rfbClientErr = thread_logger;
 
@@ -180,51 +181,52 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
     {
       wxCriticalSectionLocker lock(mutex_stats);
 
-      // raw bytes sampling
-      update_rawbytes.Add((wxString() << (int)wxGetUTCTime()) + 
-			  wxT(", ") + 
-			  (wxString() << (int)conn_stopwatch.Time())
-			  + wxT(", ") +
-			  (wxString() << upd_rawbytes));
+      if(statistics.IsEmpty())
+	statistics.Add(wxString()
+		       + wxT("UTC time, ") 
+		       + wxT("conn time, ")
+		       + wxT("raw bytes, ")
+		       + wxT("upd count, ")
+		       + wxT("latency, ")
+		       + wxT("nack rate, ")
+		       + wxT("loss rate, ")
+		       + wxT("buf size, ")
+		       + wxT("buf fill, "));
+      
+      wxString sample;
+      
+      sample += (wxString() << (int)wxGetUTCTime()); // global UTC time
+      sample += wxT(",\t");
+      sample += (wxString() << (int)conn_stopwatch.Time()); // connection time
+      sample += wxT(",\t");
+      sample += (wxString() << upd_rawbytes); // raw bytes sampling
+      sample += wxT(",\t");
+      sample += (wxString() << upd_count);  // number of updates sampling
+      sample += wxT(",\t");
+      sample += (wxString() << latency); // latency sampling
+      sample += wxT(",\t");
+      wxString nackrate_str = wxString::Format(wxT("%.4f"), multicastNACKedRatio);
+      nackrate_str.Replace(wxT(","), wxT("."));
+      sample += nackrate_str;            // nack rate sampling
+      sample += wxT(",\t");
+      wxString lossrate_str = wxString::Format(wxT("%.4f"), multicastLossRatio);
+      lossrate_str.Replace(wxT(","), wxT("."));
+      sample += lossrate_str;            // loss rate sampling
+      sample += wxT(",\t");
+      sample += (wxString() << getMCBufSize());  // buffer size sampling
+      sample += wxT(",\t");
+      sample += (wxString() << getMCBufFill());  // buffer fill sampling
+
+      // add the sample
+      statistics.Add(sample);
+		
+      // reset these
       upd_rawbytes = 0;
-
-      // number of updates sampling
-      update_counts.Add((wxString() << (int)wxGetUTCTime()) + 
-			wxT(", ") + 
-			(wxString() << (int)conn_stopwatch.Time())
-			+ wxT(", ") +
-			(wxString() << upd_count));
       upd_count = 0;
+      latency = -1;
 
-      // multicast NACKed/loss ratio and buffer fill sampling
-      if(isMulticast())
-	{
-	  wxString nackedratestring = wxString::Format(wxT("%.4f"), multicastNACKedRatio);
-	  nackedratestring.Replace(wxT(","), wxT("."));
-	  multicast_nackedratios.Add((wxString() << (int)wxGetUTCTime()) + 
-				     wxT(", ") + 
-				     (wxString() << (int)conn_stopwatch.Time())
-				     + wxT(", ") + nackedratestring);
-
-	  wxString lossratestring = wxString::Format(wxT("%.4f"), multicastLossRatio);
-	  lossratestring.Replace(wxT(","), wxT("."));
-	  multicast_lossratios.Add((wxString() << (int)wxGetUTCTime()) + 
-				   wxT(", ") + 
-				   (wxString() << (int)conn_stopwatch.Time())
-				   + wxT(", ") + lossratestring);
-
-	  multicast_bufferfills.Add((wxString() << (int)wxGetUTCTime())
-				    + wxT(", ") 
-				    + (wxString() << (int)conn_stopwatch.Time())
-				    + wxT(", ") 
-				    + (wxString() << getMCBufSize())
-				    + wxT(", ") 
-				    + (wxString() << getMCBufFill())
-				    );
-	}
 
       latency_test_trigger = true;
-
     }
 }
 
@@ -298,11 +300,14 @@ wxThread::ExitCode VNCConn::Entry()
 	  while(key_event_q.ReceiveTimeout(0, ke) != wxMSGQUEUE_TIMEOUT) // timeout == empty
 	    thread_send_key_event(ke);
 
-	  if(latency_test_trigger)
-	    {
-	      latency_test_trigger = false;
-	      thread_send_latency_probe();
-	    }
+	  {
+	    wxCriticalSectionLocker lock(mutex_stats);
+	    if(latency_test_trigger)
+	      {
+		latency_test_trigger = false;
+		thread_send_latency_probe();
+	      }
+	  }
 	 
 	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval)
 	    {
@@ -331,6 +336,7 @@ wxThread::ExitCode VNCConn::Entry()
 	      // compute nacked/loss ratio: the way we do it here is per 1MB rcvd data
 	      if(cl->multicastBytesRcvd >= 1048576)
 		{
+		  wxCriticalSectionLocker lock(mutex_stats);
 		  multicastNACKedRatio = cl->multicastPktsNACKed/(double)(cl->multicastPktsRcvd + cl->multicastPktsNACKed);
 		  multicastLossRatio = cl->multicastPktsLost/(double)(cl->multicastPktsRcvd + cl->multicastPktsLost);
 		  cl->multicastPktsRcvd = cl->multicastPktsNACKed = cl->multicastPktsLost = 0;
@@ -568,12 +574,6 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 	  if(conn->latency_test_rect_sent && this_update_rect.Contains(wxRect(LATENCY_TEST_RECT)))
 	    {
 	      conn->latency_stopwatch.Pause();
-	      conn->latencies.Add((wxString() << (int)wxGetUTCTime()) + 
-				  wxT(", ") + 
-				  (wxString() << (int)conn->conn_stopwatch.Time()) + 
-				  wxT(", ") + 
-				  (wxString() << (int)conn->latency_stopwatch.Time()));
-
 	      conn->latency_test_rect_sent = false;
 
 	      wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), conn, conn->latency_stopwatch.Time());
@@ -664,12 +664,7 @@ void VNCConn::thread_handle_xvp(rfbClient *cl, uint8_t ver, uint8_t code)
     {
       wxCriticalSectionLocker lock(conn->mutex_stats);
       conn->latency_stopwatch.Pause();
-      conn->latencies.Add((wxString() << (int)wxGetUTCTime()) + 
-			  wxT(", ") + 
-			  (wxString() << (int)conn->conn_stopwatch.Time()) + 
-			  wxT(", ") + 
-			  (wxString() << (int)conn->latency_stopwatch.Time()));
-      
+      conn->latency = conn->latency_stopwatch.Time();
       conn->latency_test_xvpmsg_sent = false;
       
       wxLogDebug(wxT("VNCConn %p: got latency test xvp message back, took %ims"), conn, conn->latency_stopwatch.Time());
@@ -1129,12 +1124,7 @@ void VNCConn::doStats(bool yesno)
 void VNCConn::resetStats()
 {
   wxCriticalSectionLocker lock(mutex_stats);
-  update_rawbytes.Clear();
-  update_counts.Clear();
-  latencies.Clear();
-  multicast_nackedratios.Clear();
-  multicast_lossratios.Clear();
-  multicast_bufferfills.Clear();
+  statistics.Clear();
 }
 
 

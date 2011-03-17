@@ -112,21 +112,8 @@ public:
   void doStats(bool yesno);
   // this clears internal statistics
   void resetStats();
-  /*
-    get stats, in format "timestamp, value"
-  */
-  // gets raw bytes updated per second
-  const wxArrayString& getUpdRawByteStats() const { const wxArrayString& ref = update_rawbytes; return ref; };
-  // gets number of updates per second 
-  const wxArrayString& getUpdCountStats() const { const wxArrayString& ref = update_counts; return ref; };
-  // gets latencies
-  const wxArrayString& getLatencyStats() const { const wxArrayString& ref = latencies; return ref; };
-  // gets multicast NACKed ratio per second
-  const wxArrayString& getMCNACKedRatioStats() const { const wxArrayString& ref = multicast_nackedratios; return ref; };
-  // gets multicast loss ratio per second
-  const wxArrayString& getMCLossRatioStats() const { const wxArrayString& ref = multicast_lossratios; return ref; };
-  // gets multicast receive buf fill per second
-  const wxArrayString& getMCBufStats() const { const wxArrayString& ref = multicast_bufferfills; return ref; };
+  //  get stats, format is described in first line
+  const wxArrayString& getStats() const { const wxArrayString& ref = statistics; return ref; };
 
   // cuttext
   const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
@@ -191,15 +178,14 @@ private:
 
   // statistics
   bool do_stats;
-  wxTimer stats_timer; // a timer that samples stattistics every second
+  wxTimer stats_timer; // a timer that samples statistics every second
   void on_stats_timer(wxTimerEvent& event);
   wxCriticalSection mutex_stats;
+  wxArrayString statistics;
   // counts raw bytes of updates
   int upd_rawbytes;
-  wxArrayString update_rawbytes;
   // counts updates 
   int upd_count; 
-  wxArrayString update_counts;
   // check latency by isueing an xvp request with some unsupported version
 #define LATENCY_TEST_XVP_VER 42
   bool latency_test_xvpmsg_sent;
@@ -208,13 +194,7 @@ private:
   bool latency_test_rect_sent;
   bool latency_test_trigger;
   wxStopWatch latency_stopwatch;
-  wxArrayString latencies;
-  // mc NACKed ratios
-  wxArrayString multicast_nackedratios;
-  // mc loss ratios
-  wxArrayString multicast_lossratios;
-  // mc buffer stats
-  wxArrayString multicast_bufferfills;
+  int latency;
 
   // per-connection error string
   wxString err;

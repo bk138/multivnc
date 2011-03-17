@@ -28,13 +28,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_1->Append(wxID_FILE, _("Show &Log"), _("Show detailed log."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_PREFERENCES, wxEmptyString, _("Change preferences."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_SAVE, _("Take Screenshot"), wxEmptyString, wxITEM_NORMAL);
-    wxMenu* wxglade_tmp_menu_1_sub = new wxMenu();
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_RAWBYTE, _("Save Framebuffer Update Data Rate Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_UPD_COUNT, _("Save Framebuffer Update Count Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LATENCIES, _("Save Latency Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_LOSSRATIO, _("Save Multicast Loss Ratio Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1_sub->Append(ID_STATS_SAVE_RECVBUF, _("Save Multicast Receive Buffer Statistics"), wxEmptyString, wxITEM_NORMAL);
-    wxglade_tmp_menu_1->Append(wxID_ANY, _("Statistics"), wxglade_tmp_menu_1_sub, wxEmptyString);
+    wxglade_tmp_menu_1->Append(ID_STATS_SAVE, _("Save Statistics..."), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->AppendSeparator();
     wxglade_tmp_menu_1->Append(wxID_EXIT, wxEmptyString, _("Exit MultiVNC."), wxITEM_NORMAL);
     frame_main_menubar->Append(wxglade_tmp_menu_1, _("&Machine"));
@@ -99,11 +93,7 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_FILE, FrameMain::machine_showlog)
     EVT_MENU(wxID_PREFERENCES, FrameMain::machine_preferences)
     EVT_MENU(wxID_SAVE, FrameMain::machine_screenshot)
-    EVT_MENU(ID_STATS_SAVE_UPD_RAWBYTE, FrameMain::machine_save_stats_upd_rawbytes)
-    EVT_MENU(ID_STATS_SAVE_UPD_COUNT, FrameMain::machine_save_stats_upd_count)
-    EVT_MENU(ID_STATS_SAVE_LATENCIES, FrameMain::machine_save_stats_latencies)
-    EVT_MENU(ID_STATS_SAVE_LOSSRATIO, FrameMain::machine_save_stats_lossratio)
-    EVT_MENU(ID_STATS_SAVE_RECVBUF, FrameMain::machine_save_stats_recvbuf)
+    EVT_MENU(ID_STATS_SAVE, FrameMain::machine_save_stats)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
     EVT_MENU(ID_TOOLBAR, FrameMain::view_toggletoolbar)
     EVT_MENU(ID_DISCOVERED, FrameMain::view_togglediscovered)
@@ -178,38 +168,10 @@ void FrameMain::machine_screenshot(wxCommandEvent &event)
 }
 
 
-void FrameMain::machine_save_stats_upd_rawbytes(wxCommandEvent &event)
+void FrameMain::machine_save_stats(wxCommandEvent &event)
 {
     event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd_rawbytes) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
-}
-
-
-void FrameMain::machine_save_stats_upd_count(wxCommandEvent &event)
-{
-    event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_upd_count) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
-}
-
-
-void FrameMain::machine_save_stats_latencies(wxCommandEvent &event)
-{
-    event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_latencies) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
-}
-
-
-void FrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
-{
-    event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_lossratio) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
-}
-
-
-void FrameMain::machine_save_stats_recvbuf(wxCommandEvent &event)
-{
-    event.Skip();
-    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats_recvbuf) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 

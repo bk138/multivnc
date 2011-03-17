@@ -86,11 +86,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // "screenshot"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
   // stats
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(4)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(false);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
@@ -526,10 +522,8 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
       return true;
     }
   
-  wxString header = wxGetHostName() + wxT(" to ") + c->getDesktopName() + wxString::Format(wxT("(%i)"), conn_index) +
-    wxT(" ") + desc + wxT(" stats on ") + wxNow();
-  
-  wxString filename = header + wxT(".csv");
+  wxString filename = wxGetHostName() + wxT(" to ") + c->getDesktopName() + wxString::Format(wxT("(%i)"), conn_index) +
+    wxT(" ") + desc + wxT(" stats on ") + wxNow() + wxT(".csv");
 #ifdef __WIN32__
   // windows doesn't like ':'s
   filename.Replace(wxString(wxT(":")), wxString(wxT("-")));
@@ -555,9 +549,7 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 	  wxLogError(_("Could not save file!"));
 	  return false;
 	}
-      // write header
-      ostream << header.char_str() << endl;
-      // and entries
+
       for(size_t i=0; i < stats.GetCount(); ++i)
 	ostream << stats[i].char_str() << endl;
     }
@@ -701,11 +693,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
   // "screenshot"
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(true);
   // stats
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(true);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(true);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(true);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(true);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(4)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(true);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
   // window sharing
@@ -747,18 +735,8 @@ void MyFrameMain::terminate_conn(int which)
 
       if(index < connections.size()) // found
 	{
-	  if(!saveStats(c, index, c->getUpdRawByteStats(), _("frame buffer update raw byte"), true))
-	    wxLogError(_("Could not autosave framebuffer update raw byte statistics!"));   
-	  if(!saveStats(c, index, c->getUpdCountStats(), _("frame buffer update count"), true))
-	    wxLogError(_("Could not autosave framebuffer update count statistics!"));
-	  if(!saveStats(c, index, c->getLatencyStats(), _("latency"), true))
-	    wxLogError(_("Could not autosave latency statistics!"));
-	  if(!saveStats(c, index, c->getMCNACKedRatioStats(), _("multicast NACK ratio"),true))
-	    wxLogError(_("Could not autosave multicast NACK ratio statistics!"));    
-	  if(!saveStats(c, index, c->getMCLossRatioStats(), _("multicast loss ratio"),true))
-	    wxLogError(_("Could not autosave multicast loss ratio statistics!"));
-	  if(!saveStats(c, index, c->getMCBufStats(), _("multicast receive buffer"),true))
-	    wxLogError(_("Could not autosave multicast receive buffer statistics!"));
+	  if(!saveStats(c, index, c->getStats(), c->isMulticast() ? wxT("MulticastVNC") : wxT("VNC"), true))
+	    wxLogError(_("Could not autosave statistics!"));   
 	}
     }
  
@@ -800,11 +778,7 @@ void MyFrameMain::terminate_conn(int which)
       // "screenshot"
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
       // stats
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(0)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(1)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(2)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(3)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->GetSubMenu()->FindItemByPosition(4)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(false);
       // bookmarks
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
       // window sharing
@@ -1084,74 +1058,15 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 
 
 
-void MyFrameMain::machine_save_stats_upd_rawbytes(wxCommandEvent &event)
+void MyFrameMain::machine_save_stats(wxCommandEvent &event)
 {
   if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getUpdRawByteStats(), _("framebuffer update raw byte"), false);
+      saveStats(c, sel, c->getStats(), c->isMulticast() ? wxT("MulticastVNC") : wxT("VNC"), false);
     }
 }
-
-
-void MyFrameMain::machine_save_stats_upd_count(wxCommandEvent &event)
-{
- if(connections.size())
-    {
-      int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getUpdCountStats(), _("framebuffer update count"), false);
-    }
-}
-
-
-
-void MyFrameMain::machine_save_stats_latencies(wxCommandEvent &event)
-{
- if(connections.size())
-    {
-      int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getLatencyStats(), _("latency"), false);
-    }
-}
-
-
-
-void MyFrameMain::machine_save_stats_nackratio(wxCommandEvent &event)
-{
-  if(connections.size())
-    {
-      int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getMCNACKedRatioStats(), _("multicast NACK ratio"), false);
-    }
-}
-
-
-void MyFrameMain::machine_save_stats_lossratio(wxCommandEvent &event)
-{
-  if(connections.size())
-    {
-      int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getMCLossRatioStats(), _("multicast loss ratio"), false);
-    }
-}
-
-
-void MyFrameMain::machine_save_stats_recvbuf(wxCommandEvent &event)
-{
-  if(connections.size())
-    {
-      int sel = notebook_connections->GetSelection();
-      VNCConn* c = connections.at(sel).conn;
-      saveStats(c, sel, c->getMCBufStats(), _("multicast receive buffer"), false);
-    }
-}
-
-
 
 
 
