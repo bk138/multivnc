@@ -410,12 +410,12 @@ void ViewerWindow::onStatsTimer(wxTimerEvent& event)
 	  tokenizer.GetNextToken(); // skip UTC time
 	  tokenizer.GetNextToken(); // skip conn time
 	  *text_ctrl_updrawbytes << wxAtoi(tokenizer.GetNextToken())/1024;
-	  *text_ctrl_updcount << wxAtoi(tokenizer.GetNextToken());
+	  *text_ctrl_updcount << tokenizer.GetNextToken();
 	  int latency =  wxAtoi(tokenizer.GetNextToken());
 	  if(latency >= 0)
 	    *text_ctrl_latency << latency;
 	  tokenizer.GetNextToken(); // skip nack ratio
-	  *text_ctrl_lossratio << wxAtoi(tokenizer.GetNextToken());
+	  *text_ctrl_lossratio << tokenizer.GetNextToken();
 	}
 
       gauge_recvbuf->SetRange(c->getMCBufSize());
