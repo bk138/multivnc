@@ -183,38 +183,38 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 
       if(statistics.IsEmpty())
 	statistics.Add(wxString()
-		       + wxT("UTC time, ") 
-		       + wxT("conn time, ")
-		       + wxT("raw bytes, ")
-		       + wxT("upd count, ")
-		       + wxT("latency, ")
-		       + wxT("nack rate, ")
-		       + wxT("loss rate, ")
-		       + wxT("buf size, ")
-		       + wxT("buf fill, "));
+		       + wxT("UTC time,") 
+		       + wxT("conn time,")
+		       + wxT("raw bytes,")
+		       + wxT("upd count,")
+		       + wxT("latency,")
+		       + wxT("nack rate,")
+		       + wxT("loss rate,")
+		       + wxT("buf size,")
+		       + wxT("buf fill,"));
       
       wxString sample;
       
       sample += (wxString() << (int)wxGetUTCTime()); // global UTC time
-      sample += wxT(",\t");
+      sample += wxT(",");
       sample += (wxString() << (int)conn_stopwatch.Time()); // connection time
-      sample += wxT(",\t");
+      sample += wxT(",");
       sample += (wxString() << upd_rawbytes); // raw bytes sampling
-      sample += wxT(",\t");
+      sample += wxT(",");
       sample += (wxString() << upd_count);  // number of updates sampling
-      sample += wxT(",\t");
+      sample += wxT(",");
       sample += (wxString() << latency); // latency sampling
-      sample += wxT(",\t");
+      sample += wxT(",");
       wxString nackrate_str = wxString::Format(wxT("%.4f"), multicastNACKedRatio);
       nackrate_str.Replace(wxT(","), wxT("."));
       sample += nackrate_str;            // nack rate sampling
-      sample += wxT(",\t");
+      sample += wxT(",");
       wxString lossrate_str = wxString::Format(wxT("%.4f"), multicastLossRatio);
       lossrate_str.Replace(wxT(","), wxT("."));
       sample += lossrate_str;            // loss rate sampling
-      sample += wxT(",\t");
+      sample += wxT(",");
       sample += (wxString() << getMCBufSize());  // buffer size sampling
-      sample += wxT(",\t");
+      sample += wxT(",");
       sample += (wxString() << getMCBufFill());  // buffer fill sampling
 
       // add the sample
