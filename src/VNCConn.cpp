@@ -330,19 +330,17 @@ wxThread::ExitCode VNCConn::Entry()
 	      break;
 	    }
 
-
-	  if(isMulticast())
+	  // compute nacked/loss ratio: the way we do it here is per 1MB rcvd data
+	  if(isMulticast() && cl->multicastBytesRcvd >= 1048576)
 	    {
-	      // compute nacked/loss ratio: the way we do it here is per 1MB rcvd data
-	      if(cl->multicastBytesRcvd >= 1048576)
-		{
-		  wxCriticalSectionLocker lock(mutex_stats);
-		  multicastNACKedRatio = cl->multicastPktsNACKed/(double)(cl->multicastPktsRcvd + cl->multicastPktsNACKed);
-		  multicastLossRatio = cl->multicastPktsLost/(double)(cl->multicastPktsRcvd + cl->multicastPktsLost);
-		  cl->multicastPktsRcvd = cl->multicastPktsNACKed = cl->multicastPktsLost = 0;
-		  cl->multicastBytesRcvd = 0;
-		}
-
+	      {
+		wxCriticalSectionLocker lock(mutex_stats);
+		multicastNACKedRatio = cl->multicastPktsNACKed/(double)(cl->multicastPktsRcvd + cl->multicastPktsNACKed);
+		multicastLossRatio = cl->multicastPktsLost/(double)(cl->multicastPktsRcvd + cl->multicastPktsLost);
+		cl->multicastPktsRcvd = cl->multicastPktsNACKed = cl->multicastPktsLost = 0;
+		cl->multicastBytesRcvd = 0;
+	      }
+	      
 	      // and act accordingly 
 	      if(multicastLossRatio > 0.5)
 		{
