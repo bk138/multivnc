@@ -25,6 +25,7 @@
 #ifndef VNCCONN_H
 #define VNCCONN_H
 
+#include <deque>
 #include <wx/event.h>
 #include <wx/string.h>
 #include <wx/arrstr.h>
@@ -134,6 +135,10 @@ public:
   // get current multicast receive buf state
   int getMCBufSize() const { if(cl) return cl->multicastRcvBufSize; else return 0; };
   int getMCBufFill() const { if(cl) return cl->multicastRcvBufLen; else return 0; };
+  // returns average (over last few seconds) NACKed ratio or -1 if there was nothing to be measured
+  double getMCNACKedRatio();
+  // returns average (over last few seconds) loss ratio or -1 if there was nothing to be measured
+  double getMCLossRatio();
  
   // get error string
   const wxString& getErr() const { const wxString& ref = err; return ref; };
@@ -158,8 +163,11 @@ private:
   wxRect updated_rect;
 
   int multicastStatus;
-  double multicastNACKedRatio;
-  double multicastLossRatio;
+  std::deque<double> multicastNACKedRatios;
+  std::deque<double> multicastLossRatios;
+  wxCriticalSection mutex_multicastratio; // the fifos above are read by both the VNC and the GUI thread
+  wxStopWatch  multicastratio_stopwatch;
+
   
 #ifdef LIBVNCSERVER_WITH_CLIENT_TLS
   static bool TLS_threading_initialized;

@@ -128,8 +128,6 @@ VNCConn::VNCConn(void* p)
   
   cl = 0;
   multicastStatus = 0;
-  multicastLossRatio = 0;
-  multicastNACKedRatio = 0;
   latency = -1;
 
   rfbClientLog = rfbClientErr = thread_logger;
@@ -205,11 +203,11 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
       sample += wxT(",");
       sample += (wxString() << latency); // latency sampling
       sample += wxT(",");
-      wxString nackrate_str = wxString::Format(wxT("%.4f"), multicastNACKedRatio);
+      wxString nackrate_str = wxString::Format(wxT("%.4f"), getMCNACKedRatio());
       nackrate_str.Replace(wxT(","), wxT("."));
       sample += nackrate_str;            // nack rate sampling
       sample += wxT(",");
-      wxString lossrate_str = wxString::Format(wxT("%.4f"), multicastLossRatio);
+      wxString lossrate_str = wxString::Format(wxT("%.4f"), getMCLossRatio());
       lossrate_str.Replace(wxT(","), wxT("."));
       sample += lossrate_str;            // loss rate sampling
       sample += wxT(",");
@@ -330,32 +328,65 @@ wxThread::ExitCode VNCConn::Entry()
 	      break;
 	    }
 
-	  // compute nacked/loss ratio: the way we do it here is per 1MB rcvd data
-	  if(isMulticast() && cl->multicastBytesRcvd >= 1048576)
+	  
+	  /*
+	    Compute nacked/loss ratio: We take a ratio sample every second and put it into a sample queue
+	    of size N. Action is taken when the average sample value of the whole buffer exceeds a per-action
+	    limit. This has advantages over taking a sample every N seconds: First, it's able to catch say a 5sec burst
+	    that could be missed by two adjacent 10sec samples (one catches 2sec, the next one 3sec - no action triggered
+	    although condition present). Second, this way we're able to show a value to the user every second independent
+	    of the sample time frame.
+	  */
+   	  if(isMulticast() && multicastratio_stopwatch.Time() >= 1000)
 	    {
+	      // restart
+	      multicastratio_stopwatch.Start();
+  
+	      /*
+		take sample
+	      */
 	      {
-		wxCriticalSectionLocker lock(mutex_stats);
-		multicastNACKedRatio = cl->multicastPktsNACKed/(double)(cl->multicastPktsRcvd + cl->multicastPktsNACKed);
-		multicastLossRatio = cl->multicastPktsLost/(double)(cl->multicastPktsRcvd + cl->multicastPktsLost);
+		const size_t N = 10; // we are averaging over this many seconds
+		// the fifos are read by the GUI thread as well!
+		wxCriticalSectionLocker lock(mutex_multicastratio);
+		
+		if(multicastNACKedRatios.size() >= N) // make room if size exceeded
+		  multicastNACKedRatios.pop_front();
+		if(cl->multicastPktsRcvd + cl->multicastPktsNACKed > 0)
+		  multicastNACKedRatios.push_back(cl->multicastPktsNACKed/(double)(cl->multicastPktsRcvd + cl->multicastPktsNACKed));
+		else
+		  multicastNACKedRatios.push_back(-1); // nothing to measure, add invalid marker
+
+		if(multicastLossRatios.size() >= N) // make room if size exceeded
+		  multicastLossRatios.pop_front();
+		if(cl->multicastPktsRcvd + cl->multicastPktsLost > 0)
+		  multicastLossRatios.push_back(cl->multicastPktsLost/(double)(cl->multicastPktsRcvd + cl->multicastPktsLost));
+		else
+		  multicastLossRatios.push_back(-1); // nothing to measure, add invalid marker
+
+		// reset the values we sample
 		cl->multicastPktsRcvd = cl->multicastPktsNACKed = cl->multicastPktsLost = 0;
-		cl->multicastBytesRcvd = 0;
 	      }
-	      
-	      // and act accordingly 
-	      if(multicastLossRatio > 0.5)
+
+	      /*
+		and act accordingly
+	      */
+	      if(getMCLossRatio() > 0.5)
 		{
 		  rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
 		  wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), this);
 		  cl->multicastDisabled = TRUE;
 		  SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
 		}
-	      else if(multicastLossRatio > 0.2) 
+	      else if(getMCLossRatio() > 0.2)
 		{
 		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full multicast framebuffer update\n");
 		  SendMulticastFramebufferUpdateRequest(cl, FALSE);
 		  cl->multicastPktsLost /= 2;
 		}
 	    }
+
+
 
 	  int now = isMulticast();
 	  if(now != multicastStatus)
@@ -838,6 +869,7 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
       cl->canHandleMulticastVNC = TRUE;
       cl->multicastSocketRcvBufSize = multicast_socketrecvbuf*1024;
       cl->multicastRcvBufSize = multicast_recvbuf*1024;
+      multicastratio_stopwatch.Start();
     }
   else
     cl->canHandleMulticastVNC = FALSE;
@@ -1296,12 +1328,53 @@ wxString VNCConn::getServerPort() const
     return wxEmptyString;
 }
 
+
 bool VNCConn::isMulticast() const
 {
   if(cl && cl->multicastSock >= 0 && !cl->multicastDisabled) 
     return true;
   else
     return false;
+}
+
+
+double VNCConn::getMCNACKedRatio()
+{
+  wxCriticalSectionLocker lock(mutex_multicastratio);
+  double retval = 0;
+  int samples = 0;
+  std::deque<double>::const_iterator it;
+  for(it = multicastNACKedRatios.begin(); it != multicastNACKedRatios.end(); ++it)
+    if(*it >= 0) // valid value
+      {
+	retval += *it;
+	++samples;
+      }
+
+  if(samples)
+    return retval/samples;
+  else
+    return -1;
+}
+
+
+double VNCConn::getMCLossRatio()
+{
+  wxCriticalSectionLocker lock(mutex_multicastratio);
+  double retval = 0;
+  int samples = 0;
+  std::deque<double>::const_iterator it;
+  for(it = multicastLossRatios.begin(); it != multicastLossRatios.end(); ++it)
+    if(*it >= 0) // valid value
+      {
+	retval += *it;
+	++samples;
+      }
+    
+  if(samples)
+    return retval/samples;
+  else
+    return -1;
 }
 
 

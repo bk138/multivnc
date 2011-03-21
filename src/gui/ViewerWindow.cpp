@@ -380,7 +380,7 @@ void ViewerWindow::onStatsTimer(wxTimerEvent& event)
 {
   if(canvas && canvas->conn)
     {
-      const VNCConn* c = canvas->conn;
+      VNCConn* c = canvas->conn;
 
       text_ctrl_updrawbytes->Clear();
       text_ctrl_updcount->Clear();
@@ -414,8 +414,10 @@ void ViewerWindow::onStatsTimer(wxTimerEvent& event)
 	  int latency =  wxAtoi(tokenizer.GetNextToken());
 	  if(latency >= 0)
 	    *text_ctrl_latency << latency;
-	  tokenizer.GetNextToken(); // skip nack ratio
-	  *text_ctrl_lossratio << tokenizer.GetNextToken();
+	 
+	  double lossratio = c->getMCLossRatio();
+	  if(lossratio >= 0) // can be -1 if nothing to measure
+	    *text_ctrl_lossratio << lossratio;
 	}
 
       gauge_recvbuf->SetRange(c->getMCBufSize());
