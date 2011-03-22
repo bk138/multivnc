@@ -165,6 +165,7 @@ private:
   int multicastStatus;
   std::deque<double> multicastNACKedRatios;
   std::deque<double> multicastLossRatios;
+#define MULTICAST_RATIO_SAMPLES 10 // we are averaging over this many seconds
   wxCriticalSection mutex_multicastratio; // the fifos above are read by both the VNC and the GUI thread
   wxStopWatch  multicastratio_stopwatch;
 

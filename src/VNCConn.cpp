@@ -346,18 +346,17 @@ wxThread::ExitCode VNCConn::Entry()
 		take sample
 	      */
 	      {
-		const size_t N = 10; // we are averaging over this many seconds
 		// the fifos are read by the GUI thread as well!
 		wxCriticalSectionLocker lock(mutex_multicastratio);
 		
-		if(multicastNACKedRatios.size() >= N) // make room if size exceeded
+		if(multicastNACKedRatios.size() >= MULTICAST_RATIO_SAMPLES) // make room if size exceeded
 		  multicastNACKedRatios.pop_front();
 		if(cl->multicastPktsRcvd + cl->multicastPktsNACKed > 0)
 		  multicastNACKedRatios.push_back(cl->multicastPktsNACKed/(double)(cl->multicastPktsRcvd + cl->multicastPktsNACKed));
 		else
 		  multicastNACKedRatios.push_back(-1); // nothing to measure, add invalid marker
 
-		if(multicastLossRatios.size() >= N) // make room if size exceeded
+		if(multicastLossRatios.size() >= MULTICAST_RATIO_SAMPLES) // make room if size exceeded
 		  multicastLossRatios.pop_front();
 		if(cl->multicastPktsRcvd + cl->multicastPktsLost > 0)
 		  multicastLossRatios.push_back(cl->multicastPktsLost/(double)(cl->multicastPktsRcvd + cl->multicastPktsLost));
@@ -369,20 +368,27 @@ wxThread::ExitCode VNCConn::Entry()
 	      }
 
 	      /*
-		and act accordingly
+		And act accordingly, but only after the ratio deques are at least half full.
+		When a client joins a multicast group with heavy traffic going on, it will lose
+		a lot of packets in the very beginning because there is a considerable time
+		amount between it's multicast socket creation and the first read. Thus, the socket
+		buffer is likely to overflow in this start situation, resulting in packet loss.
 	      */
-	      if(getMCLossRatio() > 0.5)
+	      if(multicastLossRatios.size() >= MULTICAST_RATIO_SAMPLES/2)
 		{
-		  rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
-		  wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), this);
-		  cl->multicastDisabled = TRUE;
-		  SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
-		}
-	      else if(getMCLossRatio() > 0.2)
-		{
-		  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full multicast framebuffer update\n");
-		  SendMulticastFramebufferUpdateRequest(cl, FALSE);
-		  cl->multicastPktsLost /= 2;
+		  if(getMCLossRatio() > 0.5)
+		    {
+		      rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
+		      wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), this);
+		      cl->multicastDisabled = TRUE;
+		      SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
+		    }
+		  else if(getMCLossRatio() > 0.2)
+		    {
+		      rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full multicast framebuffer update\n");
+		      SendMulticastFramebufferUpdateRequest(cl, FALSE);
+		      cl->multicastPktsLost /= 2;
+		    }
 		}
 	    }
 
