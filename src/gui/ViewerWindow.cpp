@@ -312,7 +312,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
 
  
   // create statitistics widgets
-  label_updrawbytes = new wxStaticText(stats_container, wxID_ANY, _("Raw KB/s:"));
+  label_updrawbytes = new wxStaticText(stats_container, wxID_ANY, _("Eff. KB/s:"));
   text_ctrl_updrawbytes = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
   label_updcount = new wxStaticText(stats_container, wxID_ANY, _("Updates/s:"));
   text_ctrl_updcount = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
@@ -409,7 +409,8 @@ void ViewerWindow::onStatsTimer(wxTimerEvent& event)
 	  wxStringTokenizer tokenizer(c->getStats().Last(),  wxT(","));
 	  tokenizer.GetNextToken(); // skip UTC time
 	  tokenizer.GetNextToken(); // skip conn time
-	  *text_ctrl_updrawbytes << wxAtoi(tokenizer.GetNextToken())/1024;
+	  tokenizer.GetNextToken(); // skip rcvd bytes
+	  *text_ctrl_updrawbytes << wxAtoi(tokenizer.GetNextToken())/1024; // inflated bytes
 	  *text_ctrl_updcount << tokenizer.GetNextToken();
 	  int latency =  wxAtoi(tokenizer.GetNextToken());
 	  if(latency >= 0)

@@ -191,8 +191,10 @@ private:
   void on_stats_timer(wxTimerEvent& event);
   wxCriticalSection mutex_stats;
   wxArrayString statistics;
-  // counts raw bytes of updates
-  int upd_rawbytes;
+  // counts received (probably compressed) bytes of updates
+  int upd_bytes;
+  // counts uncompressed bytes of updates
+  int upd_bytes_inflated;
   // counts updates 
   int upd_count; 
   // check latency by isueing an xvp request with some unsupported version

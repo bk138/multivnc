@@ -148,7 +148,8 @@ VNCConn::VNCConn(void* p)
 
   // statistics stuff
   do_stats = false;
-  upd_rawbytes = 0;
+  upd_bytes = 0;
+  upd_bytes_inflated = 0;
   upd_count = 0;
   stats_timer.SetOwner(this);
 
@@ -183,7 +184,8 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 	statistics.Add(wxString()
 		       + wxT("UTC time,") 
 		       + wxT("conn time,")
-		       + wxT("raw bytes,")
+		       + wxT("rcvd bytes,")
+		       + wxT("rdvd bytes inflated,")
 		       + wxT("upd count,")
 		       + wxT("latency,")
 		       + wxT("nack rate,")
@@ -197,7 +199,9 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
       sample += wxT(",");
       sample += (wxString() << (int)conn_stopwatch.Time()); // connection time
       sample += wxT(",");
-      sample += (wxString() << upd_rawbytes); // raw bytes sampling
+      sample += (wxString() << upd_bytes); // rcvd bytes sampling
+      sample += wxT(",");
+      sample += (wxString() << upd_bytes_inflated); // rcvd bytes inflated sampling
       sample += wxT(",");
       sample += (wxString() << upd_count);  // number of updates sampling
       sample += wxT(",");
@@ -219,7 +223,8 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
       statistics.Add(sample);
 		
       // reset these
-      upd_rawbytes = 0;
+      upd_bytes = 0;
+      upd_bytes_inflated = 0;
       upd_count = 0;
       latency = -1;
 
@@ -602,8 +607,13 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 
 	  wxRect this_update_rect = wxRect(x,y,w,h);
 
-	  // raw byte updates/second
-	  conn->upd_rawbytes += w*h*BYTESPERPIXEL;
+	  // compressed bytes
+	  conn->upd_bytes += conn->cl->bytesRcvd;
+	  conn->upd_bytes += conn->cl->multicastBytesRcvd;
+	  conn->cl->bytesRcvd = conn->cl->multicastBytesRcvd = 0;
+
+	  // uncompressed bytes
+	  conn->upd_bytes_inflated += w*h*BYTESPERPIXEL;
 
 	  // latency check, rect case
 	  if(conn->latency_test_rect_sent && this_update_rect.Contains(wxRect(LATENCY_TEST_RECT)))
