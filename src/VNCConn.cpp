@@ -619,6 +619,7 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 	  if(conn->latency_test_rect_sent && this_update_rect.Contains(wxRect(LATENCY_TEST_RECT)))
 	    {
 	      conn->latency_stopwatch.Pause();
+	      conn->latency = conn->latency_stopwatch.Time();
 	      conn->latency_test_rect_sent = false;
 
 	      wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), conn, conn->latency_stopwatch.Time());
