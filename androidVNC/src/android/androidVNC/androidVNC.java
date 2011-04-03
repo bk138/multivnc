@@ -321,7 +321,7 @@ public class androidVNC extends Activity {
 		spinnerConnection.setSelection(connectionIndex,false);
 		selected=connections.get(connectionIndex);
 		updateViewFromSelected();
-		IntroTextDialog.showIntroTextIfNecessary(this, database);
+
 	}
 	
 	protected void onStop() {
