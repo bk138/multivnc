@@ -687,10 +687,8 @@ public class VncCanvasActivity extends Activity {
 	 */
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-		case R.layout.entertext:
-			return new EnterTextDialog(this);
-		}
+		
+		
 		// Default to meta key dialog
 		return new MetaKeyDialog(this);
 	}
@@ -849,19 +847,12 @@ public class VncCanvasActivity extends Activity {
 			item.setChecked(true);
 			showPanningState();
 			return true;
-		case R.id.itemCenterMouse:
-			vncCanvas.warpMouse(vncCanvas.absoluteXPosition
-					+ vncCanvas.getVisibleWidth() / 2,
-					vncCanvas.absoluteYPosition + vncCanvas.getVisibleHeight()
-							/ 2);
-			return true;
+
 		case R.id.itemDisconnect:
 			vncCanvas.closeConnection();
 			finish();
 			return true;
-		case R.id.itemEnterText:
-			showDialog(R.layout.entertext);
-			return true;
+		
 		case R.id.itemCtrlAltDel:
 			vncCanvas.sendMetaKey(MetaKeyBean.keyCtrlAltDel);
 			return true;

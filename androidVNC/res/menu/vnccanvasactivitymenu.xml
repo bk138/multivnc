@@ -1,8 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:numericShortcut="1" android:alphabeticShortcut="s" android:id="@+id/itemSpecialKeys" android:title="@string/special_keys" android:icon="@android:drawable/ic_dialog_dialer"/>
-    <item android:numericShortcut="2" android:alphabeticShortcut="m" android:id="@+id/itemCenterMouse" android:title="@string/center_mouse" android:icon="@android:drawable/ic_menu_mylocation"/>
-    <item android:id="@+id/itemEnterText" android:alphabeticShortcut="e" android:title="@string/enter_text" android:icon="@android:drawable/ic_menu_edit" />
-    <item android:numericShortcut="5" android:alphabeticShortcut="p" android:id="@+id/itemInputMode" android:title="@string/input_mode" android:icon="@android:drawable/ic_input_get">
+   	<item android:numericShortcut="5" android:alphabeticShortcut="p" android:id="@+id/itemInputMode" android:title="@string/input_mode" android:icon="@android:drawable/ic_input_get">
     	<menu>
 	    	<group android:checkableBehavior="single">
 	    		<item android:id="@+id/itemInputTouchPanZoomMouse" android:title="@string/input_mode_touch_pan_zoom_mouse"/>

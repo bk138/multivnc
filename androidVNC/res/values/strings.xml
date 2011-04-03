@@ -52,11 +52,11 @@
 <string name="meta_key_title">Send Special Keys</string>
 <string name="mouse_follow_pan">Mouse follow pan</string>
 <string name="new_list_button">New List</string>
-<string name="nickname_caption">Nickname</string>
+<string name="nickname_caption">Bookmark</string>
 <string name="off">Off</string>
 <string name="on">On</string>
 <string name="one_to_one">1:1</string>
-<string name="open_doc">Manual/Wiki</string>
+<string name="open_doc">Help</string>
 <string name="pan_follow_mouse">Pan Follows Mouse</string>
 <string name="password_caption">Password</string>
 <string name="port_caption">Port</string>
