@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="address_caption">地址</string>
+    <string name="alt_check">Alt</string>
+    <string name="app_name">远程桌面</string>
+    <string name="arrow_down">向下</string>
+    <string name="arrow_left">向左</string>
+    <string name="arrow_right">向右</string>
+    <string name="arrow_up">向上</string>
+    <string name="auto">自动</string>
+    <string name="button_send_text">发送文本</string>
+    <string name="button_send_without_saving">发送文本不保存</string>
+<string name="center_mouse">鼠标 @</string>
+<string name="close">关闭</string>
+<string name="color_format_caption">颜色格式</string>
+<string name="color_mode">颜色模式</string>
+<string name="connect_button">连接</string>
+<string name="connection_caption">连接</string>
+<string name="control_check">Ctrl</string>
+<string name="copy_list_button">复制列表</string>
+<string name="ctrl_alt_del">Ctrl-Alt-Del</string>
+<string name="delete_connection">删除连接</string>
+<string name="delete_key">删除所选键</string>
+<string name="delete_key_list">删除键列表</string>
+<string name="disconnect">断开连接</string>
+<string name="enter_text_title">输入所要发送文本</string>
+<string name="enter_text">发送文本</string>
+<string name="fit_to_screen">适应屏幕</string>
+<string name="force_full_check">强制全屏位图</string>
+<string name="info">信息</string>
+<string name="intro_text">如果你需要帮助请访问 &lt;a href="http://code.google.com/p/android-vnc-viewer/wiki/Documentation"&gt;手册&lt;/a&gt; (按菜单键访问主菜单和其他选项), 或者 &lt;a href="http://code.google.com/p/android-vnc-viewer/wiki/faq"&gt;FAQ&lt;/a&gt;.&lt;br&gt;</string>
+<string name="intro_title">欢迎</string>
+<string name="intro_version_text">&lt;br&gt;--针对2.0以上版本手机的手势模式进行缩放&lt;br&gt;--修改通过物理键盘发送大写字母&lt;br&gt;--死机问题修正</string>
+<string name="input_mode">输入模式</string>
+<string name="input_mode_fit_to_screen">无面板; 轨迹球鼠标</string>
+<string name="input_mode_mouse">鼠标指针控制模式</string>
+<string name="input_mode_panning">桌面模式</string>
+<string name="input_mode_touchpad_pan_trackball_mouse">触摸板; 轨迹球鼠标</string>
+<string name="input_mode_dpad_pan_touchpad_mouse">触摸屏鼠标; D-Pad面板</string>
+<string name="input_mode_touch_pan_zoom_mouse">支持缩放的触摸屏鼠标</string>
+<string name="input_mode_touchpad">触摸屏</string><string name="keep_password_button">保持</string>
+<string name="intro_dont_show">不必再提示</string>
+<string name="keys_caption">键</string>
+<string name="list_caption">列表</string>
+<string name="list_name_caption">列表名</string>
+<string name="local_mouse_check">本地鼠标指针</string>
+<string name="meta_key_title">发送特殊键</string>
+<string name="mouse_follow_pan">鼠标跟随面板</string>
+<string name="new_list_button">新列表</string>
+<string name="nickname_caption">名称</string>
+<string name="off">关闭</string>
+<string name="on">打开</string>
+<string name="one_to_one">1:1</string>
+<string name="open_doc">手册</string>
+<string name="pan_follow_mouse">面板跟随鼠标</string>
+<string name="password_caption">密码</string>
+<string name="port_caption">端口</string>
+<string name="repeater_button">转发器</string>
+<string name="repeater_caption">输入转发器地址 &lt;b&gt;只有当&lt;/b&gt; 你正在使用&lt;br&gt;&lt;i&gt;UltraVNC&lt;/i&gt;-选中转发器</string>
+<string name="repeater_clear">不使用转发器</string>
+<string name="repeater_dialog_title">转发器信息</string>
+<string name="repeater_empty_text">无转发器</string>
+<string name="repeater_save">使用这个转发器地址</string>
+<string name="save_as_copy">保存作为副本</string>
+<string name="scaling">缩放</string>
+<string name="scaling_zoomable">可缩放</string>
+<!-- Send selected metakey -->
+<string name="send_button">发送</string>
+<string name="send_key_again">再发送键</string>
+<string name="shift_check">Shift</string>
+<string name="shortcut_label">VNC 连接</string>
+<string name="showkbd_label">键盘</string>
+<string name="special_keys">发送键</string>
+<string name="username_caption">用户名</string>
+<string name="username_hint">针对Windows授权</string>
+</resources>

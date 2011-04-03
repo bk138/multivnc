@@ -1,0 +1,12 @@
+K 10
+svn:ignore
+V 28
+apk
+androidVNC-unsigned.apk
+
+K 13
+svn:mergeinfo
+V 78
+/branches/screenasmousepad1:124-137
+/branches/ultra-mslogon/androidVNC:179-181
+END

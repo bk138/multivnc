@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/203/branches/antlersoft/androidVNC
+END
+default.properties
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/193/branches/antlersoft/androidVNC/default.properties
+END
+.classpath
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/193/branches/antlersoft/androidVNC/.classpath
+END
+.project
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/193/branches/antlersoft/androidVNC/.project
+END
+AndroidManifest.xml
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/203/branches/antlersoft/androidVNC/AndroidManifest.xml
+END
+build_android.xml
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/14/branches/antlersoft/androidVNC/build_android.xml
+END
+build.xml
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/138/branches/antlersoft/androidVNC/build.xml
+END
+install_signed.xml
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/14/branches/antlersoft/androidVNC/install_signed.xml
+END
