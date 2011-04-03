@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="android.androidVNC" android:installLocation="auto" android:versionCode="13" android:versionName="0.5.0">
     <application android:icon="@drawable/mouse_icon" android:label="androidVNC" android:debuggable="false">
- 		<activity android:label="@string/app_name" android:name="androidVNC" android:screenOrientation="landscape">
+ 		<activity android:label="@string/app_name" android:name="androidVNC">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
 				<category android:name="android.intent.category.LAUNCHER"></category>

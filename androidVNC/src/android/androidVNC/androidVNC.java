@@ -49,15 +49,14 @@ public class androidVNC extends Activity {
 	private EditText passwordText;
 	private Button goButton;
 	private TextView repeaterText;
-	private RadioGroup groupForceFullScreen;
-	private Spinner colorSpinner;
+	//private RadioGroup groupForceFullScreen;
+	//private Spinner colorSpinner;
 	private Spinner spinnerConnection;
 	private VncDatabase database;
 	private ConnectionBean selected;
 	private EditText textNickname;
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
-	private CheckBox checkboxLocalCursor;
 	private boolean repeaterTextSet;
 
 	@Override
@@ -85,14 +84,13 @@ public class androidVNC extends Activity {
 				showDialog(R.layout.importexport);
 			}
 		});
-		colorSpinner = (Spinner)findViewById(R.id.colorformat);
+		//colorSpinner = (Spinner)findViewById(R.id.colorformat);
 		COLORMODEL[] models=COLORMODEL.values();
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
-		groupForceFullScreen = (RadioGroup)findViewById(R.id.groupForceFullScreen);
+		//groupForceFullScreen = (RadioGroup)findViewById(R.id.groupForceFullScreen);
 		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
-		checkboxLocalCursor = (CheckBox)findViewById(R.id.checkboxUseLocalCursor);
-		colorSpinner.setAdapter(colorSpinnerAdapter);
-		colorSpinner.setSelection(0);
+		//colorSpinner.setAdapter(colorSpinnerAdapter);
+		//colorSpinner.setSelection(0);
 		spinnerConnection = (Spinner)findViewById(R.id.spinnerConnection);
 		spinnerConnection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
@@ -207,9 +205,8 @@ public class androidVNC extends Activity {
 		if (selected.getKeepPassword() || selected.getPassword().length()>0) {
 			passwordText.setText(selected.getPassword());
 		}
-		groupForceFullScreen.check(selected.getForceFull()==BitmapImplHint.AUTO ? R.id.radioForceFullScreenAuto : (selected.getForceFull() == BitmapImplHint.FULL ? R.id.radioForceFullScreenOn : R.id.radioForceFullScreenOff));
+		//groupForceFullScreen.check(selected.getForceFull()==BitmapImplHint.AUTO ? R.id.radioForceFullScreenAuto : (selected.getForceFull() == BitmapImplHint.FULL ? R.id.radioForceFullScreenOn : R.id.radioForceFullScreenOff));
 		checkboxKeepPassword.setChecked(selected.getKeepPassword());
-		checkboxLocalCursor.setChecked(selected.getUseLocalCursor());
 		textNickname.setText(selected.getNickname());
 		textUsername.setText(selected.getUserName());
 		COLORMODEL cm = COLORMODEL.valueOf(selected.getColorModel());
@@ -217,7 +214,7 @@ public class androidVNC extends Activity {
 		for (int i=0; i<colors.length; ++i)
 		{
 			if (colors[i] == cm) {
-				colorSpinner.setSelection(i);
+				//colorSpinner.setSelection(i);
 				break;
 			}
 		}
@@ -258,11 +255,11 @@ public class androidVNC extends Activity {
 		}
 		selected.setNickname(textNickname.getText().toString());
 		selected.setUserName(textUsername.getText().toString());
-		selected.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
+		//selected.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
 		selected.setPassword(passwordText.getText().toString());
 		selected.setKeepPassword(checkboxKeepPassword.isChecked());
-		selected.setUseLocalCursor(checkboxLocalCursor.isChecked());
-		selected.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
+		selected.setUseLocalCursor(true); // always enable
+		//selected.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
 		if (repeaterTextSet)
 		{
 			selected.setRepeaterId(repeaterText.getText().toString());
