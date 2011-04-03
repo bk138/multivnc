@@ -5,6 +5,5 @@
 	<classpathentry kind="lib" path="libs/com.antlersoft.android.db.jar" sourcepath="/home/mike/src/eclipse-workspaces/android/dbimpl/src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="libs/com.antlersoft.android.contentxml.jar" sourcepath="/dbimpl/src"/>
-	<classpathentry kind="src" path="ZoomerWithKeys_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
