@@ -17,11 +17,13 @@
 #define ICON_XPM
 #include "res/multivnc.xpm"
 #endif
+#include "evtids.h"
 #include "res/connect.png.h"
 #include "res/listen.png.h"
 #include "res/disconnect.png.h"
 #include "res/fullscreen.png.h"
 #include "res/screenshot.png.h"
+#include "res/toggle-keyboard-grab.png.h"
 #include "evtids.h"
 
 // end wxGlade
@@ -83,6 +85,7 @@ public:
     virtual void windowshare_stop(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void help_contents(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void help_about(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_grabkeyboard(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_services_dclick(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_services_select(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void listbox_bookmarks_dclick(wxCommandEvent &event); // wxGlade: <event_handler>

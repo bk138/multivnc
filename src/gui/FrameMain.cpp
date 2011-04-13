@@ -68,10 +68,12 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     frame_main_toolbar->SetToolBitmapSize(wxSize(24, 24));
     frame_main_toolbar->AddTool(wxID_YES, _("Connect"), (bitmapFromMem(connect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->AddTool(wxID_REDO, _("Listen"), (bitmapFromMem(listen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+    frame_main_toolbar->AddSeparator();
     frame_main_toolbar->AddTool(wxID_STOP, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+    frame_main_toolbar->AddTool(ID_GRABKEYBOARD, _("Grab Keyboard"), (bitmapFromMem(toggle_keyboard_grab_png)), wxNullBitmap, wxITEM_CHECK, wxEmptyString, _("Intercept all keyboard input. Allows you to use special keys that would otherwise be interpreted by the local computer."));
+    frame_main_toolbar->AddTool(wxID_SAVE, _("Take Screenshot"), (bitmapFromMem(screenshot_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->AddSeparator();
     frame_main_toolbar->AddTool(ID_FULLSCREEN, _("Fullscreen"), (bitmapFromMem(fullscreen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-    frame_main_toolbar->AddTool(wxID_SAVE, _("Take Screenshot"), (bitmapFromMem(screenshot_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->Realize();
     const wxString *list_box_services_choices = NULL;
     list_box_services = new wxListBox(splitwin_left_pane_1, ID_LISTBOX_SERVICES, wxDefaultPosition, wxDefaultSize, 0, list_box_services_choices, wxLB_SINGLE|wxLB_HSCROLL|wxLB_NEEDED_SB);
@@ -115,8 +117,9 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_TOOL(wxID_YES, FrameMain::machine_connect)
     EVT_TOOL(wxID_REDO, FrameMain::machine_listen)
     EVT_TOOL(wxID_STOP, FrameMain::machine_disconnect)
-    EVT_TOOL(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
+    EVT_TOOL(ID_GRABKEYBOARD, FrameMain::machine_grabkeyboard)
     EVT_TOOL(wxID_SAVE, FrameMain::machine_screenshot)
+    EVT_TOOL(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
     EVT_LISTBOX_DCLICK(ID_LISTBOX_SERVICES, FrameMain::listbox_services_dclick)
     EVT_LISTBOX(ID_LISTBOX_SERVICES, FrameMain::listbox_services_select)
     EVT_LISTBOX_DCLICK(ID_LISTBOX_BOOKMARKS, FrameMain::listbox_bookmarks_dclick)
@@ -270,6 +273,13 @@ void FrameMain::help_about(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::help_about) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_grabkeyboard(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_grabkeyboard) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 
