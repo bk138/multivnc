@@ -3,6 +3,7 @@ in order of importance:
  - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
  - fix the seamless connector for win32.
+ - better bookmarks using wxListCtrl
  - make it work on OS X
  - textchat
  - server side scaling
