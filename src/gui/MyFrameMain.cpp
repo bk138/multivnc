@@ -4,6 +4,12 @@
 #include <wx/socket.h>
 #include <wx/clipbrd.h>
 #include <wx/imaglist.h>
+#ifdef __WXGTK__
+#define GSocket GlibGSocket
+#include <gdk/gdkx.h>
+#include <gtk/gtk.h>
+#undef GSocket
+#endif
 
 #include "res/about.png.h"
 #include "res/unicast.png.h"
@@ -95,19 +101,24 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
 
+
+  // toolbar setup
+#ifndef __WXGTK__
+  frame_main_toolbar->DeleteTool(ID_GRABKEYBOARD);
+#endif
   if(show_toolbar)
     {
-      GetToolBar()->EnableTool(wxID_STOP, false); // disconnect
-      GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
+      frame_main_toolbar->EnableTool(wxID_STOP, false); // disconnect
+      frame_main_toolbar->EnableTool(wxID_SAVE, false); // screenshot
+
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
     }
   else
     {
-      // disable the toolbar
-      wxToolBar *tbar = GetToolBar();
-      delete tbar;
+      frame_main_toolbar->Show(false);
       SetToolBar(NULL);
     }
+
 
   splitwinlayout();
 
@@ -858,6 +869,8 @@ void MyFrameMain::splitwinlayout()
 
 
 
+
+
 bool MyFrameMain::loadbookmarks()
 {
   wxConfigBase *cfg = wxConfigBase::Get();
@@ -1058,6 +1071,33 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 
 
 
+void MyFrameMain::machine_grabkeyboard(wxCommandEvent &event)
+{
+  wxWindow* win = 0;
+  
+  //FIXME wip
+
+  if(connections.size())
+    win = connections.at(notebook_connections->GetSelection()).viewerwindow;
+  else
+    return;
+
+  if(event.IsChecked())
+    {
+#ifdef __WXGTK__
+      gdk_keyboard_grab(win->GetHandle()->window, False, GDK_CURRENT_TIME);
+#endif
+    }
+  else
+    {
+#ifdef __WXGTK__
+      gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+#endif
+    }
+}
+
+
+
 void MyFrameMain::machine_save_stats(wxCommandEvent &event)
 {
   if(connections.size())
@@ -1082,34 +1122,24 @@ void MyFrameMain::view_toggletoolbar(wxCommandEvent &event)
 {
   show_toolbar = !show_toolbar;
 
-  wxToolBar *tbar = GetToolBar();
+  frame_main_toolbar->Show(show_toolbar);
 
-  if (!tbar)
+  if(show_toolbar)
     {
-      // this is copied over from the FrameMain constructor
-      // not nice, but wtf...
-      frame_main_toolbar = new wxToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxTB_DOCKABLE|wxTB_3DBUTTONS|wxTB_TEXT);
-      SetToolBar(frame_main_toolbar);
-      frame_main_toolbar->SetToolBitmapSize(wxSize(24, 24));
-      frame_main_toolbar->AddTool(wxID_YES, _("Connect"), (bitmapFromMem(connect_png)), (bitmapFromMem(connect_png)), wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-      frame_main_toolbar->AddTool(wxID_REDO, _("Listen"), (bitmapFromMem(listen_png)), (bitmapFromMem(listen_png)), wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-      frame_main_toolbar->AddTool(wxID_STOP, _("Disconnect"), (bitmapFromMem(disconnect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-      frame_main_toolbar->AddSeparator();
-      frame_main_toolbar->AddTool(wxID_ZOOM_FIT, _("Fullscreen"), (bitmapFromMem(fullscreen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-      frame_main_toolbar->AddTool(wxID_SAVE, _("Take Screenshot"), (bitmapFromMem(screenshot_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
-      frame_main_toolbar->Realize();
-      
       bool enable = connections.size() != 0;
 	
       frame_main_toolbar->EnableTool(wxID_STOP, enable); // disconnect
       frame_main_toolbar->EnableTool(wxID_SAVE, enable); // screenshot
+      
+      SetToolBar(frame_main_toolbar);
     }
   else
     {
-      delete tbar;
       SetToolBar(NULL);
     }
 
+  // this does more than Layout() which only deals with sizers
+  SendSizeEvent(); 
 
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Write(K_SHOWTOOLBAR, show_toolbar);
