@@ -1,4 +1,4 @@
-MultiVNC 0.5 -
+MultiVNC 0.5 - "Bag o' stuff"
 	* MulticastVNC now supports the Ultra encoding and features
 	  a freely sizeable receive buffer in addition to the 
 	  OS-dependent socket receive buffer.
@@ -9,6 +9,9 @@ MultiVNC 0.5 -
 	  servers.
 	* It is now possible to select the desired VNC encoding.
 	* Encrypted connections now work on Windows as well.
+	* Added a keyboard grab button that allows to enter arbitrary
+	  key combinations like Ctrl-Alt-Del into MultiVNC without
+	  being interpreted by the local OS. Works on UNIX by now.
 	* This time really fixed the bug with the viewer becoming
           unresponsive under high multicast loads.
 	* Fixed not being able to enter IPv6 addresses.
