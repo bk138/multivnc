@@ -10,11 +10,15 @@ multivnc (0.5-1) unstable; urgency=low
      - MultiVNC is now able to connect to Apple Remote Desktop
        servers.
      - It is now possible to select the desired VNC encoding.
+     - Encrypted connections now work on Windows as well.
+     - Added a keyboard grab button that allows to enter arbitrary
+       key combinations like Ctrl-Alt-Del into MultiVNC without
+       being interpreted by the local OS. Works on UNIX by now.
      - This time really fixed the bug with the viewer becoming
        unresponsive under high multicast loads.
      - Fixed not being able to enter IPv6 addresses.
 
- -- Christian Beier <dontmind@freeshell.org>  Wed, 16 Feb 2011 19:19:22 +0100
+ -- Christian Beier <dontmind@freeshell.org>  Wed, 07 May 2011 19:19:22 +0100
 
 multivnc (0.4.1-1) unstable; urgency=low
 
