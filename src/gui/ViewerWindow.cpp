@@ -5,6 +5,12 @@
 #include <wx/dataobj.h>
 #include <wx/dcclient.h>
 #include <wx/tokenzr.h>
+#ifdef __WXGTK__
+#define GSocket GlibGSocket
+#include <gdk/gdkx.h>
+#include <gtk/gtk.h>
+#undef GSocket
+#endif
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 #include "MultiVNCApp.h"
@@ -26,6 +32,11 @@
 */
 class VNCCanvas: public wxPanel
 {
+  bool saved_enable_mnemonics;
+  bool saved_enable_accels;
+  char *saved_menubar_accel;
+  bool keyboard_grabbed;
+
   wxTimer update_timer;
   void onUpdateTimer(wxTimerEvent& event);
   void onPaint(wxPaintEvent &event);
@@ -33,6 +44,7 @@ class VNCCanvas: public wxPanel
   void onKeyDown(wxKeyEvent &event);
   void onKeyUp(wxKeyEvent &event);
   void onChar(wxKeyEvent &event);
+  void onFocusGain(wxFocusEvent &event);
   void onFocusLoss(wxFocusEvent &event);
 
 protected:
@@ -40,9 +52,12 @@ protected:
 
 public:
   VNCCanvas(wxWindow* parent, VNCConn* c);
+  void grab_keyboard();
+  void ungrab_keyboard();
 
   VNCConn* conn;
   wxRegion updated_area;
+  bool do_keyboard_grab;
 };
 	
 
@@ -56,6 +71,7 @@ BEGIN_EVENT_TABLE(VNCCanvas, wxPanel)
     EVT_KEY_DOWN (VNCCanvas::onKeyDown)
     EVT_KEY_UP (VNCCanvas::onKeyUp)
     EVT_CHAR (VNCCanvas::onChar)
+    EVT_SET_FOCUS (VNCCanvas::onFocusGain)
     EVT_KILL_FOCUS(VNCCanvas::onFocusLoss)
     EVT_TIMER (VNCCANVAS_UPDATE_TIMER_ID, VNCCanvas::onUpdateTimer)
 END_EVENT_TABLE();
@@ -72,6 +88,8 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
   wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(0,0), wxWANTS_CHARS)
 {
   conn = c;
+
+  keyboard_grabbed = do_keyboard_grab = false;
  
   // this kinda cursor creation works everywhere
   wxBitmap vnccursor_bitmap(vnccursor_bits, 16, 16);
@@ -96,6 +114,53 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 /*
   private members
 */
+
+
+void VNCCanvas::grab_keyboard()
+{
+  if(!keyboard_grabbed)
+    {
+#ifdef __WXGTK__
+      // grab
+      gdk_keyboard_grab(GetHandle()->window, True, GDK_CURRENT_TIME);
+
+      // save previous settings
+      GtkSettings *settings = gtk_settings_get_for_screen(gdk_screen_get_default());
+      g_object_get(settings, "gtk-enable-mnemonics", &saved_enable_mnemonics, NULL);
+      g_object_get(settings, "gtk-enable-accels", &saved_enable_accels, NULL);
+      g_object_get(settings, "gtk-menu-bar-accel", &saved_menubar_accel, NULL);
+ 
+      // and disable keyboard shortcuts
+      g_object_set(settings, "gtk-enable-mnemonics", false, NULL);
+      g_object_set(settings, "gtk-enable-accels", false, NULL);
+      g_object_set(settings, "gtk-menu-bar-accel", NULL, NULL);
+#endif
+
+      keyboard_grabbed = true;
+      wxLogDebug(wxT("VNCCanvas %p: grabbed keyboard"), this);
+    }
+}
+
+
+
+void VNCCanvas::ungrab_keyboard()
+{
+#ifdef __WXGTK__
+  // ungrab
+  gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+  // restore to saved values
+  GtkSettings *settings = gtk_settings_get_for_screen(gdk_screen_get_default());
+  g_object_set(settings, "gtk-enable-mnemonics", saved_enable_mnemonics, NULL);
+  g_object_set(settings, "gtk-enable-accels", saved_enable_accels, NULL);
+  g_object_set(settings, "gtk-menu-bar-accel", saved_menubar_accel, NULL);
+
+#endif
+
+  keyboard_grabbed = false;
+  wxLogDebug(wxT("VNCCanvas %p: ungrabbed keyboard"), this);
+}
+
+
 
 void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 {
@@ -185,7 +250,10 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
   if(event.Entering())
     {
       SetFocus();
-      
+
+      if(do_keyboard_grab)
+	grab_keyboard();
+
       wxCriticalSectionLocker lock(wxGetApp().mutex_theclipboard); 
       
       if(wxTheClipboard->Open()) 
@@ -200,6 +268,12 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
 	    }
 	  wxTheClipboard->Close();
 	}
+    }
+
+  if(event.Leaving())
+    {
+      if(do_keyboard_grab)
+	ungrab_keyboard();
     }
 
   conn->sendPointerEvent(event);
@@ -222,6 +296,13 @@ void VNCCanvas::onChar(wxKeyEvent &event)
 {
   conn->sendKeyEvent(event, true, true);
 }
+
+
+void VNCCanvas::onFocusGain(wxFocusEvent &event)
+{
+  wxLogDebug(wxT("VNCCanvas %p: got focus"), this);
+}
+
 
 void VNCCanvas::onFocusLoss(wxFocusEvent &event)
 {
@@ -274,7 +355,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   wxPanel(parent)
 {
   /*
-    setup man window
+    setup main window
   */
   // a sizer dividing the window vertically
   SetSizer(new wxBoxSizer(wxVERTICAL));
@@ -289,7 +370,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   stats_container = new wxScrolledWindow(this);
   stats_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
   GetSizer()->Add(stats_container, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
-  
+
 
 
   /*
@@ -477,4 +558,12 @@ void ViewerWindow::showStats(bool show_stats)
   text_ctrl_latency->Clear();
   text_ctrl_lossratio->Clear();
   gauge_recvbuf->SetValue(0);
+}
+
+
+void ViewerWindow::grabKeyboard(bool grabit)
+{
+  if(canvas)
+    // grab later on enter/leave
+    canvas->do_keyboard_grab = grabit;
 }

@@ -50,6 +50,7 @@ public:
   void adjustCanvasSize(); 
 
   void showStats(bool yesno);
+  void grabKeyboard(bool yesno);
 };
 	
 

@@ -4,12 +4,6 @@
 #include <wx/socket.h>
 #include <wx/clipbrd.h>
 #include <wx/imaglist.h>
-#ifdef __WXGTK__
-#define GSocket GlibGSocket
-#include <gdk/gdkx.h>
-#include <gtk/gtk.h>
-#undef GSocket
-#endif
 
 #include "res/about.png.h"
 #include "res/unicast.png.h"
@@ -50,6 +44,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   FrameMain(parent, id, title, pos, size, style)	
 {
   int x,y;
+  bool grab_keyboard;
   // get default config object, created on demand if not exist
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_SHOWTOOLBAR, &show_toolbar, V_SHOWTOOLBAR);
@@ -57,6 +52,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
   pConfig->Read(K_SHOWSEAMLESS, &show_seamless, V_SHOWSEAMLESS);
+  pConfig->Read(K_GRABKEYBOARD, &grab_keyboard, V_GRABKEYBOARD);
   pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
   pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
 
@@ -106,6 +102,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 #ifndef __WXGTK__
   frame_main_toolbar->DeleteTool(ID_GRABKEYBOARD);
 #endif
+  frame_main_toolbar->ToggleTool(ID_GRABKEYBOARD, grab_keyboard);
+
   if(show_toolbar)
     {
       frame_main_toolbar->EnableTool(wxID_STOP, false); // disconnect
@@ -183,6 +181,7 @@ MyFrameMain::~MyFrameMain()
   GetSize(&x, &y);
   pConfig->Write(K_SIZE_X, x);
   pConfig->Write(K_SIZE_Y, y);
+  pConfig->Write(K_GRABKEYBOARD, frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
 
   // this has to be from end to start in order for stats autosave to assign right connection numbers!
   for(int i = connections.size()-1; i >= 0; --i)
@@ -220,6 +219,7 @@ MyFrameMain::~MyFrameMain()
 
 
 // handlers
+
 
 void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 {
@@ -668,6 +668,7 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
 
   ViewerWindow* win = new ViewerWindow(notebook_connections, c);
   win->showStats(show_stats);
+  win->grabKeyboard(frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
 
   VNCSeamlessConnector* sc = 0;
   if(show_seamless != EDGE_NONE)
@@ -1073,27 +1074,8 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 
 void MyFrameMain::machine_grabkeyboard(wxCommandEvent &event)
 {
-  wxWindow* win = 0;
-  
-  //FIXME wip
-
   if(connections.size())
-    win = connections.at(notebook_connections->GetSelection()).viewerwindow;
-  else
-    return;
-
-  if(event.IsChecked())
-    {
-#ifdef __WXGTK__
-      gdk_keyboard_grab(win->GetHandle()->window, False, GDK_CURRENT_TIME);
-#endif
-    }
-  else
-    {
-#ifdef __WXGTK__
-      gdk_keyboard_ungrab(GDK_CURRENT_TIME);
-#endif
-    }
+    connections.at(notebook_connections->GetSelection()).viewerwindow->grabKeyboard(event.IsChecked());
 }
 
 

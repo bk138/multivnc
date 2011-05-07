@@ -55,6 +55,8 @@
 #define V_FASTREQUESTINTERVAL 30
 #define K_QOS_EF wxT("QOS_EF")
 #define V_QOS_EF true
+#define K_GRABKEYBOARD wxT("GrabKeyboard")
+#define V_GRABKEYBOARD false
 
 // encodings settings
 #define K_ENC_COPYRECT wxT("EncodingCopyRect")
