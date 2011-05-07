@@ -1175,8 +1175,7 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 {
   show_fullscreen = ! show_fullscreen;
 
-  ShowFullScreen(show_fullscreen, 
-		 wxFULLSCREEN_NOTOOLBAR | wxFULLSCREEN_NOSTATUSBAR | wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
+  ShowFullScreen(show_fullscreen, wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
 
   if(show_fullscreen)
     frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(6)->Check();
