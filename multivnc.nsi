@@ -19,6 +19,7 @@ Section ""
 
   File src\multivnc.exe
   File src\mingwm10.dll
+  File src\libgpg-error-0.dll
   File contrib\windowshare.exe
   File contrib\VNCHooks.dll
   File contrib\README-contrib.txt

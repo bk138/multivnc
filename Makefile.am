@@ -86,6 +86,7 @@ zip_package: all  README NEWS COPYING
 	cp src/.libs/multivnc.exe @PACKAGE_NAME@-@PACKAGE_VERSION@
 	$(STRIP) @PACKAGE_NAME@-@PACKAGE_VERSION@/multivnc.exe
 	cp src/mingwm10.dll @PACKAGE_NAME@-@PACKAGE_VERSION@
+	cp src/libgpg-error-0.dll @PACKAGE_NAME@-@PACKAGE_VERSION@
 	cp contrib/windowshare.exe @PACKAGE_NAME@-@PACKAGE_VERSION@
 	cp contrib/VNCHooks.dll @PACKAGE_NAME@-@PACKAGE_VERSION@
 	cp contrib/README-contrib.txt @PACKAGE_NAME@-@PACKAGE_VERSION@
