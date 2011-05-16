@@ -24,6 +24,10 @@
         		<category android:name="android.intent.category.DEFAULT" />
         	</intent-filter>
         </activity>
+        	
+		<activity android:name="AboutActivity"  android:theme="@android:style/Theme.NoTitleBar">
+		</activity>
+        
 	</application>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>

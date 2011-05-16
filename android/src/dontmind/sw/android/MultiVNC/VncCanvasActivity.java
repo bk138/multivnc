@@ -887,7 +887,8 @@ public class VncCanvasActivity extends Activity {
 			sendSpecialKeyAgain();
 			return true;
 		case R.id.itemOpenDoc:
-			Utils.showDocumentation(this);
+			Intent intent = new Intent (this, AboutActivity.class);
+			this.startActivity(intent);
 			return true;
 		default:
 			AbstractInputHandler input = getInputHandlerById(item.getItemId());

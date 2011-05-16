@@ -191,7 +191,8 @@ public class MultiVNC extends Activity {
 			}, null);
 			break;
 		case R.id.itemOpenDoc :
-			Utils.showDocumentation(this);
+			Intent intent = new Intent (this, AboutActivity.class);
+			this.startActivity(intent);
 			break;
 		}
 		return true;
