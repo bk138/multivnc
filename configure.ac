@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(multivnc, 0.5, http://sourceforge.net/projects/multivnc)
+AC_INIT(multivnc, 0.6, http://multivnc.sf.net)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
 dnl this one needs a prefix

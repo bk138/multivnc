@@ -1,3 +1,6 @@
+MultiVNC 0.6 -
+	* 
+
 MultiVNC 0.5 - "Bag o' stuff"
 	* MulticastVNC now supports the Ultra encoding and features
 	  a freely sizeable receive buffer in addition to the 
