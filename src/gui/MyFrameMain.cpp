@@ -1344,6 +1344,7 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   info.SetVersion(wxT(VERSION));
   info.SetDescription(desc);
   info.SetCopyright(wxT(COPYRIGHT));
+  info.SetWebSite(wxString(wxT(PACKAGE_URL)));
   
   wxAboutBox(info); 
 }
