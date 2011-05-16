@@ -2,7 +2,7 @@
 <resources>
     <string name="address_caption">地址</string>
     <string name="alt_check">Alt</string>
-    <string name="app_name">远程桌面</string>
+    <string name="app_name">MultiVNC</string>
     <string name="arrow_down">向下</string>
     <string name="arrow_left">向左</string>
     <string name="arrow_right">向右</string>
