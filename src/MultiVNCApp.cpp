@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <csignal>
+#include <wx/wfstream.h>
 #ifdef __WXMAC__
 #include <ApplicationServices/ApplicationServices.h>
 #endif
@@ -83,6 +84,29 @@ bool MultiVNCApp::OnInit()
   // to Get() if you want to override the default values (the application
   // name is the name of the executable and the vendor name is the same)
   SetVendorName(_T("MultiVNC"));
+
+  // if built as a portable edition, use file config always!
+#ifdef PORTABLE_EDITION
+  const char* name = CFGFILE;
+  wxFile cfgfile;
+
+  if(!wxFile::Exists(wxString(name, wxConvUTF8)))
+    cfgfile.Create(wxString(name, wxConvUTF8));
+
+  cfgfile.Open(wxT(CFGFILE), wxFile::read);
+
+  wxFileInputStream sin(cfgfile);
+  if(sin.Ok())
+    {
+      wxFileConfig* cfg = new wxFileConfig(sin);
+      wxConfigBase::Set(cfg);
+    }
+  else
+    {
+      wxLogError(_("Could not open config file!"));
+    }
+#endif
+
  
   // greetings to anyone who made it...
   cout << "\n:::  this is MultiVNC  :::\n\n";
@@ -119,6 +143,15 @@ bool MultiVNCApp::OnInit()
 
 int MultiVNCApp::OnExit()
 {
+  // if built as a portable edition, use file config always!
+#ifdef PORTABLE_EDITION
+  wxFile cfgfile(wxT(CFGFILE), wxFile::write);
+  wxFileOutputStream sout(cfgfile);
+  wxFileConfig* cfg = (wxFileConfig*)wxConfigBase::Get();
+  if(!cfg->Save(sout))
+    wxLogError(_("Could not save config file!"));
+#endif
+
   // clean up: Set() returns the active config object as Get() does, but unlike
   // Get() it doesn't try to create one if there is none (definitely not what
   // we want here!)

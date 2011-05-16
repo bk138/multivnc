@@ -1,5 +1,7 @@
 MultiVNC 0.6 -
-	* 
+	* The portable edition is now truly portable as it saves its
+ 	  preferences into a file under Windows now, not using the
+	  registry.
 
 MultiVNC 0.5 - "Bag o' stuff"
 	* MulticastVNC now supports the Ultra encoding and features

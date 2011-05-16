@@ -35,7 +35,7 @@
 #include "config.h"
 
 #define COPYRIGHT "Copyright (C) 2009-2011 Christian Beier <dontmind@freeshell.org>"
-
+#define CFGFILE "multivnc.cfg"
 
 class MultiVNCApp: public wxApp 
 {
