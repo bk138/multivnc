@@ -19,9 +19,9 @@ import android.widget.TextView;
  */
 class RepeaterDialog extends Dialog {
 	private EditText _repeaterId;
-	MultiVNC _configurationDialog;
+	MainMenuActivity _configurationDialog;
 
-	RepeaterDialog(MultiVNC context) {
+	RepeaterDialog(MainMenuActivity context) {
 		super(context);
 		setOwnerActivity((Activity)context);
 		_configurationDialog = context;

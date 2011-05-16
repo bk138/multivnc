@@ -16,7 +16,7 @@
  */
 
 //
-// MultiVNC is the Activity for setting VNC server IP and port.
+// MainMenuActivity is the Activity for setting VNC server IP and port.
 //
 
 package dontmind.sw.android.MultiVNC;
@@ -43,7 +43,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class MultiVNC extends Activity {
+public class MainMenuActivity extends Activity {
 	private EditText ipText;
 	private EditText portText;
 	private EditText passwordText;

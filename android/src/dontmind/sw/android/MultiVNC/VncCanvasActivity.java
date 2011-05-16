@@ -559,7 +559,7 @@ public class VncCanvasActivity extends Activity {
 			{
 				if (connection.Gen_read(database.getReadableDatabase(), port))
 				{
-					MostRecentBean bean = MultiVNC.getMostRecent(database.getReadableDatabase());
+					MostRecentBean bean = MainMenuActivity.getMostRecent(database.getReadableDatabase());
 					if (bean != null)
 					{
 						bean.setConnectionId(connection.get_Id());

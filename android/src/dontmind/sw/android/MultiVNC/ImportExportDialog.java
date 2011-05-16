@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  */
 class ImportExportDialog extends Dialog {
 
-	private MultiVNC _configurationDialog;
+	private MainMenuActivity _configurationDialog;
 	private EditText _textLoadUrl;
 	private EditText _textSaveUrl;
 	
@@ -43,7 +43,7 @@ class ImportExportDialog extends Dialog {
 	/**
 	 * @param context
 	 */
-	public ImportExportDialog(MultiVNC context) {
+	public ImportExportDialog(MainMenuActivity context) {
 		super(context);
 		setOwnerActivity((Activity)context);
 		_configurationDialog = context;
