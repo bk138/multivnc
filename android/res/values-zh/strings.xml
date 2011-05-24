@@ -35,8 +35,6 @@
 <string name="input_mode_fit_to_screen">无面板; 轨迹球鼠标</string>
 <string name="input_mode_mouse">鼠标指针控制模式</string>
 <string name="input_mode_panning">桌面模式</string>
-<string name="input_mode_touchpad_pan_trackball_mouse">触摸板; 轨迹球鼠标</string>
-<string name="input_mode_dpad_pan_touchpad_mouse">触摸屏鼠标; D-Pad面板</string>
 <string name="input_mode_touch_pan_zoom_mouse">支持缩放的触摸屏鼠标</string>
 <string name="input_mode_touchpad">触摸屏</string><string name="keep_password_button">保持</string>
 <string name="intro_dont_show">不必再提示</string>

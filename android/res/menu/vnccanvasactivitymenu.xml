@@ -7,7 +7,6 @@
 	    		<item android:id="@+id/itemInputTouchpad" android:title="@string/input_mode_touchpad"></item><item android:id="@+id/itemInputFitToScreen" android:checked="true" android:title="@string/input_mode_fit_to_screen"/>
 	    		<item android:id="@+id/itemInputPan" android:title="@string/input_mode_panning"/>
 	    		<item android:id="@+id/itemInputMouse" android:title="@string/input_mode_mouse"/>
-	    		<item android:id="@+id/itemInputTouchPanTrackballMouse" android:title="@string/input_mode_touchpad_pan_trackball_mouse"/>
 	         </group>
 	    </menu>
     </item>

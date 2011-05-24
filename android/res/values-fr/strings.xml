@@ -29,8 +29,6 @@
 <string name="input_mode_fit_to_screen">Aucun curseur; Souris trackball</string>
 <string name="input_mode_mouse">Mode de contrôle du pointeur de souris</string>
 <string name="input_mode_panning">Mode panoramique du bureau</string>
-<string name="input_mode_touchpad_pan_trackball_mouse">Curseur tactile; Souris trackball</string>
-<string name="input_mode_dpad_pan_touchpad_mouse">Souris tactile; Curseur flèches</string>
 <string name="input_mode_touch_pan_zoom_mouse">Souris curseur et zoom tactile</string>
 <string name="input_mode_touchpad">Touchpad</string><string name="keep_password_button">Retenir</string>
 <string name="keys_caption">Touches</string>

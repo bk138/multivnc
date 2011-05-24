@@ -126,16 +126,6 @@ public class VncCanvasActivity extends Activity {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onTrackballEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTrackballEvent(MotionEvent evt) {
-			return trackballMouse(evt);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
 		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
 		 */
 		@Override
@@ -308,16 +298,6 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onKeyUp(int keyCode, KeyEvent evt) {
 			return true;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onTrackballEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTrackballEvent(MotionEvent evt) {
-			return trackballMouse(evt);
 		}
 
 		/**
@@ -501,11 +481,9 @@ public class VncCanvasActivity extends Activity {
 	private MenuItem[] inputModeMenuItems;
 	private AbstractInputHandler inputModeHandlers[];
 	private ConnectionBean connection;
-	private boolean trackballButtonDown;
 	private static final int inputModeIds[] = { R.id.itemInputFitToScreen,
 			R.id.itemInputTouchpad,
 			R.id.itemInputMouse, R.id.itemInputPan,
-			R.id.itemInputTouchPanTrackballMouse,
 			R.id.itemInputTouchPanZoomMouse };
 
 	ZoomControls zoomer;
@@ -773,9 +751,6 @@ public class VncCanvasActivity extends Activity {
 					case R.id.itemInputMouse:
 						inputModeHandlers[i] = new MouseMode();
 						break;
-					case R.id.itemInputTouchPanTrackballMouse:
-						inputModeHandlers[i] = new TouchPanTrackballMouse();
-						break;
 					case R.id.itemInputTouchPanZoomMouse:
 						inputModeHandlers[i] = new ZoomInputHandler();
 						break;
@@ -949,24 +924,7 @@ public class VncCanvasActivity extends Activity {
 				Toast.LENGTH_SHORT).show();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onTrackballEvent(android.view.MotionEvent)
-	 */
-	@Override
-	public boolean onTrackballEvent(MotionEvent event) {
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			trackballButtonDown = true;
-			break;
-		case MotionEvent.ACTION_UP:
-			trackballButtonDown = false;
-			break;
-		}
-		return inputHandler.onTrackballEvent(event);
-	}
-
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		return inputHandler.onTouchEvent(event);
@@ -1064,23 +1022,6 @@ public class VncCanvasActivity extends Activity {
 		return true;
 	}
 
-	private static int convertTrackballDelta(double delta) {
-		return (int) Math.pow(Math.abs(delta) * 6.01, 2.5)
-				* (delta < 0.0 ? -1 : 1);
-	}
-
-	boolean trackballMouse(MotionEvent evt) {
-		int dx = convertTrackballDelta(evt.getX());
-		int dy = convertTrackballDelta(evt.getY());
-
-		evt.offsetLocation(vncCanvas.mouseX + dx - evt.getX(), vncCanvas.mouseY
-				+ dy - evt.getY());
-
-		if (vncCanvas.processPointerEvent(evt, trackballButtonDown)) {
-			return true;
-		}
-		return VncCanvasActivity.super.onTouchEvent(evt);
-	}
 
 	long hideZoomAfterMs;
 	static final long ZOOM_HIDE_DELAY_MS = 2500;
@@ -1205,16 +1146,6 @@ public class VncCanvasActivity extends Activity {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onTrackballEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTrackballEvent(MotionEvent evt) {
-			return false;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
 		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#handlerDescription()
 		 */
 		@Override
@@ -1230,80 +1161,6 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public String getName() {
 			return "PAN_MODE";
-		}
-
-	}
-
-	/**
-	 * The touchscreen pans the screen; the trackball moves and clicks the
-	 * mouse.
-	 * 
-	 * @author Michael A. MacDonald
-	 * 
-	 */
-	public class TouchPanTrackballMouse implements AbstractInputHandler {
-		
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onKeyDown(int,
-		 *      android.view.KeyEvent)
-		 */
-		@Override
-		public boolean onKeyDown(int keyCode, KeyEvent evt) {
-			return true;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onKeyUp(int,
-		 *      android.view.KeyEvent)
-		 */
-		@Override
-		public boolean onKeyUp(int keyCode, KeyEvent evt) {
-			return true;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onTouchEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTouchEvent(MotionEvent evt) {
-			return touchPan(evt);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onTrackballEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTrackballEvent(MotionEvent evt) {
-			return trackballMouse(evt);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#handlerDescription()
-		 */
-		@Override
-		public CharSequence getHandlerDescription() {
-			return getResources().getText(
-					R.string.input_mode_touchpad_pan_trackball_mouse);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#getName()
-		 */
-		@Override
-		public String getName() {
-			return "TOUCH_PAN_TRACKBALL_MOUSE";
 		}
 
 	}
@@ -1354,16 +1211,6 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onTouchEvent(MotionEvent evt) {
 			return false;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onTrackballEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTrackballEvent(MotionEvent evt) {
-			return trackballMouse(evt);
 		}
 
 		/*
@@ -1442,16 +1289,6 @@ public class VncCanvasActivity extends Activity {
 			if (vncCanvas.processPointerEvent(event, true))
 				return true;
 			return VncCanvasActivity.super.onTouchEvent(event);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#onTrackballEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTrackballEvent(MotionEvent evt) {
-			return false;
 		}
 
 		/*

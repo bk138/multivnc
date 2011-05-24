@@ -39,11 +39,8 @@
 <string name="intro_title">Welcome</string>
 <string name="intro_version_text">&lt;br&gt;--Sent text is remembered across sessions (optionally)&lt;br&gt;--Import/Export settings to file&lt;br&gt;--Button with zoom controls to bring up keyboard&lt;br&gt;--Can force tiling mode (very large screens)</string>
 <string name="input_mode">Input Mode</string>
-<string name="input_mode_fit_to_screen">No Pan; Trackball Mouse</string>
 <string name="input_mode_mouse">Mouse Pointer Control Mode</string>
 <string name="input_mode_panning">Desktop Panning Mode</string>
-<string name="input_mode_touchpad_pan_trackball_mouse">Touch Pan; Trackball Mouse</string>
-<string name="input_mode_dpad_pan_touchpad_mouse">Touch Mouse; D-Pad Pan</string>
 <string name="input_mode_touch_pan_zoom_mouse">Touch Mouse Pan and Zoom</string>
 <string name="input_mode_touchpad">Touchpad</string><string name="keep_password_button">Keep</string>
 <string name="intro_dont_show">Don\'t show again</string>

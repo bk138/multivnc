@@ -30,11 +30,8 @@
 <string name="intro_title">�dv�z�lj�k</string>
 <string name="intro_version_text">&lt;br&gt;--Pinch zoom for 2.0+ phones in gesture modes&lt;br&gt;--Fix sending uppercase from physical keyboard&lt;br&gt;--Crash bug fixes</string>
 <string name="input_mode">Beviteli m�d</string>
-<string name="input_mode_fit_to_screen">Nincs p�szt�z�s; Trackball eg�r</string>
 <string name="input_mode_mouse">Eg�r vez�relt m�d</string>
 <string name="input_mode_panning">Asztal p�szt�z�s m�d</string>
-<string name="input_mode_touchpad_pan_trackball_mouse">�rint�ssel p�szt�z�s; Trackball eg�r</string>
-<string name="input_mode_dpad_pan_touchpad_mouse">�rint�s eg�r; D-Pad P�szt�z�s</string>
 <string name="input_mode_touch_pan_zoom_mouse">Eg�r p�szt�z�s �s nagy�t�s</string>
 <string name="input_mode_touchpad">Touchpad</string><string name="keep_password_button">Megtart</string>
 <string name="intro_dont_show">Ne mutassa �jra</string>

@@ -23,7 +23,7 @@ class OneToOneScaling extends AbstractScaling {
 	 */
 	@Override
 	int getDefaultHandlerId() {
-		return R.id.itemInputTouchPanTrackballMouse;
+		return R.id.itemInputTouchpad;
 	}
 
 	/* (non-Javadoc)

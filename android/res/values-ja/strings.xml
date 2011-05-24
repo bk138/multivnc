@@ -29,8 +29,6 @@
 <string name="input_mode_fit_to_screen">パンなし; トラクボールマウス</string>
 <string name="input_mode_mouse">マウスで操作モード</string>
 <string name="input_mode_panning">デスクトップパンモード</string>
-<string name="input_mode_touchpad_pan_trackball_mouse">タッチでパン、トラクボールマウス</string>
-<string name="input_mode_dpad_pan_touchpad_mouse">タッチマウス、十字キー</string>
 <string name="input_mode_touch_pan_zoom_mouse">タッチマウスでパンとズーム</string>
 <string name="keep_password_button">保存</string>
 <string name="keys_caption">キー</string>

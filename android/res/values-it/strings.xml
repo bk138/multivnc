@@ -29,8 +29,6 @@
 <string name="input_mode_fit_to_screen">Nessun cursore; Mouse Trackball</string>
 <string name="input_mode_mouse">Modalità controllo puntatore Mouse</string>
 <string name="input_mode_panning">Modalità panoramica Desktop</string>
-<string name="input_mode_touchpad_pan_trackball_mouse">Tocca cursore; Mouse Trackball</string>
-<string name="input_mode_dpad_pan_touchpad_mouse">Tocca cursore; Panoramica D-Pad</string>
 <string name="input_mode_touch_pan_zoom_mouse">Panoramica tocca cursore ed Ingrandisci</string>
 <string name="keep_password_button">Mantieni</string>
 <string name="keys_caption">Tasti</string>
