@@ -28,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,12 +37,23 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceListener;
+
+
 
 public class MainMenuActivity extends Activity {
 	private EditText ipText;
@@ -58,7 +70,17 @@ public class MainMenuActivity extends Activity {
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
 	private boolean repeaterTextSet;
+	
+	// service discovery stuff
+	private android.net.wifi.WifiManager.MulticastLock lock;
+	private android.os.Handler handler = new android.os.Handler();
+	private String mdnstype = "_rfb._tcp.local.";
+	private JmDNS jmdns = null;
+	private ServiceListener listener = null;
+	private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> (); 
+	
 
+	
 	@Override
 	public void onCreate(Bundle icicle) {
 
@@ -275,6 +297,7 @@ public class MainMenuActivity extends Activity {
 	protected void onStart() {
 		super.onStart();
 		arriveOnPage();
+		mDNSstart();
 	}
 	
 	/**
@@ -297,6 +320,17 @@ public class MainMenuActivity extends Activity {
 		ArrayList<ConnectionBean> connections=new ArrayList<ConnectionBean>();
 		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, connections, ConnectionBean.newInstance);
 		Collections.sort(connections);
+		
+		//insert discovered connections
+	    Enumeration<ConnectionBean> e = connections_discovered.elements();
+		while (e.hasMoreElements()) {
+			ConnectionBean c = (ConnectionBean) e.nextElement();
+			connections.add(0, c);
+			Log.d(getString(R.string.app_name), "main menu adding");
+		}
+		
+		Log.d(getString(R.string.app_name), "main menu");
+		
 		connections.add(0, new ConnectionBean());
 		int connectionIndex=0;
 		if ( connections.size()>1)
@@ -329,6 +363,7 @@ public class MainMenuActivity extends Activity {
 		}
 		updateSelectedFromView();
 		selected.save(database.getWritableDatabase());
+		mDNSstop();
 	}
 	
 	VncDatabase getDatabaseHelper()
@@ -385,4 +420,99 @@ public class MainMenuActivity extends Activity {
 		intent.putExtra(VncConstants.CONNECTION,selected.Gen_getValues());
 		startActivity(intent);
 	}
+	
+	
+	
+
+	private void mDNSstart()
+	{
+		Log.d(getString(R.string.app_name), "starting MDNS");
+		
+		android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
+		lock = wifi.createMulticastLock("mylockthereturn");
+		lock.setReferenceCounted(true);
+		lock.acquire();
+		try {
+			jmdns = JmDNS.create();
+			jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
+
+				@Override
+				public void serviceResolved(ServiceEvent ev) {
+					
+					mDNSnotify(getString(R.string.server_found) + ": " + ev.getName());
+					
+					ConnectionBean c = new ConnectionBean();
+					c.set_Id(-42);
+					c.setNickname(ev.getName());
+					c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
+					c.setPort(ev.getInfo().getPort());
+					
+					connections_discovered.put(ev.getInfo().getQualifiedName(), c);
+				
+					Log.d(getString(R.string.app_name), "discovered server :" + ev.getName() 
+								+ ", now " + connections_discovered.size());
+					
+				}
+
+				@Override
+				public void serviceRemoved(ServiceEvent ev) {
+										
+					mDNSnotify(getString(R.string.server_removed) + ": " + ev.getName());
+					
+					connections_discovered.remove(ev.getInfo().getQualifiedName());
+					
+					Log.d(getString(R.string.app_name), "server gone:" + ev.getName() 
+							+ ", now " + connections_discovered.size());
+					
+				}
+
+				@Override
+				public void serviceAdded(ServiceEvent event) {
+					// Required to force serviceResolved to be called again (after the first search)
+					jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
+				}
+			});
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+
+	private void mDNSstop()
+	{
+		Log.d(getString(R.string.app_name), "stopping MDNS");
+		if (jmdns != null) {
+			if (listener != null) {
+				jmdns.removeServiceListener(mdnstype, listener);
+				listener = null;
+			}
+			jmdns.unregisterAllServices();
+			try {
+				jmdns.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			jmdns = null;
+		}
+
+		lock.release();
+		
+		connections_discovered.clear();
+	}
+
+	// do the GUI stuff in Runnable posted to main thread handler
+	private void mDNSnotify(final String msg) {
+		handler.postDelayed(new Runnable() {
+			public void run() {
+				Toast.makeText(MainMenuActivity.this, msg , Toast.LENGTH_LONG).show();
+				
+				// update 
+				arriveOnPage();
+			}
+		}, 1);
+	
+	}
+	
+	
 }

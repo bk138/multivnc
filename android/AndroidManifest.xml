@@ -31,6 +31,8 @@
 	</application>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
+	
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4"></uses-sdk>
     <supports-screens android:anyDensity="true" />
 
