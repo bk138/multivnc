@@ -4,6 +4,7 @@ Makefile
 *.o
 *.lo
 *.a
+*~
 compile
 configure
 configure.lineno
