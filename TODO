@@ -1,5 +1,5 @@
 
-in order of importance:
+wxWidgets version:
  - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
  - fix the seamless connector for win32.
@@ -25,3 +25,11 @@ cl->framebuffer
 
  - stutter when using stats on win32 -> seems to be caused by
    SendXvpMessage(), but why? testrect case is ok...
+   
+   
+Android version:
+  - zeroconf
+  - keyboard
+  - unified mode of operation
+  - multicast
+  
