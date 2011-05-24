@@ -8,9 +8,7 @@
 	    		<item android:id="@+id/itemInputPan" android:title="@string/input_mode_panning"/>
 	    		<item android:id="@+id/itemInputMouse" android:title="@string/input_mode_mouse"/>
 	    		<item android:id="@+id/itemInputTouchPanTrackballMouse" android:title="@string/input_mode_touchpad_pan_trackball_mouse"/>
-	    		<item android:id="@+id/itemInputDPadPanTouchMouse" android:title="@string/input_mode_dpad_pan_touchpad_mouse"/>
-	    	
-</group>
+	         </group>
 	    </menu>
     </item>
     <item android:numericShortcut="7" android:alphabeticShortcut="d" android:id="@+id/itemDisconnect" android:title="@string/disconnect" android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
