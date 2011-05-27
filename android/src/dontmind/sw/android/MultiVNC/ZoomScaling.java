@@ -35,7 +35,7 @@ class ZoomScaling extends AbstractScaling {
 	 */
 	@Override
 	int getDefaultHandlerId() {
-		return R.id.itemInputTouchPanZoomMouse;
+		return R.id.itemInputTouchpad;
 	}
 
 	/* (non-Javadoc)

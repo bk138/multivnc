@@ -59,191 +59,6 @@ import android.content.Context;
 
 public class VncCanvasActivity extends Activity {
 
-	/**
-	 * @author Michael A. MacDonald
-	 */
-	class ZoomInputHandler extends AbstractGestureInputHandler {
-
-		/**
-		 * In drag mode (entered with long press) you process mouse events
-		 * without sending them through the gesture detector
-		 */
-		private boolean dragMode;
-		
-		
-
-		/**
-		 * @param c
-		 */
-		ZoomInputHandler() {
-			super(VncCanvasActivity.this);
-			
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#getHandlerDescription()
-		 */
-		@Override
-		public CharSequence getHandlerDescription() {
-			return getResources().getString(
-					R.string.input_mode_touch_pan_zoom_mouse);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractInputHandler#getName()
-		 */
-		@Override
-		public String getName() {
-			return TOUCH_ZOOM_MODE;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.VncCanvasActivity.ZoomInputHandler#onKeyDown(int,
-		 *      android.view.KeyEvent)
-		 */
-		@Override
-		public boolean onKeyDown(int keyCode, KeyEvent evt) {
-			return true;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.VncCanvasActivity.ZoomInputHandler#onKeyUp(int,
-		 *      android.view.KeyEvent)
-		 */
-		@Override
-		public boolean onKeyUp(int keyCode, KeyEvent evt) {
-			return true;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onDown(MotionEvent e) {
-			panner.stop();
-			return true;
-		}
-
-		/**
-		 * Divide stated fling velocity by this amount to get initial velocity
-		 * per pan interval
-		 */
-		static final float FLING_FACTOR = 8;
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onFling(android.view.MotionEvent,
-		 *      android.view.MotionEvent, float, float)
-		 */
-		@Override
-		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-				float velocityY) {
-			showZoomer(false);
-			panner.start(-(velocityX / FLING_FACTOR),
-					-(velocityY / FLING_FACTOR), new Panner.VelocityUpdater() {
-
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see dontmind.sw.android.MultiVNC.Panner.VelocityUpdater#updateVelocity(android.graphics.Point,
-						 *      long)
-						 */
-						@Override
-						public boolean updateVelocity(PointF p, long interval) {
-							double scale = Math.pow(0.8, interval / 50.0);
-							p.x *= scale;
-							p.y *= scale;
-							return (Math.abs(p.x) > 0.5 || Math.abs(p.y) > 0.5);
-						}
-
-					});
-			return true;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see dontmind.sw.android.MultiVNC.AbstractGestureInputHandler#onTouchEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTouchEvent(MotionEvent e) {
-			if (dragMode) {
-				vncCanvas.changeTouchCoordinatesToFullFrame(e);
-				if (e.getAction() == MotionEvent.ACTION_UP)
-					dragMode = false;
-				return vncCanvas.processPointerEvent(e, true);
-			} else
-				return super.onTouchEvent(e);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onLongPress(android.view.MotionEvent)
-		 */
-		@Override
-		public void onLongPress(MotionEvent e) {
-			showZoomer(true);
-			BCFactory.getInstance().getBCHaptic().performLongPressHaptic(
-					vncCanvas);
-			dragMode = true;
-			vncCanvas.processPointerEvent(vncCanvas
-					.changeTouchCoordinatesToFullFrame(e), true);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onScroll(android.view.MotionEvent,
-		 *      android.view.MotionEvent, float, float)
-		 */
-		@Override
-		public boolean onScroll(MotionEvent e1, MotionEvent e2,
-				float distanceX, float distanceY) {
-			if (inScaling)
-				return false;
-			showZoomer(false);
-			return vncCanvas.pan((int) distanceX, (int) distanceY);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onSingleTapConfirmed(MotionEvent e) {
-			vncCanvas.changeTouchCoordinatesToFullFrame(e);
-			vncCanvas.processPointerEvent(e, true);
-			e.setAction(MotionEvent.ACTION_UP);
-			return vncCanvas.processPointerEvent(e, false);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onDoubleTap(MotionEvent e) {
-			vncCanvas.changeTouchCoordinatesToFullFrame(e);
-			vncCanvas.processPointerEvent(e, true, true);
-			e.setAction(MotionEvent.ACTION_UP);
-			return vncCanvas.processPointerEvent(e, false, true);
-		}
-
-	}
 
 	public class TouchpadInputHandler extends AbstractGestureInputHandler {
 		/**
@@ -483,8 +298,7 @@ public class VncCanvasActivity extends Activity {
 	private ConnectionBean connection;
 	private static final int inputModeIds[] = { R.id.itemInputFitToScreen,
 			R.id.itemInputTouchpad,
-			R.id.itemInputMouse, R.id.itemInputPan,
-			R.id.itemInputTouchPanZoomMouse };
+			R.id.itemInputMouse, R.id.itemInputPan };
 
 	ZoomControls zoomer;
 	Panner panner;
@@ -751,9 +565,6 @@ public class VncCanvasActivity extends Activity {
 					case R.id.itemInputMouse:
 						inputModeHandlers[i] = new MouseMode();
 						break;
-					case R.id.itemInputTouchPanZoomMouse:
-						inputModeHandlers[i] = new ZoomInputHandler();
-						break;
 					case R.id.itemInputTouchpad:
 						inputModeHandlers[i] = new TouchpadInputHandler();
 						break;
@@ -775,7 +586,7 @@ public class VncCanvasActivity extends Activity {
 			}
 		}
 		if (result == null) {
-			result = getInputHandlerById(R.id.itemInputTouchPanZoomMouse);
+			result = getInputHandlerById(R.id.itemInputTouchpad);
 		}
 		return result;
 	}
@@ -785,7 +596,7 @@ public class VncCanvasActivity extends Activity {
 			if (handler == getInputHandlerById(id))
 				return id;
 		}
-		return R.id.itemInputTouchPanZoomMouse;
+		return R.id.itemInputTouchpad;
 	}
 
 	@Override

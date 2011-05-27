@@ -3,7 +3,6 @@
    	<item android:numericShortcut="5" android:alphabeticShortcut="p" android:id="@+id/itemInputMode" android:title="@string/input_mode" android:icon="@android:drawable/ic_input_get">
     	<menu>
 	    	<group android:checkableBehavior="single">
-	    		<item android:id="@+id/itemInputTouchPanZoomMouse" android:title="@string/input_mode_touch_pan_zoom_mouse"/>
 	    		<item android:id="@+id/itemInputTouchpad" android:title="@string/input_mode_touchpad"></item><item android:id="@+id/itemInputFitToScreen" android:checked="true" android:title="@string/input_mode_fit_to_screen"/>
 	    		<item android:id="@+id/itemInputPan" android:title="@string/input_mode_panning"/>
 	    		<item android:id="@+id/itemInputMouse" android:title="@string/input_mode_mouse"/>

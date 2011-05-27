@@ -41,7 +41,6 @@
 <string name="input_mode">Input Mode</string>
 <string name="input_mode_mouse">Mouse Pointer Control Mode</string>
 <string name="input_mode_panning">Desktop Panning Mode</string>
-<string name="input_mode_touch_pan_zoom_mouse">Touch Mouse Pan and Zoom</string>
 <string name="input_mode_touchpad">Touchpad</string><string name="keep_password_button">Keep</string>
 <string name="intro_dont_show">Don\'t show again</string>
 <string name="keys_caption">Keys</string>
