@@ -521,9 +521,7 @@ public class VncCanvasActivity extends Activity {
 			inputModeMenuItems[i] = inputMenu.findItem(inputModeIds[i]);
 		}
 		updateInputMenu();
-		menu.findItem(R.id.itemFollowMouse).setChecked(
-				connection.getFollowMouse());
-		menu.findItem(R.id.itemFollowPan).setChecked(connection.getFollowPan());
+	
 		return true;
 	}
 
@@ -630,21 +628,7 @@ public class VncCanvasActivity extends Activity {
 		case R.id.itemCtrlAltDel:
 			vncCanvas.sendMetaKey(MetaKeyBean.keyCtrlAltDel);
 			return true;
-		case R.id.itemFollowMouse:
-			boolean newFollow = !connection.getFollowMouse();
-			item.setChecked(newFollow);
-			connection.setFollowMouse(newFollow);
-			if (newFollow) {
-				vncCanvas.panToMouse();
-			}
-			connection.save(database.getWritableDatabase());
-			return true;
-		case R.id.itemFollowPan:
-			boolean newFollowPan = !connection.getFollowPan();
-			item.setChecked(newFollowPan);
-			connection.setFollowPan(newFollowPan);
-			connection.save(database.getWritableDatabase());
-			return true;
+
 		case R.id.itemArrowLeft:
 			vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
 			return true;
