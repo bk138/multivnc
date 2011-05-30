@@ -4,15 +4,7 @@
     <item android:numericShortcut="7" android:alphabeticShortcut="d" android:id="@+id/itemDisconnect" android:title="@string/disconnect" android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
   
     <item android:numericShortcut="3" android:alphabeticShortcut="c" android:id="@+id/itemColorMode" android:title="@string/color_mode" android:icon="@android:drawable/ic_menu_preferences"></item>
-    <item android:numericShortcut="4" android:alphabeticShortcut="z" android:id="@+id/itemScaling" android:title="@string/scaling" android:icon="@android:drawable/ic_menu_zoom">
-    	<menu>
-	    	<group android:id="@+id/groupScaling" android:checkableBehavior="single">
-	    		<item android:id="@+id/itemZoomable" android:title="@string/scaling_zoomable" />
-	    		<item android:id="@+id/itemOneToOne" android:title="@string/one_to_one"/>
-	    		<item android:id="@+id/itemFitToScreen" android:title="@string/fit_to_screen" android:checked="true"/>
-	    	</group>
-    	</menu>
-    </item>
+   
     <item android:numericShortcut="8" android:alphabeticShortcut="a" android:id="@+id/itemCtrlAltDel" android:title="@string/ctrl_alt_del" android:icon="@android:drawable/ic_menu_share"/>
     <item android:numericShortcut="9" android:alphabeticShortcut="i" android:id="@+id/itemInfo" android:title="@string/info" android:icon="@android:drawable/ic_menu_info_details"></item>
     <item android:alphabeticShortcut="g" android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again"/>

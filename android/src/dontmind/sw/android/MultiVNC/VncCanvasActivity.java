@@ -509,9 +509,7 @@ public class VncCanvasActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
 
-		if (vncCanvas.scaling != null)
-			menu.findItem(vncCanvas.scaling.getId()).setChecked(true);
-
+		
 			
 		return true;
 	}
@@ -580,15 +578,7 @@ public class VncCanvasActivity extends Activity {
 		case R.id.itemColorMode:
 			selectColorModel();
 			return true;
-			// Following sets one of the scaling options
-		case R.id.itemZoomable:
-		case R.id.itemOneToOne:
-		case R.id.itemFitToScreen:
-			AbstractScaling.getById(item.getItemId()).setScaleTypeForActivity(
-					this);
-			item.setChecked(true);
-			showPanningState();
-			return true;
+	
 
 		case R.id.itemDisconnect:
 			vncCanvas.closeConnection();

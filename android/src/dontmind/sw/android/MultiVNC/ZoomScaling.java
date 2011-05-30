@@ -25,7 +25,7 @@ class ZoomScaling extends AbstractScaling {
 	 * @param scaleType
 	 */
 	public ZoomScaling() {
-		super(R.id.itemZoomable, ScaleType.MATRIX);
+		super(AbstractScaling.zoomableId, ScaleType.MATRIX);
 		matrix = new Matrix();
 		scaling = 1;
 	}
