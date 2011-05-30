@@ -35,7 +35,7 @@ class ZoomScaling extends AbstractScaling {
 	 */
 	@Override
 	int getDefaultHandlerId() {
-		return R.id.itemInputTouchpad;
+		return VncCanvasActivity.touchPadId;
 	}
 
 	/* (non-Javadoc)
@@ -51,7 +51,7 @@ class ZoomScaling extends AbstractScaling {
 	 */
 	@Override
 	boolean isValidInputMode(int mode) {
-		return mode != R.id.itemInputFitToScreen;
+		return true;
 	}
 	
 	/**

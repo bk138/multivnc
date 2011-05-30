@@ -1,14 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:numericShortcut="1" android:alphabeticShortcut="s" android:id="@+id/itemSpecialKeys" android:title="@string/special_keys" android:icon="@android:drawable/ic_dialog_dialer"/>
-   	<item android:numericShortcut="5" android:alphabeticShortcut="p" android:id="@+id/itemInputMode" android:title="@string/input_mode" android:icon="@android:drawable/ic_input_get">
-    	<menu>
-	    	<group android:checkableBehavior="single">
-	    		<item android:id="@+id/itemInputTouchpad" android:title="@string/input_mode_touchpad"></item><item android:id="@+id/itemInputFitToScreen" android:checked="true" android:title="@string/input_mode_fit_to_screen"/>
-	    		<item android:id="@+id/itemInputPan" android:title="@string/input_mode_panning"/>
-	    		<item android:id="@+id/itemInputMouse" android:title="@string/input_mode_mouse"/>
-	         </group>
-	    </menu>
-    </item>
+  
     <item android:numericShortcut="7" android:alphabeticShortcut="d" android:id="@+id/itemDisconnect" android:title="@string/disconnect" android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
   
     <item android:numericShortcut="3" android:alphabeticShortcut="c" android:id="@+id/itemColorMode" android:title="@string/color_mode" android:icon="@android:drawable/ic_menu_preferences"></item>

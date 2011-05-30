@@ -293,12 +293,10 @@ public class VncCanvasActivity extends Activity {
 
 	VncDatabase database;
 
-	private MenuItem[] inputModeMenuItems;
 	private AbstractInputHandler inputModeHandlers[];
 	private ConnectionBean connection;
-	private static final int inputModeIds[] = { R.id.itemInputFitToScreen,
-			R.id.itemInputTouchpad,
-			R.id.itemInputMouse, R.id.itemInputPan };
+	public static final int touchPadId = 666;
+	private static final int inputModeIds[] = { touchPadId };
 
 	ZoomControls zoomer;
 	Panner panner;
@@ -443,7 +441,7 @@ public class VncCanvasActivity extends Activity {
 		});
 		panner = new Panner(this, vncCanvas.handler);
 
-		inputHandler = getInputHandlerById(R.id.itemInputFitToScreen);
+		inputHandler = getInputHandlerById(touchPadId);
 	}
 
 	/**
@@ -514,31 +512,11 @@ public class VncCanvasActivity extends Activity {
 		if (vncCanvas.scaling != null)
 			menu.findItem(vncCanvas.scaling.getId()).setChecked(true);
 
-		Menu inputMenu = menu.findItem(R.id.itemInputMode).getSubMenu();
-
-		inputModeMenuItems = new MenuItem[inputModeIds.length];
-		for (int i = 0; i < inputModeIds.length; i++) {
-			inputModeMenuItems[i] = inputMenu.findItem(inputModeIds[i]);
-		}
-		updateInputMenu();
-	
+			
 		return true;
 	}
 
-	/**
-	 * Change the input mode sub-menu to reflect change in scaling
-	 */
-	void updateInputMenu() {
-		if (inputModeMenuItems == null || vncCanvas.scaling == null) {
-			return;
-		}
-		for (MenuItem item : inputModeMenuItems) {
-			item.setEnabled(vncCanvas.scaling
-					.isValidInputMode(item.getItemId()));
-			if (getInputHandlerById(item.getItemId()) == inputHandler)
-				item.setChecked(true);
-		}
-	}
+	
 
 	/**
 	 * If id represents an input handler, return that; otherwise return null
@@ -554,16 +532,8 @@ public class VncCanvasActivity extends Activity {
 			if (inputModeIds[i] == id) {
 				if (inputModeHandlers[i] == null) {
 					switch (id) {
-					case R.id.itemInputFitToScreen:
-						inputModeHandlers[i] = new FitToScreenMode();
-						break;
-					case R.id.itemInputPan:
-						inputModeHandlers[i] = new PanMode();
-						break;
-					case R.id.itemInputMouse:
-						inputModeHandlers[i] = new MouseMode();
-						break;
-					case R.id.itemInputTouchpad:
+			
+					case touchPadId:
 						inputModeHandlers[i] = new TouchpadInputHandler();
 						break;
 					}
@@ -584,7 +554,7 @@ public class VncCanvasActivity extends Activity {
 			}
 		}
 		if (result == null) {
-			result = getInputHandlerById(R.id.itemInputTouchpad);
+			result = getInputHandlerById(touchPadId);
 		}
 		return result;
 	}
@@ -594,7 +564,7 @@ public class VncCanvasActivity extends Activity {
 			if (handler == getInputHandlerById(id))
 				return id;
 		}
-		return R.id.itemInputTouchpad;
+		return touchPadId;
 	}
 
 	@Override
@@ -909,13 +879,7 @@ public class VncCanvasActivity extends Activity {
 			// Ignore KeyUp events for DPAD keys in Panning Mode; trackball
 			// button switches to mouse mode
 			switch (keyCode) {
-			case KeyEvent.KEYCODE_DPAD_CENTER:
-				inputHandler = getInputHandlerById(R.id.itemInputMouse);
-				connection.setInputMode(inputHandler.getName());
-				connection.save(database.getWritableDatabase());
-				updateInputMenu();
-				showPanningState();
-				return true;
+		
 			case KeyEvent.KEYCODE_DPAD_LEFT:
 				return true;
 			case KeyEvent.KEYCODE_DPAD_RIGHT:
@@ -1059,14 +1023,7 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onKeyUp(int keyCode, KeyEvent evt) {
-			if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-				inputHandler = getInputHandlerById(R.id.itemInputPan);
-				showPanningState();
-				connection.setInputMode(inputHandler.getName());
-				connection.save(database.getWritableDatabase());
-				updateInputMenu();
-				return true;
-			}
+		
 			return defaultKeyUpHandler(keyCode, evt);
 		}
 
