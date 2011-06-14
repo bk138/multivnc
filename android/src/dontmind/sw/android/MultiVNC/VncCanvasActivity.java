@@ -454,7 +454,6 @@ public class VncCanvasActivity extends Activity {
 		AbstractScaling.getByScaleType(connection.getScaleMode())
 				.setScaleTypeForActivity(this);
 		this.inputHandler = handler;
-		showPanningState();
 	}
 
 	ConnectionBean getConnection() {
@@ -616,7 +615,6 @@ public class VncCanvasActivity extends Activity {
 				if (input.getName().equals(TOUCHPAD_MODE))
 					connection.setFollowMouse(true);
 				item.setChecked(true);
-				showPanningState();
 				connection.save(database.getWritableDatabase());
 				return true;
 			}
@@ -672,11 +670,6 @@ public class VncCanvasActivity extends Activity {
 			return super.onKeyUp(keyCode, evt);
 
 		return inputHandler.onKeyUp(keyCode, evt);
-	}
-
-	public void showPanningState() {
-		Toast.makeText(this, inputHandler.getHandlerDescription(),
-				Toast.LENGTH_SHORT).show();
 	}
 
 	
