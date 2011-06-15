@@ -67,6 +67,7 @@ public class VncCanvas extends ImageView {
 	private boolean maintainConnection = true;
 	private boolean showDesktopInfo = true;
 	private boolean repaintsEnabled = true;
+	private boolean framebufferUpdatesEnabled = true;
 	
 	/**
 	 * Use camera button as meta key for right mouse button
@@ -416,7 +417,8 @@ public class VncCanvas extends ImageView {
 					}
 
 					setEncodings(true);
-					bitmapData.writeFullUpdateRequest(!fullUpdateNeeded);
+					if(framebufferUpdatesEnabled)
+						bitmapData.writeFullUpdateRequest(!fullUpdateNeeded);
 
 					break;
 
@@ -697,8 +699,16 @@ public class VncCanvas extends ImageView {
 				showDesktopInfo = false;
 				showConnectionInfo();
 			}
+
 			if (bitmapData != null)
+			{
+				// make sure updates arriving after the toggle are
+				// not shown...
+				if(!framebufferUpdatesEnabled)
+					bitmapData.clear();
+				
 				bitmapData.updateView(VncCanvas.this);
+			}
 		}
 	};
 	
@@ -713,6 +723,29 @@ public class VncCanvas extends ImageView {
 
 	public void enableRepaints() {
 		repaintsEnabled = true;
+	}
+	
+	public boolean toggleFramebufferUpdates()
+	{
+		framebufferUpdatesEnabled = !framebufferUpdatesEnabled;
+		if(framebufferUpdatesEnabled)
+		{
+			try {
+				// request full non-incremental update to get going again
+				bitmapData.writeFullUpdateRequest(false);
+				connection.setUseLocalCursor(true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		else // disabled
+		{
+			bitmapData.clear();
+			connection.setUseLocalCursor(false); // disable cursor draw, it's confusing
+			reDraw();	
+		}
+
+		return framebufferUpdatesEnabled;
 	}
 
 	public void showConnectionInfo() {

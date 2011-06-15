@@ -507,13 +507,15 @@ public class VncCanvasActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
-
-		
-			
 		return true;
 	}
 
-	
+	public boolean onPrepareOptionsMenu (Menu menu)
+	{
+		
+		return true;
+	}
+
 
 	/**
 	 * If id represents an input handler, return that; otherwise return null
@@ -577,7 +579,9 @@ public class VncCanvasActivity extends Activity {
 		case R.id.itemColorMode:
 			selectColorModel();
 			return true;
-	
+		case R.id.itemToggleFramebufferUpdate:
+			vncCanvas.toggleFramebufferUpdates();
+			return true;
 
 		case R.id.itemDisconnect:
 			vncCanvas.closeConnection();

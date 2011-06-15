@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.widget.ImageView;
@@ -158,6 +159,14 @@ abstract class AbstractBitmapData {
 	 */
 	abstract void syncScroll();
 
+	void clear()
+	{
+		// blacken the int array that belongs to our bitmap
+		if(bitmapPixels != null)
+			for(int i=0; i<bitmapPixels.length; ++i)
+				bitmapPixels[i] = 0;
+	}
+	
 	/**
 	 * Release resources
 	 */

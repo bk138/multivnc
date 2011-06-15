@@ -5,6 +5,9 @@
     <item android:numericShortcut="7" android:alphabeticShortcut="d" android:id="@+id/itemDisconnect" android:title="@string/disconnect" android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
   
     <item android:numericShortcut="3" android:alphabeticShortcut="c" android:id="@+id/itemColorMode" android:title="@string/color_mode" android:icon="@android:drawable/ic_menu_preferences"></item>
+
+    <item android:id="@+id/itemToggleFramebufferUpdate" android:title="@string/toggle_framebuffer_update"></item>
+
    
     <item android:numericShortcut="9" android:alphabeticShortcut="i" android:id="@+id/itemInfo" android:title="@string/info" android:icon="@android:drawable/ic_menu_info_details"></item>
     <item android:alphabeticShortcut="h" android:id="@+id/itemArrowLeft" android:title="@string/arrow_left"/>
