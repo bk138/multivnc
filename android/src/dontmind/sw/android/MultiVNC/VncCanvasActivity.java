@@ -584,10 +584,6 @@ public class VncCanvasActivity extends Activity {
 			finish();
 			return true;
 		
-		case R.id.itemCtrlAltDel:
-			vncCanvas.sendMetaKey(MetaKeyBean.keyCtrlAltDel);
-			return true;
-
 		case R.id.itemArrowLeft:
 			vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
 			return true;
