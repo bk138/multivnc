@@ -609,8 +609,11 @@ public class VncCanvasActivity extends Activity {
 			selectColorModel();
 			return true;
 		case R.id.itemToggleFramebufferUpdate:
-			vncCanvas.toggleFramebufferUpdates();
-			return true;
+			if(vncCanvas.toggleFramebufferUpdates()) // view enabled
+				vncCanvas.setVisibility(View.VISIBLE);
+			else
+				vncCanvas.setVisibility(View.GONE);
+			return true;	
 
 		case R.id.itemDisconnect:
 			vncCanvas.closeConnection();

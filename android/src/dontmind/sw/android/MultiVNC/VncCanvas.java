@@ -702,10 +702,7 @@ public class VncCanvas extends ImageView {
 
 			if (bitmapData != null)
 			{
-				// make sure updates arriving after the toggle are
-				// not shown...
-				if(!framebufferUpdatesEnabled)
-					bitmapData.clear();
+				Log.d(TAG, "redraw");
 				
 				bitmapData.updateView(VncCanvas.this);
 			}
@@ -731,20 +728,15 @@ public class VncCanvas extends ImageView {
 		if(framebufferUpdatesEnabled)
 		{
 			try {
+				// clear old framebuffer
+				bitmapData.clear();
 				// request full non-incremental update to get going again
 				bitmapData.writeFullUpdateRequest(false);
-				connection.setUseLocalCursor(true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		else // disabled
-		{
-			bitmapData.clear();
-			connection.setUseLocalCursor(false); // disable cursor draw, it's confusing
-			reDraw();	
-		}
-
+	
 		return framebufferUpdatesEnabled;
 	}
 
