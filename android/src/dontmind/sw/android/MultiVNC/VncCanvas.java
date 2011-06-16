@@ -840,12 +840,23 @@ public class VncCanvas extends ImageView {
 		if (rfb != null && rfb.inNormalProtocol) {
 		    if (action == MotionEvent.ACTION_DOWN || (mouseIsDown && action == MotionEvent.ACTION_MOVE)) {
 		      if (useRightButton) {
-		        pointerMask = MOUSE_BUTTON_RIGHT;
+		    	  if(action == MotionEvent.ACTION_MOVE) 
+		    		  Log.d(TAG, "Input: moving, right mouse button down");
+		    	  else 
+		    		  Log.d(TAG, "Input: right mouse button down");
+		    	  
+		    	  pointerMask = MOUSE_BUTTON_RIGHT;
 		      } else {
-		        pointerMask = MOUSE_BUTTON_LEFT;
+		    	  if(action == MotionEvent.ACTION_MOVE) 
+		    		  Log.d(TAG, "Input: moving, left mouse button down");
+		    	  else 
+		    		  Log.d(TAG, "Input: left mouse button down");
+		    	  
+		    	  pointerMask = MOUSE_BUTTON_LEFT;
 		      }
 		    } else if (action == MotionEvent.ACTION_UP) {
-		      pointerMask = 0;
+		    	Log.d(TAG, "Input: all mouse buttons up");
+		    	pointerMask = 0;
 		    }
 		    bitmapData.invalidateMousePosition();
 		    mouseX= x;

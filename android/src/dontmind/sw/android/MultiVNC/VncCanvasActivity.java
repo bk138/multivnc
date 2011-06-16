@@ -36,7 +36,6 @@ import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -53,7 +52,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
@@ -67,6 +65,8 @@ public class VncCanvasActivity extends Activity {
 		 */
 		private boolean dragMode;
 		float dragX, dragY;
+		
+		private boolean button2insteadof1 = false;
 		
 		TouchpadInputHandler() {
 			super(VncCanvasActivity.this);
@@ -148,6 +148,7 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public void onLongPress(MotionEvent e) {
 			
+			Log.d(TAG, "Input: long press");
 			
 			showZoomer(true);
 			BCFactory.getInstance().getBCHaptic().performLongPressHaptic(
@@ -155,10 +156,6 @@ public class VncCanvasActivity extends Activity {
 			dragMode = true;
 			dragX = e.getX();
 			dragY = e.getY();
-			// send a mouse down event to the remote without moving the mouse.
-			remoteMouseStayPut(e);
-			vncCanvas.processPointerEvent(e, true);
-			
 		}
 
 		/*
@@ -171,6 +168,8 @@ public class VncCanvasActivity extends Activity {
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
 			
+			Log.d(TAG, "Input: scroll");
+
 			if (BCFactory.getInstance().getBCMotionEvent().getPointerCount(e2) > 1)
 			{
 				if (inScaling)
@@ -214,6 +213,8 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onTouchEvent(MotionEvent e) {
 			if (dragMode) {
+				Log.d(TAG, "Input: touch drag");
+
 				// compute the relative movement offset on the remote screen.
 				float deltaX = (e.getX() - dragX) *vncCanvas.getScale();
 				float deltaY = (e.getY() - dragY) *vncCanvas.getScale();
@@ -228,11 +229,32 @@ public class VncCanvasActivity extends Activity {
 
 
 				if (e.getAction() == MotionEvent.ACTION_UP)
+				{
+					Log.d(TAG, "Input: touch drag, finger up");
+					
 					dragMode = false;
+					
+					button2insteadof1 = false;
+
+					remoteMouseStayPut(e);
+					vncCanvas.processPointerEvent(e, false);
+					return super.onTouchEvent(e); // important! otherwise the gesture detector gets confused!
+				}
 				e.setLocation(newRemoteX, newRemoteY);
-				return vncCanvas.processPointerEvent(e, true);
+				
+				boolean status = false;
+				if(!button2insteadof1) // button 1 down
+					status = vncCanvas.processPointerEvent(e, true, false);
+				else // button2 down
+					status = vncCanvas.processPointerEvent(e, true, true);
+				return status;
+
 			} else
+			{
+				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+							
 				return super.onTouchEvent(e);
+			}
 		}
 
 		/**
@@ -246,14 +268,17 @@ public class VncCanvasActivity extends Activity {
 		}
 		/*
 		 * (non-Javadoc)
-		 * confirmed single tap: do a single mouse click on remote without moving the mouse.
+		 * confirmed single tap: do a left mouse down and up click on remote without moving the mouse.
 		 * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
 		 */
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
+			
+			Log.d(TAG, "Input: single tap");
+			
 			boolean multiTouch = (BCFactory.getInstance().getBCMotionEvent().getPointerCount(e) > 1);
 			remoteMouseStayPut(e);
-            
+
 			vncCanvas.processPointerEvent(e, true, multiTouch||vncCanvas.cameraButtonDown);
 			e.setAction(MotionEvent.ACTION_UP);
 			return vncCanvas.processPointerEvent(e, false, multiTouch||vncCanvas.cameraButtonDown);
@@ -261,15 +286,19 @@ public class VncCanvasActivity extends Activity {
 
 		/*
 		 * (non-Javadoc)
-		 * double tap: do two  left mouse right mouse clicks on remote without moving the mouse.
+		 * double tap: do right mouse down and up click on remote without moving the mouse.
 		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
 		 */
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
+			Log.d(TAG, "Input: double tap");
+
+			button2insteadof1 = true;
+			
 			remoteMouseStayPut(e);
 			vncCanvas.processPointerEvent(e, true, true);
 			e.setAction(MotionEvent.ACTION_UP);
-			return vncCanvas.processPointerEvent(e, false, true);			
+			return vncCanvas.processPointerEvent(e, false, true);
 		}
 		
 		

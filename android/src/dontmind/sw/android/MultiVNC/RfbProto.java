@@ -1073,6 +1073,8 @@ class RfbProto {
    */
   synchronized void writePointerEvent( int x, int y, int modifiers, int pointerMask) throws IOException
   {
+	    Log.d(TAG, "Input: writerPointerEvent: pointerMask:" + pointerMask);
+	  
 	    eventBufLen = 0;
 	    writeModifierKeyEvents(modifiers);
 
