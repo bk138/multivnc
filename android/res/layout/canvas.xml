@@ -1,23 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
 
-<dontmind.sw.android.MultiVNC.VncCanvas
-    android:id="@+id/vnc_canvas"
+	<dontmind.sw.android.MultiVNC.VncCanvas
+    	android:id="@+id/vnc_canvas"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:layout_gravity="bottom|center"
+    	>
+	</dontmind.sw.android.MultiVNC.VncCanvas>
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_gravity="bottom|center"
-    >
-</dontmind.sw.android.MultiVNC.VncCanvas>
-  
-<com.antlersoft.android.zoomer.ZoomControls
-    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/zoomer"
-    android:layout_gravity="bottom|center"
-/>
+    android:layout_gravity="center|bottom">
+  
+		<com.antlersoft.android.zoomer.ZoomControls
+	    	android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+	   		android:id="@+id/zoomer"
+    		android:layout_gravity="center|bottom"
+		/>
+
+	  <LinearLayout
+	      android:orientation="horizontal"
+	      android:layout_width="fill_parent"
+	      android:layout_height="42dip">
+	      <View
+	      	  android:id="@+id/mousebutton1"
+	          android:gravity="center_horizontal"
+	          android:background="#aa7f7f7f"
+	          android:layout_width="wrap_content"
+	          android:layout_height="fill_parent"
+	          android:layout_weight="1"/>
+	      <View
+	       	  android:id="@+id/mousebutton3"
+	          android:gravity="center_horizontal"
+	          android:background="#cc7f7f7f"
+	          android:layout_width="wrap_content"
+	          android:layout_height="fill_parent"
+	          android:layout_weight="1"/>
+	      <View
+	          android:id="@+id/mousebutton2"
+	          android:gravity="center_horizontal"
+	          android:background="#aa7f7f7f"
+	          android:layout_width="wrap_content"
+	          android:layout_height="fill_parent"
+	          android:layout_weight="1"/>
+	     
+	  </LinearLayout>
+
+	 </LinearLayout>
+	 
 
 </FrameLayout>
