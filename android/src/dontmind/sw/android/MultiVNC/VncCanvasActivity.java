@@ -148,7 +148,7 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public void onLongPress(MotionEvent e) {
 			
-			Log.d(TAG, "Input: long press");
+			if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 			
 			showZoomer(true);
 			BCFactory.getInstance().getBCHaptic().performLongPressHaptic(
@@ -168,7 +168,7 @@ public class VncCanvasActivity extends Activity {
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
 			
-			Log.d(TAG, "Input: scroll");
+			if(Utils.DEBUG()) Log.d(TAG, "Input: scroll");
 
 			if (BCFactory.getInstance().getBCMotionEvent().getPointerCount(e2) > 1)
 			{
@@ -213,7 +213,8 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onTouchEvent(MotionEvent e) {
 			if (dragMode) {
-				Log.d(TAG, "Input: touch drag");
+				
+				if(Utils.DEBUG()) Log.d(TAG, "Input: touch drag");
 
 				// compute the relative movement offset on the remote screen.
 				float deltaX = (e.getX() - dragX) *vncCanvas.getScale();
@@ -230,7 +231,7 @@ public class VncCanvasActivity extends Activity {
 
 				if (e.getAction() == MotionEvent.ACTION_UP)
 				{
-					Log.d(TAG, "Input: touch drag, finger up");
+					if(Utils.DEBUG()) Log.d(TAG, "Input: touch drag, finger up");
 					
 					dragMode = false;
 					
@@ -251,7 +252,8 @@ public class VncCanvasActivity extends Activity {
 
 			} else
 			{
-				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+				if(Utils.DEBUG())
+					Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
 							
 				return super.onTouchEvent(e);
 			}
@@ -274,7 +276,7 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
 			
-			Log.d(TAG, "Input: single tap");
+			if(Utils.DEBUG()) Log.d(TAG, "Input: single tap");
 			
 			boolean multiTouch = (BCFactory.getInstance().getBCMotionEvent().getPointerCount(e) > 1);
 			remoteMouseStayPut(e);
@@ -291,7 +293,7 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
-			Log.d(TAG, "Input: double tap");
+			if(Utils.DEBUG()) Log.d(TAG, "Input: double tap");
 
 			button2insteadof1 = true;
 			

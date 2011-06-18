@@ -7,11 +7,13 @@ import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
-import android.net.Uri;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.text.Html;
 
 public class Utils {
+	
+	public static boolean debug = false;
 
 	public static void showYesNoPrompt(Context _context, String title, String message, OnClickListener onYesListener, OnClickListener onNoListener) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(_context);
@@ -65,5 +67,20 @@ public class Utils {
 		builder.setPositiveButton("Acknowledged", ackHandler);
 		builder.setIcon(icon);
 		builder.show();
+	}
+	
+	public static void DEBUG(Context c)
+	{
+		try {
+			debug = (c.getPackageManager().getApplicationInfo(c.getPackageName(), 0).flags &
+					ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static boolean DEBUG()
+	{
+		return debug;
 	}
 }

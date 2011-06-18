@@ -46,8 +46,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
@@ -86,6 +84,9 @@ public class MainMenuActivity extends Activity {
 
 		super.onCreate(icicle);
 		setContentView(R.layout.main);
+		
+		// get package debug flag and set it 
+		Utils.DEBUG(this);
 
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);

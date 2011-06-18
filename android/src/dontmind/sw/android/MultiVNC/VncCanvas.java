@@ -229,7 +229,7 @@ public class VncCanvas extends ImageView {
 		int bitPref=0;
 		if(connection.getUserName().length()>0)
 		  bitPref|=1;
-		Log.d("debug","bitPref="+bitPref);
+		if(Utils.DEBUG()) Log.d("debug","bitPref="+bitPref);
 		int secType = rfb.negotiateSecurity(bitPref);
 		int authType;
 		if (secType == RfbProto.SecTypeTight) {
@@ -702,7 +702,7 @@ public class VncCanvas extends ImageView {
 
 			if (bitmapData != null)
 			{
-				Log.d(TAG, "redraw");
+				if(Utils.DEBUG()) Log.d(TAG, "redraw");
 				
 				bitmapData.updateView(VncCanvas.this);
 			}
@@ -833,21 +833,21 @@ public class VncCanvas extends ImageView {
 		    if (action == MotionEvent.ACTION_DOWN || (mouseIsDown && action == MotionEvent.ACTION_MOVE)) {
 		      if (useRightButton) {
 		    	  if(action == MotionEvent.ACTION_MOVE) 
-		    		  Log.d(TAG, "Input: moving, right mouse button down");
+		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, right mouse button down");
 		    	  else 
-		    		  Log.d(TAG, "Input: right mouse button down");
+		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: right mouse button down");
 		    	  
 		    	  pointerMask = MOUSE_BUTTON_RIGHT;
 		      } else {
 		    	  if(action == MotionEvent.ACTION_MOVE) 
-		    		  Log.d(TAG, "Input: moving, left mouse button down");
+		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, left mouse button down");
 		    	  else 
-		    		  Log.d(TAG, "Input: left mouse button down");
+		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: left mouse button down");
 		    	  
 		    	  pointerMask = MOUSE_BUTTON_LEFT;
 		      }
 		    } else if (action == MotionEvent.ACTION_UP) {
-		    	Log.d(TAG, "Input: all mouse buttons up");
+		    	if(Utils.DEBUG()) Log.d(TAG, "Input: all mouse buttons up");
 		    	pointerMask = 0;
 		    }
 		    bitmapData.invalidateMousePosition();
