@@ -167,11 +167,11 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
-			
-			if(Utils.DEBUG()) Log.d(TAG, "Input: scroll");
 
 			if (BCFactory.getInstance().getBCMotionEvent().getPointerCount(e2) > 1)
 			{
+				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll multitouch");
+				
 				if (inScaling)
 					return false;
 				showZoomer(false);
@@ -179,6 +179,8 @@ public class VncCanvasActivity extends Activity {
 			}
 			else
 			{
+				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll single touch");
+
 				// compute the relative movement offset on the remote screen.
 				float deltaX = -distanceX *vncCanvas.getScale();
 				float deltaY = -distanceY *vncCanvas.getScale();
@@ -331,6 +333,10 @@ public class VncCanvasActivity extends Activity {
 
 	ZoomControls zoomer;
 	Panner panner;
+	
+	MouseButtonView mousebutton1;
+	MouseButtonView mousebutton2;
+	MouseButtonView mousebutton3;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -473,6 +479,35 @@ public class VncCanvasActivity extends Activity {
 		panner = new Panner(this, vncCanvas.handler);
 
 		inputHandler = getInputHandlerById(touchPadId);
+		
+		mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
+		mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
+		mousebutton3 = (MouseButtonView) findViewById(R.id.mousebutton3);
+		
+		mousebutton1.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent e) {
+				MouseButtonView button = (MouseButtonView) v;
+				return button.handleEvent(e, 1, inputHandler);
+			}
+		});
+		
+		mousebutton2.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent e) {
+				MouseButtonView button = (MouseButtonView) v;
+				return button.handleEvent(e, 2, inputHandler);
+			}
+		});
+		
+		mousebutton3.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent e) {
+				MouseButtonView button = (MouseButtonView) v;
+				return button.handleEvent(e, 3, inputHandler);
+			}
+		});
+		
 	}
 
 	/**
