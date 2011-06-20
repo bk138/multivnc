@@ -26,6 +26,7 @@
 <string name="delete_key_list">Delete Key List</string>
 <string name="disconnect">Disconnect</string>
 <string name="toggle_framebuffer_update">Toggle View</string>
+<string name="toggle_mouse_buttons">Toggle Mouse Buttons</string>
 <string name="export_settings">Export</string>
 <string name="export_settings_path">Export to file</string>
 <string name="enter_text_title">Enter Text to Send</string>

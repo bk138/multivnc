@@ -1,22 +1,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:numericShortcut="1" android:alphabeticShortcut="s" android:id="@+id/itemSpecialKeys" android:title="@string/special_keys" android:icon="@android:drawable/ic_dialog_dialer"/>
-      <item android:alphabeticShortcut="g" android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again"/>
-  
-    <item android:numericShortcut="7" android:alphabeticShortcut="d" android:id="@+id/itemDisconnect" android:title="@string/disconnect" android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
-  
-    <item android:numericShortcut="3" android:alphabeticShortcut="c" android:id="@+id/itemColorMode" android:title="@string/color_mode" android:icon="@android:drawable/ic_menu_preferences"></item>
-
-    <item android:id="@+id/itemToggleFramebufferUpdate" android:title="@string/toggle_framebuffer_update"></item>
-
-   
-    <item android:numericShortcut="9" android:alphabeticShortcut="i" android:id="@+id/itemInfo" android:title="@string/info" android:icon="@android:drawable/ic_menu_info_details"></item>
-    <item android:alphabeticShortcut="h" android:id="@+id/itemArrowLeft" android:title="@string/arrow_left"/>
-    <item android:alphabeticShortcut="j" android:id="@+id/itemArrowDown" android:title="@string/arrow_down"/>
-    <item android:alphabeticShortcut="k" android:id="@+id/itemArrowUp" android:title="@string/arrow_up"/>
-    <item android:alphabeticShortcut="l" android:id="@+id/itemArrowRight" android:title="@string/arrow_right"></item>
-    <item android:id="@+id/itemOpenDoc" android:title="@string/open_doc" android:icon="@android:drawable/ic_menu_help"/>
-   
-
-
-
+	<item android:id="@+id/itemSpecialKeys" android:title="@string/special_keys"
+		android:icon="@drawable/specialkeys" />
+	<item android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again" />
+	<item android:id="@+id/itemDisconnect" android:title="@string/disconnect"
+		android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
+	<item android:id="@+id/itemToggleFramebufferUpdate" android:title="@string/toggle_framebuffer_update"
+		android:icon="@android:drawable/ic_menu_view"></item>
+	<item android:id="@+id/itemToggleMouseButtons" android:title="@string/toggle_mouse_buttons"
+		android:icon="@drawable/mouse_icon"></item>
+	<item android:id="@+id/itemColorMode" android:title="@string/color_mode"
+		android:icon="@android:drawable/ic_menu_preferences"></item>
+	<item android:id="@+id/itemInfo" android:title="@string/info"
+		android:icon="@android:drawable/ic_menu_info_details"></item>
+	<item android:alphabeticShortcut="h" android:id="@+id/itemArrowLeft"
+		android:title="@string/arrow_left" />
+	<item android:alphabeticShortcut="j" android:id="@+id/itemArrowDown"
+		android:title="@string/arrow_down" />
+	<item android:alphabeticShortcut="k" android:id="@+id/itemArrowUp"
+		android:title="@string/arrow_up" />
+	<item android:alphabeticShortcut="l" android:id="@+id/itemArrowRight"
+		android:title="@string/arrow_right"></item>
+	<item android:id="@+id/itemOpenDoc" android:title="@string/open_doc"
+		android:icon="@android:drawable/ic_menu_help" />
 </menu>

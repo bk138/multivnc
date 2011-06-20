@@ -44,6 +44,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -146,12 +147,17 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public void onLongPress(MotionEvent e) {
-			
+
 			if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 			
 			showZoomer(true);
-					vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-							HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+			
+			// disable if virtual mouse buttons are in use 
+			if(mousebuttons.getVisibility()== View.VISIBLE)
+				return;
+			
+			vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
 			dragMode = true;
 			dragX = e.getX();
 			dragY = e.getY();
@@ -278,6 +284,10 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
 			
+			// disable if virtual mouse buttons are in use 
+			if(mousebuttons.getVisibility()== View.VISIBLE)
+				return false;
+			
 			if(Utils.DEBUG()) Log.d(TAG, "Input: single tap");
 			
 			boolean multiTouch = e.getPointerCount() > 1;
@@ -295,6 +305,11 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
+			
+			// disable if virtual mouse buttons are in use 
+			if(mousebuttons.getVisibility()== View.VISIBLE)
+				return false;
+			
 			if(Utils.DEBUG()) Log.d(TAG, "Input: double tap");
 
 			button2insteadof1 = true;
@@ -334,9 +349,7 @@ public class VncCanvasActivity extends Activity {
 	ZoomControls zoomer;
 	Panner panner;
 	
-	MouseButtonView mousebutton1;
-	MouseButtonView mousebutton2;
-	MouseButtonView mousebutton3;
+	ViewGroup mousebuttons;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -480,9 +493,10 @@ public class VncCanvasActivity extends Activity {
 
 		inputHandler = getInputHandlerById(touchPadId);
 		
-		mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
-		mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
-		mousebutton3 = (MouseButtonView) findViewById(R.id.mousebutton3);
+		mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
+		MouseButtonView mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
+		MouseButtonView mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
+		MouseButtonView mousebutton3 = (MouseButtonView) findViewById(R.id.mousebutton3);
 		
 		mousebutton1.setOnTouchListener(new View.OnTouchListener() {
 			@Override
@@ -650,6 +664,13 @@ public class VncCanvasActivity extends Activity {
 				vncCanvas.setVisibility(View.VISIBLE);
 			else
 				vncCanvas.setVisibility(View.GONE);
+			return true;	
+			
+		case R.id.itemToggleMouseButtons:
+			if(mousebuttons.getVisibility()== View.VISIBLE)
+				mousebuttons.setVisibility(View.GONE);
+			else
+				mousebuttons.setVisibility(View.VISIBLE);	
 			return true;	
 
 		case R.id.itemDisconnect:
