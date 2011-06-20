@@ -24,8 +24,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.antlersoft.android.bc.BCFactory;
-
 import com.antlersoft.android.zoomer.ZoomControls;
 
 import android.app.Activity;
@@ -169,7 +167,7 @@ public class VncCanvasActivity extends Activity {
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
 
-			if (BCFactory.getInstance().getBCMotionEvent().getPointerCount(e2) > 1)
+			if (e2.getPointerCount() > 1)
 			{
 				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll multitouch");
 				
@@ -282,7 +280,7 @@ public class VncCanvasActivity extends Activity {
 			
 			if(Utils.DEBUG()) Log.d(TAG, "Input: single tap");
 			
-			boolean multiTouch = (BCFactory.getInstance().getBCMotionEvent().getPointerCount(e) > 1);
+			boolean multiTouch = e.getPointerCount() > 1;
 			remoteMouseStayPut(e);
 
 			vncCanvas.processPointerEvent(e, true, multiTouch||vncCanvas.cameraButtonDown);

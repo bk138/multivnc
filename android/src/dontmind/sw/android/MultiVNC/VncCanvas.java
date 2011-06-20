@@ -268,7 +268,7 @@ public class VncCanvas extends ImageView {
 		Log.i(TAG, "Desktop size is " + rfb.framebufferWidth + " x " + rfb.framebufferHeight);
 
 		boolean useFull = false;
-		int capacity = BCFactory.getInstance().getBCActivityManager().getMemoryClass(Utils.getActivityManager(getContext()));
+		int capacity = Utils.getActivityManager(getContext()).getMemoryClass();
 		if (connection.getForceFull() == BitmapImplHint.AUTO)
 		{
 			if (rfb.framebufferWidth * rfb.framebufferHeight * FullBufferBitmapData.CAPACITY_MULTIPLIER <= capacity * 1024 * 1024)

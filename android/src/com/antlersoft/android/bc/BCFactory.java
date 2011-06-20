@@ -15,10 +15,7 @@ public class BCFactory {
 	
 	private static BCFactory _theInstance = new BCFactory();
 	
-	private IBCActivityManager bcActivityManager;
 	private IBCGestureDetector bcGestureDetector;
-	private IBCHaptic bcHaptic;
-	private IBCMotionEvent bcMotionEvent;
 	private IBCStorageContext bcStorageContext;
 	
 	/**
@@ -38,39 +35,7 @@ public class BCFactory {
 		}
 	}
 	
-	/**
-	 * Return the implementation of IBCActivityManager appropriate for this SDK level
-	 * @return
-	 */
-	public IBCActivityManager getBCActivityManager()
-	{
-		if (bcActivityManager == null)
-		{
-			synchronized (this)
-			{
-				if (bcActivityManager == null)
-				{
-					if (getSdkVersion() >= 5)
-					{
-						try
-						{
-							bcActivityManager = (IBCActivityManager)getClass().getClassLoader().loadClass("com.antlersoft.android.bc.BCActivityManagerV5").newInstance();
-						}
-						catch (Exception ie)
-						{
-							bcActivityManager = new BCActivityManagerDefault();
-							throw new RuntimeException("Error instantiating", ie);
-						}
-					}
-					else
-					{
-						bcActivityManager = new BCActivityManagerDefault();
-					}
-				}
-			}
-		}
-		return bcActivityManager;
-	}
+
 	
 	/**
 	 * Return the implementation of IBCGestureDetector appropriate for this SDK level
@@ -100,73 +65,8 @@ public class BCFactory {
 		return bcGestureDetector;
 	}
 	
-	/**
-	 * Return the implementation of IBCHaptic appropriate for this SDK level
-	 * 
-	 * Since we dropped support of SDK levels prior to 3, there is only one version at the moment.
-	 * @return
-	 */
-	public IBCHaptic getBCHaptic()
-	{
-		if (bcHaptic == null)
-		{
-			synchronized (this)
-			{
-				if (bcHaptic == null)
-				{
-					try
-					{
-						bcHaptic = (IBCHaptic)getClass().getClassLoader().loadClass("com.antlersoft.android.bc.BCHapticDefault").newInstance();
-					}
-					catch (Exception ie)
-					{
-						throw new RuntimeException("Error instantiating", ie);
-					}
-				}
-			}
-		}
-		return bcHaptic;
-	}
 	
-	/**
-	 * Return the implementation of IBCMotionEvent appropriate for this SDK level
-	 * @return
-	 */
-	public IBCMotionEvent getBCMotionEvent()
-	{
-		if (bcMotionEvent == null)
-		{
-			synchronized (this)
-			{
-				if (bcMotionEvent == null)
-				{
-					if (getSdkVersion() >= 5)
-					{
-						try
-						{
-							bcMotionEvent = (IBCMotionEvent)getClass().getClassLoader().loadClass("com.antlersoft.android.bc.BCMotionEvent5").newInstance();
-						}
-						catch (Exception ie)
-						{
-							throw new RuntimeException("Error instantiating", ie);
-						}
-					}
-					else
-					{
-						try
-						{
-							bcMotionEvent = (IBCMotionEvent)getClass().getClassLoader().loadClass("com.antlersoft.android.bc.BCMotionEvent4").newInstance();
-						}
-						catch (Exception ie)
-						{
-							throw new RuntimeException("Error instantiating", ie);
-						}
-					}
-				}
-			}
-		}
-		return bcMotionEvent;
-	}
+	
 	
 	@SuppressWarnings("unchecked")
 	static private Class[] scaleDetectorConstructorArgs = new Class[] { Context.class, OnScaleGestureListener.class };
