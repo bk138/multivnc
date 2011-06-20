@@ -40,6 +40,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -151,8 +152,8 @@ public class VncCanvasActivity extends Activity {
 			if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 			
 			showZoomer(true);
-			BCFactory.getInstance().getBCHaptic().performLongPressHaptic(
-					vncCanvas);
+					vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+							HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
 			dragMode = true;
 			dragX = e.getX();
 			dragY = e.getY();
