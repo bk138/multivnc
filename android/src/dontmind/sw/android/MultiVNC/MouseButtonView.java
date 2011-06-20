@@ -65,30 +65,27 @@ public class MouseButtonView extends View {
 				// get oldest one
 				new_e = MotionEvent.obtain(
 						e.getDownTime(), // downtime //XXX?
-						e.getHistoricalEventTime(historySize-1), // oldest eventtime
+						e.getHistoricalEventTime(0), // oldest eventtime
 						e.getAction(),  // action
-						origin_x + e.getHistoricalX(1, historySize-1), // oldest x
-						origin_y + e.getHistoricalY(1, historySize-1), // oldest y
-						e.getHistoricalPressure(1, historySize-1), // oldest pressure
-						e.getHistoricalSize(1, historySize-1),  // oldest size
+						origin_x + e.getHistoricalX(1, 0), // oldest x
+						origin_y + e.getHistoricalY(1, 0), // oldest y
+						e.getHistoricalPressure(1, 0), // oldest pressure
+						e.getHistoricalSize(1, 0),  // oldest size
 						e.getMetaState(), // metastate
 						e.getXPrecision(), e.getYPrecision(), // x,y precision
 						e.getDeviceId(), // device id
 						e.getEdgeFlags()); // edgeflags
 
 				// add up more history. addBatch adds to front!
-				if(historySize > 1)
+				for (int h = 1; h < historySize; ++h) // from 2nd oldest to 2nd newest
 				{
-					for (int h = historySize-2; h >= 0; --h) // from last to first 
-					{
-						new_e.addBatch(
-								e.getHistoricalEventTime(h),
-								origin_x + e.getHistoricalX(1, h),
-								origin_y + e.getHistoricalY(1, h),
-								e.getHistoricalPressure(1, h), 
-								e.getHistoricalSize(1, h),
-								e.getMetaState());
-					}
+					new_e.addBatch(
+							e.getHistoricalEventTime(h),
+							origin_x + e.getHistoricalX(1, h),
+							origin_y + e.getHistoricalY(1, h),
+							e.getHistoricalPressure(1, h), 
+							e.getHistoricalSize(1, h),
+							e.getMetaState());
 				}
 
 				// and the newest one
@@ -124,7 +121,7 @@ public class MouseButtonView extends View {
 		final int historySize = e.getHistorySize();
 		final int pointerCount = e.getPointerCount();
 		for (int h = 0; h < historySize; h++) {
-			Log.d(TAG, "Input: historical:");
+			Log.d(TAG, "Input: historical @ " + e.getHistoricalEventTime(h));
 			for (int p = 0; p < pointerCount; p++) {
 				Log.d(TAG, "Input:  pointer:" +
 						e.getPointerId(p) + " x:" +  e.getHistoricalX(p, h)
@@ -132,7 +129,7 @@ public class MouseButtonView extends View {
 			}
 		}
 		for (int p = 0; p < pointerCount; p++) {
-			Log.d(TAG, "Input: now:");
+			Log.d(TAG, "Input: now @ " + e.getEventTime());
 			Log.d(TAG, "Input:  pointer:" +
 					e.getPointerId(p)
 					+ " x:" + e.getX(p)
