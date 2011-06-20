@@ -1,10 +1,13 @@
 package dontmind.sw.android.MultiVNC;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 
 
@@ -14,22 +17,28 @@ public class MouseButtonView extends View {
 
 	public MouseButtonView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-
+		setSoundEffectsEnabled(true);
 	}
 
 
-	public boolean handleEvent(MotionEvent e, int buttonId, AbstractInputHandler inputHandler)
+	public boolean handleEvent(MotionEvent e, int buttonId, 
+				AbstractInputHandler inputHandler, VncCanvas canvas)
 	{
 		if(Utils.DEBUG()) 
 			Log.d(TAG, "Input: button " + buttonId + " action:" + e.getAction());
+
+		final int action = e.getAction();
 
 		/* 
 		 * in case one pointer holds the button down and another one tries
 		 * to move the mouse, we need to feed the input handler with a 
 		 * synthetic motion event.
 		 */
-		if(e.getPointerCount() > 1
-				&& e.getAction() == MotionEvent.ACTION_MOVE)
+		final int action_masked = action & MotionEvent.ACTION_MASK;
+		if(e.getPointerCount() > 1 	
+				&& ((action_masked == MotionEvent.ACTION_MOVE)
+						|| action_masked == MotionEvent.ACTION_POINTER_UP
+						|| action_masked == MotionEvent.ACTION_POINTER_DOWN))
 		{
 			if(Utils.DEBUG()) inspectEvent(e);
 
@@ -39,6 +48,20 @@ public class MouseButtonView extends View {
 
 			if(Utils.DEBUG()) Log.d(TAG, "Input button " + buttonId + " origin: " + origin_x + "," + origin_y);
 
+			int new_action = action;
+			switch (action_masked)
+			{
+			case MotionEvent.ACTION_MOVE:
+				new_action = MotionEvent.ACTION_MOVE;
+				break;
+			case MotionEvent.ACTION_POINTER_UP:
+				new_action = MotionEvent.ACTION_UP;
+				break;
+			case MotionEvent.ACTION_POINTER_DOWN:
+				new_action = MotionEvent.ACTION_DOWN;
+				break;
+			}
+			
 			final int historySize = e.getHistorySize();
 
 			// get a new MotionEvent.
@@ -50,7 +73,7 @@ public class MouseButtonView extends View {
 				new_e = MotionEvent.obtain(
 						e.getDownTime(), // downtime //XXX?
 						e.getEventTime(), // eventtime
-						e.getAction(),  // action
+						new_action,  // action
 						origin_x + e.getX(1), // x
 						origin_y + e.getY(1), // y
 						e.getPressure(1), // pressure
@@ -66,7 +89,7 @@ public class MouseButtonView extends View {
 				new_e = MotionEvent.obtain(
 						e.getDownTime(), // downtime //XXX?
 						e.getHistoricalEventTime(0), // oldest eventtime
-						e.getAction(),  // action
+						new_action,  // action, will always be ACTION_MOVE here
 						origin_x + e.getHistoricalX(1, 0), // oldest x
 						origin_y + e.getHistoricalY(1, 0), // oldest y
 						e.getHistoricalPressure(1, 0), // oldest pressure
@@ -103,11 +126,38 @@ public class MouseButtonView extends View {
 			// feed to input handler
 			inputHandler.onTouchEvent(new_e);
 		}
-		else
+
+		if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
 		{
-			// vibrate	
+			// bzzt!	
 			performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
 					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+			
+			// beep!
+			playSoundEffect(SoundEffectConstants.CLICK);
+			
+			int pointerMask = 0; // like up
+			if(action == MotionEvent.ACTION_DOWN)
+			{
+				switch(buttonId)
+				{
+				case 1:
+					pointerMask = 1;
+					break;
+				case 2:
+					pointerMask = 2;
+					break;
+				case 3:		
+					pointerMask = 4;
+					break;
+				}
+			}
+
+			try {
+				canvas.rfb.writePointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 
 		}
 
@@ -128,12 +178,13 @@ public class MouseButtonView extends View {
 						+ " y:" +  e.getHistoricalY(p, h));
 			}
 		}
+		Log.d(TAG, "Input: now @ " + e.getEventTime());
 		for (int p = 0; p < pointerCount; p++) {
-			Log.d(TAG, "Input: now @ " + e.getEventTime());
 			Log.d(TAG, "Input:  pointer:" +
 					e.getPointerId(p)
 					+ " x:" + e.getX(p)
-					+ " y:" + e.getY(p));
+					+ " y:" + e.getY(p)
+					+ " action:" + e.getAction());
 		}
 	}
 }

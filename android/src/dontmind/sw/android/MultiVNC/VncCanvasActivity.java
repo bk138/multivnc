@@ -179,8 +179,6 @@ public class VncCanvasActivity extends Activity {
 			}
 			else
 			{
-				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll single touch");
-
 				// compute the relative movement offset on the remote screen.
 				float deltaX = -distanceX *vncCanvas.getScale();
 				float deltaY = -distanceY *vncCanvas.getScale();
@@ -191,6 +189,9 @@ public class VncCanvasActivity extends Activity {
 				float newRemoteX = vncCanvas.mouseX + deltaX;
 				float newRemoteY = vncCanvas.mouseY + deltaY;
 	
+				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll single touch from " 
+						+ vncCanvas.mouseX + "," + vncCanvas.mouseY
+						+ " to " + (int)newRemoteX + "," + (int)newRemoteY);
 	
 				if (dragMode) {
 					if (e2.getAction() == MotionEvent.ACTION_UP)
@@ -488,7 +489,7 @@ public class VncCanvasActivity extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent e) {
 				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 1, inputHandler);
+				return button.handleEvent(e, 1, inputHandler, vncCanvas);
 			}
 		});
 		
@@ -496,7 +497,7 @@ public class VncCanvasActivity extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent e) {
 				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 2, inputHandler);
+				return button.handleEvent(e, 2, inputHandler, vncCanvas);
 			}
 		});
 		
@@ -504,7 +505,7 @@ public class VncCanvasActivity extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent e) {
 				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 3, inputHandler);
+				return button.handleEvent(e, 3, inputHandler, vncCanvas);
 			}
 		});
 		

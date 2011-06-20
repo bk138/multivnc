@@ -39,14 +39,14 @@
 	          android:layout_height="fill_parent"
 	          android:layout_weight="1"/>
 	      <dontmind.sw.android.MultiVNC.MouseButtonView
-	       	  android:id="@+id/mousebutton3"
+	       	  android:id="@+id/mousebutton2"
 	          android:gravity="center_horizontal"
 	          android:background="#cc7f7f7f"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:layout_weight="1"/>
 	      <dontmind.sw.android.MultiVNC.MouseButtonView
-	          android:id="@+id/mousebutton2"
+	          android:id="@+id/mousebutton3"
 	          android:gravity="center_horizontal"
 	          android:background="#aa7f7f7f"
 	          android:layout_width="wrap_content"
