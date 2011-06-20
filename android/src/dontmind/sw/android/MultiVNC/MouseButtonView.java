@@ -24,9 +24,6 @@ public class MouseButtonView extends View {
 	public boolean handleEvent(MotionEvent e, int buttonId, 
 				AbstractInputHandler inputHandler, VncCanvas canvas)
 	{
-		if(Utils.DEBUG()) 
-			Log.d(TAG, "Input: button " + buttonId + " action:" + e.getAction());
-
 		final int action = e.getAction();
 
 		/* 
@@ -40,13 +37,17 @@ public class MouseButtonView extends View {
 						|| action_masked == MotionEvent.ACTION_POINTER_UP
 						|| action_masked == MotionEvent.ACTION_POINTER_DOWN))
 		{
-			if(Utils.DEBUG()) inspectEvent(e);
+			if(Utils.DEBUG()) 
+			{
+				Log.d(TAG, "Input: button " + buttonId + " second pointer");
+				inspectEvent(e);
+			}
 
 			// calc button view origin
 			final float origin_x = e.getRawX() - e.getX();
 			final float origin_y = e.getRawY() - e.getY();
 
-			if(Utils.DEBUG()) Log.d(TAG, "Input button " + buttonId + " origin: " + origin_x + "," + origin_y);
+			if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " origin: " + origin_x + "," + origin_y);
 
 			int new_action = action;
 			switch (action_masked)
@@ -129,6 +130,9 @@ public class MouseButtonView extends View {
 
 		if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
 		{
+			if(Utils.DEBUG()) 
+				Log.d(TAG, "Input: button " + buttonId + " action:" + action);
+			
 			// bzzt!	
 			performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
 					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
