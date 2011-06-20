@@ -502,7 +502,7 @@ public class VncCanvasActivity extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent e) {
 				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 1, inputHandler, vncCanvas);
+				return button.handleEvent(e, 1, vncCanvas);
 			}
 		});
 		
@@ -510,7 +510,7 @@ public class VncCanvasActivity extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent e) {
 				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 2, inputHandler, vncCanvas);
+				return button.handleEvent(e, 2, vncCanvas);
 			}
 		});
 		
@@ -518,7 +518,7 @@ public class VncCanvasActivity extends Activity {
 			@Override
 			public boolean onTouch(View v, MotionEvent e) {
 				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 3, inputHandler, vncCanvas);
+				return button.handleEvent(e, 3, vncCanvas);
 			}
 		});
 		

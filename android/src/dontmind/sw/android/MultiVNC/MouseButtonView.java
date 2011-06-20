@@ -14,6 +14,7 @@ import android.view.View;
 public class MouseButtonView extends View {
 
 	private final static String TAG = "MouseButtonView";
+	private float dragX, dragY;
 
 	public MouseButtonView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -21,15 +22,13 @@ public class MouseButtonView extends View {
 	}
 
 
-	public boolean handleEvent(MotionEvent e, int buttonId, 
-				AbstractInputHandler inputHandler, VncCanvas canvas)
+	public boolean handleEvent(MotionEvent e, int buttonId, VncCanvas canvas)
 	{
 		final int action = e.getAction();
 
 		/* 
 		 * in case one pointer holds the button down and another one tries
-		 * to move the mouse, we need to feed the input handler with a 
-		 * synthetic motion event.
+		 * to move the mouse
 		 */
 		final int action_masked = action & MotionEvent.ACTION_MASK;
 		if(e.getPointerCount() > 1 	
@@ -46,88 +45,52 @@ public class MouseButtonView extends View {
 			// calc button view origin
 			final float origin_x = e.getRawX() - e.getX();
 			final float origin_y = e.getRawY() - e.getY();
-
 			if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " origin: " + origin_x + "," + origin_y);
+			
+			// from there, get second pointer's _absolute_ coords
+			final float pointer_x = origin_x + e.getX(1); 
+			final float pointer_y = origin_y + e.getY(1); 
 
-			int new_action = action;
 			switch (action_masked)
 			{
 			case MotionEvent.ACTION_MOVE:
-				new_action = MotionEvent.ACTION_MOVE;
-				break;
-			case MotionEvent.ACTION_POINTER_UP:
-				new_action = MotionEvent.ACTION_UP;
+				
+				if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer pos: " + pointer_x + "," + pointer_y);
+				
+				// compute the relative movement offset on the remote screen.
+				float deltaX = (pointer_x - dragX) * canvas.getScale();
+				float deltaY = (pointer_y - dragY) * canvas.getScale();
+				dragX = pointer_x;
+				dragY = pointer_y;
+				deltaX = fineCtrlScale(deltaX);
+				deltaY = fineCtrlScale(deltaY);
+				
+				// compute the absolute new mouse pos on the remote site.
+				float newRemoteX = canvas.mouseX + deltaX;
+				float newRemoteY = canvas.mouseY + deltaY;
+								
+				try {
+					canvas.rfb.writePointerEvent((int)newRemoteX, (int)newRemoteY, e.getMetaState(), 1 << (buttonId-1));
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+				
+				// update view
+				// FIXME use only canvas, not rfb directly
+				canvas.mouseX = (int) newRemoteX;
+				canvas.mouseY = (int) newRemoteY;
+				canvas.panToMouse();
+				
 				break;
 			case MotionEvent.ACTION_POINTER_DOWN:
-				new_action = MotionEvent.ACTION_DOWN;
+				if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer pos: " + pointer_x + "," + pointer_y + " DOWN");
+				dragX = pointer_x;
+				dragY = pointer_y;
 				break;
 			}
-			
-			final int historySize = e.getHistorySize();
-
-			// get a new MotionEvent.
-			// we can not reuse the old one since there's now way to 
-			// remove the second pointer from it.
-			MotionEvent new_e;
-			if(historySize == 0) // no history, simple case
-			{
-				new_e = MotionEvent.obtain(
-						e.getDownTime(), // downtime //XXX?
-						e.getEventTime(), // eventtime
-						new_action,  // action
-						origin_x + e.getX(1), // x
-						origin_y + e.getY(1), // y
-						e.getPressure(1), // pressure
-						e.getSize(1),  //size
-						e.getMetaState(), // metastate
-						e.getXPrecision(), e.getYPrecision(), // x,y precision
-						e.getDeviceId(), // device id
-						e.getEdgeFlags()); // edgeflags
-			}
-			else // there is history, bit more complicated
-			{
-				// get oldest one
-				new_e = MotionEvent.obtain(
-						e.getDownTime(), // downtime //XXX?
-						e.getHistoricalEventTime(0), // oldest eventtime
-						new_action,  // action, will always be ACTION_MOVE here
-						origin_x + e.getHistoricalX(1, 0), // oldest x
-						origin_y + e.getHistoricalY(1, 0), // oldest y
-						e.getHistoricalPressure(1, 0), // oldest pressure
-						e.getHistoricalSize(1, 0),  // oldest size
-						e.getMetaState(), // metastate
-						e.getXPrecision(), e.getYPrecision(), // x,y precision
-						e.getDeviceId(), // device id
-						e.getEdgeFlags()); // edgeflags
-
-				// add up more history. addBatch adds to front!
-				for (int h = 1; h < historySize; ++h) // from 2nd oldest to 2nd newest
-				{
-					new_e.addBatch(
-							e.getHistoricalEventTime(h),
-							origin_x + e.getHistoricalX(1, h),
-							origin_y + e.getHistoricalY(1, h),
-							e.getHistoricalPressure(1, h), 
-							e.getHistoricalSize(1, h),
-							e.getMetaState());
-				}
-
-				// and the newest one
-				new_e.addBatch(
-						e.getEventTime(),
-						origin_x + e.getX(1), // x
-						origin_y + e.getY(1), // y
-						e.getPressure(1), // pressure
-						e.getSize(1),  //size
-						e.getMetaState()); // metastate
-			}
-
-			if(Utils.DEBUG()) inspectEvent(new_e);
-
-			// feed to input handler
-			inputHandler.onTouchEvent(new_e);
 		}
 
+		// one pointer
 		if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
 		{
 			if(Utils.DEBUG()) 
@@ -142,20 +105,7 @@ public class MouseButtonView extends View {
 			
 			int pointerMask = 0; // like up
 			if(action == MotionEvent.ACTION_DOWN)
-			{
-				switch(buttonId)
-				{
-				case 1:
-					pointerMask = 1;
-					break;
-				case 2:
-					pointerMask = 2;
-					break;
-				case 3:		
-					pointerMask = 4;
-					break;
-				}
-			}
+				pointerMask = 1 << (buttonId-1);
 
 			try {
 				canvas.rfb.writePointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
@@ -169,7 +119,32 @@ public class MouseButtonView extends View {
 		return true;
 	}
 
-
+	/**
+	 * scale down delta when it is small. This will allow finer control
+	 * when user is making a small movement on touch screen.
+	 * Scale up delta when delta is big. This allows fast mouse movement when
+	 * user is flinging.
+	 * @param deltaX
+	 * @return
+	 */
+	private float fineCtrlScale(float delta) {
+		float sign = (delta>0) ? 1 : -1;
+		delta = Math.abs(delta);
+		if (delta>=1 && delta <=3) {
+			delta = 1;
+		}else if (delta <= 10) {
+			delta *= 0.34;
+		} else if (delta <= 30 ) {
+			delta *= delta/30;
+		} else if (delta <= 90) {
+			delta *=  (delta/30);
+		} else {
+			delta *= 3.0;
+		}
+		return sign * delta;
+	}
+	
+	
 	private void inspectEvent(MotionEvent e)
 	{
 		final int historySize = e.getHistorySize();
