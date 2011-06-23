@@ -15,6 +15,8 @@ public class MouseButtonView extends View {
 
 	private final static String TAG = "MouseButtonView";
 	private float dragX, dragY;
+	private int pointerOneId = -1;
+	private int pointerTwoId = -1;
 
 	public MouseButtonView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -25,99 +27,160 @@ public class MouseButtonView extends View {
 	public boolean handleEvent(MotionEvent e, int buttonId, VncCanvas canvas)
 	{
 		final int action = e.getAction();
-
+		///
+		if(action != MotionEvent.ACTION_MOVE)
+			Log.d(TAG, "Input: something!!!!!!!!!!!!!!!!!!!!!!!!!");
+		
 		/* 
 		 * in case one pointer holds the button down and another one tries
 		 * to move the mouse
 		 */
 		final int action_masked = action & MotionEvent.ACTION_MASK;
-		if(e.getPointerCount() > 1 	
+		if(e.getPointerCount() > 1
 				&& ((action_masked == MotionEvent.ACTION_MOVE)
 						|| action_masked == MotionEvent.ACTION_POINTER_UP
 						|| action_masked == MotionEvent.ACTION_POINTER_DOWN))
 		{
 			if(Utils.DEBUG()) 
-			{
-				Log.d(TAG, "Input: button " + buttonId + " second pointer");
 				inspectEvent(e);
-			}
 
 			// calc button view origin
 			final float origin_x = e.getRawX() - e.getX();
 			final float origin_y = e.getRawY() - e.getY();
 			if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " origin: " + origin_x + "," + origin_y);
-			
-			// from there, get second pointer's _absolute_ coords
-			final float pointer_x = origin_x + e.getX(1); 
-			final float pointer_y = origin_y + e.getY(1); 
 
 			switch (action_masked)
 			{
 			case MotionEvent.ACTION_MOVE:
-				
-				if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer pos: " + pointer_x + "," + pointer_y);
-				
-				// compute the relative movement offset on the remote screen.
-				float deltaX = (pointer_x - dragX) * canvas.getScale();
-				float deltaY = (pointer_y - dragY) * canvas.getScale();
-				dragX = pointer_x;
-				dragY = pointer_y;
-				deltaX = fineCtrlScale(deltaX);
-				deltaY = fineCtrlScale(deltaY);
-				
-				// compute the absolute new mouse pos on the remote site.
-				float newRemoteX = canvas.mouseX + deltaX;
-				float newRemoteY = canvas.mouseY + deltaY;
-								
-				try {
-					canvas.rfb.writePointerEvent((int)newRemoteX, (int)newRemoteY, e.getMetaState(), 1 << (buttonId-1));
-				} catch (IOException ex) {
-					ex.printStackTrace();
+				// is there data for pointerTwo?
+				int pointerTwoIndex;
+				if((pointerTwoIndex = e.findPointerIndex(pointerTwoId)) >= 0)
+				{
+					// get second pointer's _absolute_ coords
+					final float pointerTwoX = origin_x + e.getX(pointerTwoIndex); 
+					final float pointerTwoY = origin_y + e.getY(pointerTwoIndex); 
+
+					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId + " idx:" + pointerTwoIndex + " pos: " + pointerTwoX + "," + pointerTwoY + " MOVE");
+
+					// compute the relative movement offset on the remote screen.
+					float deltaX = (pointerTwoX - dragX) * canvas.getScale();
+					float deltaY = (pointerTwoY - dragY) * canvas.getScale();
+					dragX = pointerTwoX;
+					dragY = pointerTwoY;
+					deltaX = fineCtrlScale(deltaX);
+					deltaY = fineCtrlScale(deltaY);
+
+					// compute the absolute new mouse pos on the remote site.
+					float newRemoteX = canvas.mouseX + deltaX;
+					float newRemoteY = canvas.mouseY + deltaY;
+
+					try {
+						canvas.rfb.writePointerEvent((int)newRemoteX, (int)newRemoteY, e.getMetaState(), 1 << (buttonId-1));
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
+
+					// update view
+					// FIXME use only canvas, not rfb directly
+					canvas.mouseX = (int) newRemoteX;
+					canvas.mouseY = (int) newRemoteY;
+					canvas.panToMouse();
 				}
-				
-				// update view
-				// FIXME use only canvas, not rfb directly
-				canvas.mouseX = (int) newRemoteX;
-				canvas.mouseY = (int) newRemoteY;
-				canvas.panToMouse();
-				
 				break;
 			case MotionEvent.ACTION_POINTER_DOWN:
-				if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer pos: " + pointer_x + "," + pointer_y + " DOWN");
-				dragX = pointer_x;
-				dragY = pointer_y;
+				// XXX
+				Log.d(TAG,"Input:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx ");
+				Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId  +  " DOWN");
+				int idx = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+				>> MotionEvent.ACTION_POINTER_INDEX_SHIFT;	
+				Log.d(TAG, "Input: button " + buttonId + " this events idx:" + idx);
+//				XXX
+				
+				if(pointerOneId >= 0 && pointerTwoId < 0) // only one pointer was down before
+				{
+					pointerTwoId = e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+							>> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
+					pointerTwoIndex = e.findPointerIndex(pointerTwoId);
+					// get second pointer's _absolute_ coords
+					final float pointerTwoX = origin_x + e.getX(pointerTwoIndex); 
+					final float pointerTwoY = origin_y + e.getY(pointerTwoIndex); 
+					dragX = pointerTwoX;
+					dragY = pointerTwoY;
+					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId + " idx:" + pointerTwoIndex + " pos: " + pointerTwoX + "," + pointerTwoY + " DOWN");
+				}
 				break;
+			case MotionEvent.ACTION_POINTER_UP:
+				if(pointerTwoId // this was actually pointerTwo going up
+						== e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT)) 
+				{
+					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer UP");
+					pointerTwoId = -1;	// set invalid again
+				}
+				if(pointerOneId // this was  pointerOne going up
+						== e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT)) 
+				{
+					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " first pointer UP");
+					pointerOneId = -1;	// set invalid again
+					pointerTwoId = -1;  // and this one too!
+					doClick(e, buttonId, canvas);
+				}
+
+				break;
+
 			}
 		}
 
-		// one pointer
+		// only one pointer
 		if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
 		{
 			if(Utils.DEBUG()) 
-				Log.d(TAG, "Input: button " + buttonId + " action:" + action);
-			
-			// bzzt!	
-			performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
-			
-			// beep!
-			playSoundEffect(SoundEffectConstants.CLICK);
-			
-			int pointerMask = 0; // like up
+				Log.d(TAG, "Input: button " + buttonId + " single pointer:" + action);
+
 			if(action == MotionEvent.ACTION_DOWN)
-				pointerMask = 1 << (buttonId-1);
-
-			try {
-				canvas.rfb.writePointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-
+				{
+				pointerOneId = e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+						>> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
+				doClick(e, buttonId, canvas);
+				}
+			else // ACTION_UP
+				if(e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+						>> MotionEvent.ACTION_POINTER_INDEX_SHIFT)
+						== pointerOneId)
+				{
+					pointerOneId = -1;	// set invalid again
+					pointerTwoId = -1;  // and this one too!
+					doClick(e, buttonId, canvas);
+				}
 		}
 
 		// we have to return true to get the ACTION_UP event 
 		return true;
 	}
+
+
+	void doClick(MotionEvent e, int buttonId, VncCanvas canvas)
+	{
+		if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " CLICK");
+
+		// bzzt!	
+		performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+				HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+
+		// beep!
+		playSoundEffect(SoundEffectConstants.CLICK);
+
+		int pointerMask = 0; // like up
+		if(e.getAction() == MotionEvent.ACTION_DOWN)
+			pointerMask = 1 << (buttonId-1);
+
+		try {
+			canvas.rfb.writePointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+
 
 	/**
 	 * scale down delta when it is small. This will allow finer control
@@ -143,20 +206,20 @@ public class MouseButtonView extends View {
 		}
 		return sign * delta;
 	}
-	
-	
+
+
 	private void inspectEvent(MotionEvent e)
 	{
 		final int historySize = e.getHistorySize();
 		final int pointerCount = e.getPointerCount();
-		for (int h = 0; h < historySize; h++) {
+		/*for (int h = 0; h < historySize; h++) {
 			Log.d(TAG, "Input: historical @ " + e.getHistoricalEventTime(h));
 			for (int p = 0; p < pointerCount; p++) {
 				Log.d(TAG, "Input:  pointer:" +
 						e.getPointerId(p) + " x:" +  e.getHistoricalX(p, h)
 						+ " y:" +  e.getHistoricalY(p, h));
 			}
-		}
+		}*/
 		Log.d(TAG, "Input: now @ " + e.getEventTime());
 		for (int p = 0; p < pointerCount; p++) {
 			Log.d(TAG, "Input:  pointer:" +
