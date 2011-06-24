@@ -498,30 +498,9 @@ public class VncCanvasActivity extends Activity {
 		MouseButtonView mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
 		MouseButtonView mousebutton3 = (MouseButtonView) findViewById(R.id.mousebutton3);
 		
-		mousebutton1.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent e) {
-				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 1, vncCanvas);
-			}
-		});
-		
-		mousebutton2.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent e) {
-				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 2, vncCanvas);
-			}
-		});
-		
-		mousebutton3.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent e) {
-				MouseButtonView button = (MouseButtonView) v;
-				return button.handleEvent(e, 3, vncCanvas);
-			}
-		});
-		
+		mousebutton1.init(1, vncCanvas);
+		mousebutton2.init(2, vncCanvas);
+		mousebutton3.init(3, vncCanvas);
 	}
 
 	/**

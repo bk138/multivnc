@@ -31,7 +31,7 @@
 	      android:id="@+id/virtualmousebuttons"
 	      android:orientation="horizontal"
 	      android:layout_width="fill_parent"
-	      android:layout_height="50dip">
+	      android:layout_height="70dip">
 	      <dontmind.sw.android.MultiVNC.MouseButtonView
 	      	  android:id="@+id/mousebutton1"
 	          android:gravity="center_horizontal"

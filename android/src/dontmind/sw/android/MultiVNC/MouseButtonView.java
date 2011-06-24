@@ -3,8 +3,10 @@ package dontmind.sw.android.MultiVNC;
 import java.io.IOException;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
@@ -14,23 +16,52 @@ import android.view.View;
 public class MouseButtonView extends View {
 
 	private final static String TAG = "MouseButtonView";
+	private int buttonId;
+	Drawable dfltBackground;
+	private VncCanvas canvas;
+	protected GestureDetector gestureDetector;
 	private float dragX, dragY;
 	private int pointerOneId = -1;
 	private int pointerTwoId = -1;
 
-	public MouseButtonView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		setSoundEffectsEnabled(true);
+
+	class MouseButtonGestureListener extends GestureDetector.SimpleOnGestureListener{
+		@Override
+		public void onLongPress(MotionEvent ev) {
+
+			if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " longpress");
+
+			// maybe implement a button lock here later
+			/*
+			  performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+			 */
+		}
 	}
 
 
-	public boolean handleEvent(MotionEvent e, int buttonId, VncCanvas canvas)
+	public MouseButtonView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		setSoundEffectsEnabled(true);
+		dfltBackground = getBackground();
+		gestureDetector = new GestureDetector(context, new MouseButtonGestureListener());
+	}
+
+	// we need an init method since objects are instantiated by the layout inflater
+	// which uses the constructor above
+	public void init(int buttonId, VncCanvas canvas)
 	{
+		this.buttonId = buttonId;
+		this.canvas = canvas; 
+	}
+
+
+	@Override
+	public boolean onTouchEvent(MotionEvent e) 
+	{
+
 		final int action = e.getAction();
-		///
-		if(action != MotionEvent.ACTION_MOVE)
-			Log.d(TAG, "Input: something!!!!!!!!!!!!!!!!!!!!!!!!!");
-		
+
 		/* 
 		 * in case one pointer holds the button down and another one tries
 		 * to move the mouse
@@ -88,14 +119,6 @@ public class MouseButtonView extends View {
 				}
 				break;
 			case MotionEvent.ACTION_POINTER_DOWN:
-				// XXX
-				Log.d(TAG,"Input:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx ");
-				Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId  +  " DOWN");
-				int idx = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
-				>> MotionEvent.ACTION_POINTER_INDEX_SHIFT;	
-				Log.d(TAG, "Input: button " + buttonId + " this events idx:" + idx);
-//				XXX
-				
 				if(pointerOneId >= 0 && pointerTwoId < 0) // only one pointer was down before
 				{
 					pointerTwoId = e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK)
@@ -122,7 +145,7 @@ public class MouseButtonView extends View {
 					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " first pointer UP");
 					pointerOneId = -1;	// set invalid again
 					pointerTwoId = -1;  // and this one too!
-					doClick(e, buttonId, canvas);
+					doClick(e);
 				}
 
 				break;
@@ -137,11 +160,11 @@ public class MouseButtonView extends View {
 				Log.d(TAG, "Input: button " + buttonId + " single pointer:" + action);
 
 			if(action == MotionEvent.ACTION_DOWN)
-				{
+			{
 				pointerOneId = e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK)
 						>> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
-				doClick(e, buttonId, canvas);
-				}
+				doClick(e);
+			}
 			else // ACTION_UP
 				if(e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK)
 						>> MotionEvent.ACTION_POINTER_INDEX_SHIFT)
@@ -149,21 +172,24 @@ public class MouseButtonView extends View {
 				{
 					pointerOneId = -1;	// set invalid again
 					pointerTwoId = -1;  // and this one too!
-					doClick(e, buttonId, canvas);
+					doClick(e);
 				}
 		}
+
+		// check for gestures here
+		gestureDetector.onTouchEvent(e);
 
 		// we have to return true to get the ACTION_UP event 
 		return true;
 	}
 
 
-	void doClick(MotionEvent e, int buttonId, VncCanvas canvas)
+	void doClick(MotionEvent e)
 	{
 		if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " CLICK");
 
 		// bzzt!	
-		performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+		performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
 				HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
 
 		// beep!
@@ -171,7 +197,15 @@ public class MouseButtonView extends View {
 
 		int pointerMask = 0; // like up
 		if(e.getAction() == MotionEvent.ACTION_DOWN)
+		{
 			pointerMask = 1 << (buttonId-1);
+			setBackgroundResource(R.color.transparentred);
+		}
+		else // ACTION_UP
+		{
+			setBackgroundDrawable(dfltBackground);
+		}
+			
 
 		try {
 			canvas.rfb.writePointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
@@ -210,16 +244,8 @@ public class MouseButtonView extends View {
 
 	private void inspectEvent(MotionEvent e)
 	{
-		final int historySize = e.getHistorySize();
 		final int pointerCount = e.getPointerCount();
-		/*for (int h = 0; h < historySize; h++) {
-			Log.d(TAG, "Input: historical @ " + e.getHistoricalEventTime(h));
-			for (int p = 0; p < pointerCount; p++) {
-				Log.d(TAG, "Input:  pointer:" +
-						e.getPointerId(p) + " x:" +  e.getHistoricalX(p, h)
-						+ " y:" +  e.getHistoricalY(p, h));
-			}
-		}*/
+
 		Log.d(TAG, "Input: now @ " + e.getEventTime());
 		for (int p = 0; p < pointerCount; p++) {
 			Log.d(TAG, "Input:  pointer:" +
