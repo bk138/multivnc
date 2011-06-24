@@ -86,16 +86,11 @@ abstract class AbstractScaling {
 		activity.vncCanvas.scaling = this;
 		activity.vncCanvas.setScaleType(scaleType);
 		activity.getConnection().setScaleMode(scaleType);
-		if (activity.inputHandler == null || ! isValidInputMode(activity.getModeIdFromHandler(activity.inputHandler))) {
-			activity.inputHandler=activity.getInputHandlerById(getDefaultHandlerId());
-			activity.getConnection().setInputMode(activity.inputHandler.getName());
-		}
-		activity.getConnection().Gen_update(activity.database.getWritableDatabase());
 		
+		activity.getConnection().Gen_update(activity.database.getWritableDatabase());
 	}
 	
-	abstract int getDefaultHandlerId();
-	
+
 	/**
 	 * True if this scale type allows panning of the image
 	 * @return

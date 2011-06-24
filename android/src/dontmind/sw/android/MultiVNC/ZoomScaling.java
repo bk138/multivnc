@@ -30,13 +30,7 @@ class ZoomScaling extends AbstractScaling {
 		scaling = 1;
 	}
 
-	/* (non-Javadoc)
-	 * @see dontmind.sw.android.MultiVNC.AbstractScaling#getDefaultHandlerId()
-	 */
-	@Override
-	int getDefaultHandlerId() {
-		return VncCanvasActivity.touchPadId;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see dontmind.sw.android.MultiVNC.AbstractScaling#isAbleToPan()

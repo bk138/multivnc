@@ -335,20 +335,14 @@ public class VncCanvasActivity extends Activity {
 	
 	private final static String TAG = "VncCanvasActivity";
 
-	AbstractInputHandler inputHandler;
 
 	VncCanvas vncCanvas;
-
 	VncDatabase database;
-
-	private AbstractInputHandler inputModeHandlers[];
 	private ConnectionBean connection;
-	public static final int touchPadId = 666;
-	private static final int inputModeIds[] = { touchPadId };
 
 	ZoomControls zoomer;
 	Panner panner;
-	
+	TouchpadInputHandler touchPad;
 	ViewGroup mousebuttons;
 
 	@Override
@@ -491,7 +485,7 @@ public class VncCanvasActivity extends Activity {
 		});
 		panner = new Panner(this, vncCanvas.handler);
 
-		inputHandler = getInputHandlerById(touchPadId);
+		touchPad =  new TouchpadInputHandler();
 		
 		mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
 		MouseButtonView mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
@@ -505,14 +499,13 @@ public class VncCanvasActivity extends Activity {
 
 	/**
 	 * Set modes on start to match what is specified in the ConnectionBean;
-	 * color mode (already done) scaling, input mode
+	 * color mode (already done), scaling
 	 */
 	void setModes() {
-		AbstractInputHandler handler = getInputHandlerByName(connection
-				.getInputMode());
+		
 		AbstractScaling.getByScaleType(connection.getScaleMode())
 				.setScaleTypeForActivity(this);
-		this.inputHandler = handler;
+		
 	}
 
 	ConnectionBean getConnection() {
@@ -576,54 +569,6 @@ public class VncCanvasActivity extends Activity {
 	}
 
 
-	/**
-	 * If id represents an input handler, return that; otherwise return null
-	 * 
-	 * @param id
-	 * @return
-	 */
-	AbstractInputHandler getInputHandlerById(int id) {
-		if (inputModeHandlers == null) {
-			inputModeHandlers = new AbstractInputHandler[inputModeIds.length];
-		}
-		for (int i = 0; i < inputModeIds.length; ++i) {
-			if (inputModeIds[i] == id) {
-				if (inputModeHandlers[i] == null) {
-					switch (id) {
-			
-					case touchPadId:
-						inputModeHandlers[i] = new TouchpadInputHandler();
-						break;
-					}
-				}
-				return inputModeHandlers[i];
-			}
-		}
-		return null;
-	}
-
-	AbstractInputHandler getInputHandlerByName(String name) {
-		AbstractInputHandler result = null;
-		for (int id : inputModeIds) {
-			AbstractInputHandler handler = getInputHandlerById(id);
-			if (handler.getName().equals(name)) {
-				result = handler;
-				break;
-			}
-		}
-		if (result == null) {
-			result = getInputHandlerById(touchPadId);
-		}
-		return result;
-	}
-	
-	int getModeIdFromHandler(AbstractInputHandler handler) {
-		for (int id : inputModeIds) {
-			if (handler == getInputHandlerById(id))
-				return id;
-		}
-		return touchPadId;
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -677,16 +622,7 @@ public class VncCanvasActivity extends Activity {
 			this.startActivity(intent);
 			return true;
 		default:
-			AbstractInputHandler input = getInputHandlerById(item.getItemId());
-			if (input != null) {
-				inputHandler = input;
-				connection.setInputMode(input.getName());
-				if (input.getName().equals(TOUCHPAD_MODE))
-					connection.setFollowMouse(true);
-				item.setChecked(true);
-				connection.save(database.getWritableDatabase());
-				return true;
-			}
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -730,7 +666,7 @@ public class VncCanvasActivity extends Activity {
 		if (keyCode == KeyEvent.KEYCODE_MENU)
 			return super.onKeyDown(keyCode, evt);
 
-		return inputHandler.onKeyDown(keyCode, evt);
+		return touchPad.onKeyDown(keyCode, evt);
 	}
 
 	@Override
@@ -738,13 +674,13 @@ public class VncCanvasActivity extends Activity {
 		if (keyCode == KeyEvent.KEYCODE_MENU)
 			return super.onKeyUp(keyCode, evt);
 
-		return inputHandler.onKeyUp(keyCode, evt);
+		return touchPad.onKeyUp(keyCode, evt);
 	}
 
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		return inputHandler.onTouchEvent(event);
+		return touchPad.onTouchEvent(event);
 	}
 
 	private void selectColorModel() {
