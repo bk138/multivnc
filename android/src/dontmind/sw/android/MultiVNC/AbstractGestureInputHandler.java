@@ -16,7 +16,7 @@ import com.antlersoft.android.bc.OnScaleGestureListener;
  * 
  * @author Michael A. MacDonald
  */
-abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestureListener implements AbstractInputHandler, OnScaleGestureListener {
+abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestureListener implements OnScaleGestureListener {
 	protected GestureDetector gestures;
 	protected IBCScaleGestureDetector scaleGestures;
 	private VncCanvasActivity activity;
@@ -35,7 +35,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		scaleGestures=BCFactory.getInstance().getScaleGestureDetector(c, this);
 	}
 
-	@Override
 	public boolean onTouchEvent(MotionEvent evt) {
 		scaleGestures.onTouchEvent(evt);
 		return gestures.onTouchEvent(evt);

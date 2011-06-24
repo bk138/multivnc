@@ -119,8 +119,6 @@ public abstract class AbstractConnectionBean extends com.antlersoft.android.dbim
     public void setForceFull(long arg_forceFull) { gen_forceFull = arg_forceFull; }
     public java.lang.String getRepeaterId() { return gen_repeaterId; }
     public void setRepeaterId(java.lang.String arg_repeaterId) { gen_repeaterId = arg_repeaterId; }
-    public java.lang.String getInputMode() { return gen_inputMode; }
-    public void setInputMode(java.lang.String arg_inputMode) { gen_inputMode = arg_inputMode; }
     public java.lang.String getScaleModeAsString() { return gen_SCALEMODE; }
     public void setScaleModeAsString(java.lang.String arg_SCALEMODE) { gen_SCALEMODE = arg_SCALEMODE; }
     public boolean getUseLocalCursor() { return gen_useLocalCursor; }

@@ -33,8 +33,6 @@ interface IConnectionBean {
 	long getForceFull();
 	@FieldAccessor
 	String getRepeaterId();
-	@FieldAccessor
-	String getInputMode();
 	@FieldAccessor(Name="SCALEMODE")
 	String getScaleModeAsString();
 	@FieldAccessor

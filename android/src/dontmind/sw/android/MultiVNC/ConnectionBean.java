@@ -30,7 +30,6 @@ class ConnectionBean extends AbstractConnectionBean implements Comparable<Connec
 		setPort(5900);
 		setColorModel(COLORMODEL.C64.nameString());
 		setScaleMode(ScaleType.MATRIX);
-		setInputMode(VncCanvasActivity.TOUCH_ZOOM_MODE);
 		setFollowMouse(true);
 		setRepeaterId("");
 		setMetaListId(1);
