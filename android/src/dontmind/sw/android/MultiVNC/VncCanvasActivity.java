@@ -38,6 +38,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -738,6 +739,16 @@ public class VncCanvasActivity extends Activity {
 			}
 		}
 
+	}
+	
+	public void showScaleToast()
+	{
+		// show scale
+		Toast msg = Toast.makeText(this, getString(R.string.scale_msg) + " "
+				+ (int)(100*vncCanvas.getScale()) + "%",
+				Toast.LENGTH_SHORT);
+		msg.setGravity(Gravity.TOP, 0, 0);
+		msg.show();
 	}
 
 	

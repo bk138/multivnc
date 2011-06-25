@@ -4,7 +4,6 @@
 package dontmind.sw.android.MultiVNC;
 
 import android.graphics.Matrix;
-import android.util.Log;
 import android.widget.ImageView.ScaleType;
 
 /**
@@ -76,6 +75,8 @@ class ZoomScaling extends AbstractScaling {
 		//Log.v(TAG,String.format("before set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		activity.vncCanvas.setImageMatrix(matrix);
 		resolveZoom(activity);
+		// show scale
+		activity.showScaleToast();
 	}
 
 	/* (non-Javadoc)
@@ -105,6 +106,8 @@ class ZoomScaling extends AbstractScaling {
 		activity.vncCanvas.setImageMatrix(matrix);
 		//Log.v(TAG,String.format("after set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		resolveZoom(activity);
+		// show scale
+		activity.showScaleToast();
 	}
 
 	/* (non-Javadoc)

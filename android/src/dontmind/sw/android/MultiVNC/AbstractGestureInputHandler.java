@@ -3,10 +3,8 @@
  */
 package dontmind.sw.android.MultiVNC;
 
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-
 import com.antlersoft.android.bc.BCFactory;
 import com.antlersoft.android.bc.IBCScaleGestureDetector;
 import com.antlersoft.android.bc.OnScaleGestureListener;
@@ -88,5 +86,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	public void onScaleEnd(IBCScaleGestureDetector detector) {
 		//Log.i(TAG,"scale end");
 		inScaling = false;
+		// show scale
+		activity.showScaleToast();
 	}
 }

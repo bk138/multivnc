@@ -12,6 +12,8 @@
     <string name="button_send_without_saving">Send Text/Don\'t Save It</string>
     <string name="server_found">Found VNC Server</string>
     <string name="server_removed">VNC Server disappeared</string>
+    <string name="scale_msg">Scale now</string>
+    
 <string name="center_mouse">Mouse @</string>
 <string name="close">Close</string>
 <string name="color_format_caption">Color Format</string>

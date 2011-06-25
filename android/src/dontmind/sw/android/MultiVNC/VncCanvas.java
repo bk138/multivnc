@@ -48,8 +48,6 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.antlersoft.android.bc.BCFactory;
-
 
 public class VncCanvas extends ImageView {
 	private final static String TAG = "VncCanvas";
