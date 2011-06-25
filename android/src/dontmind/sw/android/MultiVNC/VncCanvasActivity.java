@@ -303,6 +303,7 @@ public class VncCanvasActivity extends Activity {
 	Panner panner;
 	TouchpadInputHandler touchPad;
 	ViewGroup mousebuttons;
+	TouchPointView touchpoints;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -454,6 +455,8 @@ public class VncCanvasActivity extends Activity {
 		mousebutton1.init(1, vncCanvas);
 		mousebutton2.init(2, vncCanvas);
 		mousebutton3.init(3, vncCanvas);
+		
+		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
 	}
 
 	/**
@@ -544,9 +547,15 @@ public class VncCanvasActivity extends Activity {
 			return true;
 		case R.id.itemToggleFramebufferUpdate:
 			if(vncCanvas.toggleFramebufferUpdates()) // view enabled
+			{
 				vncCanvas.setVisibility(View.VISIBLE);
+				touchpoints.setVisibility(View.GONE);
+			}
 			else
+			{
 				vncCanvas.setVisibility(View.GONE);
+				touchpoints.setVisibility(View.VISIBLE);
+			}
 			return true;	
 			
 		case R.id.itemToggleMouseButtons:
@@ -623,6 +632,9 @@ public class VncCanvasActivity extends Activity {
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		if(touchpoints.getVisibility()== View.VISIBLE)
+			touchpoints.handleEvent(event);
+		
 		return touchPad.onTouchEvent(event);
 	}
 

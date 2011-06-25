@@ -13,6 +13,14 @@
     	android:layout_gravity="bottom|center"
     	>
 	</dontmind.sw.android.MultiVNC.VncCanvas>
+	
+	<dontmind.sw.android.MultiVNC.TouchPointView
+    	android:id="@+id/touchpoints"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:layout_gravity="bottom|center"
+    	android:visibility="gone"
+    />
 
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
