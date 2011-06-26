@@ -28,7 +28,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center|bottom">
   
-		<com.antlersoft.android.zoomer.ZoomControls
+		<dontmind.sw.android.MultiVNC.ZoomControls
 	    	android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
 	   		android:id="@+id/zoomer"

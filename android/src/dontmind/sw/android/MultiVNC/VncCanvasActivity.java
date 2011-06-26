@@ -24,7 +24,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.antlersoft.android.zoomer.ZoomControls;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -637,6 +636,40 @@ public class VncCanvasActivity extends Activity {
 		
 		return touchPad.onTouchEvent(event);
 	}
+	
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent evt) {
+		if(Utils.DEBUG()) Log.d(TAG, "Input: key down: " + evt.toString());
+
+		if (keyCode == KeyEvent.KEYCODE_MENU)
+			return super.onKeyDown(keyCode, evt);
+
+		// use search key to toggle soft keyboard
+		if (keyCode == KeyEvent.KEYCODE_SEARCH)
+		{
+			InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			inputMgr.toggleSoftInput(0, 0);
+		}
+
+
+		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
+			return true;
+		return super.onKeyDown(keyCode, evt);
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent evt) {
+		if(Utils.DEBUG()) Log.d(TAG, "Input: key up: " + evt.toString());
+
+		if (keyCode == KeyEvent.KEYCODE_MENU)
+			return super.onKeyUp(keyCode, evt);
+
+		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
+			return true;
+		return super.onKeyUp(keyCode, evt);
+	}
+
 
 	private void selectColorModel() {
 		// Stop repainting the desktop
@@ -700,17 +733,7 @@ public class VncCanvasActivity extends Activity {
 		return vncCanvas.pan(dX, dY);
 	}
 
-	boolean defaultKeyDownHandler(int keyCode, KeyEvent evt) {
-		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
-			return true;
-		return super.onKeyDown(keyCode, evt);
-	}
-
-	boolean defaultKeyUpHandler(int keyCode, KeyEvent evt) {
-		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
-			return true;
-		return super.onKeyUp(keyCode, evt);
-	}
+	
 
 	boolean touchPan(MotionEvent event) {
 		switch (event.getAction()) {

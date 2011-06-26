@@ -32,7 +32,7 @@
  * USA.
  */
 
-package com.antlersoft.android.zoomer;
+package dontmind.sw.android.MultiVNC;
 
 import dontmind.sw.android.MultiVNC.R;
 import android.content.Context;
