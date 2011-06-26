@@ -5,9 +5,11 @@
 package dontmind.sw.android.MultiVNC;
 
 import android.content.Context;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.BlurMaskFilter.Blur;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -45,6 +47,8 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 		for (int i = 0; i < MAX_TOUCHPOINTS; i++) {
 			touchPaints[i] = new Paint();
 			touchPaints[i].setColor(colors[i]);
+			touchPaints[i].setAlpha(200);
+			touchPaints[i].setMaskFilter(new BlurMaskFilter(15, Blur.NORMAL));
 		}
 	}
 
