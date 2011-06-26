@@ -101,12 +101,7 @@ public class MainMenuActivity extends Activity {
 				showDialog(R.layout.repeater_dialog);
 			}
 		});
-		((Button)findViewById(R.id.buttonImportExport)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showDialog(R.layout.importexport);
-			}
-		});
+		
 		//colorSpinner = (Spinner)findViewById(R.id.colorformat);
 		COLORMODEL[] models=COLORMODEL.values();
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
@@ -213,6 +208,10 @@ public class MainMenuActivity extends Activity {
 				}
 			}, null);
 			break;
+		case R.id.itemImportExport :
+			showDialog(R.layout.importexport);
+			break;
+			
 		case R.id.itemOpenDoc :
 			Intent intent = new Intent (this, AboutActivity.class);
 			this.startActivity(intent);

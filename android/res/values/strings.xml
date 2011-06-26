@@ -35,7 +35,7 @@
 <string name="enter_text">Send text</string>
 <string name="fit_to_screen">Fit to Screen</string>
 <string name="force_full_check">Force full-screen bitmap</string>
-<string name="import_export_settings">Import/Export Settings</string>
+<string name="import_export_settings">Import/Export</string>
 <string name="import_settings">Import</string>
 <string name="import_settings_file_url">Import from file or URL</string>
 <string name="info">Connection Info</string>
@@ -54,6 +54,7 @@
 <string name="meta_key_title">Send Special Keys</string>
 <string name="mouse_follow_pan">Mouse follow pan</string>
 <string name="new_list_button">New List</string>
+<string name="new_connection">New Connection</string>
 <string name="nickname_caption">Bookmark</string>
 <string name="off">Off</string>
 <string name="on">On</string>

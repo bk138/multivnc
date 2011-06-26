@@ -5,28 +5,7 @@
 	android:padding="10dip"
 	android:orientation="vertical"
 		>
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		>
-
-		<Spinner 
-		    android:id="@+id/spinnerConnection"
-		    android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-		/>
 		
-		<Button 
-			    android:id="@+id/buttonGO" 
-			    android:text="@string/connect_button"
-			    android:textAppearance="?android:attr/textAppearanceMedium"
-				android:layout_height="wrap_content"
-			android:layout_width="match_parent"/>
-	</LinearLayout>
-	
-	
-	<ImageView android:layout_width="fill_parent" android:layout_height="wrap_content" android:src="@android:drawable/divider_horizontal_bright"/>
 	<ScrollView
 		android:layout_height="fill_parent"
 		android:layout_width="fill_parent"	
@@ -38,6 +17,20 @@
 			android:padding="10dip"
 			android:orientation="vertical"
 			>
+			
+			<Spinner 
+		    android:id="@+id/spinnerConnection"
+		    android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+		    />
+
+	         <TextView android:text="@string/new_connection"
+		               android:layout_width="fill_parent" android:layout_height="wrap_content" 
+		               android:textAppearance="?android:attr/textAppearanceLarge"
+		               android:padding="10dip"
+		     />
+		
+			
 			<TableLayout 
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
@@ -155,13 +148,17 @@
 					android:gravity="left|center_vertical"
 					android:text="@string/repeater_empty_text"
 					/>
-			</LinearLayout>
-			<Button
-				android:id="@+id/buttonImportExport"
-				android:text="@string/import_export_settings"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				/>
-		</LinearLayout>
+		       </LinearLayout>
+		       
+		       
+		     <Button 
+					    android:id="@+id/buttonGO" 
+					    android:text="@string/connect_button"
+					    android:textAppearance="?android:attr/textAppearanceMedium"
+						android:layout_height="wrap_content"
+					android:layout_width="match_parent"/>
+			       
+		 </LinearLayout>
+		       	       
 	</ScrollView>
 </LinearLayout>
