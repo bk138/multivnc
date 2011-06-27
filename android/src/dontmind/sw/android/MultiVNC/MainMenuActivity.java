@@ -24,11 +24,13 @@ package dontmind.sw.android.MultiVNC;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ActivityManager.MemoryInfo;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +39,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +47,6 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.jmdns.JmDNS;
@@ -76,7 +78,6 @@ public class MainMenuActivity extends Activity {
 	private JmDNS jmdns = null;
 	private ServiceListener listener = null;
 	private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> (); 
-	
 
 	
 	@Override
@@ -87,7 +88,8 @@ public class MainMenuActivity extends Activity {
 		
 		// get package debug flag and set it 
 		Utils.DEBUG(this);
-
+		
+		
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
@@ -321,14 +323,6 @@ public class MainMenuActivity extends Activity {
 		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, connections, ConnectionBean.newInstance);
 		Collections.sort(connections);
 		
-		//insert discovered connections
-	    Enumeration<ConnectionBean> e = connections_discovered.elements();
-		while (e.hasMoreElements()) {
-			ConnectionBean c = (ConnectionBean) e.nextElement();
-			connections.add(0, c);
-			Log.d(getString(R.string.app_name), "main menu adding");
-		}
-		
 		Log.d(getString(R.string.app_name), "main menu");
 		
 		connections.add(0, new ConnectionBean());
@@ -352,8 +346,9 @@ public class MainMenuActivity extends Activity {
 				connections.toArray(new ConnectionBean[connections.size()])));
 		spinnerConnection.setSelection(connectionIndex,false);
 		selected=connections.get(connectionIndex);
+		
+		
 		updateViewFromSelected();
-
 	}
 	
 	protected void onStop() {
@@ -438,9 +433,6 @@ public class MainMenuActivity extends Activity {
 
 				@Override
 				public void serviceResolved(ServiceEvent ev) {
-					
-					mDNSnotify(getString(R.string.server_found) + ": " + ev.getName());
-					
 					ConnectionBean c = new ConnectionBean();
 					c.set_Id(-42);
 					c.setNickname(ev.getName());
@@ -452,18 +444,17 @@ public class MainMenuActivity extends Activity {
 					Log.d(getString(R.string.app_name), "discovered server :" + ev.getName() 
 								+ ", now " + connections_discovered.size());
 					
+					mDNSnotify(getString(R.string.server_found) + ": " + ev.getName(), c);
 				}
 
 				@Override
 				public void serviceRemoved(ServiceEvent ev) {
-										
-					mDNSnotify(getString(R.string.server_removed) + ": " + ev.getName());
-					
 					connections_discovered.remove(ev.getInfo().getQualifiedName());
 					
 					Log.d(getString(R.string.app_name), "server gone:" + ev.getName() 
 							+ ", now " + connections_discovered.size());
 					
+					mDNSnotify(getString(R.string.server_removed) + ": " + ev.getName(), null);
 				}
 
 				@Override
@@ -499,19 +490,62 @@ public class MainMenuActivity extends Activity {
 		lock.release();
 		
 		connections_discovered.clear();
+		((LinearLayout)findViewById(R.id.discovered_servers_list)).removeAllViews();
 	}
 
 	// do the GUI stuff in Runnable posted to main thread handler
-	private void mDNSnotify(final String msg) {
+	private void mDNSnotify(final String msg, final ConnectionBean conn) {
 		handler.postDelayed(new Runnable() {
 			public void run() {
-				Toast.makeText(MainMenuActivity.this, msg , Toast.LENGTH_LONG).show();
-				
+
+				Toast.makeText(MainMenuActivity.this, msg , Toast.LENGTH_SHORT).show();
+
 				// update 
-				arriveOnPage();
+				LinearLayout serverlist = (LinearLayout) findViewById(R.id.discovered_servers_list);
+				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				if(conn == null) // is removal
+				{
+					// clear
+					serverlist.removeAllViews();
+					// refill
+					synchronized (connections_discovered) {
+						for(final ConnectionBean c : connections_discovered.values()) {
+							View v = vi.inflate(R.layout.discovered_servers_list_item, null);
+							TextView name = (TextView) v.findViewById(R.id.discovered_server_name);
+							name.setText(c.getNickname());
+							name.setOnClickListener(new View.OnClickListener() {
+								@Override
+								public void onClick(View view) {
+									Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
+									intent.putExtra(VncConstants.CONNECTION , c.Gen_getValues());
+									startActivity(intent);
+								}
+							});
+							serverlist.addView(v);
+						}
+					}
+
+				}
+				else // is add
+				{
+					View v = vi.inflate(R.layout.discovered_servers_list_item, null);
+					TextView name = (TextView) v.findViewById(R.id.discovered_server_name);
+					name.setText(conn.getNickname());
+					name.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View view) {
+							Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
+							intent.putExtra(VncConstants.CONNECTION , conn.Gen_getValues());
+							startActivity(intent);
+						}
+					});
+					
+					serverlist.addView(v);
+				}
+
 			}
 		}, 1);
-	
+
 	}
 	
 	

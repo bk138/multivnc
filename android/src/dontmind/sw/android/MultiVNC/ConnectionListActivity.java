@@ -28,8 +28,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import java.util.ArrayList;
-
 /**
  * @author Michael A. MacDonald
  *

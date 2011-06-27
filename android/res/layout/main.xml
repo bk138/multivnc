@@ -11,12 +11,37 @@
 		android:layout_width="fill_parent"	
 		android:scrollbars="vertical"
 		>	
+		<!-- this is focusable to start with view focus here! -->
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:padding="10dip"
 			android:orientation="vertical"
+			android:focusable="true" android:focusableInTouchMode="true"
 			>
+			
+			<TextView android:text="@string/discovered_servers"
+		               android:layout_width="fill_parent" android:layout_height="wrap_content" 
+		               android:textAppearance="?android:attr/textAppearanceLarge"
+		               android:paddingTop="10dip"
+		               android:paddingBottom="10dip"
+		     />
+
+			<LinearLayout android:id="@+id/discovered_servers_list"
+					  android:orientation="vertical"
+	 				  android:layout_height="wrap_content"
+	                  android:layout_width="fill_parent"
+	                  android:padding="10dip"
+	                  />
+     
+			
+			<TextView android:text="@string/bookmarks"
+		               android:layout_width="fill_parent" android:layout_height="wrap_content" 
+		               android:textAppearance="?android:attr/textAppearanceLarge"
+ 					   android:paddingTop="10dip"
+		               android:paddingBottom="10dip"
+		     />
+		
 			
 			<Spinner 
 		    android:id="@+id/spinnerConnection"
@@ -27,7 +52,8 @@
 	         <TextView android:text="@string/new_connection"
 		               android:layout_width="fill_parent" android:layout_height="wrap_content" 
 		               android:textAppearance="?android:attr/textAppearanceLarge"
-		               android:padding="10dip"
+		               android:paddingTop="10dip"
+		               android:paddingBottom="10dip"
 		     />
 		
 			
