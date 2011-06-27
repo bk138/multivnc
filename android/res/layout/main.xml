@@ -64,7 +64,7 @@
 				>
 				<TableRow>
 					<TextView android:text="@string/nickname_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<EditText android:id="@+id/textNickname" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
+					<EditText android:id="@+id/textNickname" android:hint="@string/bookmark_hint" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
 				</TableRow>
 				
 				<TableRow>

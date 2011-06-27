@@ -82,5 +82,6 @@
 <string name="showkbd_label">Keyboard</string>
 <string name="special_keys">Special Keys</string>
 <string name="username_caption">Username</string>
-<string name="username_hint">For Windows Authentication</string>
+<string name="username_hint">For Windows authentication</string>
+<string name="bookmark_hint">If filled in, connection will be bookmarked...</string>
 </resources>
