@@ -1,0 +1,11 @@
+* rework main screen
+
+* release
+
+* show touch point when button pressed
+
+* rework special keys dialog
+
+* rework color mode selector
+
+* port to libvncclient
