@@ -56,6 +56,8 @@ DIE=0
     export LIBTOOL=glibtool
     export LIBTOOLIZE=glibtoolize
   }
+  export LIBTOOL=libtool
+  export LIBTOOLIZE=libtoolize
 }
 
 
