@@ -34,6 +34,11 @@
 #include "wx/config.h"
 #include "config.h"
 
+// in case we have an old autoconf...
+#ifndef PACKAGE_URL
+#define PACKAGE_URL "http://multivnc.sf.net"
+#endif
+
 #define COPYRIGHT "Copyright (C) 2009-2011 Christian Beier <dontmind@freeshell.org>"
 #define CFGFILE "multivnc.cfg"
 
