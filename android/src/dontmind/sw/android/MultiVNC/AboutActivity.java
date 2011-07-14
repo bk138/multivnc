@@ -19,7 +19,7 @@ public class AboutActivity extends Activity {
 		try {
 			pinfo = getPackageManager().getPackageInfo(getPackageName(),0);
 			TextView tw = (TextView) findViewById(R.id.TextViewVersion);
-			String v = getString(R.string.app_name) +  " " + pinfo.versionName + " ("+pinfo.versionCode + ")";
+			String v = getString(R.string.app_name) +  " " + pinfo.versionName;
 			tw.setText(v);
 		} catch (NameNotFoundException e) {
 			// TODO Auto-generated catch block
