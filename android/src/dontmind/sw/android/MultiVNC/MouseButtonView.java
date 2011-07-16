@@ -21,6 +21,7 @@ public class MouseButtonView extends View {
 	private VncCanvas canvas;
 	protected GestureDetector gestureDetector;
 	private float dragX, dragY;
+	boolean drag_started = false; // workaround buggy touch screens
 	private int pointerOneId = -1;
 	private int pointerTwoId = -1;
 
@@ -93,6 +94,14 @@ public class MouseButtonView extends View {
 
 					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId + " idx:" + pointerTwoIndex + " pos: " + pointerTwoX + "," + pointerTwoY + " MOVE");
 
+					// workaround for buggy touch screens, see below
+					if(drag_started)
+					{
+						dragX = pointerTwoX; // now good coords
+						dragY = pointerTwoY;
+						drag_started = false;
+					}
+					
 					// compute the relative movement offset on the remote screen.
 					float deltaX = (pointerTwoX - dragX) * canvas.getScale();
 					float deltaY = (pointerTwoY - dragY) * canvas.getScale();
@@ -124,12 +133,14 @@ public class MouseButtonView extends View {
 					pointerTwoId = e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK)
 							>> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
 					pointerTwoIndex = e.findPointerIndex(pointerTwoId);
-					// get second pointer's _absolute_ coords
-					final float pointerTwoX = origin_x + e.getX(pointerTwoIndex); 
-					final float pointerTwoY = origin_y + e.getY(pointerTwoIndex); 
-					dragX = pointerTwoX;
-					dragY = pointerTwoY;
-					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId + " idx:" + pointerTwoIndex + " pos: " + pointerTwoX + "," + pointerTwoY + " DOWN");
+					/*
+					 * Note that we DO NOT use the pointer coords here. On some devices, the hardware reports
+					 * coordinates that are WAY off the following MOVE coordinates. Thus, just get the pointer's
+					 * ID and set the drag start flag.
+					 */
+					drag_started = true;
+					
+					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId + " idx:" + pointerTwoIndex + " DOWN");
 				}
 				break;
 			case MotionEvent.ACTION_POINTER_UP:
