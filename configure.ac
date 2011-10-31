@@ -5,6 +5,7 @@ AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
 dnl this one needs a prefix
 AX_PREFIX_CONFIG_H([src/rfb/rfbconfig.h], LibVNCServer)
+AM_SILENT_RULES([yes])
 
 
 
