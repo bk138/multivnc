@@ -102,6 +102,7 @@ dnl add some extra includes needed by src/gui/VNCSeamlessConnector
 if test ! -z "`$WXCONFIG --selected-config | grep "gtk2" 2>/dev/null`"; then
     PKG_CHECK_MODULES(GTK, gtk+-2.0)  
     WX_CXXFLAGS+=" `pkg-config --cflags gtk+-2.0`"
+    WX_LIBS+=" `pkg-config --libs gtk+-2.0`"
 fi
 
  
