@@ -1543,10 +1543,12 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
   if(window == wxEmptyString)
     return;
 #else
-  if(wxMessageBox(_("A cross-shaped cursor will appear. Use it to select the window you want to share."),
+  if(wxMessageBox(_("The MultiVNC window will be minimized and a cross-shaped cursor will appear. Use it to select the window you want to share."),
 		  _("Share a Window"), wxOK|wxCANCEL)
      == wxCANCEL)
     return;
+  
+  Iconize(true);
 #endif
 
   // handle %a and %p
@@ -1565,7 +1567,7 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
   cb->windowshare_proc = new wxProcess(this, ID_WINDOWSHARE_PROC_END);
   cb->windowshare_proc_pid = wxExecute(cmd, wxEXEC_ASYNC|wxEXEC_MAKE_GROUP_LEADER, cb->windowshare_proc);
   wxLogDebug(wxT("windowshare_start() spawned %d."), cb->windowshare_proc_pid);
-  
+
   if(cb->windowshare_proc_pid == 0)
     {
       SetStatusText(_("Window sharing helper execution failed."));
