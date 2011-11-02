@@ -116,6 +116,15 @@ public:
   //  get stats, format is described in first line
   const wxArrayString& getStats() const { const wxArrayString& ref = statistics; return ref; };
 
+  /*
+    replay/record user interaction
+  */
+  bool replayUserInputStart(wxArrayString src); // copies in src and plays it
+  bool replayUserInputStop();
+  bool recordUserInputStart();
+  bool recordUserInputStop(wxArrayString* dst); // if ok, copies recorded input to dst
+
+
   // cuttext
   const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
   void setCuttext(const wxString& text) { wxCriticalSectionLocker lock(mutex_cuttext); cuttext = text; };
@@ -206,6 +215,14 @@ private:
   bool latency_test_trigger;
   wxStopWatch latency_stopwatch;
   int latency;
+
+  // record/replay stuff
+  wxArrayString userinput;
+  size_t userinput_pos;
+  wxStopWatch recordreplay_stopwatch;
+  bool replaying;
+  bool recording;
+  wxCriticalSection mutex_recordreplay;
 
   // per-connection error string
   wxString err;

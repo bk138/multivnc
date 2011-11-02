@@ -155,6 +155,10 @@ VNCConn::VNCConn(void* p)
 
   // fastrequest stuff
   fastrequest_interval = 0;
+
+  // record/replay stuff
+  recording = replaying = false;
+
 }
 
 
@@ -297,6 +301,53 @@ wxThread::ExitCode VNCConn::Entry()
 	}
       else
 	{
+	  // userinput replay here
+	  {
+	    wxCriticalSectionLocker lock(mutex_recordreplay);
+
+	    if(replaying && userinput_pos < userinput.GetCount()) // still recorded input there
+	      {
+		wxString ui_now = userinput[userinput_pos];
+		// get timestamp and strip it from string
+		long ts = wxAtol(ui_now.BeforeFirst(','));
+		ui_now = ui_now.AfterFirst(',');
+
+		if(ts <= recordreplay_stopwatch.Time()) // past or now, process it
+		  {
+		    // get type
+		    wxString type = ui_now.BeforeFirst(',');
+		    ui_now = ui_now.AfterFirst(',');
+
+		    if(type == wxT("p"))
+		      {
+			// get pointer x,y, buttmask
+			int x = wxAtoi(ui_now.BeforeFirst(','));
+			ui_now = ui_now.AfterFirst(',');
+			int y = wxAtoi(ui_now.BeforeFirst(','));
+			ui_now = ui_now.AfterFirst(',');
+			int bmask = wxAtoi(ui_now);
+
+			// and send
+			SendPointerEvent(cl, x, y, bmask);
+		      }
+
+		    if(type == wxT("k"))
+		      {
+			// get keysym
+			rfbKeySym keysym = wxAtoi(ui_now.BeforeFirst(','));
+			ui_now = ui_now.AfterFirst(',');
+			bool down = wxAtoi(ui_now); 
+
+			// and send 
+			SendKeyEvent(cl, keysym, down);
+		      }
+
+		    // advance to next input
+		    ++userinput_pos;
+		  }
+	      }
+	  }
+
 	  // send everything that's inside the input queues
 	  while(pointer_event_q.ReceiveTimeout(0, pe) != wxMSGQUEUE_TIMEOUT) // timeout == empty
 	    thread_send_pointer_event(pe);
@@ -449,6 +500,27 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
 	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
     }
 
+  // record here
+  {
+    wxCriticalSectionLocker lock(mutex_recordreplay);
+
+    if(recording)
+      {
+	wxString ui_now;
+	ui_now += (wxString() << (int)recordreplay_stopwatch.Time()); 
+	ui_now += wxT(",");
+	ui_now += wxT("p"); // is pointer event
+	ui_now += wxT(",");
+	ui_now += (wxString() << event.m_x);
+	ui_now += wxT(",");
+	ui_now += (wxString() << event.m_y);
+	ui_now += wxT(",");
+	ui_now += (wxString() << buttonmask);
+
+	userinput.Add(ui_now);
+      }
+  }
+
   wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
   return SendPointerEvent(cl, event.m_x, event.m_y, buttonmask);
 }
@@ -458,6 +530,25 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
 
 bool VNCConn::thread_send_key_event(keyEvent &event)
 {
+  // record here
+  {
+    wxCriticalSectionLocker lock(mutex_recordreplay);
+
+    if(recording)
+      {
+	wxString ui_now;
+	ui_now += (wxString() << (int)recordreplay_stopwatch.Time()); 
+	ui_now += wxT(",");
+	ui_now += wxT("k"); // is key event
+	ui_now += wxT(",");
+	ui_now += (wxString() << event.keysym);
+	ui_now += wxT(",");
+	ui_now += (wxString() << event.down);
+
+	userinput.Add(ui_now);
+      }
+  }
+
   return SendKeyEvent(cl, event.keysym, event.down);
 }
 
@@ -1173,6 +1264,74 @@ void VNCConn::resetStats()
   wxCriticalSectionLocker lock(mutex_stats);
   statistics.Clear();
 }
+
+
+
+
+/*
+  user input record/replay stuff
+ */
+bool VNCConn::replayUserInputStart(wxArrayString src)
+{
+  wxCriticalSectionLocker lock(mutex_recordreplay);
+
+  if(!recording)
+    {
+      recordreplay_stopwatch.Start();
+      userinput_pos = 0;
+      userinput = src;
+      replaying = true;
+      return true;
+    }
+  return false;
+}
+
+
+bool VNCConn::replayUserInputStop()
+{
+  wxCriticalSectionLocker lock(mutex_recordreplay);
+
+  if(replaying) 
+    {
+      recordreplay_stopwatch.Pause();
+      userinput.Clear();
+      replaying = false;
+      return true;
+    }
+  return false;
+}
+
+
+bool VNCConn::recordUserInputStart()
+{
+   wxCriticalSectionLocker lock(mutex_recordreplay);
+  
+   if(!replaying)
+     {
+       recordreplay_stopwatch.Start();
+       userinput_pos = 0;
+       userinput.Clear();
+       recording = true;
+       return true;
+     }
+   return false;
+}
+
+
+bool VNCConn::recordUserInputStop(wxArrayString *dst)
+{
+   wxCriticalSectionLocker lock(mutex_recordreplay);
+ 
+  if(recording) 
+     {
+       recordreplay_stopwatch.Pause();
+       recording = false;
+       *dst = userinput; // copy over
+       return true;
+     }
+   return false;
+}
+
 
 
 
