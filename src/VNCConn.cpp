@@ -305,46 +305,51 @@ wxThread::ExitCode VNCConn::Entry()
 	  {
 	    wxCriticalSectionLocker lock(mutex_recordreplay);
 
-	    if(replaying && userinput_pos < userinput.GetCount()) // still recorded input there
+	    if(replaying)
 	      {
-		wxString ui_now = userinput[userinput_pos];
-		// get timestamp and strip it from string
-		long ts = wxAtol(ui_now.BeforeFirst(','));
-		ui_now = ui_now.AfterFirst(',');
-
-		if(ts <= recordreplay_stopwatch.Time()) // past or now, process it
+		if(userinput_pos < userinput.GetCount()) // still recorded input there
 		  {
-		    // get type
-		    wxString type = ui_now.BeforeFirst(',');
+		    wxString ui_now = userinput[userinput_pos];
+		    // get timestamp and strip it from string
+		    long ts = wxAtol(ui_now.BeforeFirst(','));
 		    ui_now = ui_now.AfterFirst(',');
 
-		    if(type == wxT("p"))
+		    if(ts <= recordreplay_stopwatch.Time()) // past or now, process it
 		      {
-			// get pointer x,y, buttmask
-			int x = wxAtoi(ui_now.BeforeFirst(','));
+			// get type
+			wxString type = ui_now.BeforeFirst(',');
 			ui_now = ui_now.AfterFirst(',');
-			int y = wxAtoi(ui_now.BeforeFirst(','));
-			ui_now = ui_now.AfterFirst(',');
-			int bmask = wxAtoi(ui_now);
 
-			// and send
-			SendPointerEvent(cl, x, y, bmask);
+			if(type == wxT("p"))
+			  {
+			    // get pointer x,y, buttmask
+			    int x = wxAtoi(ui_now.BeforeFirst(','));
+			    ui_now = ui_now.AfterFirst(',');
+			    int y = wxAtoi(ui_now.BeforeFirst(','));
+			    ui_now = ui_now.AfterFirst(',');
+			    int bmask = wxAtoi(ui_now);
+
+			    // and send
+			    SendPointerEvent(cl, x, y, bmask);
+			  }
+
+			if(type == wxT("k"))
+			  {
+			    // get keysym
+			    rfbKeySym keysym = wxAtoi(ui_now.BeforeFirst(','));
+			    ui_now = ui_now.AfterFirst(',');
+			    bool down = wxAtoi(ui_now); 
+
+			    // and send 
+			    SendKeyEvent(cl, keysym, down);
+			  }
+
+			// advance to next input
+			++userinput_pos;
 		      }
-
-		    if(type == wxT("k"))
-		      {
-			// get keysym
-			rfbKeySym keysym = wxAtoi(ui_now.BeforeFirst(','));
-			ui_now = ui_now.AfterFirst(',');
-			bool down = wxAtoi(ui_now); 
-
-			// and send 
-			SendKeyEvent(cl, keysym, down);
-		      }
-
-		    // advance to next input
-		    ++userinput_pos;
 		  }
+		else
+		  replaying = false; // all done
 	      }
 	  }
 
@@ -1091,6 +1096,9 @@ bool VNCConn::setDSCP(uint8_t dscp)
 // this simply posts the mouse event into the worker thread's input queue
 void VNCConn::sendPointerEvent(wxMouseEvent &event)
 {
+  if(replaying)
+    return;
+
   if(GetThread() && GetThread()->IsRunning())
     pointer_event_q.Post(event);
 }
@@ -1099,6 +1107,9 @@ void VNCConn::sendPointerEvent(wxMouseEvent &event)
 // because of the possible wxKeyEvent.Skip(), this posts the found keysym + down
 bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 {
+  if(replaying)
+    return false;
+
   keyEvent kev = {0,0};
 
   if(isChar)
