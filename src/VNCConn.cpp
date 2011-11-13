@@ -57,6 +57,7 @@ DEFINE_EVENT_TYPE(VNCConnFBResizeNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnCuttextNOTIFY) 
 DEFINE_EVENT_TYPE(VNCConnBellNOTIFY) 
 DEFINE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY);
+DEFINE_EVENT_TYPE(VNCConnReplayFinishedNOTIFY);
 
 
 BEGIN_EVENT_TABLE(VNCConn, wxEvtHandler)
@@ -348,8 +349,12 @@ wxThread::ExitCode VNCConn::Entry()
 			++userinput_pos;
 		      }
 		  }
-		else
-		  replaying = false; // all done
+		else 
+		  {
+		    replaying = false; // all done
+		    thread_post_replayfinished_notify();
+		  }
+
 	      }
 	  }
 
@@ -675,6 +680,16 @@ void VNCConn::thread_post_bell_notify()
 void VNCConn::thread_post_unimultichanged_notify()
 {
   wxCommandEvent event(VNCConnUniMultiChangedNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  
+  // Send it
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+
+void VNCConn::thread_post_replayfinished_notify()
+{
+  wxCommandEvent event(VNCConnReplayFinishedNOTIFY, wxID_ANY);
   event.SetEventObject(this); // set sender
   
   // Send it

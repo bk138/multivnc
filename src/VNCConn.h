@@ -56,6 +56,8 @@ DECLARE_EVENT_TYPE(VNCConnUpdateNOTIFY, -1)
 // sent when status changes from/to uni/-multicast. 
 // get current state via isMulticast()
 DECLARE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY, -1) 
+// sent when userinput replay finished
+DECLARE_EVENT_TYPE(VNCConnReplayFinishedNOTIFY, -1) 
 
 
 
@@ -261,7 +263,7 @@ private:
   void thread_post_cuttext_notify();
   void thread_post_bell_notify();
   void thread_post_unimultichanged_notify();
-
+  void thread_post_replayfinished_notify();
 
   // libvncclient callbacks
   static rfbBool alloc_framebuffer(rfbClient* client);

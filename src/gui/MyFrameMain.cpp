@@ -24,6 +24,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
   EVT_VNCCONNUPDATENOTIFY (wxID_ANY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnUniMultiChangedNOTIFY, MyFrameMain::onVNCConnUniMultiChangedNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnReplayFinishedNOTIFY, MyFrameMain::onVNCConnReplayFinishedNotify)
   EVT_COMMAND (wxID_ANY, VNCConnFBResizeNOTIFY, MyFrameMain::onVNCConnFBResizeNotify)
   EVT_COMMAND (wxID_ANY, VNCConnCuttextNOTIFY, MyFrameMain::onVNCConnCuttextNotify)
   EVT_COMMAND (wxID_ANY, VNCConnBellNOTIFY, MyFrameMain::onVNCConnBellNotify)
@@ -278,6 +279,31 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
 	  wxLogStatus( _("Connection to %s is now unicast."), c->getServerHost().c_str());
 	  notebook_connections->SetPageImage(index, 0);
 	}
+    }
+}
+
+
+
+
+void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
+{
+  // get sender
+  VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
+
+  // find index of this connection
+  vector<ConnBlob>::iterator it = connections.begin();
+  size_t index = 0;
+  while(it != connections.end() && it->conn != c)
+    {
+      ++it;
+      ++index;
+    }
+
+  if(index < connections.size()) // found
+    {
+      // update icon
+      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
+      wxLogMessage( _("Replay finished!"));
     }
 }
 

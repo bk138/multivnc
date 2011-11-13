@@ -69,6 +69,7 @@ class MyFrameMain: public FrameMain
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
   void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
   void onVNCConnUniMultiChangedNotify(wxCommandEvent& event);
+  void onVNCConnReplayFinishedNotify(wxCommandEvent& event);
   void onVNCConnFBResizeNotify(wxCommandEvent& event);
   void onVNCConnDisconnectNotify(wxCommandEvent& event);
   void onVNCConnIncomingConnectionNotify(wxCommandEvent& event);
