@@ -28,8 +28,6 @@ cl->framebuffer
    
    
 Android version:
-  - zeroconf
-  - keyboard
   - unified mode of operation
   - multicast
   

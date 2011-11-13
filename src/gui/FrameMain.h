@@ -24,7 +24,10 @@
 #include "res/fullscreen.png.h"
 #include "res/screenshot.png.h"
 #include "res/toggle-keyboard-grab.png.h"
+#include "res/replay.png.h"
+#include "res/record.png.h"
 #include "evtids.h"
+
 
 // end wxGlade
 
@@ -71,6 +74,8 @@ public:
     virtual void machine_preferences(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_screenshot(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_save_stats(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_input_record(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_input_replay(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_exit(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_toggletoolbar(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglediscovered(wxCommandEvent &event); // wxGlade: <event_handler>

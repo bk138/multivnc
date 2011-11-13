@@ -29,6 +29,8 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     wxglade_tmp_menu_1->Append(wxID_PREFERENCES, wxEmptyString, _("Change preferences."), wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(wxID_SAVE, _("Take Screenshot"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->Append(ID_STATS_SAVE, _("Save Statistics..."), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1->Append(ID_INPUT_RECORD, _("Record Input"), wxEmptyString, wxITEM_NORMAL);
+    wxglade_tmp_menu_1->Append(ID_INPUT_REPLAY, _("Replay Input"), wxEmptyString, wxITEM_NORMAL);
     wxglade_tmp_menu_1->AppendSeparator();
     wxglade_tmp_menu_1->Append(wxID_EXIT, wxEmptyString, _("Exit MultiVNC."), wxITEM_NORMAL);
     frame_main_menubar->Append(wxglade_tmp_menu_1, _("&Machine"));
@@ -73,6 +75,9 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     frame_main_toolbar->AddTool(ID_GRABKEYBOARD, _("Grab Keyboard"), (bitmapFromMem(toggle_keyboard_grab_png)), wxNullBitmap, wxITEM_CHECK, wxEmptyString, _("Intercept all keyboard input. Allows you to use special keys that would otherwise be interpreted by the local computer."));
     frame_main_toolbar->AddTool(wxID_SAVE, _("Take Screenshot"), (bitmapFromMem(screenshot_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->AddSeparator();
+    frame_main_toolbar->AddTool(ID_INPUT_RECORD, _("Record Input"), (bitmapFromMem(record_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+    frame_main_toolbar->AddTool(ID_INPUT_REPLAY, _("Replay Input"), (bitmapFromMem(replay_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
+    frame_main_toolbar->AddSeparator();
     frame_main_toolbar->AddTool(ID_FULLSCREEN, _("Fullscreen"), (bitmapFromMem(fullscreen_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
     frame_main_toolbar->Realize();
     const wxString *list_box_services_choices = NULL;
@@ -96,6 +101,8 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_MENU(wxID_PREFERENCES, FrameMain::machine_preferences)
     EVT_MENU(wxID_SAVE, FrameMain::machine_screenshot)
     EVT_MENU(ID_STATS_SAVE, FrameMain::machine_save_stats)
+    EVT_MENU(ID_INPUT_RECORD, FrameMain::machine_input_record)
+    EVT_MENU(ID_INPUT_REPLAY, FrameMain::machine_input_replay)
     EVT_MENU(wxID_EXIT, FrameMain::machine_exit)
     EVT_MENU(ID_TOOLBAR, FrameMain::view_toggletoolbar)
     EVT_MENU(ID_DISCOVERED, FrameMain::view_togglediscovered)
@@ -119,6 +126,8 @@ BEGIN_EVENT_TABLE(FrameMain, wxFrame)
     EVT_TOOL(wxID_STOP, FrameMain::machine_disconnect)
     EVT_TOOL(ID_GRABKEYBOARD, FrameMain::machine_grabkeyboard)
     EVT_TOOL(wxID_SAVE, FrameMain::machine_screenshot)
+    EVT_TOOL(ID_INPUT_RECORD, FrameMain::machine_input_record)
+    EVT_TOOL(ID_INPUT_REPLAY, FrameMain::machine_input_replay)
     EVT_TOOL(ID_FULLSCREEN, FrameMain::view_togglefullscreen)
     EVT_LISTBOX_DCLICK(ID_LISTBOX_SERVICES, FrameMain::listbox_services_dclick)
     EVT_LISTBOX(ID_LISTBOX_SERVICES, FrameMain::listbox_services_select)
@@ -175,6 +184,20 @@ void FrameMain::machine_save_stats(wxCommandEvent &event)
 {
     event.Skip();
     wxLogDebug(wxT("Event handler (FrameMain::machine_save_stats) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_input_record(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_input_record) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+
+void FrameMain::machine_input_replay(wxCommandEvent &event)
+{
+    event.Skip();
+    wxLogDebug(wxT("Event handler (FrameMain::machine_input_replay) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
 }
 
 
