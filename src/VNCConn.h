@@ -123,8 +123,8 @@ public:
   bool replayUserInputStop();
   bool recordUserInputStart();
   bool recordUserInputStop(wxArrayString& dst); // if ok, copies recorded input to dst
-  bool getReplaying() { return replaying; };
-  bool getRecording() { return recording; };
+  bool isReplaying() { return replaying; };
+  bool isRecording() { return recording; };
 
 
   // cuttext

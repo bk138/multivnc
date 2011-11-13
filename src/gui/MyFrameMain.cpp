@@ -1099,11 +1099,11 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
       
-      if(c->getReplaying())
+      if(c->isReplaying())
 	return; // bail out
 
 
-      if(c->getRecording())
+      if(c->isRecording())
 	{
 	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(record_png));
 	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
@@ -1170,11 +1170,11 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
       int sel = notebook_connections->GetSelection();
       VNCConn* c = connections.at(sel).conn;
       
-      if(c->getRecording())
+      if(c->isRecording())
 	return; // bail out
 
 
-      if(c->getReplaying())
+      if(c->isReplaying())
 	{
 	  c->replayUserInputStop();
 
