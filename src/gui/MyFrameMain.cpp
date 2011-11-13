@@ -1092,6 +1092,85 @@ void MyFrameMain::machine_save_stats(wxCommandEvent &event)
 
 
 
+void MyFrameMain::machine_input_record(wxCommandEvent &event)
+{
+  if(connections.size())
+    {
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel).conn;
+      
+      if(c->getReplaying())
+	return; // bail out
+
+
+      if(c->getRecording())
+	{
+	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(record_png));
+	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
+	  
+	  wxArrayString recorded_input;
+	  
+	  if(c->recordUserInputStop(recorded_input))
+	    {
+	      if(recorded_input.IsEmpty())
+		{
+		  wxLogMessage(_("Nothing to save!"));
+		  return;
+		}
+
+	      wxString filename = wxGetHostName() + wxT(" to ") + c->getDesktopName() + wxString::Format(wxT("(%i)"), sel) +
+	        + wxT(" input on ") + wxNow() + wxT(".csv");
+#ifdef __WIN32__
+	      // windows doesn't like ':'s
+	      filename.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
+	      
+	      filename = wxFileSelector(_("Saving recorded input..."), 
+					wxEmptyString,
+					filename, 
+					wxT(".csv"), 
+					_("CSV files|*.csv"), 
+					wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+ 
+	      wxLogDebug(wxT("About to save recorded input to ") + filename);
+
+	      if(!filename.empty())
+		{
+		  wxBusyCursor busy;
+		  ofstream ostream(filename.char_str());
+		  if(! ostream)
+		    {
+		      wxLogError(_("Could not save file!"));
+		      return;
+		    }
+
+		  for(size_t i=0; i < recorded_input.GetCount(); ++i)
+		    ostream << recorded_input[i].char_str() << endl;
+		}
+	    }
+
+	}
+      else // not recording
+	{
+	  if( c->recordUserInputStart()) 
+	    {
+	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(stop_png));
+	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+	    }
+	}
+	
+    }
+}
+
+
+void MyFrameMain::machine_input_replay(wxCommandEvent &event)
+{
+
+
+}
+
+
+
 void MyFrameMain::machine_exit(wxCommandEvent &event)
 {
   Close(true);

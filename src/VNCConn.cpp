@@ -1329,7 +1329,7 @@ bool VNCConn::recordUserInputStart()
 }
 
 
-bool VNCConn::recordUserInputStop(wxArrayString *dst)
+bool VNCConn::recordUserInputStop(wxArrayString &dst)
 {
    wxCriticalSectionLocker lock(mutex_recordreplay);
  
@@ -1337,7 +1337,7 @@ bool VNCConn::recordUserInputStop(wxArrayString *dst)
      {
        recordreplay_stopwatch.Pause();
        recording = false;
-       *dst = userinput; // copy over
+       dst = userinput; // copy over
        return true;
      }
    return false;

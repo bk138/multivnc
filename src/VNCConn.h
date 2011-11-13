@@ -122,7 +122,7 @@ public:
   bool replayUserInputStart(wxArrayString src); // copies in src and plays it
   bool replayUserInputStop();
   bool recordUserInputStart();
-  bool recordUserInputStop(wxArrayString* dst); // if ok, copies recorded input to dst
+  bool recordUserInputStop(wxArrayString& dst); // if ok, copies recorded input to dst
   bool getReplaying() { return replaying; };
   bool getRecording() { return recording; };
 

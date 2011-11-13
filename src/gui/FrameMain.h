@@ -26,6 +26,8 @@
 #include "res/toggle-keyboard-grab.png.h"
 #include "res/replay.png.h"
 #include "res/record.png.h"
+#include "res/stop.png.h"
+
 #include "evtids.h"
 
 
