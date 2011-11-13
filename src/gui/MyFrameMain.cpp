@@ -304,6 +304,7 @@ void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
       // update icon
       frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
       wxLogMessage( _("Replay finished!"));
+      wxLogStatus(_("Replay finished!"));
     }
 }
 
@@ -1138,6 +1139,8 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	  
 	  if(c->recordUserInputStop(recorded_input))
 	    {
+	      wxLogStatus(_("Stopped recording user input!"));
+	      
 	      if(recorded_input.IsEmpty())
 		{
 		  wxLogMessage(_("Nothing to save!"));
@@ -1178,10 +1181,13 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	}
       else // not recording
 	{
+	  wxLogMessage(_("From now on, all your mouse and keyboard input will be recorded. Click the stop button to finish recording and save your input."));
+
 	  if( c->recordUserInputStart()) 
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(stop_png));
 	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+	      wxLogStatus(_("Recording user input..."));
 	    }
 	}
 	
@@ -1206,6 +1212,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 
 	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
 	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
+	  wxLogStatus(_("Stopped replaying user input!"));
 	}
       else // not replaying
 	{
@@ -1236,12 +1243,15 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	      while(istream.getline(buf, 1024))
 		recorded_input.Add(wxString(buf, wxConvUTF8));
 	    }
-
+	  else
+	    return; // canceled
+	  
 	  // start replay
 	  if(c->replayUserInputStart(recorded_input))
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
 	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+	      wxLogStatus(_("Replaying user input..."));
 	    }
 	}
 	
