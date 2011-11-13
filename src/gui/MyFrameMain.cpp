@@ -1155,6 +1155,7 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	  if(c->recordUserInputStop(recorded_input))
 	    {
 	      wxLogStatus(_("Stopped recording user input!"));
+	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->SetItemLabel(_("Record Input"));
 
 	      // re-enable replay buttons
 	      GetToolBar()->EnableTool(ID_INPUT_REPLAY, true);
@@ -1205,7 +1206,9 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	  if( c->recordUserInputStart()) 
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(stop_png));
+	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->SetItemLabel(_("Stop Recording"));
 	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+
 	      wxLogStatus(_("Recording user input..."));
 
 	      // disable replay buttons
@@ -1234,7 +1237,9 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  c->replayUserInputStop();
 
 	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Replay Input"));
 	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
+
 	  wxLogStatus(_("Stopped replaying user input!"));
 
 	  // re-enable record buttons
@@ -1277,7 +1282,9 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  if(c->replayUserInputStart(recorded_input))
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
+	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Stop Replaying"));
 	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+
 	      wxLogStatus(_("Replaying user input..."));
 
 	      // disable record buttons
