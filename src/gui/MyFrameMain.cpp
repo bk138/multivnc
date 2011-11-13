@@ -306,8 +306,18 @@ void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
 
   if(index < connections.size()) // found
     {
-      // update icon
       frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Replay Input"));
+      // remove and insert are necessary, otherwise label won't be updated
+      size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
+      wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_REPLAY);
+      button->SetLabel(_("Replay Input"));
+      frame_main_toolbar->InsertTool(pos, button);
+
+      // re-enable record buttons
+      GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(true);
+
       wxLogMessage( _("Replay finished!"));
       wxLogStatus(_("Replay finished!"));
     }
@@ -1148,7 +1158,11 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
       if(c->isRecording())
 	{
 	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(record_png));
-	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
+	  // remove and insert are necessary, otherwise label won't be updated
+	  size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_RECORD);
+	  wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_RECORD);
+	  button->SetLabel(_("Record Input"));
+	  frame_main_toolbar->InsertTool(pos, button);
 	  
 	  wxArrayString recorded_input;
 	  
@@ -1207,7 +1221,11 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(stop_png));
 	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->SetItemLabel(_("Stop Recording"));
-	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+	      // remove and insert are necessary, otherwise label won't be updated
+	      size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_RECORD);
+	      wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_RECORD);
+	      button->SetLabel(_("Stop"));
+	      frame_main_toolbar->InsertTool(pos, button);
 
 	      wxLogStatus(_("Recording user input..."));
 
@@ -1238,7 +1256,11 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 
 	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
 	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Replay Input"));
-	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
+	  // remove and insert are necessary, otherwise label won't be updated
+	  size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
+	  wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_REPLAY);
+	  button->SetLabel(_("Replay Input"));
+	  frame_main_toolbar->InsertTool(pos, button);
 
 	  wxLogStatus(_("Stopped replaying user input!"));
 
@@ -1283,7 +1305,11 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
 	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Stop Replaying"));
-	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+	      // remove and insert are necessary, otherwise label won't be updated
+	      size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
+	      wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_REPLAY);
+	      button->SetLabel(_("Stop"));
+	      frame_main_toolbar->InsertTool(pos, button);
 
 	      wxLogStatus(_("Replaying user input..."));
 
