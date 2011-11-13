@@ -1125,7 +1125,7 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	      filename.Replace(wxString(wxT(":")), wxString(wxT("-")));
 #endif
 	      
-	      filename = wxFileSelector(_("Saving recorded input..."), 
+	      filename = wxFileSelector(_("Save recorded input..."), 
 					wxEmptyString,
 					filename, 
 					wxT(".csv"), 
@@ -1165,8 +1165,61 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 
 void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 {
+  if(connections.size())
+    {
+      int sel = notebook_connections->GetSelection();
+      VNCConn* c = connections.at(sel).conn;
+      
+      if(c->getRecording())
+	return; // bail out
 
 
+      if(c->getReplaying())
+	{
+	  c->replayUserInputStop();
+
+	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
+	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
+	}
+      else // not replaying
+	{
+	  wxArrayString recorded_input;
+
+	  // load recorded input
+	  wxString  filename = wxFileSelector(_("Load recorded input..."), 
+					      wxEmptyString,
+					      filename, 
+					      wxT(".csv"), 
+					      _("CSV files|*.csv"), 
+					      wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+ 
+	  if(!filename.empty())
+	    {
+	      wxBusyCursor busy;
+	      
+	      wxLogDebug(wxT("About to load recorded input from ") + filename);
+	      
+	      ifstream istream(filename.char_str());
+	      if(! istream)
+		{
+		  wxLogError(_("Could not open file!"));
+		  return;
+		}
+
+	      char buf[1024];
+	      while(istream.getline(buf, 1024))
+		recorded_input.Add(wxString(buf, wxConvUTF8));
+	    }
+
+	  // start replay
+	  if(c->replayUserInputStart(recorded_input))
+	    {
+	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
+	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
+	    }
+	}
+	
+    }
 }
 
 
