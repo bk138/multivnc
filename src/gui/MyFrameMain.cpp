@@ -90,6 +90,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
   // stats
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(false);
+  // record/replay
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(false);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(false);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
@@ -109,6 +112,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     {
       frame_main_toolbar->EnableTool(wxID_STOP, false); // disconnect
       frame_main_toolbar->EnableTool(wxID_SAVE, false); // screenshot
+      frame_main_toolbar->EnableTool(ID_INPUT_REPLAY, false);
+      frame_main_toolbar->EnableTool(ID_INPUT_RECORD, false);
 
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
     }
@@ -733,6 +738,9 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(true);
   // stats
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(true);
+  // record/replay
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(true);
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(true);
   // bookmarks
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
   // window sharing
@@ -743,6 +751,8 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
     {
       GetToolBar()->EnableTool(wxID_STOP, true); // disconnect
       GetToolBar()->EnableTool(wxID_SAVE, true); // screenshot
+      GetToolBar()->EnableTool(ID_INPUT_REPLAY, true);
+      GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
     }
   
   return true;
@@ -818,6 +828,9 @@ void MyFrameMain::terminate_conn(int which)
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
       // stats
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(false);
+      // record/replay
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(false);
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(false);
       // bookmarks
       frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
       // window sharing
@@ -828,6 +841,8 @@ void MyFrameMain::terminate_conn(int which)
 	{
 	  GetToolBar()->EnableTool(wxID_STOP, false); // disconnect
 	  GetToolBar()->EnableTool(wxID_SAVE, false); // screenshot
+	  GetToolBar()->EnableTool(ID_INPUT_REPLAY, false);
+	  GetToolBar()->EnableTool(ID_INPUT_RECORD, false);
 	}
     }
 
@@ -1140,6 +1155,10 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	  if(c->recordUserInputStop(recorded_input))
 	    {
 	      wxLogStatus(_("Stopped recording user input!"));
+
+	      // re-enable replay buttons
+	      GetToolBar()->EnableTool(ID_INPUT_REPLAY, true);
+	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(true);
 	      
 	      if(recorded_input.IsEmpty())
 		{
@@ -1188,6 +1207,10 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(stop_png));
 	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
 	      wxLogStatus(_("Recording user input..."));
+
+	      // disable replay buttons
+	      GetToolBar()->EnableTool(ID_INPUT_REPLAY, false);
+	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(false);
 	    }
 	}
 	
@@ -1213,6 +1236,10 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
 	  //	  frame_main_toolbar->FindControl(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
 	  wxLogStatus(_("Stopped replaying user input!"));
+
+	  // re-enable record buttons
+	  GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
+	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(true);
 	}
       else // not replaying
 	{
@@ -1221,7 +1248,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  // load recorded input
 	  wxString  filename = wxFileSelector(_("Load recorded input..."), 
 					      wxEmptyString,
-					      filename, 
+					      wxEmptyString, 
 					      wxT(".csv"), 
 					      _("CSV files|*.csv"), 
 					      wxFD_OPEN|wxFD_FILE_MUST_EXIST);
@@ -1252,6 +1279,10 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
 	      //frame_main_toolbar->FindControl(frame_main_toolbar->GetToolPos(ID_INPUT_RECORD))->SetLabel(_("Stop"));
 	      wxLogStatus(_("Replaying user input..."));
+
+	      // disable record buttons
+	      GetToolBar()->EnableTool(ID_INPUT_RECORD, false);
+	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(false);
 	    }
 	}
 	
