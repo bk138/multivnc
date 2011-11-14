@@ -121,7 +121,7 @@ public:
   /*
     replay/record user interaction
   */
-  bool replayUserInputStart(wxArrayString src); // copies in src and plays it
+  bool replayUserInputStart(wxArrayString src, bool loop); // copies in src and plays it
   bool replayUserInputStop();
   bool recordUserInputStart();
   bool recordUserInputStop(wxArrayString& dst); // if ok, copies recorded input to dst
@@ -225,6 +225,7 @@ private:
   size_t userinput_pos;
   wxStopWatch recordreplay_stopwatch;
   bool replaying;
+  bool replay_loop;
   bool recording;
   wxCriticalSection mutex_recordreplay;
 

@@ -349,7 +349,12 @@ wxThread::ExitCode VNCConn::Entry()
 			++userinput_pos;
 		      }
 		  }
-		else 
+		else if (replay_loop)
+		  {
+		    userinput_pos = 0; // rewind
+		    recordreplay_stopwatch.Start(); // restart
+		  }
+		else
 		  {
 		    replaying = false; // all done
 		    thread_post_replayfinished_notify();
@@ -1297,7 +1302,7 @@ void VNCConn::resetStats()
 /*
   user input record/replay stuff
  */
-bool VNCConn::replayUserInputStart(wxArrayString src)
+ bool VNCConn::replayUserInputStart(wxArrayString src, bool loop)
 {
   wxCriticalSectionLocker lock(mutex_recordreplay);
 
@@ -1306,6 +1311,7 @@ bool VNCConn::replayUserInputStart(wxArrayString src)
       recordreplay_stopwatch.Start();
       userinput_pos = 0;
       userinput = src;
+      replay_loop = loop;
       replaying = true;
       return true;
     }

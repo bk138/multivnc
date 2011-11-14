@@ -1241,6 +1241,8 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 
 void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 {
+  bool shift_was_down = wxGetMouseState().ShiftDown();
+
   if(connections.size())
     {
       int sel = notebook_connections->GetSelection();
@@ -1299,9 +1301,10 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	    }
 	  else
 	    return; // canceled
+
 	  
 	  // start replay
-	  if(c->replayUserInputStart(recorded_input))
+	  if(c->replayUserInputStart(recorded_input, shift_was_down))
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
 	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Stop Replaying"));
@@ -1311,7 +1314,10 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	      button->SetLabel(_("Stop"));
 	      frame_main_toolbar->InsertTool(pos, button);
 
-	      wxLogStatus(_("Replaying user input..."));
+	      if(shift_was_down)
+		wxLogStatus(_("Replaying user input in loop..."));
+	      else
+		wxLogStatus(_("Replaying user input..."));
 
 	      // disable record buttons
 	      GetToolBar()->EnableTool(ID_INPUT_RECORD, false);
