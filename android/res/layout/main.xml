@@ -41,12 +41,13 @@
 		               android:paddingBottom="10dip"
 		     />
 		
+				<LinearLayout android:id="@+id/bookmarks_list"
+					  android:orientation="vertical"
+	 				  android:layout_height="wrap_content"
+	                  android:layout_width="fill_parent"
+	                  android:padding="10dip"
+	                  />
 			
-			<Spinner 
-		    android:id="@+id/spinnerConnection"
-		    android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-		    />
 
 	         <TextView android:text="@string/new_connection"
 		               android:layout_width="fill_parent" android:layout_height="wrap_content" 

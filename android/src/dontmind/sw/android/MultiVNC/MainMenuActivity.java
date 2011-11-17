@@ -63,7 +63,9 @@ public class MainMenuActivity extends Activity {
 	private TextView repeaterText;
 	//private RadioGroup groupForceFullScreen;
 	//private Spinner colorSpinner;
-	private Spinner spinnerConnection;
+	private LinearLayout serverlist;
+	private LinearLayout bookmarkslist;
+
 	private VncDatabase database;
 	private ConnectionBean selected;
 	private EditText textNickname;
@@ -104,6 +106,10 @@ public class MainMenuActivity extends Activity {
 			}
 		});
 		
+		serverlist = (LinearLayout) findViewById(R.id.discovered_servers_list);
+		bookmarkslist = (LinearLayout) findViewById(R.id.bookmarks_list);
+
+		
 		//colorSpinner = (Spinner)findViewById(R.id.colorformat);
 		COLORMODEL[] models=COLORMODEL.values();
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
@@ -111,33 +117,41 @@ public class MainMenuActivity extends Activity {
 		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
 		//colorSpinner.setAdapter(colorSpinnerAdapter);
 		//colorSpinner.setSelection(0);
-		spinnerConnection = (Spinner)findViewById(R.id.spinnerConnection);
-		spinnerConnection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> ad, View view, int itemIndex, long id) {
-				selected = (ConnectionBean)ad.getSelectedItem();
-				updateViewFromSelected();
-			}
-			@Override
-			public void onNothingSelected(AdapterView<?> ad) {
-				selected = null;
-			}
-		});
-		spinnerConnection.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-			/* (non-Javadoc)
-			 * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView, android.view.View, int, long)
-			 */
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-					int arg2, long arg3) {
-				spinnerConnection.setSelection(arg2);
-				selected = (ConnectionBean)spinnerConnection.getItemAtPosition(arg2);
-				canvasStart();
-				return true;
-			}
-			
-		});
+		
+		
+		
+//		spinnerConnection = (Spinner)findViewById(R.id.spinnerConnection);
+//		spinnerConnection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//			@Override
+//			public void onItemSelected(AdapterView<?> ad, View view, int itemIndex, long id) {
+//				selected = (ConnectionBean)ad.getSelectedItem();
+//				updateViewFromSelected();
+//			}
+//			@Override
+//			public void onNothingSelected(AdapterView<?> ad) {
+//				selected = null;
+//			}
+//		});
+//		spinnerConnection.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//
+//			/* (non-Javadoc)
+//			 * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView, android.view.View, int, long)
+//			 */
+//			@Override
+//			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+//					int arg2, long arg3) {
+//				spinnerConnection.setSelection(arg2);
+//				selected = (ConnectionBean)spinnerConnection.getItemAtPosition(arg2);
+//				canvasStart();
+//				return true;
+//			}
+//			
+//		});
+//		
+		
+		
+		
+		
 		repeaterText = (TextView)findViewById(R.id.textRepeaterId);
 		goButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -222,7 +236,7 @@ public class MainMenuActivity extends Activity {
 		return true;
 	}
 
-	private void updateViewFromSelected() {
+	private void updateFieldsFromSelectedBookmark() {
 		if (selected==null)
 			return;
 		ipText.setText(selected.getAddress());
@@ -319,22 +333,21 @@ public class MainMenuActivity extends Activity {
 	}
 	
 	void arriveOnPage() {
-		ArrayList<ConnectionBean> connections=new ArrayList<ConnectionBean>();
-		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, connections, ConnectionBean.newInstance);
-		Collections.sort(connections);
+		ArrayList<ConnectionBean> bookmarked_connections=new ArrayList<ConnectionBean>();
+		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, bookmarked_connections, ConnectionBean.newInstance);
+		Collections.sort(bookmarked_connections);
 		
 		Log.d(getString(R.string.app_name), "main menu");
 		
-		connections.add(0, new ConnectionBean());
 		int connectionIndex=0;
-		if ( connections.size()>1)
+		if ( bookmarked_connections.size()>1)
 		{
 			MostRecentBean mostRecent = getMostRecent(database.getReadableDatabase());
 			if (mostRecent != null)
 			{
-				for ( int i=1; i<connections.size(); ++i)
+				for ( int i=1; i<bookmarked_connections.size(); ++i)
 				{
-					if (connections.get(i).get_Id() == mostRecent.getConnectionId())
+					if (bookmarked_connections.get(i).get_Id() == mostRecent.getConnectionId())
 					{
 						connectionIndex=i;
 						break;
@@ -342,13 +355,36 @@ public class MainMenuActivity extends Activity {
 				}
 			}
 		}
-		spinnerConnection.setAdapter(new ArrayAdapter<ConnectionBean>(this,android.R.layout.simple_spinner_item,
-				connections.toArray(new ConnectionBean[connections.size()])));
-		spinnerConnection.setSelection(connectionIndex,false);
-		selected=connections.get(connectionIndex);
+//		spinnerConnection.setAdapter(new ArrayAdapter<ConnectionBean>(this,android.R.layout.simple_spinner_item,
+//				connections.toArray(new ConnectionBean[connections.size()])));
+//		spinnerConnection.setSelection(connectionIndex,false);
+
+
+		// update bookmarks list
+		bookmarkslist.removeAllViews();
+		LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		for(int i=0; i < bookmarked_connections.size(); ++i)
+		{
+			final ConnectionBean conn = bookmarked_connections.get(i);
+			View v = vi.inflate(R.layout.bookmarks_list_item, null);
+			TextView name = (TextView) v.findViewById(R.id.bookmark_name);
+			name.setText(conn.getNickname());
+			name.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
+					intent.putExtra(VncConstants.CONNECTION , conn.Gen_getValues());
+					startActivity(intent);
+				}
+			});
+
+			bookmarkslist.addView(v);
+
+		}
 		
+		selected=bookmarked_connections.get(connectionIndex);
 		
-		updateViewFromSelected();
+		updateFieldsFromSelectedBookmark();
 	}
 	
 	protected void onStop() {
@@ -501,7 +537,6 @@ public class MainMenuActivity extends Activity {
 				Toast.makeText(MainMenuActivity.this, msg , Toast.LENGTH_SHORT).show();
 
 				// update 
-				LinearLayout serverlist = (LinearLayout) findViewById(R.id.discovered_servers_list);
 				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				if(conn == null) // is removal
 				{
