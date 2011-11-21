@@ -2,11 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:flattr_sdk="http://schemas.flattr4android.com/sdk"
 	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:padding="3dp">
+	android:layout_height="fill_parent">
+	
+	  <ScrollView 
+		android:layout_gravity="center_vertical" android:layout_width="fill_parent"
+		android:layout_height="fill_parent">  
 
 	<LinearLayout android:orientation="vertical"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:layout_weight="1" android:paddingTop="10dp"
+		android:layout_weight="1" android:paddingTop="10dp"  android:padding="10dip"
 		android:gravity="center_horizontal">
 		<ImageView android:id="@+id/ImageView01"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -25,22 +29,19 @@
 		flattr_sdk:token="41e28ea212496725687036408604b16b"
 		flattr_sdk:token_secret="9cbb740e9f11c42948cbbc3f0549f2fe"
 		flattr_sdk:thing_id="183793" flattr_sdk:button_style="vertical"
-		android:layout_gravity="center"	/>
+		android:layout_gravity="center"
+		android:layout_marginBottom="20dip"	/>
 		   
-	   <ScrollView android:id="@+id/ScrollView01"
-			android:layout_width="fill_parent" android:layout_height="wrap_content"
-			android:paddingTop = "3pt">
-					
-			<LinearLayout android:orientation="vertical"
-				android:layout_width="fill_parent" android:layout_height="fill_parent"
-				android:layout_weight="1">
-
-
-		
-
-			</LinearLayout>
-		</ScrollView>
+	      
+					<ImageButton android:id="@+id/paypal_button"
+						android:clickable="true" android:src="@drawable/paypal_button"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content" android:layout_gravity="center"
+						android:padding="0dip" />
 	
-</LinearLayout>
+      </LinearLayout>
+
+ </ScrollView>
+
 </LinearLayout>
 
