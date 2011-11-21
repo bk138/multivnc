@@ -174,8 +174,15 @@
 					android:gravity="left|center_vertical"
 					android:text="@string/repeater_empty_text"
 					/>
+				
 		       </LinearLayout>
-		       
+		 
+		    <Button
+					android:id="@+id/buttonSaveBookmark"
+					android:text="@string/savebookmark_button"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					/>
 		       
 		     <Button 
 					    android:id="@+id/buttonGO" 

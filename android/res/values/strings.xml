@@ -58,6 +58,7 @@
 <string name="nickname_caption">Bookmark</string>
 <string name="discovered_servers">Discovered Servers</string>
 <string name="bookmarks">Bookmarks</string>
+<string name="savebookmark_button">Save Bookmark</string>
 <string name="off">Off</string>
 <string name="on">On</string>
 <string name="one_to_one">1:1</string>
