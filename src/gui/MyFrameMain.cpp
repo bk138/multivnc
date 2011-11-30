@@ -489,7 +489,7 @@ void MyFrameMain::onSDNotify(wxCommandEvent& event)
       for(it=entries.begin(); it != entries.end(); it++)
 	items.Add(it->name.Mid(0, it->name.Len() - qlen));
       
-      list_box_services->Set(items, 0);
+      list_box_services->Set(items, (void**)0);
     }
 }
 
@@ -988,7 +988,7 @@ bool MyFrameMain::loadbookmarks()
   
   cfg->SetPath(wxT("/"));
 
-  list_box_bookmarks->Set(bookmarknames, 0);
+  list_box_bookmarks->Set(bookmarknames, (void**)0);
 
   return true;
 }
