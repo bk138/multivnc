@@ -2,6 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(multivnc, 0.6, http://sourceforge.net/projects/multivnc/support, multivnc, http://multivnc.sf.net)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_CONFIG_HEADER(config.h)
 dnl this one needs a prefix
 AX_PREFIX_CONFIG_H([src/rfb/rfbconfig.h], LibVNCServer)
