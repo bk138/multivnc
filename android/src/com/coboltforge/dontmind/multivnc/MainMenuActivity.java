@@ -54,6 +54,9 @@ import javax.jmdns.ServiceListener;
 
 
 public class MainMenuActivity extends Activity {
+	
+	private static final String TAG = "MainActivity";
+	
 	private EditText ipText;
 	private EditText portText;
 	private EditText passwordText;
@@ -314,6 +317,8 @@ public class MainMenuActivity extends Activity {
 		mDNSstart();
 	}
 	
+	
+	
 	/**
 	 * Return the object representing the app global state in the database, or null
 	 * if the object hasn't been set up yet
@@ -335,7 +340,7 @@ public class MainMenuActivity extends Activity {
 		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, bookmarked_connections, ConnectionBean.newInstance);
 		Collections.sort(bookmarked_connections);
 		
-		Log.d(getString(R.string.app_name), "main menu");
+		Log.d(TAG, "main menu arriveonpage()");
 		
 		int connectionIndex=0;
 		if ( bookmarked_connections.size()>1)
@@ -460,7 +465,12 @@ public class MainMenuActivity extends Activity {
 
 	private void mDNSstart()
 	{
-		Log.d(getString(R.string.app_name), "starting MDNS");
+		Log.d(TAG, "starting MDNS");
+		
+		if(jmdns != null) {
+			Log.d(TAG, "MDNS already running, bailing out");
+			return;
+		}
 		
 		android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
 		lock = wifi.createMulticastLock("mylockthereturn");
@@ -480,7 +490,7 @@ public class MainMenuActivity extends Activity {
 					
 					connections_discovered.put(ev.getInfo().getQualifiedName(), c);
 				
-					Log.d(getString(R.string.app_name), "discovered server :" + ev.getName() 
+					Log.d(TAG, "discovered server :" + ev.getName() 
 								+ ", now " + connections_discovered.size());
 					
 					mDNSnotify(getString(R.string.server_found) + ": " + ev.getName(), c);
@@ -490,7 +500,7 @@ public class MainMenuActivity extends Activity {
 				public void serviceRemoved(ServiceEvent ev) {
 					connections_discovered.remove(ev.getInfo().getQualifiedName());
 					
-					Log.d(getString(R.string.app_name), "server gone:" + ev.getName() 
+					Log.d(TAG, "server gone:" + ev.getName() 
 							+ ", now " + connections_discovered.size());
 					
 					mDNSnotify(getString(R.string.server_removed) + ": " + ev.getName(), null);
@@ -511,7 +521,7 @@ public class MainMenuActivity extends Activity {
 
 	private void mDNSstop()
 	{
-		Log.d(getString(R.string.app_name), "stopping MDNS");
+		Log.d(TAG, "stopping MDNS");
 		if (jmdns != null) {
 			if (listener != null) {
 				jmdns.removeServiceListener(mdnstype, listener);
@@ -530,6 +540,8 @@ public class MainMenuActivity extends Activity {
 		
 		connections_discovered.clear();
 		((LinearLayout)findViewById(R.id.discovered_servers_list)).removeAllViews();
+		
+		Log.d(TAG, "stopping MDNS done");
 	}
 
 	// do the GUI stuff in Runnable posted to main thread handler
