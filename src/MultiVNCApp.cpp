@@ -69,10 +69,7 @@ bool MultiVNCApp::OnInit()
 {
   locale = 0;
 
-#if wxCHECK_VERSION(2, 9, 0) 
-#else  
   setLocale(wxLANGUAGE_DEFAULT);
-#endif
 
   // setup signal handlers
   nr_sigints = 0;
@@ -216,7 +213,7 @@ bool MultiVNCApp::setLocale(int language)
 
   // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return 
   // false just because it failed to load wxstd catalog                                 
-  if(! locale->Init(language, wxLOCALE_CONV_ENCODING) )                      
+  if(! locale->Init(language) )                      
     {  
       wxLogError(_("This language is not supported by the system.")); 
       return false;    
