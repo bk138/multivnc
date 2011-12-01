@@ -191,15 +191,6 @@ public class MainMenuActivity extends Activity {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onMenuOpened(int, android.view.Menu)
-	 */
-	@Override
-	public boolean onMenuOpened(int featureId, Menu menu) {
-		menu.findItem(R.id.itemDeleteConnection).setEnabled(selected!=null && ! selected.isNew());
-		menu.findItem(R.id.itemSaveAsCopy).setEnabled(selected!=null && ! selected.isNew());
-		return true;
-	}
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
@@ -216,21 +207,9 @@ public class MainMenuActivity extends Activity {
 			saveAndWriteRecent();
 			arriveOnPage();
 			break;
-		case R.id.itemDeleteConnection :
-			Utils.showYesNoPrompt(this, "Delete?", "Delete " + selected.getNickname() + "?",
-					new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int i)
-				{
-					selected.Gen_delete(database.getWritableDatabase());
-					arriveOnPage();
-				}
-			}, null);
-			break;
 		case R.id.itemImportExport :
 			showDialog(R.layout.importexport);
 			break;
-			
 		case R.id.itemOpenDoc :
 			Intent intent = new Intent (this, AboutActivity.class);
 			this.startActivity(intent);
@@ -372,6 +351,8 @@ public class MainMenuActivity extends Activity {
 		{
 			final ConnectionBean conn = bookmarked_connections.get(i);
 			View v = vi.inflate(R.layout.bookmarks_list_item, null);
+
+			// name
 			TextView name = (TextView) v.findViewById(R.id.bookmark_name);
 			name.setText(conn.getNickname());
 			name.setOnClickListener(new View.OnClickListener() {
@@ -382,9 +363,70 @@ public class MainMenuActivity extends Activity {
 					startActivity(intent);
 				}
 			});
+			
+			// button
+			ImageButton button = (ImageButton) v.findViewById(R.id.bookmark_edit_button);
+			button.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					
+					final CharSequence[] items = {
+							getString(R.string.save_as_copy), 
+							getString(R.string.delete_connection), 
+							getString(R.string.edit)
+					};
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
+					builder.setItems(items, new DialogInterface.OnClickListener() {
+					    public void onClick(DialogInterface dialog, int item) {
+					    	switch(item) {
+					    	
+					    	case 0: // save as copy
+//					    		ConnectionBean copy = conn.clone();
+//
+//					    		copy.setNickname("Copy of " + conn.getNickname());
+//					    		copy.set_Id(0); // new!
+//								saveBookmark(copy);
+//								// update
+//								arriveOnPage();
+					    		break;
+					    		
+					    	case 1: // delete
+					    		AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
+								builder.setMessage(getString(R.string.bookmark_delete_question))
+								.setCancelable(false)
+								.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										Log.d(TAG, "Deleting bookmark " + conn.get_Id());
+										// delete from DB
+										conn.Gen_delete(database.getWritableDatabase());
+										// update
+										arriveOnPage();
+									}
+								})
+								.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										dialog.cancel();
+									}
+								});
+								AlertDialog saveornot = builder.create();
+								saveornot.show();
+
+					    	
+					    		break;
+					    		
+					    	case 2: // edit
+					    		
+					    		break;
+					    	}
+					    }
+					});
+					AlertDialog chooser = builder.create();
+					chooser.show();
+				}
+			});
 
 			bookmarkslist.addView(v);
-
 		}
 		
 		try {
