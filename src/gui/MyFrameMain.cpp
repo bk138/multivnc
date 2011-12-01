@@ -17,6 +17,9 @@
 
 using namespace std;
 
+#ifdef __WXGTK__ // only GTK supports this atm
+#define MULTIVNC_GRABKEYBOARD
+#endif
 
 // map recv of custom events to handler methods
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
@@ -103,10 +106,12 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
 
   // toolbar setup
-#ifndef __WXGTK__
+#ifdef MULTIVNC_GRABKEYBOARD
+  frame_main_toolbar->ToggleTool(ID_GRABKEYBOARD, grab_keyboard);
+#else 
   frame_main_toolbar->DeleteTool(ID_GRABKEYBOARD);
 #endif
-  frame_main_toolbar->ToggleTool(ID_GRABKEYBOARD, grab_keyboard);
+
 
   if(show_toolbar)
     {
@@ -187,7 +192,9 @@ MyFrameMain::~MyFrameMain()
   GetSize(&x, &y);
   pConfig->Write(K_SIZE_X, x);
   pConfig->Write(K_SIZE_Y, y);
+#ifdef MULTIVNC_GRABKEYBOARD
   pConfig->Write(K_GRABKEYBOARD, frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
+#endif
 
   // this has to be from end to start in order for stats autosave to assign right connection numbers!
   for(int i = connections.size()-1; i >= 0; --i)
@@ -710,7 +717,9 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
 
   ViewerWindow* win = new ViewerWindow(notebook_connections, c);
   win->showStats(show_stats);
+#ifdef MULTIVNC_GRABKEYBOARD
   win->grabKeyboard(frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
+#endif
 
   VNCSeamlessConnector* sc = 0;
   if(show_seamless != EDGE_NONE)
