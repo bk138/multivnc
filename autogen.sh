@@ -42,7 +42,11 @@ DIE=0
 }
 
 (grep "^AM_PROG_LIBTOOL" $srcdir/configure.ac >/dev/null) && {
-  (libtool --version) < /dev/null > /dev/null 2>&1 || {
+  (libtool --version) < /dev/null > /dev/null 2>&1 && {
+      export LIBTOOL=libtool
+      export LIBTOOLIZE=libtoolize
+  } ||
+  {
     # GNU libtool wasn't found as "libtool",
     # so we check if it's known as "glibtool" (as on OS X)
     (glibtool --version) < /dev/null > /dev/null 2>&1 || {
@@ -56,8 +60,6 @@ DIE=0
     export LIBTOOL=glibtool
     export LIBTOOLIZE=glibtoolize
   }
-  export LIBTOOL=libtool
-  export LIBTOOLIZE=libtoolize
 }
 
 
