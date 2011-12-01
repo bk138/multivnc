@@ -544,7 +544,6 @@ public class MainMenuActivity extends Activity {
 				jmdns.removeServiceListener(mdnstype, listener);
 				listener = null;
 			}
-			jmdns.unregisterAllServices();
 			try {
 				jmdns.close();
 			} catch (IOException e) {
