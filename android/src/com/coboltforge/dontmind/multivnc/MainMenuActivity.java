@@ -22,6 +22,7 @@
 package com.coboltforge.dontmind.multivnc;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
@@ -38,6 +39,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -452,6 +454,21 @@ public class MainMenuActivity extends Activity {
 		}
 	}
 	
+	private void saveBookmark(ConnectionBean conn) 	{
+		SQLiteDatabase db = database.getWritableDatabase();
+		db.beginTransaction();
+		try {
+			conn.save(db);
+			db.setTransactionSuccessful();
+		}
+		catch(Exception e) {
+			Log.e(TAG, "Error saving bookmark: " + e.getMessage());
+		}
+		finally {
+			db.endTransaction();
+		}
+	}
+	
 	private void vnc() {
 		updateSelectedFromView();
 		saveAndWriteRecent();
@@ -483,7 +500,7 @@ public class MainMenuActivity extends Activity {
 				@Override
 				public void serviceResolved(ServiceEvent ev) {
 					ConnectionBean c = new ConnectionBean();
-					c.set_Id(-42);
+					c.set_Id(0); // new!
 					c.setNickname(ev.getName());
 					c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
 					c.setPort(ev.getInfo().getPort());
@@ -553,50 +570,70 @@ public class MainMenuActivity extends Activity {
 
 				// update 
 				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				if(conn == null) // is removal
-				{
-					// clear
-					serverlist.removeAllViews();
-					// refill
-					synchronized (connections_discovered) {
-						for(final ConnectionBean c : connections_discovered.values()) {
-							View v = vi.inflate(R.layout.discovered_servers_list_item, null);
-							TextView name = (TextView) v.findViewById(R.id.discovered_server_name);
-							name.setText(c.getNickname());
-							name.setOnClickListener(new View.OnClickListener() {
-								@Override
-								public void onClick(View view) {
-									Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-									intent.putExtra(VncConstants.CONNECTION , c.Gen_getValues());
-									startActivity(intent);
-								}
-							});
-							serverlist.addView(v);
-						}
-					}
 
+				/*
+				 * we don't care whether this is a conn add or removal (conn!=null or conn==null),
+				 * we always rebuild the whole view for the sake of code simplicity  
+				 */
+				serverlist.removeAllViews();
+				// refill
+				synchronized (connections_discovered) {
+					for(final ConnectionBean c : connections_discovered.values()) {
+						// the list item
+						View v = vi.inflate(R.layout.discovered_servers_list_item, null);
+
+						// name part of list item
+						TextView name = (TextView) v.findViewById(R.id.discovered_server_name);
+						name.setText(c.getNickname());
+						name.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
+								intent.putExtra(VncConstants.CONNECTION , c.Gen_getValues());
+								startActivity(intent);
+							}
+						});
+
+						// button part of list item
+						ImageButton button = (ImageButton) v.findViewById(R.id.discovered_server_save_button);
+						button.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View view) {
+								AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
+								builder.setMessage(getString(R.string.bookmark_save_question))
+								.setCancelable(false)
+								.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										Log.d(TAG, "Bookmarking connection " + c.get_Id());
+										// save bookmark
+										saveBookmark(c);
+										// set as 'new' again. makes this ConnectionBean saveable again
+										c.set_Id(0);
+										// and update view
+										arriveOnPage();
+									}
+								})
+								.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										dialog.cancel();
+									}
+								});
+								AlertDialog saveornot = builder.create();
+								saveornot.show();
+
+							}
+						});
+
+						serverlist.addView(v);
+					}
 				}
-				else // is add
-				{
-					View v = vi.inflate(R.layout.discovered_servers_list_item, null);
-					TextView name = (TextView) v.findViewById(R.id.discovered_server_name);
-					name.setText(conn.getNickname());
-					name.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View view) {
-							Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-							intent.putExtra(VncConstants.CONNECTION , conn.Gen_getValues());
-							startActivity(intent);
-						}
-					});
-					
-					serverlist.addView(v);
-				}
+
+
 
 			}
 		}, 1);
 
 	}
-	
+
 	
 }

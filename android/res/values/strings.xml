@@ -85,4 +85,7 @@
 <string name="username_caption">Username</string>
 <string name="username_hint">For Windows authentication</string>
 <string name="bookmark_hint">If filled in, connection will be bookmarked...</string>
+<string name="bookmark_save_question">Do you want to bookmark this server?</string>
+<string name="yes">Yes</string>
+<string name="no">No</string>
 </resources>

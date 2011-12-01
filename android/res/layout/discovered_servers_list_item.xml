@@ -11,7 +11,7 @@
         	android:layout_width="wrap_content"
         	android:layout_weight="1"
         android:layout_gravity="center_vertical"/>
-        <ImageButton android:id="@+id/discovered_server_save"
+        <ImageButton android:id="@+id/discovered_server_save_button"
         	android:src="@android:drawable/ic_menu_save"
         	android:layout_gravity="center_vertical"
         	android:scaleType="centerInside"
