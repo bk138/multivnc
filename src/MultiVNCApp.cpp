@@ -69,7 +69,10 @@ bool MultiVNCApp::OnInit()
 {
   locale = 0;
 
+#if wxCHECK_VERSION(2, 9, 0) 
+#else  
   setLocale(wxLANGUAGE_DEFAULT);
+#endif
 
   // setup signal handlers
   nr_sigints = 0;
