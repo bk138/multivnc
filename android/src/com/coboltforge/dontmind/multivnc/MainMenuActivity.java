@@ -77,7 +77,7 @@ public class MainMenuActivity extends Activity {
 	private boolean repeaterTextSet;
 	
 	// service discovery stuff
-	private android.net.wifi.WifiManager.MulticastLock lock;
+	private android.net.wifi.WifiManager.MulticastLock multicastLock;
 	private android.os.Handler handler = new android.os.Handler();
 	private String mdnstype = "_rfb._tcp.local.";
 	private JmDNS jmdns = null;
@@ -490,9 +490,9 @@ public class MainMenuActivity extends Activity {
 		}
 		
 		android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
-		lock = wifi.createMulticastLock("mylockthereturn");
-		lock.setReferenceCounted(true);
-		lock.acquire();
+		multicastLock = wifi.createMulticastLock("mylockthereturn");
+		multicastLock.setReferenceCounted(true);
+		multicastLock.acquire();
 		try {
 			jmdns = JmDNS.create();
 			jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
@@ -553,7 +553,7 @@ public class MainMenuActivity extends Activity {
 			jmdns = null;
 		}
 
-		lock.release();
+		multicastLock.release();
 		
 		connections_discovered.clear();
 		((LinearLayout)findViewById(R.id.discovered_servers_list)).removeAllViews();
