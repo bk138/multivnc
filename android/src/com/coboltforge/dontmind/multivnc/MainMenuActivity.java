@@ -199,14 +199,6 @@ public class MainMenuActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId())
 		{
-		case R.id.itemSaveAsCopy :
-			if (selected.getNickname().equals(textNickname.getText().toString()))
-				textNickname.setText("Copy of "+selected.getNickname());
-			updateSelectedFromView();
-			selected.set_Id(0);
-			saveAndWriteRecent();
-			arriveOnPage();
-			break;
 		case R.id.itemImportExport :
 			showDialog(R.layout.importexport);
 			break;
@@ -339,10 +331,6 @@ public class MainMenuActivity extends Activity {
 				}
 			}
 		}
-//		spinnerConnection.setAdapter(new ArrayAdapter<ConnectionBean>(this,android.R.layout.simple_spinner_item,
-//				connections.toArray(new ConnectionBean[connections.size()])));
-//		spinnerConnection.setSelection(connectionIndex,false);
-
 
 		// update bookmarks list
 		bookmarkslist.removeAllViews();
@@ -382,13 +370,14 @@ public class MainMenuActivity extends Activity {
 					    	switch(item) {
 					    	
 					    	case 0: // save as copy
-//					    		ConnectionBean copy = conn.clone();
-//
-//					    		copy.setNickname("Copy of " + conn.getNickname());
-//					    		copy.set_Id(0); // new!
-//								saveBookmark(copy);
-//								// update
-//								arriveOnPage();
+					    		/* the ConnectionBean objects are transient and generated
+					    		   anew with each call to this function
+					    		 */
+					    		conn.setNickname("Copy of " + conn.getNickname());
+					    		conn.set_Id(0); // this saves a new one in the DB!
+								saveBookmark(conn);
+								// update
+								arriveOnPage();
 					    		break;
 					    		
 					    	case 1: // delete
@@ -500,6 +489,7 @@ public class MainMenuActivity extends Activity {
 		SQLiteDatabase db = database.getWritableDatabase();
 		db.beginTransaction();
 		try {
+			Log.d(TAG, "Saving bookmark for conn " + conn.get_Id());
 			conn.save(db);
 			db.setTransactionSuccessful();
 		}
