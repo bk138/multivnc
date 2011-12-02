@@ -1,8 +1,8 @@
 * rework main screen
+   - remove old functions
+   - connect editbookmark activity
 
 * release
-
-* show touch point when button pressed
 
 * rework special keys dialog
 

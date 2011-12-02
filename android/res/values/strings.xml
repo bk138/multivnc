@@ -84,10 +84,11 @@
 <string name="special_keys">Special Keys</string>
 <string name="username_caption">Username</string>
 <string name="username_hint">For Windows authentication</string>
-<string name="bookmark_hint">If filled in, connection will be bookmarked...</string>
+<string name="editbookmark_title">Edit Bookmark</string>
 <string name="bookmark_save_question">Do you want to bookmark this server?</string>
 <string name="bookmark_delete_question">Are you sure you want to delete this bookmark?</string>
 <string name="yes">Yes</string>
 <string name="no">No</string>
+<string name="cancel">Cancel</string>
 <string name="edit">Edit</string>
 </resources>

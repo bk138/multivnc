@@ -71,7 +71,6 @@ public class MainMenuActivity extends Activity {
 
 	private VncDatabase database;
 	private ConnectionBean selected;
-	private EditText textNickname;
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
 	private boolean repeaterTextSet;
@@ -98,7 +97,6 @@ public class MainMenuActivity extends Activity {
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
-		textNickname = (EditText) findViewById(R.id.textNickname);
 		textUsername = (EditText) findViewById(R.id.textUsername);
 		goButton = (Button) findViewById(R.id.buttonGO);
 		((Button) findViewById(R.id.buttonRepeater)).setOnClickListener(new View.OnClickListener() {
@@ -220,7 +218,7 @@ public class MainMenuActivity extends Activity {
 		}
 		//groupForceFullScreen.check(selected.getForceFull()==BitmapImplHint.AUTO ? R.id.radioForceFullScreenAuto : (selected.getForceFull() == BitmapImplHint.FULL ? R.id.radioForceFullScreenOn : R.id.radioForceFullScreenOff));
 		checkboxKeepPassword.setChecked(selected.getKeepPassword());
-		textNickname.setText(selected.getNickname());
+		//textNickname.setText(selected.getNickname());
 		textUsername.setText(selected.getUserName());
 		COLORMODEL cm = COLORMODEL.valueOf(selected.getColorModel());
 		COLORMODEL[] colors=COLORMODEL.values();
@@ -266,7 +264,7 @@ public class MainMenuActivity extends Activity {
 		{
 			
 		}
-		selected.setNickname(textNickname.getText().toString());
+	//	selected.setNickname(textNickname.getText().toString());
 		selected.setUserName(textUsername.getText().toString());
 		//selected.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
 		selected.setPassword(passwordText.getText().toString());
@@ -400,13 +398,14 @@ public class MainMenuActivity extends Activity {
 								});
 								AlertDialog saveornot = builder.create();
 								saveornot.show();
-
-					    	
 					    		break;
 					    		
 					    	case 2: // edit
-					    		
+					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
+					    		//intent.putExtra(VncConstants.CONNECTION,selected.Gen_getValues());
+					    		startActivity(intent);
 					    		break;
+					    		
 					    	}
 					    }
 					});
