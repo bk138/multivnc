@@ -274,6 +274,7 @@ public class MainMenuActivity extends Activity {
 			name.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
+					Log.d(TAG, "Starting bookmarked connection " + conn.toString());
 					Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 					intent.putExtra(VncConstants.CONNECTION , conn.Gen_getValues());
 					startActivity(intent);
@@ -462,6 +463,7 @@ public class MainMenuActivity extends Activity {
 	private void vnc() {
 		updateSelectedFromView();
 		saveAndWriteRecent();
+		Log.d(TAG, "Starting NEW connection " + selected.toString());
 		Intent intent = new Intent(this, VncCanvasActivity.class);
 		intent.putExtra(VncConstants.CONNECTION,selected.Gen_getValues());
 		startActivity(intent);
@@ -577,6 +579,7 @@ public class MainMenuActivity extends Activity {
 						name.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
+								Log.d(TAG, "Starting discovered connection " + conn.toString());
 								Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 								intent.putExtra(VncConstants.CONNECTION , c.Gen_getValues());
 								startActivity(intent);
