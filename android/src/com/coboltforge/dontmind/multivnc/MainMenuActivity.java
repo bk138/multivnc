@@ -73,7 +73,6 @@ public class MainMenuActivity extends Activity {
 	private ConnectionBean selected;
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
-	private boolean repeaterTextSet;
 	
 	// service discovery stuff
 	private android.net.wifi.WifiManager.MulticastLock multicastLock;
@@ -99,13 +98,6 @@ public class MainMenuActivity extends Activity {
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
 		textUsername = (EditText) findViewById(R.id.textUsername);
 		goButton = (Button) findViewById(R.id.buttonGO);
-		((Button) findViewById(R.id.buttonRepeater)).setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				showDialog(R.layout.repeater_dialog);
-			}
-		});
 		
 		serverlist = (LinearLayout) findViewById(R.id.discovered_servers_list);
 		bookmarkslist = (LinearLayout) findViewById(R.id.bookmarks_list);
@@ -178,28 +170,11 @@ public class MainMenuActivity extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		if (id == R.layout.importexport)
 			return new ImportExportDialog(this);
-		else
-			return new RepeaterDialog(this);
+		
+		return null;
 	}
 	
-	/**
-	 * Called when changing view to match selected connection or from
-	 * Repeater dialog to update the repeater information shown.
-	 * @param repeaterId If null or empty, show text for not using repeater
-	 */
-	void updateRepeaterInfo(boolean useRepeater, String repeaterId)
-	{
-		if (useRepeater)
-		{
-			repeaterText.setText(repeaterId);
-			repeaterTextSet = true;
-		}
-		else
-		{
-			repeaterText.setText(getText(R.string.repeater_empty_text));
-			repeaterTextSet = false;
-		}
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -464,20 +439,19 @@ public class MainMenuActivity extends Activity {
 		{
 			
 		}
-		//selected.setNickname(bookmarkNameText.getText().toString());
 		selected.setUserName(textUsername.getText().toString());
 		//selected.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
 		selected.setPassword(passwordText.getText().toString());
 		selected.setKeepPassword(checkboxKeepPassword.isChecked());
 		selected.setUseLocalCursor(true); // always enable
 		//selected.setColorModel(((COLORMODEL)colorSpinner.getbookmarkItem()).nameString());
-		if (repeaterTextSet)
+		if (repeaterText.getText().length() > 0)
 		{
 			selected.setRepeaterId(repeaterText.getText().toString());
 			selected.setUseRepeater(true);
 		}
 		else
-		{
+		{			
 			selected.setUseRepeater(false);
 		}
 	}
