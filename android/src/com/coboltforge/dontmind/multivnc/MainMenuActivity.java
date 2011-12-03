@@ -165,8 +165,10 @@ public class MainMenuActivity extends Activity {
 	}
 	
 	protected void onDestroy() {
-		database.close();
 		super.onDestroy();
+
+		database.close();
+		mDNSstop();
 	}
 	
 	/* (non-Javadoc)
@@ -178,6 +180,25 @@ public class MainMenuActivity extends Activity {
 			return new ImportExportDialog(this);
 		else
 			return new RepeaterDialog(this);
+	}
+	
+	/**
+	 * Called when changing view to match selected connection or from
+	 * Repeater dialog to update the repeater information shown.
+	 * @param repeaterId If null or empty, show text for not using repeater
+	 */
+	void updateRepeaterInfo(boolean useRepeater, String repeaterId)
+	{
+		if (useRepeater)
+		{
+			repeaterText.setText(repeaterId);
+			repeaterTextSet = true;
+		}
+		else
+		{
+			repeaterText.setText(getText(R.string.repeater_empty_text));
+			repeaterTextSet = false;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -208,79 +229,11 @@ public class MainMenuActivity extends Activity {
 		return true;
 	}
 
-	private void updateFieldsFromSelectedBookmark() {
-		if (selected==null)
-			return;
-		ipText.setText(selected.getAddress());
-		portText.setText(Integer.toString(selected.getPort()));
-		if (selected.getKeepPassword() || selected.getPassword().length()>0) {
-			passwordText.setText(selected.getPassword());
-		}
-		//groupForceFullScreen.check(selected.getForceFull()==BitmapImplHint.AUTO ? R.id.radioForceFullScreenAuto : (selected.getForceFull() == BitmapImplHint.FULL ? R.id.radioForceFullScreenOn : R.id.radioForceFullScreenOff));
-		checkboxKeepPassword.setChecked(selected.getKeepPassword());
-		//textNickname.setText(selected.getNickname());
-		textUsername.setText(selected.getUserName());
-		COLORMODEL cm = COLORMODEL.valueOf(selected.getColorModel());
-		COLORMODEL[] colors=COLORMODEL.values();
-		for (int i=0; i<colors.length; ++i)
-		{
-			if (colors[i] == cm) {
-				//colorSpinner.setSelection(i);
-				break;
-			}
-		}
-		updateRepeaterInfo(selected.getUseRepeater(), selected.getRepeaterId());
-	}
+
 	
-	/**
-	 * Called when changing view to match selected connection or from
-	 * Repeater dialog to update the repeater information shown.
-	 * @param repeaterId If null or empty, show text for not using repeater
-	 */
-	void updateRepeaterInfo(boolean useRepeater, String repeaterId)
-	{
-		if (useRepeater)
-		{
-			repeaterText.setText(repeaterId);
-			repeaterTextSet = true;
-		}
-		else
-		{
-			repeaterText.setText(getText(R.string.repeater_empty_text));
-			repeaterTextSet = false;
-		}
-	}
+
 	
-	private void updateSelectedFromView() {
-		if (selected==null) {
-			return;
-		}
-		selected.setAddress(ipText.getText().toString());
-		try
-		{
-			selected.setPort(Integer.parseInt(portText.getText().toString()));
-		}
-		catch (NumberFormatException nfe)
-		{
-			
-		}
-	//	selected.setNickname(textNickname.getText().toString());
-		selected.setUserName(textUsername.getText().toString());
-		//selected.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
-		selected.setPassword(passwordText.getText().toString());
-		selected.setKeepPassword(checkboxKeepPassword.isChecked());
-		selected.setUseLocalCursor(true); // always enable
-		//selected.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
-		if (repeaterTextSet)
-		{
-			selected.setRepeaterId(repeaterText.getText().toString());
-			selected.setUseRepeater(true);
-		}
-		else
-		{
-			selected.setUseRepeater(false);
-		}
-	}
+	
 	
 	protected void onStart() {
 		super.onStart();
@@ -401,8 +354,9 @@ public class MainMenuActivity extends Activity {
 					    		break;
 					    		
 					    	case 2: // edit
+								Log.d(TAG, "Editing bookmark " + conn.get_Id());
 					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
-					    		//intent.putExtra(VncConstants.CONNECTION,selected.Gen_getValues());
+					    		intent.putExtra(VncConstants.CONNECTION, conn.get_Id());
 					    		startActivity(intent);
 					    		break;
 					    		
@@ -424,7 +378,6 @@ public class MainMenuActivity extends Activity {
 			selected = null;
 		}
 		
-		updateFieldsFromSelectedBookmark();
 	}
 	
 	protected void onStop() {
@@ -434,7 +387,6 @@ public class MainMenuActivity extends Activity {
 		}
 		updateSelectedFromView();
 		selected.save(database.getWritableDatabase());
-		mDNSstop();
 	}
 	
 	VncDatabase getDatabaseHelper()
@@ -499,6 +451,37 @@ public class MainMenuActivity extends Activity {
 			db.endTransaction();
 		}
 	}
+	
+
+	private void updateSelectedFromView() {
+	
+		selected.setAddress(ipText.getText().toString());
+		try
+		{
+			selected.setPort(Integer.parseInt(portText.getText().toString()));
+		}
+		catch (NumberFormatException nfe)
+		{
+			
+		}
+		//selected.setNickname(bookmarkNameText.getText().toString());
+		selected.setUserName(textUsername.getText().toString());
+		//selected.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
+		selected.setPassword(passwordText.getText().toString());
+		selected.setKeepPassword(checkboxKeepPassword.isChecked());
+		selected.setUseLocalCursor(true); // always enable
+		//selected.setColorModel(((COLORMODEL)colorSpinner.getbookmarkItem()).nameString());
+		if (repeaterTextSet)
+		{
+			selected.setRepeaterId(repeaterText.getText().toString());
+			selected.setUseRepeater(true);
+		}
+		else
+		{
+			selected.setUseRepeater(false);
+		}
+	}
+	
 	
 	private void vnc() {
 		updateSelectedFromView();

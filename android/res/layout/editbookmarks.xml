@@ -27,23 +27,23 @@
 				>
 				<TableRow>
 					<TextView android:text="@string/nickname_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<EditText android:id="@+id/textNickname" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
+					<EditText android:id="@+id/textNicknameBookmark" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
 				</TableRow>
 				
 				<TableRow>
 					<TextView android:text="@string/address_caption" android:hint="localhost" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<EditText android:id="@+id/textIP" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
+					<EditText android:id="@+id/textIPBookmark" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
 				</TableRow>
 				<TableRow>
 					<TextView android:text="@string/port_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<EditText android:id="@+id/textPORT"
+					<EditText android:id="@+id/textPORTBookmark"
 						android:text="5900"
 						android:layout_width="fill_parent"
 						android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
 				</TableRow>
 				<TableRow>
 					<TextView android:text="@string/username_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<EditText android:layout_width="fill_parent" android:hint="@string/username_hint" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" android:id="@+id/textUsername"/>
+					<EditText android:layout_width="fill_parent" android:hint="@string/username_hint" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" android:id="@+id/textUsernameBookmark"/>
 				</TableRow>
 				<TableRow>
 					<TextView android:text="@string/password_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -53,10 +53,10 @@
 						android:orientation="horizontal"
 						android:layout_weight="1"
 						>
-						<EditText android:id="@+id/textPASSWORD"
+						<EditText android:id="@+id/textPASSWORDBookmark"
 							android:password="true"
 							android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
-						<CheckBox android:id="@+id/checkboxKeepPassword"
+						<CheckBox android:id="@+id/checkboxKeepPasswordBookmark"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:text="@string/keep_password_button"
@@ -64,6 +64,12 @@
 						/>
 					</LinearLayout>
 				</TableRow>
+
+				<TableRow>
+					<TextView android:text="@string/repeater_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
+					<EditText android:layout_width="fill_parent" android:hint="@string/repeater_hint" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" android:id="@+id/textRepeaterIdBookmark"/>
+				</TableRow>
+				    
 			</TableLayout>
 			<!-- 
 			<TextView
@@ -120,26 +126,6 @@
 			</LinearLayout>
 			 -->
 			
-			<LinearLayout android:orientation="horizontal"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				>
-				<Button
-					android:id="@+id/buttonRepeater"
-					android:text="@string/repeater_button"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					/>
-				<TextView
-					android:id="@+id/textRepeaterId"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:gravity="left|center_vertical"
-					android:text="@string/repeater_empty_text"
-					/>
-				
-		       </LinearLayout>
-		 
 			    	
 			<LinearLayout android:orientation="horizontal"
 				android:layout_width="fill_parent"
