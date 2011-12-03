@@ -265,6 +265,8 @@ public class MainMenuActivity extends Activity {
 		{
 			final ConnectionBean conn = bookmarked_connections.get(i);
 			View v = vi.inflate(R.layout.bookmarks_list_item, null);
+			
+			Log.d(TAG, "Displaying bookmark: " + conn.toString());
 
 			// name
 			TextView name = (TextView) v.findViewById(R.id.bookmark_name);

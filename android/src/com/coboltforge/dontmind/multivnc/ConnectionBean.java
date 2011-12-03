@@ -69,7 +69,7 @@ class ConnectionBean extends AbstractConnectionBean implements Comparable<Connec
 		{
 			return "New";
 		}
-		return getNickname()+":"+getAddress()+":"+getPort();
+		return get_Id() + " " + getNickname()+":"+getAddress()+":"+getPort();
 	}
 
 	/* (non-Javadoc)

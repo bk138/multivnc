@@ -1,6 +1,5 @@
 * rework main screen
    - remove old functions
-   - connect editbookmark activity
 
 * release
 
