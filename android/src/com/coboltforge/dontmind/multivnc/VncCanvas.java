@@ -133,6 +133,11 @@ public class VncCanvas extends ImageView {
 		scrollRunnable = new MouseScrollRunnable();
 		handleRREPaint = new Paint();
 		handleRREPaint.setStyle(Style.FILL);
+		
+		int oldprio = android.os.Process.getThreadPriority(android.os.Process.myTid());
+		// GIVE US MAGIC POWER, O GREAT FAIR SCHEDULER!
+		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
+		Log.d(TAG, "Changed prio from " + oldprio + " to " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
 	}
 
 	/**
