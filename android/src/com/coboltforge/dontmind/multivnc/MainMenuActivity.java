@@ -115,7 +115,14 @@ public class MainMenuActivity extends Activity {
 		goButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				vnc();
+				if(conn_new == null)
+					return;
+				updateNewConnFromView();
+				writeRecent(conn_new);
+				Log.d(TAG, "Starting NEW connection " + conn_new.toString());
+				Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
+				intent.putExtra(VncConstants.CONNECTION,conn_new.Gen_getValues());
+				startActivity(intent);
 			}
 		});
 		
@@ -241,6 +248,7 @@ public class MainMenuActivity extends Activity {
 				@Override
 				public void onClick(View view) {
 					Log.d(TAG, "Starting bookmarked connection " + conn.toString());
+					writeRecent(conn);
 					Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 					intent.putExtra(VncConstants.CONNECTION , conn.Gen_getValues());
 					startActivity(intent);
@@ -326,23 +334,22 @@ public class MainMenuActivity extends Activity {
 	
 	
 	
-	private void saveAndWriteRecent()
+	private void writeRecent(ConnectionBean conn)
 	{
 		SQLiteDatabase db = database.getWritableDatabase();
 		db.beginTransaction();
 		try
 		{
-			conn_new.save(db);
 			MostRecentBean mostRecent = getMostRecent(db);
 			if (mostRecent == null)
 			{
 				mostRecent = new MostRecentBean();
-				mostRecent.setConnectionId(conn_new.get_Id());
+				mostRecent.setConnectionId(conn.get_Id());
 				mostRecent.Gen_insert(db);
 			}
 			else
 			{
-				mostRecent.setConnectionId(conn_new.get_Id());
+				mostRecent.setConnectionId(conn.get_Id());
 				mostRecent.Gen_update(db);
 			}
 			db.setTransactionSuccessful();
@@ -397,19 +404,6 @@ public class MainMenuActivity extends Activity {
 			conn_new.setUseRepeater(false);
 		}
 	}
-	
-	
-	private void vnc() {
-		if(conn_new == null)
-			return;
-		updateNewConnFromView();
-		saveAndWriteRecent();
-		Log.d(TAG, "Starting NEW connection " + conn_new.toString());
-		Intent intent = new Intent(this, VncCanvasActivity.class);
-		intent.putExtra(VncConstants.CONNECTION,conn_new.Gen_getValues());
-		startActivity(intent);
-	}
-	
 	
 	
 
@@ -521,6 +515,7 @@ public class MainMenuActivity extends Activity {
 							@Override
 							public void onClick(View view) {
 								Log.d(TAG, "Starting discovered connection " + conn.toString());
+								writeRecent(conn);
 								Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 								intent.putExtra(VncConstants.CONNECTION , c.Gen_getValues());
 								startActivity(intent);
