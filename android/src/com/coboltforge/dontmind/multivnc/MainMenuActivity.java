@@ -70,7 +70,7 @@ public class MainMenuActivity extends Activity {
 	private LinearLayout bookmarkslist;
 
 	private VncDatabase database;
-	private ConnectionBean selected;
+	private ConnectionBean conn_new;
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
 	
@@ -117,12 +117,12 @@ public class MainMenuActivity extends Activity {
 //		spinnerConnection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 //			@Override
 //			public void onItemSelected(AdapterView<?> ad, View view, int itemIndex, long id) {
-//				selected = (ConnectionBean)ad.getSelectedItem();
+//				conn_new = (ConnectionBean)ad.getSelectedItem();
 //				updateViewFromSelected();
 //			}
 //			@Override
 //			public void onNothingSelected(AdapterView<?> ad) {
-//				selected = null;
+//				conn_new = null;
 //			}
 //		});
 //		spinnerConnection.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -134,7 +134,7 @@ public class MainMenuActivity extends Activity {
 //			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 //					int arg2, long arg3) {
 //				spinnerConnection.setSelection(arg2);
-//				selected = (ConnectionBean)spinnerConnection.getItemAtPosition(arg2);
+//				conn_new = (ConnectionBean)spinnerConnection.getItemAtPosition(arg2);
 //				canvasStart();
 //				return true;
 //			}
@@ -149,7 +149,7 @@ public class MainMenuActivity extends Activity {
 		goButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				canvasStart();
+				vnc();
 			}
 		});
 		
@@ -350,21 +350,21 @@ public class MainMenuActivity extends Activity {
 		}
 		
 		try {
-			selected=bookmarked_connections.get(connectionIndex);
+			conn_new=bookmarked_connections.get(connectionIndex);
 		}
 		catch (IndexOutOfBoundsException e) {
-			selected = null;
+			conn_new = null;
 		}
 		
 	}
 	
 	protected void onStop() {
 		super.onStop();
-		if ( selected == null ) {
+		if ( conn_new == null ) {
 			return;
 		}
-		updateSelectedFromView();
-		selected.save(database.getWritableDatabase());
+		updateNewConnFromView();
+		conn_new.save(database.getWritableDatabase());
 	}
 	
 	VncDatabase getDatabaseHelper()
@@ -372,20 +372,7 @@ public class MainMenuActivity extends Activity {
 		return database;
 	}
 	
-	private void canvasStart() {
-		if (selected == null) return;
-		MemoryInfo info = Utils.getMemoryInfo(this);
-		if (info.lowMemory) {
-			// Low Memory situation.  Prompt.
-			Utils.showYesNoPrompt(this, "Continue?", "Android reports low system memory.\nContinue with VNC connection?", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					vnc();
-				}
-			}, null);
-		} else
-			vnc();
-	}
+	
 	
 	private void saveAndWriteRecent()
 	{
@@ -393,17 +380,17 @@ public class MainMenuActivity extends Activity {
 		db.beginTransaction();
 		try
 		{
-			selected.save(db);
+			conn_new.save(db);
 			MostRecentBean mostRecent = getMostRecent(db);
 			if (mostRecent == null)
 			{
 				mostRecent = new MostRecentBean();
-				mostRecent.setConnectionId(selected.get_Id());
+				mostRecent.setConnectionId(conn_new.get_Id());
 				mostRecent.Gen_insert(db);
 			}
 			else
 			{
-				mostRecent.setConnectionId(selected.get_Id());
+				mostRecent.setConnectionId(conn_new.get_Id());
 				mostRecent.Gen_update(db);
 			}
 			db.setTransactionSuccessful();
@@ -431,41 +418,43 @@ public class MainMenuActivity extends Activity {
 	}
 	
 
-	private void updateSelectedFromView() {
+	private void updateNewConnFromView() {
 	
-		selected.setAddress(ipText.getText().toString());
+		conn_new.setAddress(ipText.getText().toString());
 		try
 		{
-			selected.setPort(Integer.parseInt(portText.getText().toString()));
+			conn_new.setPort(Integer.parseInt(portText.getText().toString()));
 		}
 		catch (NumberFormatException nfe)
 		{
 			
 		}
-		selected.setUserName(textUsername.getText().toString());
-		//selected.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
-		selected.setPassword(passwordText.getText().toString());
-		selected.setKeepPassword(checkboxKeepPassword.isChecked());
-		selected.setUseLocalCursor(true); // always enable
-		//selected.setColorModel(((COLORMODEL)colorSpinner.getbookmarkItem()).nameString());
+		conn_new.setUserName(textUsername.getText().toString());
+		//conn_new.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
+		conn_new.setPassword(passwordText.getText().toString());
+		conn_new.setKeepPassword(checkboxKeepPassword.isChecked());
+		conn_new.setUseLocalCursor(true); // always enable
+		//conn_new.setColorModel(((COLORMODEL)colorSpinner.getbookmarkItem()).nameString());
 		if (repeaterText.getText().length() > 0)
 		{
-			selected.setRepeaterId(repeaterText.getText().toString());
-			selected.setUseRepeater(true);
+			conn_new.setRepeaterId(repeaterText.getText().toString());
+			conn_new.setUseRepeater(true);
 		}
 		else
 		{			
-			selected.setUseRepeater(false);
+			conn_new.setUseRepeater(false);
 		}
 	}
 	
 	
 	private void vnc() {
-		updateSelectedFromView();
+		if(conn_new == null)
+			return;
+		updateNewConnFromView();
 		saveAndWriteRecent();
-		Log.d(TAG, "Starting NEW connection " + selected.toString());
+		Log.d(TAG, "Starting NEW connection " + conn_new.toString());
 		Intent intent = new Intent(this, VncCanvasActivity.class);
-		intent.putExtra(VncConstants.CONNECTION,selected.Gen_getValues());
+		intent.putExtra(VncConstants.CONNECTION,conn_new.Gen_getValues());
 		startActivity(intent);
 	}
 	
