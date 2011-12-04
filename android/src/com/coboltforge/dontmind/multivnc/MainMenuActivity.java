@@ -239,7 +239,7 @@ public class MainMenuActivity extends Activity {
 		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, bookmarked_connections, ConnectionBean.newInstance);
 		Collections.sort(bookmarked_connections);
 		
-		Log.d(TAG, "main menu arriveonpage()");
+		Log.d(TAG, "updateBookMarkView()");
 		
 //		int connectionIndex=0;
 //		if ( bookmarked_connections.size()>1)
