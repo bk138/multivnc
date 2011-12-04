@@ -141,7 +141,7 @@
 		       
 		     <Button 
 					android:id="@+id/buttonCancelBookmark" 
-					android:text="@string/cancel"
+					android:text="@android:string/cancel"
 					android:layout_width="0dip"
 					android:layout_height="wrap_content"
 					android:layout_weight="1"
