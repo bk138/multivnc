@@ -24,7 +24,6 @@ package com.coboltforge.dontmind.multivnc;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -110,39 +109,6 @@ public class MainMenuActivity extends Activity {
 		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
 		//colorSpinner.setAdapter(colorSpinnerAdapter);
 		//colorSpinner.setSelection(0);
-		
-		
-		
-//		spinnerConnection = (Spinner)findViewById(R.id.spinnerConnection);
-//		spinnerConnection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//			@Override
-//			public void onItemSelected(AdapterView<?> ad, View view, int itemIndex, long id) {
-//				conn_new = (ConnectionBean)ad.getSelectedItem();
-//				updateViewFromSelected();
-//			}
-//			@Override
-//			public void onNothingSelected(AdapterView<?> ad) {
-//				conn_new = null;
-//			}
-//		});
-//		spinnerConnection.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//
-//			/* (non-Javadoc)
-//			 * @see android.widget.AdapterView.OnItemLongClickListener#onItemLongClick(android.widget.AdapterView, android.view.View, int, long)
-//			 */
-//			@Override
-//			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-//					int arg2, long arg3) {
-//				spinnerConnection.setSelection(arg2);
-//				conn_new = (ConnectionBean)spinnerConnection.getItemAtPosition(arg2);
-//				canvasStart();
-//				return true;
-//			}
-//			
-//		});
-//		
-		
-		
 		
 		
 		repeaterText = (TextView)findViewById(R.id.textRepeaterId);
@@ -241,22 +207,22 @@ public class MainMenuActivity extends Activity {
 		
 		Log.d(TAG, "main menu arriveonpage()");
 		
-		int connectionIndex=0;
-		if ( bookmarked_connections.size()>1)
-		{
-			MostRecentBean mostRecent = getMostRecent(database.getReadableDatabase());
-			if (mostRecent != null)
-			{
-				for ( int i=1; i<bookmarked_connections.size(); ++i)
-				{
-					if (bookmarked_connections.get(i).get_Id() == mostRecent.getConnectionId())
-					{
-						connectionIndex=i;
-						break;
-					}
-				}
-			}
-		}
+//		int connectionIndex=0;
+//		if ( bookmarked_connections.size()>1)
+//		{
+//			MostRecentBean mostRecent = getMostRecent(database.getReadableDatabase());
+//			if (mostRecent != null)
+//			{
+//				for ( int i=1; i<bookmarked_connections.size(); ++i)
+//				{
+//					if (bookmarked_connections.get(i).get_Id() == mostRecent.getConnectionId())
+//					{
+//						connectionIndex=i;
+//						break;
+//					}
+//				}
+//			}
+//		}
 
 		// update bookmarks list
 		bookmarkslist.removeAllViews();
@@ -349,23 +315,9 @@ public class MainMenuActivity extends Activity {
 			bookmarkslist.addView(v);
 		}
 		
-		try {
-			conn_new=bookmarked_connections.get(connectionIndex);
-		}
-		catch (IndexOutOfBoundsException e) {
-			conn_new = null;
-		}
-		
+	
 	}
 	
-	protected void onStop() {
-		super.onStop();
-		if ( conn_new == null ) {
-			return;
-		}
-		updateNewConnFromView();
-		conn_new.save(database.getWritableDatabase());
-	}
 	
 	VncDatabase getDatabaseHelper()
 	{
@@ -405,7 +357,7 @@ public class MainMenuActivity extends Activity {
 		SQLiteDatabase db = database.getWritableDatabase();
 		db.beginTransaction();
 		try {
-			Log.d(TAG, "Saving bookmark for conn " + conn.get_Id());
+			Log.d(TAG, "Saving bookmark for conn " + conn.toString());
 			conn.save(db);
 			db.setTransactionSuccessful();
 		}
