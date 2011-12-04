@@ -51,7 +51,7 @@
 <string name="list_caption">List</string>
 <string name="list_name_caption">List Name</string>
 <string name="local_mouse_check">Local mouse pointer</string>
-<string name="meta_key_title">Send Special Keys</string>
+<string name="meta_key_title">Send Special Key</string>
 <string name="mouse_follow_pan">Mouse follow pan</string>
 <string name="new_list_button">New List</string>
 <string name="new_connection">New Connection</string>
@@ -76,7 +76,7 @@
 <string name="scaling_zoomable">Zoomable</string>
 <!-- Send selected metakey -->
 <string name="send_button">Send</string>
-<string name="send_key_again">Send Key Again</string>
+<string name="send_key_again">Send Special Key</string>
 <string name="shift_check">Shift</string>
 <string name="shortcut_label">VNC Connection</string>
 <string name="showkbd_label">Keyboard</string>

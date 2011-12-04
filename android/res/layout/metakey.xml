@@ -15,22 +15,26 @@
 			android:layout_height="wrap_content"
 			android:text="@string/shift_check"
 			android:layout_weight="0"
+			android:layout_margin="3dip"
 		/>
 		<CheckBox android:id="@+id/checkboxCtrl"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/control_check"
 			android:layout_weight="0"
+			android:layout_margin="3dip"
 		/>
 		<CheckBox android:id="@+id/checkboxAlt"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/alt_check"
 			android:layout_weight="0"
+			android:layout_margin="3dip"
 		/>
 		<Spinner android:id="@+id/spinnerKeySelect"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
+			android:layout_margin="3dip"
 		/>
 	</LinearLayout>
 	<LinearLayout
@@ -46,67 +50,9 @@
 		<TextView android:id="@+id/textKeyDesc"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:layout_marginLeft="10dip"
 		/>
 	</LinearLayout>
 	<ImageView android:layout_width="fill_parent" android:layout_height="wrap_content" android:src="@android:drawable/divider_horizontal_bright"/>
-	<ScrollView
-		android:layout_height="fill_parent"
-		android:layout_width="fill_parent"	
-		android:scrollbars="vertical"
-		>
-		<LinearLayout
-			android:layout_height="fill_parent"
-			android:layout_width="fill_parent"
-			android:orientation="vertical"
-			>	
-			<TableLayout		
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:padding="10dip"
-				>
-				<TableRow>
-					<TextView android:text="@string/keys_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<Spinner android:id="@+id/spinnerKeysInList" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1" />
-				</TableRow>
-				<TableRow>
-					<TextView android:text="@string/list_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<Spinner android:id="@+id/spinnerLists" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="1" />
-				</TableRow>
-				<TableRow>
-					<TextView android:text="@string/list_name_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
-					<EditText android:id="@+id/textListName" android:layout_width="fill_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
-				</TableRow>
-			</TableLayout>
-			<LinearLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal"
-				>
-				<LinearLayout
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_weight="1"
-					>
-					<Button android:id="@+id/buttonNewList"
-						android:text="@string/new_list_button"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						/>
-				</LinearLayout>
-				<LinearLayout
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:orientation="horizontal"
-					android:layout_weight="1"
-					>
-					<Button android:id="@+id/buttonCopyList"
-						android:text="@string/copy_list_button"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						/>
-				</LinearLayout>
-			</LinearLayout>
-		</LinearLayout>
-	</ScrollView>
 </LinearLayout>

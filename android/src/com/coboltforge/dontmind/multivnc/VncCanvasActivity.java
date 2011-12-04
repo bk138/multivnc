@@ -611,7 +611,8 @@ public class VncCanvasActivity extends Activity {
 			if (keys.size() > 0) {
 				lastSentKey = keys.get(0);
 			} else {
-				lastSentKey = null;
+				lastSentKey = new MetaKeyBean();
+				lastSentKey.setKeySym(0xFFC6); // set F9 as default
 			}
 		}
 		if (lastSentKey != null)
