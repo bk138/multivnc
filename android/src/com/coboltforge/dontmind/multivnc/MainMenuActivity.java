@@ -34,7 +34,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -61,7 +60,6 @@ public class MainMenuActivity extends Activity {
 	private EditText ipText;
 	private EditText portText;
 	private EditText passwordText;
-	private Button goButton;
 	private TextView repeaterText;
 	//private RadioGroup groupForceFullScreen;
 	//private Spinner colorSpinner;
@@ -69,7 +67,6 @@ public class MainMenuActivity extends Activity {
 	private LinearLayout bookmarkslist;
 
 	private VncDatabase database;
-	private ConnectionBean conn_new;
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
 	
@@ -96,15 +93,14 @@ public class MainMenuActivity extends Activity {
 		portText = (EditText) findViewById(R.id.textPORT);
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
 		textUsername = (EditText) findViewById(R.id.textUsername);
-		goButton = (Button) findViewById(R.id.buttonGO);
 		
 		serverlist = (LinearLayout) findViewById(R.id.discovered_servers_list);
 		bookmarkslist = (LinearLayout) findViewById(R.id.bookmarks_list);
 
 		
 		//colorSpinner = (Spinner)findViewById(R.id.colorformat);
-		COLORMODEL[] models=COLORMODEL.values();
-		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
+		//COLORMODEL[] models=COLORMODEL.values();
+		//ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
 		//groupForceFullScreen = (RadioGroup)findViewById(R.id.groupForceFullScreen);
 		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
 		//colorSpinner.setAdapter(colorSpinnerAdapter);
@@ -112,17 +108,51 @@ public class MainMenuActivity extends Activity {
 		
 		
 		repeaterText = (TextView)findViewById(R.id.textRepeaterId);
+		
+		Button goButton = (Button) findViewById(R.id.buttonGO);
 		goButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if(conn_new == null)
+				ConnectionBean conn = makeNewConnFromView();
+				if(conn == null)
 					return;
-				updateNewConnFromView();
-				writeRecent(conn_new);
-				Log.d(TAG, "Starting NEW connection " + conn_new.toString());
+				writeRecent(conn);
+				Log.d(TAG, "Starting NEW connection " + conn.toString());
 				Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-				intent.putExtra(VncConstants.CONNECTION,conn_new.Gen_getValues());
+				intent.putExtra(VncConstants.CONNECTION,conn.Gen_getValues());
 				startActivity(intent);
+			}
+		});
+		
+		Button saveBookmarkButton = (Button) findViewById(R.id.buttonSaveBookmark);
+		saveBookmarkButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				final ConnectionBean conn = makeNewConnFromView();
+				if(conn == null)
+					return;
+
+				final EditText input = new EditText(MainMenuActivity.this);
+
+				new AlertDialog.Builder(MainMenuActivity.this)
+				.setMessage(getString(R.string.enterbookmarkname))
+				.setView(input)
+				.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String name = input.getText().toString();
+						if(name.length() == 0) 
+							name = conn.getAddress() + ":" + conn.getPort(); 
+						conn.setNickname(name);
+						saveBookmark(conn);
+						updateBookmarkView();
+					}
+				}).setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// Do nothing.
+					}
+				}).show();
+
 			}
 		});
 		
@@ -179,13 +209,10 @@ public class MainMenuActivity extends Activity {
 
 
 	
-
-	
-	
 	
 	protected void onStart() {
 		super.onStart();
-		arriveOnPage();
+		updateBookmarkView();
 		mDNSstart();
 	}
 	
@@ -207,7 +234,7 @@ public class MainMenuActivity extends Activity {
 		return recents.get(0);
 	}
 	
-	void arriveOnPage() {
+	void updateBookmarkView() {
 		ArrayList<ConnectionBean> bookmarked_connections=new ArrayList<ConnectionBean>();
 		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, bookmarked_connections, ConnectionBean.newInstance);
 		Collections.sort(bookmarked_connections);
@@ -280,7 +307,7 @@ public class MainMenuActivity extends Activity {
 					    		conn.set_Id(0); // this saves a new one in the DB!
 								saveBookmark(conn);
 								// update
-								arriveOnPage();
+								updateBookmarkView();
 					    		break;
 					    		
 					    	case 1: // delete
@@ -293,7 +320,7 @@ public class MainMenuActivity extends Activity {
 										// delete from DB
 										conn.Gen_delete(database.getWritableDatabase());
 										// update
-										arriveOnPage();
+										updateBookmarkView();
 									}
 								})
 								.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
@@ -377,32 +404,39 @@ public class MainMenuActivity extends Activity {
 	}
 	
 
-	private void updateNewConnFromView() {
+	private ConnectionBean makeNewConnFromView() {
 	
-		conn_new.setAddress(ipText.getText().toString());
-		try
-		{
-			conn_new.setPort(Integer.parseInt(portText.getText().toString()));
+		ConnectionBean conn = new ConnectionBean();
+		
+		conn.setAddress(ipText.getText().toString());
+		
+		if(conn.getAddress().length() == 0)
+			return null;
+		
+		conn.set_Id(0); // is new!!
+		
+		try {
+			conn.setPort(Integer.parseInt(portText.getText().toString()));
 		}
-		catch (NumberFormatException nfe)
-		{
-			
+		catch (NumberFormatException nfe) {			
 		}
-		conn_new.setUserName(textUsername.getText().toString());
+		conn.setUserName(textUsername.getText().toString());
 		//conn_new.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
-		conn_new.setPassword(passwordText.getText().toString());
-		conn_new.setKeepPassword(checkboxKeepPassword.isChecked());
-		conn_new.setUseLocalCursor(true); // always enable
+		conn.setPassword(passwordText.getText().toString());
+		conn.setKeepPassword(checkboxKeepPassword.isChecked());
+		conn.setUseLocalCursor(true); // always enable
 		//conn_new.setColorModel(((COLORMODEL)colorSpinner.getbookmarkItem()).nameString());
 		if (repeaterText.getText().length() > 0)
 		{
-			conn_new.setRepeaterId(repeaterText.getText().toString());
-			conn_new.setUseRepeater(true);
+			conn.setRepeaterId(repeaterText.getText().toString());
+			conn.setUseRepeater(true);
 		}
 		else
 		{			
-			conn_new.setUseRepeater(false);
+			conn.setUseRepeater(false);
 		}
+		
+		return conn;
 	}
 	
 	
@@ -538,7 +572,7 @@ public class MainMenuActivity extends Activity {
 										// set as 'new' again. makes this ConnectionBean saveable again
 										c.set_Id(0);
 										// and update view
-										arriveOnPage();
+										updateBookmarkView();
 									}
 								})
 								.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {

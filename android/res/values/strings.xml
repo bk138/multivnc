@@ -84,6 +84,8 @@
 <string name="username_caption">Username</string>
 <string name="username_hint">For Windows authentication</string>
 <string name="editbookmark_title">Edit Bookmark</string>
+<string name="enterbookmarkname">Bookmark Name</string>
+<string name="enterbookmarknamemessage">Please enter a bookmark name!</string>
 <string name="bookmark_save_question">Do you want to bookmark this server?</string>
 <string name="bookmark_delete_question">Are you sure you want to delete this bookmark?</string>
 <string name="yes">Yes</string>

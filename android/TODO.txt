@@ -1,5 +1,3 @@
-* rework main screen
-   - remove old functions
 
 * release
 

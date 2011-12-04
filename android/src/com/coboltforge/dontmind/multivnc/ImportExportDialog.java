@@ -111,7 +111,7 @@ class ImportExportDialog extends Dialog {
 							reader,
 							ReplaceStrategy.REPLACE_EXISTING);
 					dismiss();
-					_configurationDialog.arriveOnPage();
+					_configurationDialog.updateBookmarkView();
 				}
 				catch (MalformedURLException mfe)
 				{
