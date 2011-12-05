@@ -29,6 +29,7 @@
 <string name="disconnect">Disconnect</string>
 <string name="toggle_framebuffer_update">Toggle View</string>
 <string name="toggle_mouse_buttons">Toggle Mouse Buttons</string>
+<string name="toggle_keyboard">Toggle Keyboard</string>
 <string name="export_settings">Export</string>
 <string name="export_settings_path">Export to file</string>
 <string name="enter_text_title">Enter Text to Send</string>
@@ -87,6 +88,7 @@
 <string name="enterbookmarkname">Please enter a bookmark name...</string>
 <string name="bookmark_save_question">Do you want to bookmark this server?</string>
 <string name="bookmark_delete_question">Are you sure you want to delete this bookmark?</string>
+<string name="disconnect_question">Are you sure you want to disconnect?</string>
 <string name="yes">Yes</string>
 <string name="no">No</string>
 <string name="edit">Edit</string>

@@ -26,6 +26,7 @@ import java.util.List;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -564,9 +565,8 @@ public class VncCanvasActivity extends Activity {
 				mousebuttons.setVisibility(View.VISIBLE);	
 			return true;	
 
-		case R.id.itemDisconnect:
-			vncCanvas.closeConnection();
-			finish();
+		case R.id.itemToggleKeyboard:
+			toggleKeyboard();
 			return true;
 	
 		case R.id.itemSendKeyAgain:
@@ -606,6 +606,11 @@ public class VncCanvasActivity extends Activity {
 		if (lastSentKey != null)
 			vncCanvas.sendMetaKey(lastSentKey);
 	}
+	
+	private void toggleKeyboard() {
+		InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMgr.toggleSoftInput(0, 0);
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -633,14 +638,28 @@ public class VncCanvasActivity extends Activity {
 
 		if (keyCode == KeyEvent.KEYCODE_MENU)
 			return super.onKeyDown(keyCode, evt);
+		
+		if(keyCode == KeyEvent.KEYCODE_BACK) {
+			
+			new AlertDialog.Builder(this)
+			.setMessage(getString(R.string.disconnect_question))
+			.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					vncCanvas.closeConnection();
+					finish();
+				}
+			}).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					// Do nothing.
+				}
+			}).show();
+			
+			return true;
+		}
 
 		// use search key to toggle soft keyboard
 		if (keyCode == KeyEvent.KEYCODE_SEARCH)
-		{
-			InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-			inputMgr.toggleSoftInput(0, 0);
-		}
-
+			toggleKeyboard();
 
 		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
 			return true;

@@ -2,8 +2,8 @@
 	<item android:id="@+id/itemSpecialKeys" android:title="@string/special_keys"
 		android:icon="@drawable/specialkeys" />
 	<item android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again" />
-	<item android:id="@+id/itemDisconnect" android:title="@string/disconnect"
-		android:icon="@android:drawable/ic_menu_close_clear_cancel"></item>
+	<item android:id="@+id/itemToggleKeyboard" android:title="@string/toggle_keyboard"
+		android:icon="@android:drawable/ic_menu_sort_alphabetically"></item>
 	<item android:id="@+id/itemToggleFramebufferUpdate" android:title="@string/toggle_framebuffer_update"
 		android:icon="@android:drawable/ic_menu_view"></item>
 	<item android:id="@+id/itemToggleMouseButtons" android:title="@string/toggle_mouse_buttons"
