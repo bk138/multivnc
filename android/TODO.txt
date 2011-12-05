@@ -1,6 +1,4 @@
 
-* release
-
 * find a solution for mDNSStop()
 
 * rework color mode selector

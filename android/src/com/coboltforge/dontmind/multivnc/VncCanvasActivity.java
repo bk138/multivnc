@@ -568,19 +568,7 @@ public class VncCanvasActivity extends Activity {
 			vncCanvas.closeConnection();
 			finish();
 			return true;
-		
-		case R.id.itemArrowLeft:
-			vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
-			return true;
-		case R.id.itemArrowUp:
-			vncCanvas.sendMetaKey(MetaKeyBean.keyArrowUp);
-			return true;
-		case R.id.itemArrowRight:
-			vncCanvas.sendMetaKey(MetaKeyBean.keyArrowRight);
-			return true;
-		case R.id.itemArrowDown:
-			vncCanvas.sendMetaKey(MetaKeyBean.keyArrowDown);
-			return true;
+	
 		case R.id.itemSendKeyAgain:
 			sendSpecialKeyAgain();
 			return true;
