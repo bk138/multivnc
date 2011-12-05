@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.coboltforge.dontmind.multivnc" android:installLocation="auto" android:versionCode="1" android:versionName="1.0.0">
-    <application android:icon="@drawable/icon" android:label="MultiVNC" android:debuggable="true">
+    <application android:icon="@drawable/icon" android:label="MultiVNC" android:debuggable="false">
  		<activity android:label="@string/app_name" android:name="MainMenuActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"></action>
@@ -39,7 +39,7 @@
 	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
 	<uses-permission android:name="com.flattr4android.permission.READ_THING"/>
 	
-    <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="5"></uses-sdk>
+    <uses-sdk android:minSdkVersion="5"></uses-sdk>
     <supports-screens android:anyDensity="true" />
 
 </manifest> 
