@@ -21,6 +21,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	
 	float xInitialFocus;
 	float yInitialFocus;
+	float scale_orig;
 	boolean inScaling;
 	
 	private static final String TAG = "AbstractGestureInputHandler";
@@ -75,6 +76,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		xInitialFocus = detector.getFocusX();
 		yInitialFocus = detector.getFocusY();
 		inScaling = false;
+		scale_orig = activity.vncCanvas.getScale();
 		//Log.i(TAG,"scale begin ("+xInitialFocus+","+yInitialFocus+")");
 		return true;
 	}
@@ -87,6 +89,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		//Log.i(TAG,"scale end");
 		inScaling = false;
 		// show scale
-		activity.showScaleToast();
+		if( activity.vncCanvas.getScale() != scale_orig )
+			activity.showScaleToast();
 	}
 }
