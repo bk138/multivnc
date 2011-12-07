@@ -89,6 +89,9 @@ public class Utils {
 	
 	public static void inspectEvent(MotionEvent e)
 	{
+		if(e == null)
+			return;
+		
 		final int pointerCount = e.getPointerCount();
 
 		Log.d(TAG, "Input: now @ " + e.getEventTime());
