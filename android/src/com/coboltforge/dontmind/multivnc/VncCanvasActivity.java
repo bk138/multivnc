@@ -44,6 +44,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -69,8 +71,24 @@ public class VncCanvasActivity extends Activity {
 		
 		private boolean button2insteadof1 = false;
 		
+		private long twoFingerFlingStart = -1;
+		private VelocityTracker twoFingerFlingVelocityTracker;
+		private boolean twoFingerFlingDetected = false;
+		private final int TWO_FINGER_FLING_UNITS = 1000;
+		private final float TWO_FINGER_FLING_THRESHOLD = 1000;
+		
 		TouchpadInputHandler() {
 			super(VncCanvasActivity.this);
+			twoFingerFlingVelocityTracker = VelocityTracker.obtain();
+		}
+		
+		@Override
+		protected void finalize() throws Throwable {
+			if(twoFingerFlingVelocityTracker != null)
+				twoFingerFlingVelocityTracker.recycle();
+			
+			Log.d(TAG, "TouchpadInputHandler destroyed!");
+			super.finalize();
 		}
 
 		
@@ -98,6 +116,39 @@ public class VncCanvasActivity extends Activity {
 			}
 			return sign * delta;
 		}
+		
+		private void twoFingerFlingNotification(String str)
+		{
+			// bzzt!	
+			vncCanvas.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
+					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+
+			// beep!
+			vncCanvas.playSoundEffect(SoundEffectConstants.CLICK);
+			
+			Toast msg = Toast.makeText(getApplicationContext(), str ,Toast.LENGTH_SHORT);
+			msg.setGravity(Gravity.TOP, 0, 0);
+			msg.show();
+		}
+		
+		private void twoFingerFlingAction(Character d)
+		{
+			switch(d) {
+			case '←':
+				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
+				break;
+			case '→':
+				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowRight);
+				break;
+			case '↑':
+				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowUp);
+				break;
+			case '↓':
+				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowDown);
+				break;
+			}
+		}
+		
 
 		/*
 		 * (non-Javadoc)
@@ -131,15 +182,80 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
-
+			
 			if (e2.getPointerCount() > 1)
 			{
 				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll multitouch");
 				
 				if (inScaling)
 					return false;
-				showZoomer(false);
-				return vncCanvas.pan((int) distanceX, (int) distanceY);			
+				
+				// pan on 3 fingers and more
+				if(e2.getPointerCount() > 2) {
+					showZoomer(false);
+					return vncCanvas.pan((int) distanceX, (int) distanceY);
+				}
+			
+				/*
+				 * here comes the stuff that acts for two fingers
+				 */
+
+				// gesture start
+				if(twoFingerFlingStart != e1.getEventTime()) // it's a new scroll sequence
+				{
+					twoFingerFlingStart = e1.getEventTime();
+					twoFingerFlingDetected = false;
+					twoFingerFlingVelocityTracker.clear();
+					if(Utils.DEBUG()) Log.d(TAG, "new twoFingerFling detection started");
+				}
+				
+				// gesture end
+				if(twoFingerFlingDetected == false) // not yet detected in this sequence (we only want ONE event per sequence!)
+				{
+					// update our velocity tracker
+					twoFingerFlingVelocityTracker.addMovement(e2);
+					twoFingerFlingVelocityTracker.computeCurrentVelocity(TWO_FINGER_FLING_UNITS);
+					
+					float velocityX = twoFingerFlingVelocityTracker.getXVelocity();
+					float velocityY = twoFingerFlingVelocityTracker.getYVelocity();
+
+					// check for left/right flings
+					if(Math.abs(velocityX) > TWO_FINGER_FLING_THRESHOLD
+							&& Math.abs(velocityX) > Math.abs(2*velocityY)) {
+						if(velocityX < 0) {
+							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling LEFT detected");
+							twoFingerFlingNotification("←");
+							twoFingerFlingAction('←');
+						}
+						else {
+							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling RIGHT detected");
+							twoFingerFlingNotification("→");
+							twoFingerFlingAction('→');
+						}
+
+						twoFingerFlingDetected = true;
+					}
+
+					// check for left/right flings
+					if(Math.abs(velocityY) > TWO_FINGER_FLING_THRESHOLD
+							&& Math.abs(velocityY) > Math.abs(2*velocityX)) {
+						if(velocityY < 0) {
+							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling UP detected");
+							twoFingerFlingNotification("↑");
+							twoFingerFlingAction('↑');
+						}
+						else {
+							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling DOWN detected");
+							twoFingerFlingNotification("↓");
+							twoFingerFlingAction('↓');
+						}
+
+						twoFingerFlingDetected = true;
+					}
+					
+				}
+
+				return true;
 			}
 			else
 			{
@@ -524,11 +640,6 @@ public class VncCanvasActivity extends Activity {
 		return true;
 	}
 
-	public boolean onPrepareOptionsMenu (Menu menu)
-	{
-		
-		return true;
-	}
 
 
 
