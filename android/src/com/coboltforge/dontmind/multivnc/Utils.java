@@ -94,7 +94,7 @@ public class Utils {
 		
 		final int pointerCount = e.getPointerCount();
 
-		Log.d(TAG, "Input: now @ " + e.getEventTime());
+		Log.d(TAG, "Input: event time: " + e.getEventTime());
 		for (int p = 0; p < pointerCount; p++) {
 			Log.d(TAG, "Input:  pointer:" +
 					e.getPointerId(p)
