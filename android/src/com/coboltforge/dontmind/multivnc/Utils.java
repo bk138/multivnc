@@ -10,9 +10,12 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.text.Html;
+import android.util.Log;
+import android.view.MotionEvent;
 
 public class Utils {
 	
+	private static final String TAG = "Utils";
 	public static boolean debug = false;
 
 	public static void showYesNoPrompt(Context _context, String title, String message, OnClickListener onYesListener, OnClickListener onNoListener) {
@@ -82,5 +85,19 @@ public class Utils {
 	public static boolean DEBUG()
 	{
 		return debug;
+	}
+	
+	public static void inspectEvent(MotionEvent e)
+	{
+		final int pointerCount = e.getPointerCount();
+
+		Log.d(TAG, "Input: now @ " + e.getEventTime());
+		for (int p = 0; p < pointerCount; p++) {
+			Log.d(TAG, "Input:  pointer:" +
+					e.getPointerId(p)
+					+ " x:" + e.getX(p)
+					+ " y:" + e.getY(p)
+					+ " action:" + e.getAction());
+		}
 	}
 }

@@ -74,7 +74,7 @@ public class MouseButtonView extends View {
 						|| action_masked == MotionEvent.ACTION_POINTER_DOWN))
 		{
 			if(Utils.DEBUG()) 
-				inspectEvent(e);
+				Utils.inspectEvent(e);
 
 			// calc button view origin
 			final float origin_x = e.getRawX() - e.getX();
@@ -251,19 +251,5 @@ public class MouseButtonView extends View {
 		}
 		return sign * delta;
 	}
-
-
-	private void inspectEvent(MotionEvent e)
-	{
-		final int pointerCount = e.getPointerCount();
-
-		Log.d(TAG, "Input: now @ " + e.getEventTime());
-		for (int p = 0; p < pointerCount; p++) {
-			Log.d(TAG, "Input:  pointer:" +
-					e.getPointerId(p)
-					+ " x:" + e.getX(p)
-					+ " y:" + e.getY(p)
-					+ " action:" + e.getAction());
-		}
-	}
+	
 }
