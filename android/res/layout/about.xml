@@ -22,9 +22,20 @@
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:paddingBottom="10dp" 
 		/>
-
-
-	<com.flattr4android.sdk.FlattrButton
+		
+		<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="30dip"
+                android:layout_marginTop="10dip"
+                android:autoLink="web"
+                android:padding="10dip"
+                android:text="@string/madeby" 
+                />
+		
+		
+<com.flattr4android.sdk.FlattrButton
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		flattr_sdk:token="41e28ea212496725687036408604b16b"
 		flattr_sdk:token_secret="9cbb740e9f11c42948cbbc3f0549f2fe"
