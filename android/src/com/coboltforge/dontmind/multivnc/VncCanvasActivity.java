@@ -126,9 +126,8 @@ public class VncCanvasActivity extends Activity {
 			// beep!
 			vncCanvas.playSoundEffect(SoundEffectConstants.CLICK);
 			
-			Toast msg = Toast.makeText(getApplicationContext(), str ,Toast.LENGTH_SHORT);
-			msg.setGravity(Gravity.TOP, 0, 0);
-			msg.show();
+			VncCanvasActivity.this.notificationToast.setText(str);
+			VncCanvasActivity.this.notificationToast.show();
 		}
 		
 		private void twoFingerFlingAction(Character d)
@@ -420,6 +419,7 @@ public class VncCanvasActivity extends Activity {
 	TouchpadInputHandler touchPad;
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
+	Toast notificationToast;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -573,6 +573,10 @@ public class VncCanvasActivity extends Activity {
 		mousebutton3.init(3, vncCanvas);
 		
 		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
+		
+		// create an empty toast. we do this do be able to cancel
+		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
+		notificationToast.setGravity(Gravity.TOP, 0, 0);
 	}
 
 	/**
@@ -898,11 +902,8 @@ public class VncCanvasActivity extends Activity {
 	public void showScaleToast()
 	{
 		// show scale
-		Toast msg = Toast.makeText(this, getString(R.string.scale_msg) + " "
-				+ (int)(100*vncCanvas.getScale()) + "%",
-				Toast.LENGTH_SHORT);
-		msg.setGravity(Gravity.TOP, 0, 0);
-		msg.show();
+		notificationToast.setText(getString(R.string.scale_msg) + " " + (int)(100*vncCanvas.getScale()) + "%");
+		notificationToast.show();
 	}
 
 	
