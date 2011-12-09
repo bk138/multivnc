@@ -12,6 +12,8 @@
 		android:icon="@android:drawable/ic_menu_preferences"></item>
 	<item android:id="@+id/itemInfo" android:title="@string/info"
 		android:icon="@android:drawable/ic_menu_info_details"></item>
+	<item android:id="@+id/itemSaveBookmark" android:title="@string/savebookmark_button"
+		android:icon="@android:drawable/ic_menu_save"></item>
 	<item android:id="@+id/itemOpenDoc" android:title="@string/open_doc"
 		android:icon="@android:drawable/ic_menu_help" />
 </menu>

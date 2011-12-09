@@ -683,6 +683,10 @@ public class VncCanvasActivity extends Activity {
 		case R.id.itemSendKeyAgain:
 			sendSpecialKeyAgain();
 			return true;
+		case R.id.itemSaveBookmark:
+			connection.save(database.getWritableDatabase());
+			Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
+			return true;
 		case R.id.itemOpenDoc:
 			Intent intent = new Intent (this, AboutActivity.class);
 			this.startActivity(intent);
