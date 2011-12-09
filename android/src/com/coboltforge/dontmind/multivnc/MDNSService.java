@@ -12,7 +12,11 @@ import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceListener;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -21,6 +25,8 @@ public class MDNSService extends Service {
 
 	private final String TAG = "MDNSService";
 	private final IBinder mBinder = new LocalBinder();
+	
+	private BroadcastReceiver netStateChangedReceiver;
 	
 	private android.net.wifi.WifiManager.MulticastLock multicastLock;
 	private String mdnstype = "_rfb._tcp.local.";
@@ -62,7 +68,37 @@ public class MDNSService extends Service {
 	public void onCreate() {
 		//code to execute when the service is first created
 		Log.d(TAG, "mDNS service onCreate()!");
-		mDNSstart();
+		
+
+		// listen for scan results 
+		netStateChangedReceiver = new BroadcastReceiver() {
+			//@Override
+			public void onReceive(Context context, Intent intent)
+			{
+				boolean no_net = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+				Log.d(TAG, "Connectivity changed, still sth. available: " +  !no_net + " " + intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO).toString());
+
+				// we get this as soon as we're registering, see http://stackoverflow.com/questions/6670514/connectivitymanager-connectivity-action-always-broadcast-when-registering-a-rec
+				// thus it's okay to have the (re-)startup here!
+				mDNSstop();
+
+				if(!no_net) // only (re)start when we actually have connection
+				{
+					// not nice, but seems to be needed sometimes :-/
+					try {
+						Thread.sleep(4000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					mDNSstart();
+				}
+				
+			}
+		};
+		registerReceiver(netStateChangedReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
 	}
 
 
@@ -70,6 +106,8 @@ public class MDNSService extends Service {
 	public void onDestroy() {
 		//code to execute when the service is shutting down
 		Log.d(TAG, "mDNS service onDestroy()!");
+		
+		unregisterReceiver(netStateChangedReceiver);
 		mDNSstop();
 	}
 
@@ -168,7 +206,10 @@ public class MDNSService extends Service {
 			jmdns = null;
 		}
 
-		multicastLock.release();
+		if(multicastLock != null) {
+			multicastLock.release();
+			multicastLock = null;
+		}
 		
 		connections_discovered.clear();
 		
