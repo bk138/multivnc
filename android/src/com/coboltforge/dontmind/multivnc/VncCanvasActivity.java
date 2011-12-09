@@ -50,11 +50,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
@@ -799,7 +795,7 @@ public class VncCanvasActivity extends Activity {
 		// because the display is composited!
 		vncCanvas.disableRepaints();
 
-		String[] choices = new String[COLORMODEL.values().length];
+		final String[] choices = new String[COLORMODEL.values().length];
 		int currentSelection = -1;
 		for (int i = 0; i < choices.length; i++) {
 			COLORMODEL cm = COLORMODEL.values()[i];
@@ -808,26 +804,20 @@ public class VncCanvasActivity extends Activity {
 				currentSelection = i;
 		}
 
-		final Dialog dialog = new Dialog(this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		ListView list = new ListView(this);
-		list.setAdapter(new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_checked, choices));
-		list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		list.setItemChecked(currentSelection, true);
-		list.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				dialog.dismiss();
-				COLORMODEL cm = COLORMODEL.values()[arg2];
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setSingleChoiceItems(choices, currentSelection, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int item) {
+		    	dialog.dismiss();
+				COLORMODEL cm = COLORMODEL.values()[item];
 				vncCanvas.setColorModel(cm);
 				connection.setColorModel(cm.nameString());
 				connection.save(database.getWritableDatabase());
 				Toast.makeText(VncCanvasActivity.this,
 						"Updating Color Model to " + cm.toString(),
 						Toast.LENGTH_SHORT).show();
-			}
+		    }
 		});
+		AlertDialog dialog = builder.create();
 		dialog.setOnDismissListener(new OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface arg0) {
@@ -836,7 +826,6 @@ public class VncCanvasActivity extends Activity {
 				vncCanvas.enableRepaints();
 			}
 		});
-		dialog.setContentView(list);
 		dialog.show();
 	}
 
