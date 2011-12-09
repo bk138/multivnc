@@ -1,4 +1,2 @@
 
-* find a solution for mDNSStop()
-
 * port to libvncclient

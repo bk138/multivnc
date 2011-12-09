@@ -24,11 +24,14 @@ package com.coboltforge.dontmind.multivnc;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,20 +45,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceEvent;
-import javax.jmdns.ServiceListener;
 
 
 
-public class MainMenuActivity extends Activity {
+public class MainMenuActivity extends Activity implements ImDNSNotify {
 	
-	private static final String TAG = "MainActivity";
+	private static final String TAG = "MainMenuActivity";
 	
 	private EditText ipText;
 	private EditText portText;
@@ -71,13 +70,39 @@ public class MainMenuActivity extends Activity {
 	private CheckBox checkboxKeepPassword;
 	
 	// service discovery stuff
-	private android.net.wifi.WifiManager.MulticastLock multicastLock;
+	private MDNSService boundMDNSService;
+	private ServiceConnection connection_MDNSService;
 	private android.os.Handler handler = new android.os.Handler();
-	private String mdnstype = "_rfb._tcp.local.";
-	private JmDNS jmdns = null;
-	private ServiceListener listener = null;
-	private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> (); 
+	
 
+	public class MDNSServiceConnection implements ServiceConnection {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			// This is called when the connection with the service has been
+			// established, giving us the service object we can use to
+			// interact with the service. Because we have bound to a explicit
+			// service that we know is running in our own process, we can
+			// cast its IBinder to a concrete class and directly access it.
+			boundMDNSService = ((MDNSService.LocalBinder) service).getService();
+			
+			// register our callback to be notified about changes
+			boundMDNSService.registerCallback(MainMenuActivity.this);
+			
+			// and force a dump of discovered connections
+			boundMDNSService.dump();
+			
+			Log.d(TAG, "bound to MDNSService " + boundMDNSService);
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			// This is called when the connection with the service has been
+			// unexpectedly disconnected -- that is, its process crashed.
+			// Because it is running in our same process, we should never
+			// see this happen.
+			boundMDNSService = null;
+		}
+	};
+	
+	
 	
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -88,6 +113,10 @@ public class MainMenuActivity extends Activity {
 		// get package debug flag and set it 
 		Utils.DEBUG(this);
 		
+		// start the MDNS service
+		startMDNSService();
+		// and (re-)bind to MDNS service
+		bindToMDNSService(new Intent(this, MDNSService.class));
 		
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);
@@ -163,7 +192,8 @@ public class MainMenuActivity extends Activity {
 		super.onDestroy();
 
 		database.close();
-		mDNSstop();
+		
+		unbindFromMDNSService();
 	}
 	
 	/* (non-Javadoc)
@@ -213,7 +243,6 @@ public class MainMenuActivity extends Activity {
 	protected void onStart() {
 		super.onStart();
 		updateBookmarkView();
-		mDNSstart();
 	}
 	
 	
@@ -441,92 +470,41 @@ public class MainMenuActivity extends Activity {
 	
 	
 
-	private void mDNSstart()
+
+	void startMDNSService() {
+		Intent serviceIntent = new Intent(Intent.ACTION_VIEW, null, this, MDNSService.class);
+		this.startService(serviceIntent);
+	}
+
+	void bindToMDNSService(Intent serviceIntent) {
+		unbindFromMDNSService();
+		connection_MDNSService = new MDNSServiceConnection();
+		if (!this.bindService(serviceIntent, connection_MDNSService, Context.BIND_AUTO_CREATE))
+			Toast.makeText(this, "Could not bind to MDNSService!", Toast.LENGTH_LONG).show();
+	}
+
+	void unbindFromMDNSService() 
 	{
-		Log.d(TAG, "starting MDNS " + JmDNS.VERSION);
-		
-		if(jmdns != null) {
-			Log.d(TAG, "MDNS already running, bailing out");
-			return;
-		}
-		
-		android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
-		multicastLock = wifi.createMulticastLock("mylockthereturn");
-		multicastLock.setReferenceCounted(true);
-		multicastLock.acquire();
-		try {
-			jmdns = JmDNS.create();
-			jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
-
-				@Override
-				public void serviceResolved(ServiceEvent ev) {
-					ConnectionBean c = new ConnectionBean();
-					c.set_Id(0); // new!
-					c.setNickname(ev.getName());
-					c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
-					c.setPort(ev.getInfo().getPort());
-					
-					connections_discovered.put(ev.getInfo().getQualifiedName(), c);
-				
-					Log.d(TAG, "discovered server :" + ev.getName() 
-								+ ", now " + connections_discovered.size());
-					
-					mDNSnotify(getString(R.string.server_found) + ": " + ev.getName(), c);
-				}
-
-				@Override
-				public void serviceRemoved(ServiceEvent ev) {
-					connections_discovered.remove(ev.getInfo().getQualifiedName());
-					
-					Log.d(TAG, "server gone:" + ev.getName() 
-							+ ", now " + connections_discovered.size());
-					
-					mDNSnotify(getString(R.string.server_removed) + ": " + ev.getName(), null);
-				}
-
-				@Override
-				public void serviceAdded(ServiceEvent event) {
-					// Required to force serviceResolved to be called again (after the first search)
-					jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
-				}
-			});
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
+		if(connection_MDNSService != null)
+		{
+			this.unbindService(connection_MDNSService);
+			connection_MDNSService = null;
+			boundMDNSService = null;
 		}
 	}
 
-	private void mDNSstop()
-	{
-		Log.d(TAG, "stopping MDNS");
-		if (jmdns != null) {
-			if (listener != null) {
-				jmdns.removeServiceListener(mdnstype, listener);
-				listener = null;
-			}
-			try {
-				jmdns.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			jmdns = null;
-		}
-
-		multicastLock.release();
-		
-		connections_discovered.clear();
-		((LinearLayout)findViewById(R.id.discovered_servers_list)).removeAllViews();
-		
-		Log.d(TAG, "stopping MDNS done");
-	}
-
-	// do the GUI stuff in Runnable posted to main thread handler
-	private void mDNSnotify(final String msg, final ConnectionBean conn) {
+	@Override
+	public void mDNSnotify(final String conn_name, final ConnectionBean conn, final Hashtable<String,ConnectionBean> connections_discovered ) {
 		handler.postDelayed(new Runnable() {
 			public void run() {
 
-				Toast.makeText(MainMenuActivity.this, msg , Toast.LENGTH_SHORT).show();
+				String msg;
+				if(conn != null)
+					msg = getString(R.string.server_found) + ": " + conn_name;
+				else
+					msg = getString(R.string.server_removed) + ": " + conn_name;
+				
+				Toast.makeText(getApplicationContext(), msg , Toast.LENGTH_SHORT).show();
 
 				// update 
 				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -596,6 +574,4 @@ public class MainMenuActivity extends Activity {
 		}, 1);
 
 	}
-
-	
 }

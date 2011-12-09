@@ -32,6 +32,11 @@
         <activity android:name="AboutActivity"
              android:label="@string/open_doc" >
 		</activity>
+		
+        <service
+            android:enabled="true"
+            android:name=".MDNSService" >
+        </service>
         
 	</application>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
