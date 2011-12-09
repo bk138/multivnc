@@ -811,7 +811,6 @@ public class VncCanvasActivity extends Activity {
 				COLORMODEL cm = COLORMODEL.values()[item];
 				vncCanvas.setColorModel(cm);
 				connection.setColorModel(cm.nameString());
-				connection.save(database.getWritableDatabase());
 				Toast.makeText(VncCanvasActivity.this,
 						"Updating Color Model to " + cm.toString(),
 						Toast.LENGTH_SHORT).show();
