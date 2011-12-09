@@ -83,17 +83,7 @@ public class MDNSService extends Service {
 				mDNSstop();
 
 				if(!no_net) // only (re)start when we actually have connection
-				{
-					// not nice, but seems to be needed sometimes :-/
-					try {
-						Thread.sleep(4000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
 					mDNSstart();
-				}
 				
 			}
 		};
@@ -211,6 +201,10 @@ public class MDNSService extends Service {
 			multicastLock = null;
 		}
 		
+		// notify our callback about our internal state, i.e. the removals
+		for(ConnectionBean c: connections_discovered.values()) 
+			mDNSnotify(c.getNickname(), null);
+		// and clear internal state
 		connections_discovered.clear();
 		
 		Log.d(TAG, "stopping MDNS done");
