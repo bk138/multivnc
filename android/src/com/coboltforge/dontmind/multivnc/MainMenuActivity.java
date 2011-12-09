@@ -443,7 +443,7 @@ public class MainMenuActivity extends Activity {
 
 	private void mDNSstart()
 	{
-		Log.d(TAG, "starting MDNS");
+		Log.d(TAG, "starting MDNS " + JmDNS.VERSION);
 		
 		if(jmdns != null) {
 			Log.d(TAG, "MDNS already running, bailing out");
