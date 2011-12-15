@@ -18,7 +18,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 public class MDNSService extends Service {
@@ -28,11 +31,8 @@ public class MDNSService extends Service {
 	
 	private BroadcastReceiver netStateChangedReceiver;
 	
-	private android.net.wifi.WifiManager.MulticastLock multicastLock;
-	private String mdnstype = "_rfb._tcp.local.";
-	private JmDNS jmdns = null;
-	private ServiceListener listener = null;
-	private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> (); 
+	private MDNSWorkerThread workerThread = new MDNSWorkerThread();
+	
 	private ImDNSNotify callback;
 
 
@@ -50,12 +50,6 @@ public class MDNSService extends Service {
 
 
 
-	public MDNSService() {
-
-	}
-
-
-
 	@Override
 	public IBinder onBind(Intent intent) {
 		// handleIntent(intent);
@@ -69,6 +63,7 @@ public class MDNSService extends Service {
 		//code to execute when the service is first created
 		Log.d(TAG, "mDNS service onCreate()!");
 		
+		workerThread.start();
 
 		// listen for scan results 
 		netStateChangedReceiver = new BroadcastReceiver() {
@@ -80,10 +75,10 @@ public class MDNSService extends Service {
 
 				// we get this as soon as we're registering, see http://stackoverflow.com/questions/6670514/connectivitymanager-connectivity-action-always-broadcast-when-registering-a-rec
 				// thus it's okay to have the (re-)startup here!
-				mDNSstop();
+				Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_STOP).sendToTarget();
 
 				if(!no_net) // only (re)start when we actually have connection
-					mDNSstart();
+					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_START).sendToTarget();
 				
 			}
 		};
@@ -98,7 +93,9 @@ public class MDNSService extends Service {
 		Log.d(TAG, "mDNS service onDestroy()!");
 		
 		unregisterReceiver(netStateChangedReceiver);
-		mDNSstop();
+		
+		// this will end the worker thread
+		workerThread.interrupt();
 	}
 
 
@@ -113,110 +110,166 @@ public class MDNSService extends Service {
 		return START_STICKY;
 	} 
 	
+	// NB: this is called from the worker thread!!
 	public void registerCallback(ImDNSNotify c) {
 		callback = c;
 	}
 
 	// force a callback call for every conn in connections_discovered
 	public void dump() {
-		for(ConnectionBean c : connections_discovered.values()) {
-			mDNSnotify(c.getNickname(), c);
-		}
+		Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_DUMP).sendToTarget();
 	}
+
 	
-	private void mDNSstart()
+	private class MDNSWorkerThread extends Thread
 	{
-		Log.d(TAG, "starting MDNS " + JmDNS.VERSION);
+		private android.net.wifi.WifiManager.MulticastLock multicastLock;
+		private String mdnstype = "_rfb._tcp.local.";
+		private JmDNS jmdns = null;
+		private ServiceListener listener = null;
+		private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> (); 
+		private Handler handler;
 		
-		if(jmdns != null) {
-			Log.d(TAG, "MDNS already running, bailing out");
-			return;
-		}
-		
-		android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
-		multicastLock = wifi.createMulticastLock("mylockthereturn");
-		multicastLock.setReferenceCounted(true);
-		multicastLock.acquire();
-		try {
-			jmdns = JmDNS.create();
-			jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
+		public final static int MESSAGE_START = 0;
+		public final static int MESSAGE_STOP = 1;
+		public final static int MESSAGE_DUMP = 2;
 
-				@Override
-				public void serviceResolved(ServiceEvent ev) {
-					ConnectionBean c = new ConnectionBean();
-					c.set_Id(0); // new!
-					c.setNickname(ev.getName());
-					c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
-					c.setPort(ev.getInfo().getPort());
-					
-					connections_discovered.put(ev.getInfo().getQualifiedName(), c);
+
+		// this just runs a message loop and acts according to messages
+		public void run() {
+			Looper.prepare();
+			
+			handler = new Handler() {
+	            
+				public void handleMessage(Message msg) {
+					// if interrupted, bail out at once
+					if(isInterrupted())
+					{
+						Log.d(TAG, "INTERRUPTED, bailing out!");
+						mDNSstop();
+						getLooper().quit();
+						return;
+					}
+					// otherwise, process our message queue
+
+					switch (msg.what) {
+					case MDNSWorkerThread.MESSAGE_START:
+						mDNSstart();
+						break;
+					case MDNSWorkerThread.MESSAGE_STOP:
+						mDNSstop();
+						break;
+					case MDNSWorkerThread.MESSAGE_DUMP:
+						for(ConnectionBean c : connections_discovered.values()) {
+							mDNSnotify(c.getNickname(), c);
+						}
+						break;
+					}
+				}
 				
-					Log.d(TAG, "discovered server :" + ev.getName() 
-								+ ", now " + connections_discovered.size());
-					
-					mDNSnotify(ev.getName(), c);
-				}
-
-				@Override
-				public void serviceRemoved(ServiceEvent ev) {
-					connections_discovered.remove(ev.getInfo().getQualifiedName());
-					
-					Log.d(TAG, "server gone:" + ev.getName() 
-							+ ", now " + connections_discovered.size());
-					
-					mDNSnotify(ev.getName(), null);
-				}
-
-				@Override
-				public void serviceAdded(ServiceEvent event) {
-					// Required to force serviceResolved to be called again (after the first search)
-					jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
-				}
-			});
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
+	          };
+			
+			Looper.loop();
 		}
-	}
-
-	private void mDNSstop()
-	{
-		Log.d(TAG, "stopping MDNS");
-		if (jmdns != null) {
-			if (listener != null) {
-				jmdns.removeServiceListener(mdnstype, listener);
-				listener = null;
+		
+		
+		private void mDNSstart()
+		{
+			Log.d(TAG, "starting MDNS " + JmDNS.VERSION);
+			
+			if(jmdns != null) {
+				Log.d(TAG, "MDNS already running, bailing out");
+				return;
 			}
+			
+			android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
+			multicastLock = wifi.createMulticastLock("mylockthereturn");
+			multicastLock.setReferenceCounted(true);
+			multicastLock.acquire();
 			try {
-				jmdns.close();
+				jmdns = JmDNS.create();
+				jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
+
+					@Override
+					public void serviceResolved(ServiceEvent ev) {
+						ConnectionBean c = new ConnectionBean();
+						c.set_Id(0); // new!
+						c.setNickname(ev.getName());
+						c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
+						c.setPort(ev.getInfo().getPort());
+						
+						connections_discovered.put(ev.getInfo().getQualifiedName(), c);
+					
+						Log.d(TAG, "discovered server :" + ev.getName() 
+									+ ", now " + connections_discovered.size());
+						
+						mDNSnotify(ev.getName(), c);
+					}
+
+					@Override
+					public void serviceRemoved(ServiceEvent ev) {
+						connections_discovered.remove(ev.getInfo().getQualifiedName());
+						
+						Log.d(TAG, "server gone:" + ev.getName() 
+								+ ", now " + connections_discovered.size());
+						
+						mDNSnotify(ev.getName(), null);
+					}
+
+					@Override
+					public void serviceAdded(ServiceEvent event) {
+						// Required to force serviceResolved to be called again (after the first search)
+						jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
+					}
+				});
+
 			} catch (IOException e) {
 				e.printStackTrace();
+				return;
 			}
-			jmdns = null;
 		}
 
-		if(multicastLock != null) {
-			multicastLock.release();
-			multicastLock = null;
+		private void mDNSstop()
+		{
+			Log.d(TAG, "stopping MDNS");
+			if (jmdns != null) {
+				if (listener != null) {
+					jmdns.removeServiceListener(mdnstype, listener);
+					listener = null;
+				}
+				try {
+					jmdns.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				jmdns = null;
+			}
+
+			if(multicastLock != null) {
+				multicastLock.release();
+				multicastLock = null;
+			}
+			
+			// notify our callback about our internal state, i.e. the removals
+			for(ConnectionBean c: connections_discovered.values()) 
+				mDNSnotify(c.getNickname(), null);
+			// and clear internal state
+			connections_discovered.clear();
+			
+			Log.d(TAG, "stopping MDNS done");
+		}
+
+		// do the GUI stuff in Runnable posted to main thread handler
+		private void mDNSnotify(final String conn_name, final ConnectionBean conn) {
+			if(callback!=null)
+				callback.mDNSnotify(conn_name, conn, connections_discovered);
+			else
+				Log.d(TAG, "callback is NULL, not notifying");
+
 		}
 		
-		// notify our callback about our internal state, i.e. the removals
-		for(ConnectionBean c: connections_discovered.values()) 
-			mDNSnotify(c.getNickname(), null);
-		// and clear internal state
-		connections_discovered.clear();
 		
-		Log.d(TAG, "stopping MDNS done");
 	}
-
-	// do the GUI stuff in Runnable posted to main thread handler
-	private void mDNSnotify(final String conn_name, final ConnectionBean conn) {
-		if(callback!=null)
-			callback.mDNSnotify(conn_name, conn, connections_discovered);
-		else
-			Log.d(TAG, "callback is NULL, not notifying");
-
-	}
+	
 	
 }
