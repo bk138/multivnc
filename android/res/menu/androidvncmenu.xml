@@ -1,4 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/itemMDNSRestart" android:title="@string/restartMDNS"
+		android:icon="@android:drawable/ic_menu_search" />
     <item android:id="@+id/itemImportExport" android:title="@string/import_export_settings"
 		android:icon="@android:drawable/ic_menu_save" />
 	<item android:id="@+id/itemOpenDoc" android:title="@string/open_doc"

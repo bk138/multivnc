@@ -119,6 +119,11 @@ public class MDNSService extends Service {
 	public void dump() {
 		Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_DUMP).sendToTarget();
 	}
+	
+	public void restart() {
+		Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_STOP).sendToTarget();
+		Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_START).sendToTarget();
+	}
 
 	
 	private class MDNSWorkerThread extends Thread

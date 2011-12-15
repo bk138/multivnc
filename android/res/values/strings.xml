@@ -12,6 +12,7 @@
     <string name="button_send_without_saving">Send Text/Don\'t Save It</string>
     <string name="server_found">Found VNC Server</string>
     <string name="server_removed">VNC Server disappeared</string>
+    <string name="restartMDNS">Restart Server Discovery</string>
     <string name="scale_msg">Scale now</string>
 <string name="madeby">MultiVNC on Android is brought to you by CoboltForge (www.coboltforge.com).\n\nIt is based on android-vnc-viewer (http://code.google.com/p/android-vnc-viewer), with major cleanups and improvements done by CoboltForge.</string>
 <string name="center_mouse">Mouse @</string>

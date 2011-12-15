@@ -226,6 +226,13 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId())
 		{
+		case R.id.itemMDNSRestart :
+			try {
+				boundMDNSService.restart();
+			}
+			catch(NullPointerException e) {
+			}
+			break;
 		case R.id.itemImportExport :
 			showDialog(R.layout.importexport);
 			break;
