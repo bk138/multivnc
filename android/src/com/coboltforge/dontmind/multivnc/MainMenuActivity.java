@@ -214,7 +214,7 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.androidvncmenu,menu);
+		getMenuInflater().inflate(R.menu.mainmenuactivitymenu,menu);
 		return true;
 	}
 
