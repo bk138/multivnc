@@ -64,7 +64,7 @@ public class MDNSService extends Service {
 		Log.d(TAG, "mDNS service onCreate()!");
 		
 		workerThread.start();
-
+		
 		// listen for scan results 
 		netStateChangedReceiver = new BroadcastReceiver() {
 			//@Override
@@ -75,10 +75,20 @@ public class MDNSService extends Service {
 
 				// we get this as soon as we're registering, see http://stackoverflow.com/questions/6670514/connectivitymanager-connectivity-action-always-broadcast-when-registering-a-rec
 				// thus it's okay to have the (re-)startup here!
-				Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_STOP).sendToTarget();
+				try {
+					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_STOP).sendToTarget();
+				}
+				catch(NullPointerException e) {
+				}
 
 				if(!no_net) // only (re)start when we actually have connection
-					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_START).sendToTarget();
+				{
+					try {
+						Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_START).sendToTarget();
+					}
+					catch(NullPointerException e) {
+					}
+				}
 				
 			}
 		};
@@ -117,7 +127,11 @@ public class MDNSService extends Service {
 
 	// force a callback call for every conn in connections_discovered
 	public void dump() {
-		Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_DUMP).sendToTarget();
+		try {
+			Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_DUMP).sendToTarget();
+		}
+		catch(NullPointerException e) {
+		}
 	}
 
 	
