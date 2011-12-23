@@ -632,6 +632,21 @@ public class VncCanvasActivity extends Activity {
 		vncCanvas.enableRepaints();
 		super.onRestart();
 	}
+	
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		// needed for the GLSurfaceView
+		vncCanvas.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// needed for the GLSurfaceView
+		vncCanvas.onResume();
+	}
 
 	/** {@inheritDoc} */
 	@Override

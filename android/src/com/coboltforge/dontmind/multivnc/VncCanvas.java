@@ -30,26 +30,39 @@
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.zip.Inflater;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11;
+import javax.microedition.khronos.opengles.GL11Ext;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.opengl.GLSurfaceView;
+import android.opengl.GLU;
+import android.opengl.GLUtils;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.ImageView.ScaleType;
 
 
-public class VncCanvas extends ImageView {
+public class VncCanvas extends GLSurfaceView {
 	private final static String TAG = "VncCanvas";
 	private final static boolean LOCAL_LOGV = true;
 	
@@ -122,6 +135,8 @@ public class VncCanvas extends ImageView {
 	 * full-frame coordinates
 	 */
 	int absoluteXPosition = 0, absoluteYPosition = 0;
+	
+
 
 	/**
 	 * Constructor used by the inflation apparatus
@@ -133,6 +148,145 @@ public class VncCanvas extends ImageView {
 		scrollRunnable = new MouseScrollRunnable();
 		handleRREPaint = new Paint();
 		handleRREPaint.setStyle(Style.FILL);
+		
+		setRenderer(new GLSurfaceView.Renderer() {
+			
+			int[] textureIDs = new int[1];   // Array for 1 texture-ID
+		    private int[] mTexCrop = new int[4];
+		    private FloatBuffer triangleVB;
+
+
+		    private void initShapes(){
+		        
+		        float triangleCoords[] = {
+		            // X, Y, Z
+		            -0.5f, -0.25f, 0,
+		             0.5f, -0.25f, 0,
+		             0.0f,  0.559016994f, 0
+		        }; 
+		        
+		        // initialize vertex Buffer for triangle  
+		        ByteBuffer vbb = ByteBuffer.allocateDirect(
+		                // (# of coordinate values * 4 bytes per float)
+		                triangleCoords.length * 4); 
+		        vbb.order(ByteOrder.nativeOrder());// use the device hardware's native byte order
+		        triangleVB = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
+		        triangleVB.put(triangleCoords);    // add the coordinates to the FloatBuffer
+		        triangleVB.position(0);            // set the buffer to read the first coordinate
+		    
+		    }
+		    
+			@Override
+			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
+				gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  // Set color's clear-value to black
+				
+				gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
+
+				gl.glShadeModel(GL10.GL_FLAT);
+				gl.glEnable(GL10.GL_TEXTURE_2D);
+
+				/*
+				 * By default, OpenGL enables features that improve quality but reduce
+				 * performance. One might want to tweak that especially on software
+				 * renderer.
+				 */
+				gl.glDisable(GL10.GL_DITHER);
+				gl.glDisable(GL10.GL_LIGHTING);
+				gl.glDisable(GL10.GL_BLEND);
+				gl.glDisable(GL10.GL_DEPTH_TEST);
+				
+				// setup texture stuff
+				gl.glDeleteTextures(1, textureIDs, 0);
+				gl.glGenTextures(1, textureIDs, 0); // Generate texture-ID array
+
+				//XXX
+//				  initShapes();
+			}
+			
+			// Call back after onSurfaceCreated() or whenever the window's size changes
+			@Override
+			public void onSurfaceChanged(GL10 gl, int width, int height) {
+				
+		        if (height == 0) height = 1;   // To prevent divide by zero
+		        float aspect = (float)width / height;
+		     
+		        // Set the viewport (display area) to cover the entire window
+		        gl.glViewport(0, 0, width, height);
+		    
+		        // Setup perspective projection, with aspect ratio matches viewport
+		        gl.glMatrixMode(GL10.GL_PROJECTION); // Select projection matrix
+		        gl.glLoadIdentity();                 // Reset projection matrix
+		        // Use perspective projection
+		        GLU.gluPerspective(gl, 45, aspect, 0.1f, 100.f);
+		    
+		        gl.glMatrixMode(GL10.GL_MODELVIEW);  // Select model-view matrix
+		        gl.glLoadIdentity();                 // Reset
+		        
+			}
+			
+			@Override
+			public void onDrawFrame(GL10 gl) {
+				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+				
+//				 // Set GL_MODELVIEW transformation mode
+//		        gl.glMatrixMode(GL10.GL_MODELVIEW);
+//		        gl.glLoadIdentity();   // reset the matrix to its default state
+//		        
+//		        // When using GL_MODELVIEW, you must set the view point
+//		        GLU.gluLookAt(gl, 0, 0, -5, 0f, 0f, 0f, 0f, 1.0f, 0.0f);     
+//				 // Enable use of vertex arrays
+//		        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+//		        // Draw the triangle
+//		        gl.glColor4f(0.63671875f, 0.76953125f, 0.22265625f, 0.0f);
+//		        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, triangleVB);
+//		        gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);
+//		        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+
+		        
+				try{
+					gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[0]);   // Bind to texture ID
+					// Set up texture filters
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+					gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
+
+					gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE);
+
+					Bitmap bitmap = bitmapData.mbitmap;
+
+					// Build Texture from loaded bitmap
+					// See http://www.scottlu.com/2008/04/fast-2d-graphics-wopengl-es.html
+					GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+
+					mTexCrop[0] = 0;
+					mTexCrop[1] = bitmap.getHeight();
+					mTexCrop[2] = bitmap.getWidth();
+					mTexCrop[3] = -bitmap.getHeight();
+
+					((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mTexCrop, 0);
+
+					//Load an identity matrix so we don't multiply the current model-view matrix by the last matrix.  AKA reset the matrix.
+					gl.glLoadIdentity();
+					//Half the size of the object on the x and y axis
+					gl.glScalef((float)0.5, (float)0.5, 0);
+					//Rotate 30 degrees around the Z axis.
+					gl.glRotatef((float)30.0, (float)0, (float)0, (float)1.0);
+
+					// very fast, but very basic transforming
+					// uses the GL_OES_draw_texture extension to draw sprites on the screen without
+					// any sort of projection or vertex buffers involved
+					// http://harmattan-dev.nokia.com/docs/library/html/opengles-1.1/glDrawTex.html?tab=1
+					((GL11Ext) gl).glDrawTexfOES((float)(0), (float)(0), 0, bitmap.getWidth()*getScale(), bitmap.getHeight()*getScale());
+
+				}
+				catch(NullPointerException e) {
+				}
+
+			}
+			
+			
+		});
+		
 		
 		int oldprio = android.os.Process.getThreadPriority(android.os.Process.myTid());
 		// GIVE US MAGIC POWER, O GREAT FAIR SCHEDULER!
@@ -279,10 +433,11 @@ public class VncCanvas extends ImageView {
 		}
 		else
 			useFull = (connection.getForceFull() == BitmapImplHint.FULL);
-		if (! useFull)
+//XXX
+		//		if (! useFull)
 			bitmapData=new LargeBitmapData(rfb,this,dx,dy,capacity);
-		else
-			bitmapData=new FullBufferBitmapData(rfb,this, capacity);
+//		else
+//			bitmapData=new FullBufferBitmapData(rfb,this, capacity);
 		mouseX=rfb.framebufferWidth/2;
 		mouseY=rfb.framebufferHeight/2;
 
@@ -707,7 +862,7 @@ public class VncCanvas extends ImageView {
 			{
 				if(Utils.DEBUG()) Log.d(TAG, "redraw");
 				
-				bitmapData.updateView(VncCanvas.this);
+//				bitmapData.updateView(VncCanvas.this);
 			}
 		}
 	};
@@ -1670,5 +1825,20 @@ public class VncCanvas extends ImageView {
 		}
 
 		bitmapData.updateBitmap(x, y, w, h);
+	}
+
+	public ScaleType getScaleType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setImageMatrix(Matrix matrix) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setScaleType(ScaleType scaleType) {
+		// TODO Auto-generated method stub
+		
 	}
 }
