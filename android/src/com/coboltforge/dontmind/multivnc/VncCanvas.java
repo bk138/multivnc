@@ -30,9 +30,6 @@
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.zip.Inflater;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -50,7 +47,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -153,38 +149,15 @@ public class VncCanvas extends GLSurfaceView {
 			
 			int[] textureIDs = new int[1];   // Array for 1 texture-ID
 		    private int[] mTexCrop = new int[4];
-		    private FloatBuffer triangleVB;
 
-
-		    private void initShapes(){
-		        
-		        float triangleCoords[] = {
-		            // X, Y, Z
-		            -0.5f, -0.25f, 0,
-		             0.5f, -0.25f, 0,
-		             0.0f,  0.559016994f, 0
-		        }; 
-		        
-		        // initialize vertex Buffer for triangle  
-		        ByteBuffer vbb = ByteBuffer.allocateDirect(
-		                // (# of coordinate values * 4 bytes per float)
-		                triangleCoords.length * 4); 
-		        vbb.order(ByteOrder.nativeOrder());// use the device hardware's native byte order
-		        triangleVB = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
-		        triangleVB.put(triangleCoords);    // add the coordinates to the FloatBuffer
-		        triangleVB.position(0);            // set the buffer to read the first coordinate
-		    
-		    }
-		    
 			@Override
 			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
-				gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  // Set color's clear-value to black
 				
-				gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_FASTEST);
+				if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
 
-				gl.glShadeModel(GL10.GL_FLAT);
-				gl.glEnable(GL10.GL_TEXTURE_2D);
+				// Set color's clear-value to black
+				gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+				
 
 				/*
 				 * By default, OpenGL enables features that improve quality but reduce
@@ -196,87 +169,76 @@ public class VncCanvas extends GLSurfaceView {
 				gl.glDisable(GL10.GL_BLEND);
 				gl.glDisable(GL10.GL_DEPTH_TEST);
 				
-				// setup texture stuff
+				/*
+				 * setup texture stuff
+				 */
+				// enable 2d textures
+				gl.glEnable(GL10.GL_TEXTURE_2D);
+				// Generate texture-ID array
 				gl.glDeleteTextures(1, textureIDs, 0);
-				gl.glGenTextures(1, textureIDs, 0); // Generate texture-ID array
+				gl.glGenTextures(1, textureIDs, 0);
+				 // this is a 2D texture
+				gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[0]);
+				// Set up texture filters --> nice smoothing
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+				// texture environment
+				gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE);
 
-				//XXX
-//				  initShapes();
 			}
 			
 			// Call back after onSurfaceCreated() or whenever the window's size changes
 			@Override
 			public void onSurfaceChanged(GL10 gl, int width, int height) {
 				
-		        if (height == 0) height = 1;   // To prevent divide by zero
-		        float aspect = (float)width / height;
-		     
-		        // Set the viewport (display area) to cover the entire window
-		        gl.glViewport(0, 0, width, height);
-		    
-		        // Setup perspective projection, with aspect ratio matches viewport
-		        gl.glMatrixMode(GL10.GL_PROJECTION); // Select projection matrix
-		        gl.glLoadIdentity();                 // Reset projection matrix
-		        // Use perspective projection
-		        GLU.gluPerspective(gl, 45, aspect, 0.1f, 100.f);
-		    
-		        gl.glMatrixMode(GL10.GL_MODELVIEW);  // Select model-view matrix
-		        gl.glLoadIdentity();                 // Reset
-		        
+				if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
+
+				// nothing needed in here with glDrawTexOES()
+				// http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
 			}
 			
 			@Override
 			public void onDrawFrame(GL10 gl) {
-				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 				
-//				 // Set GL_MODELVIEW transformation mode
-//		        gl.glMatrixMode(GL10.GL_MODELVIEW);
-//		        gl.glLoadIdentity();   // reset the matrix to its default state
-//		        
-//		        // When using GL_MODELVIEW, you must set the view point
-//		        GLU.gluLookAt(gl, 0, 0, -5, 0f, 0f, 0f, 0f, 1.0f, 0.0f);     
-//				 // Enable use of vertex arrays
-//		        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-//		        // Draw the triangle
-//		        gl.glColor4f(0.63671875f, 0.76953125f, 0.22265625f, 0.0f);
-//		        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, triangleVB);
-//		        gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);
-//		        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-
-		        
 				try{
-					gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[0]);   // Bind to texture ID
-					// Set up texture filters
-					gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
-					gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_NEAREST);
+					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-					gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE);
-
+					// TODO optimize: pbuffer, texSUBimage ?
+					
 					Bitmap bitmap = bitmapData.mbitmap;
 
 					// Build Texture from loaded bitmap
 					// See http://www.scottlu.com/2008/04/fast-2d-graphics-wopengl-es.html
 					GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
 
-					mTexCrop[0] = 0;
-					mTexCrop[1] = bitmap.getHeight();
-					mTexCrop[2] = bitmap.getWidth();
-					mTexCrop[3] = -bitmap.getHeight();
+					/*
+					 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr. 
+					 * That is, "left"/"bottom"/width/height, although you can 
+					 * also have negative width and height to flip the image. 
+					 * 
+					 * This is the part of the framebuffer we show on-screen.
+					 * 
+					 */
+					mTexCrop[0] = absoluteXPosition;
+					mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
+					mTexCrop[2] = (int) (VncCanvas.this.getWidth() / getScale());
+					mTexCrop[3] = (int) (-VncCanvas.this.getHeight() / getScale());
+					
+					Log.d(TAG, "scrollToRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
 
 					((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mTexCrop, 0);
 
-					//Load an identity matrix so we don't multiply the current model-view matrix by the last matrix.  AKA reset the matrix.
-					gl.glLoadIdentity();
-					//Half the size of the object on the x and y axis
-					gl.glScalef((float)0.5, (float)0.5, 0);
-					//Rotate 30 degrees around the Z axis.
-					gl.glRotatef((float)30.0, (float)0, (float)0, (float)1.0);
-
-					// very fast, but very basic transforming
-					// uses the GL_OES_draw_texture extension to draw sprites on the screen without
-					// any sort of projection or vertex buffers involved
-					// http://harmattan-dev.nokia.com/docs/library/html/opengles-1.1/glDrawTex.html?tab=1
-					((GL11Ext) gl).glDrawTexfOES((float)(0), (float)(0), 0, bitmap.getWidth()*getScale(), bitmap.getHeight()*getScale());
+					/*
+					 * Very fast, but very basic transforming: only transpose, flip and scale.
+					 * Uses the GL_OES_draw_texture extension to draw sprites on the screen without
+					 * any sort of projection or vertex buffers involved.
+					 * 
+					 * See http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
+					 * 
+					 * All parameters in GL screen coordinates!
+					 */
+					((GL11Ext) gl).glDrawTexfOES(0, 0, 0, VncCanvas.this.getWidth(), VncCanvas.this.getHeight());
+//					((GL11Ext) gl).glDrawTexfOES(0, 0, 0, bitmap.getWidth()*getScale(), bitmap.getHeight()*getScale());
 
 				}
 				catch(NullPointerException e) {
@@ -687,6 +649,7 @@ public class VncCanvas extends GLSurfaceView {
 	 */
 	void scrollToAbsolute()
 	{
+		if(Utils.DEBUG()) Log.d(TAG, "scrollToAbsolute() " + absoluteXPosition + ", " + absoluteYPosition);
 		float scale = getScale();
 		scrollTo((int)((absoluteXPosition + ((float)getWidth() - getImageWidth()) / 2 ) * scale),
 				(int)((absoluteYPosition + ((float)getHeight() - getImageHeight()) / 2 ) * scale));
