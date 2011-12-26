@@ -81,18 +81,14 @@ class LargeBitmapData extends AbstractBitmapData {
 	 * @param displayHeight
 	 * @param capacity Max process heap size in bytes
 	 */
-	LargeBitmapData(RfbProto p, VncCanvas c, int displayWidth, int displayHeight, int capacity)
+	LargeBitmapData(RfbProto p, VncCanvas c, int capacity)
 	{
 		super(p,c);
 		double scaleMultiplier = Math.sqrt((double)(capacity * 1024 * 1024) / (double)(CAPACITY_MULTIPLIER * framebufferwidth * framebufferheight));
 		if (scaleMultiplier > 1)
 			scaleMultiplier = 1;
 		bitmapwidth=(int)((double)framebufferwidth * scaleMultiplier);
-		if (bitmapwidth < displayWidth)
-			bitmapwidth = displayWidth;
 		bitmapheight=(int)((double)framebufferheight * scaleMultiplier);
-		if (bitmapheight < displayHeight)
-			bitmapheight = displayHeight;
 		android.util.Log.i("LBM", "bitmapsize = ("+bitmapwidth+","+bitmapheight+")");
 		mbitmap = Bitmap.createBitmap(bitmapwidth, bitmapheight, Bitmap.Config.RGB_565);
 		memGraphics = new Canvas(mbitmap);

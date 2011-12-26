@@ -219,12 +219,12 @@ public class VncCanvas extends GLSurfaceView {
 					 * This is the part of the framebuffer we show on-screen.
 					 * 
 					 */
-					mTexCrop[0] = absoluteXPosition;
+					mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
 					mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
-					mTexCrop[2] = (int) (VncCanvas.this.getWidth() / getScale());
-					mTexCrop[3] = (int) (-VncCanvas.this.getHeight() / getScale());
+					mTexCrop[2] = (int) (VncCanvas.this.getWidth() < bitmap.getWidth()*getScale() ? VncCanvas.this.getWidth() / getScale() : bitmap.getWidth());
+					mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < bitmap.getHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : bitmap.getHeight());
 					
-					Log.d(TAG, "scrollToRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
+					if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
 
 					((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mTexCrop, 0);
 
@@ -237,9 +237,13 @@ public class VncCanvas extends GLSurfaceView {
 					 * 
 					 * All parameters in GL screen coordinates!
 					 */
-					((GL11Ext) gl).glDrawTexfOES(0, 0, 0, VncCanvas.this.getWidth(), VncCanvas.this.getHeight());
-//					((GL11Ext) gl).glDrawTexfOES(0, 0, 0, bitmap.getWidth()*getScale(), bitmap.getHeight()*getScale());
+					int x = (int) (VncCanvas.this.getWidth() < bitmap.getWidth()*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (bitmap.getWidth()*getScale())/2);
+					int y = (int) (VncCanvas.this.getHeight() < bitmap.getHeight()*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (bitmap.getHeight()*getScale())/2);
+					int w = (int) (VncCanvas.this.getWidth() < bitmap.getWidth()*getScale() ? VncCanvas.this.getWidth(): bitmap.getWidth()*getScale());
+					int h =(int) (VncCanvas.this.getHeight() < bitmap.getHeight()*getScale() ? VncCanvas.this.getHeight(): bitmap.getHeight()*getScale());
+					((GL11Ext) gl).glDrawTexfOES(x, y, 0, w, h);
 
+					if(Utils.DEBUG()) Log.d(TAG, "drawing to screen: x " + x + " y " + y + " w " + w + " h " + h);
 				}
 				catch(NullPointerException e) {
 				}
@@ -397,7 +401,7 @@ public class VncCanvas extends GLSurfaceView {
 			useFull = (connection.getForceFull() == BitmapImplHint.FULL);
 //XXX
 		//		if (! useFull)
-			bitmapData=new LargeBitmapData(rfb,this,dx,dy,capacity);
+			bitmapData=new LargeBitmapData(rfb,this, capacity);
 //		else
 //			bitmapData=new FullBufferBitmapData(rfb,this, capacity);
 		mouseX=rfb.framebufferWidth/2;
