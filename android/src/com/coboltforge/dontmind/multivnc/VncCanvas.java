@@ -30,6 +30,7 @@
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
+import java.nio.IntBuffer;
 import java.util.zip.Inflater;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -40,7 +41,6 @@ import javax.microedition.khronos.opengles.GL11Ext;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -207,12 +207,15 @@ public class VncCanvas extends GLSurfaceView {
 					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 					if(bitmapData instanceof LargeBitmapData) {
-						// Build Texture from loaded bitmap
+						// Build Texture from bitmap
 						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmapData.mbitmap, 0);
 					}
 					
 					if(bitmapData instanceof FullBufferBitmapData) {
-						; //XXX
+						// build texture from pixel array
+						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
+								bitmapData.framebufferwidth, bitmapData.framebufferheight,
+								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(bitmapData.bitmapPixels));
 					}
 
 					
@@ -404,10 +407,10 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		else
 			useFull = (connection.getForceFull() == BitmapImplHint.FULL);
-//		if (! useFull)
+		if (! useFull)
 			bitmapData=new LargeBitmapData(rfb,this, capacity);
-//		else
-//			bitmapData=new FullBufferBitmapData(rfb,this, capacity);
+		else
+			bitmapData=new FullBufferBitmapData(rfb,this, capacity);
 		mouseX=rfb.framebufferWidth/2;
 		mouseY=rfb.framebufferHeight/2;
 
