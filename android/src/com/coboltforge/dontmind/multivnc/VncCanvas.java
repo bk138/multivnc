@@ -150,6 +150,7 @@ public class VncCanvas extends GLSurfaceView {
 			int[] textureIDs = new int[1];   // Array for 1 texture-ID
 		    private int[] mTexCrop = new int[4];
 
+		    
 			@Override
 			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 				
@@ -200,17 +201,21 @@ public class VncCanvas extends GLSurfaceView {
 			@Override
 			public void onDrawFrame(GL10 gl) {
 				
+				// TODO optimize: pbuffer, texSUBimage ?
+				
 				try{
 					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-					// TODO optimize: pbuffer, texSUBimage ?
+					if(bitmapData instanceof LargeBitmapData) {
+						// Build Texture from loaded bitmap
+						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmapData.mbitmap, 0);
+					}
 					
-					Bitmap bitmap = bitmapData.mbitmap;
+					if(bitmapData instanceof FullBufferBitmapData) {
+						; //XXX
+					}
 
-					// Build Texture from loaded bitmap
-					// See http://www.scottlu.com/2008/04/fast-2d-graphics-wopengl-es.html
-					GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-
+					
 					/*
 					 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr. 
 					 * That is, "left"/"bottom"/width/height, although you can 
@@ -221,8 +226,8 @@ public class VncCanvas extends GLSurfaceView {
 					 */
 					mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
 					mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
-					mTexCrop[2] = (int) (VncCanvas.this.getWidth() < bitmap.getWidth()*getScale() ? VncCanvas.this.getWidth() / getScale() : bitmap.getWidth());
-					mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < bitmap.getHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : bitmap.getHeight());
+					mTexCrop[2] = (int) (VncCanvas.this.getWidth() < bitmapData.framebufferwidth*getScale() ? VncCanvas.this.getWidth() / getScale() : bitmapData.framebufferwidth);
+					mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < bitmapData.framebufferheight*getScale() ? VncCanvas.this.getHeight() / getScale() : bitmapData.framebufferheight);
 					
 					if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
 
@@ -237,10 +242,10 @@ public class VncCanvas extends GLSurfaceView {
 					 * 
 					 * All parameters in GL screen coordinates!
 					 */
-					int x = (int) (VncCanvas.this.getWidth() < bitmap.getWidth()*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (bitmap.getWidth()*getScale())/2);
-					int y = (int) (VncCanvas.this.getHeight() < bitmap.getHeight()*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (bitmap.getHeight()*getScale())/2);
-					int w = (int) (VncCanvas.this.getWidth() < bitmap.getWidth()*getScale() ? VncCanvas.this.getWidth(): bitmap.getWidth()*getScale());
-					int h =(int) (VncCanvas.this.getHeight() < bitmap.getHeight()*getScale() ? VncCanvas.this.getHeight(): bitmap.getHeight()*getScale());
+					int x = (int) (VncCanvas.this.getWidth() < bitmapData.framebufferwidth*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (bitmapData.framebufferwidth*getScale())/2);
+					int y = (int) (VncCanvas.this.getHeight() < bitmapData.framebufferheight*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (bitmapData.framebufferheight*getScale())/2);
+					int w = (int) (VncCanvas.this.getWidth() < bitmapData.framebufferwidth*getScale() ? VncCanvas.this.getWidth(): bitmapData.framebufferwidth*getScale());
+					int h =(int) (VncCanvas.this.getHeight() < bitmapData.framebufferheight*getScale() ? VncCanvas.this.getHeight(): bitmapData.framebufferheight*getScale());
 					((GL11Ext) gl).glDrawTexfOES(x, y, 0, w, h);
 
 					if(Utils.DEBUG()) Log.d(TAG, "drawing to screen: x " + x + " y " + y + " w " + w + " h " + h);
@@ -399,8 +404,7 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		else
 			useFull = (connection.getForceFull() == BitmapImplHint.FULL);
-//XXX
-		//		if (! useFull)
+//		if (! useFull)
 			bitmapData=new LargeBitmapData(rfb,this, capacity);
 //		else
 //			bitmapData=new FullBufferBitmapData(rfb,this, capacity);
