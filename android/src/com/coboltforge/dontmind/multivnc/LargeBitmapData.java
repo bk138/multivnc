@@ -51,27 +51,7 @@ class LargeBitmapData extends AbstractBitmapData {
 		}		
 	};
 	
-	class LargeBitmapDrawable extends AbstractBitmapDrawable
-	{
-		LargeBitmapDrawable()
-		{
-			super(LargeBitmapData.this);
-		}
-		/* (non-Javadoc)
-		 * @see android.graphics.drawable.DrawableContainer#draw(android.graphics.Canvas)
-		 */
-		@Override
-		public void draw(Canvas canvas) {
-			//android.util.Log.i("LBM", "Drawing "+xoffset+" "+yoffset);
-			int xoff, yoff;
-			synchronized ( LargeBitmapData.this )
-			{
-				xoff=xoffset;
-				yoff=yoffset;
-			}
-			draw(canvas, xoff, yoff);
-		}
-	}
+
 	
 	/**
 	 * 
@@ -99,11 +79,6 @@ class LargeBitmapData extends AbstractBitmapData {
 		defaultPaint = new Paint();
 	}
 	
-	@Override
-	AbstractBitmapDrawable createDrawable()
-	{
-		return new LargeBitmapDrawable();
-	}
 	
 	/* (non-Javadoc)
 	 * @see com.coboltforge.dontmind.multivnc.AbstractBitmapData#copyRect(android.graphics.Rect, android.graphics.Rect, android.graphics.Paint)

@@ -6,11 +6,8 @@ package com.coboltforge.dontmind.multivnc;
 import java.io.IOException;
 import java.util.Arrays;
 
-import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.Log;
-import android.widget.ImageView;
 
 /**
  * @author Michael A. MacDonald
@@ -21,71 +18,6 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	int xoffset;
 	int yoffset;
 	
-	/**
-	 * @author Michael A. MacDonald
-	 *
-	 */
-	class Drawable extends AbstractBitmapDrawable {
-
-		/**
-		 * @param data
-		 */
-		public Drawable(AbstractBitmapData data) {
-			super(data);
-			// TODO Auto-generated constructor stub
-		}
-
-		/* (non-Javadoc)
-		 * @see android.graphics.drawable.DrawableContainer#draw(android.graphics.Canvas)
-		 */
-		@Override
-		public void draw(Canvas canvas) {
-			if (vncCanvas.getScaleType() == ImageView.ScaleType.FIT_CENTER)
-			{
-				canvas.drawBitmap(data.bitmapPixels, 0, data.framebufferwidth, xoffset, yoffset, framebufferwidth, framebufferheight, false, null);				
-			}
-			else
-			{
-				float scale = vncCanvas.getScale();
-				int xo = xoffset < 0 ? 0 : xoffset;
-				int yo = yoffset < 0 ? 0 : yoffset;
-				/*
-				if (scale == 1 || scale <= 0)
-				{
-				*/
-					int drawWidth = vncCanvas.getVisibleWidth();
-					if (drawWidth + xo > data.framebufferwidth)
-						drawWidth = data.framebufferwidth - xo;
-					int drawHeight = vncCanvas.getVisibleHeight();
-					if (drawHeight + yo > data.framebufferheight)
-						drawHeight = data.framebufferheight - yo;
-					canvas.drawBitmap(data.bitmapPixels, offset(xo, yo), data.framebufferwidth, xo, yo, drawWidth, drawHeight, false, null);
-				/*
-				}
-				else
-				{
-					int scalewidth = (int)(vncCanvas.getVisibleWidth() / scale + 1);
-					if (scalewidth + xo > data.framebufferwidth)
-						scalewidth = data.framebufferwidth - xo;
-					int scaleheight = (int)(vncCanvas.getVisibleHeight() / scale + 1);
-					if (scaleheight + yo > data.framebufferheight)
-						scaleheight = data.framebufferheight - yo;
-					canvas.drawBitmap(data.bitmapPixels, offset(xo, yo), data.framebufferwidth, xo, yo, scalewidth, scaleheight, false, null);				
-				}
-				*/
-			}
-			if(data.vncCanvas.connection.getUseLocalCursor())
-			{
-				setCursorRect(data.vncCanvas.mouseX, data.vncCanvas.mouseY);
-				clipRect.set(cursorRect);
-				if (canvas.clipRect(cursorRect))
-				{
-					drawCursor(canvas);
-				}
-			}
-		}
-	}
-
 	/**
 	 * Multiply this times total number of pixels to get estimate of process size with all buffers plus
 	 * safety factor
@@ -115,13 +47,7 @@ class FullBufferBitmapData extends AbstractBitmapData {
 		throw new RuntimeException( "copyrect Not implemented");
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractBitmapData#createDrawable()
-	 */
-	@Override
-	AbstractBitmapDrawable createDrawable() {
-		return new Drawable(this);
-	}
+
 
 	/* (non-Javadoc)
 	 * @see com.coboltforge.dontmind.multivnc.AbstractBitmapData#drawRect(int, int, int, int, android.graphics.Paint)
@@ -129,6 +55,15 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	@Override
 	void drawRect(int x, int y, int w, int h, Paint paint) {
 		int color = paint.getColor();
+		
+		/*
+		 * OpenGL seems to use a different byte order.
+		 * We need colours in RGBA, not ABGR.
+		 */
+//		if(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) // java uses big endian
+//			color = Integer.reverse(color);
+//			color = 0x00FF0000;
+		
 		int offset = offset(x,y);
 		if (w > 10)
 		{
