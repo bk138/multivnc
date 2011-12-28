@@ -56,14 +56,6 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	void drawRect(int x, int y, int w, int h, Paint paint) {
 		int color = paint.getColor();
 		
-		/*
-		 * OpenGL seems to use a different byte order.
-		 * We need colours in RGBA, not ABGR.
-		 */
-//		if(ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN) // java uses big endian
-//			color = Integer.reverse(color);
-//			color = 0x00FF0000;
-		
 		int offset = offset(x,y);
 		if (w > 10)
 		{

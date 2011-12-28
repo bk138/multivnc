@@ -30,6 +30,7 @@
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.zip.Inflater;
 
@@ -201,7 +202,8 @@ public class VncCanvas extends GLSurfaceView {
 			@Override
 			public void onDrawFrame(GL10 gl) {
 				
-				// TODO optimize: pbuffer, texSUBimage ?
+				// TODO optimize: texSUBimage ?
+				// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
 				
 				try{
 					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
@@ -212,6 +214,24 @@ public class VncCanvas extends GLSurfaceView {
 					}
 					
 					if(bitmapData instanceof FullBufferBitmapData) {
+						
+						// make sure pixel array is in the right format. ouch!!!
+						for(int i=0; i < bitmapData.bitmapPixels.length; ++i) {
+							int pix = bitmapData.bitmapPixels[i];
+							int alpha = ((pix >> 24) & 0xFF); 
+							int blue = ((pix >> 16) & 0xFF); 
+							int green = ((pix >> 8) & 0xFF); 
+							int red = ((pix) & 0xFF); 
+							
+							if(alpha == 255) {
+								// mark
+								alpha = 254;
+								// convert to ARGB
+								bitmapData.bitmapPixels[i] = (alpha << 24 | red << 16 | green << 8 | blue); 
+							}
+						} 
+					
+						
 						// build texture from pixel array
 						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
 								bitmapData.framebufferwidth, bitmapData.framebufferheight,
