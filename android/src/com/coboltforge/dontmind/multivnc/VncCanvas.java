@@ -30,8 +30,9 @@
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Inflater;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -97,6 +98,8 @@ public class VncCanvas extends GLSurfaceView {
 
 	// Internal bitmap data
 	AbstractBitmapData bitmapData;
+	Lock bitmapDataPixelsLock = new ReentrantLock(); 
+
 	public Handler handler = new Handler();
 
 	// VNC Encoding parameters
@@ -215,7 +218,11 @@ public class VncCanvas extends GLSurfaceView {
 					
 					if(bitmapData instanceof FullBufferBitmapData) {
 						
-						// make sure pixel array is in the right format. ouch!!!
+						bitmapDataPixelsLock.lock();
+
+						/*
+						 *  make sure pixel array is in the right format. ouch!!!
+						 */
 						for(int i=0; i < bitmapData.bitmapPixels.length; ++i) {
 							int pix = bitmapData.bitmapPixels[i];
 							int alpha = ((pix >> 24) & 0xFF); 
@@ -236,6 +243,8 @@ public class VncCanvas extends GLSurfaceView {
 						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
 								bitmapData.framebufferwidth, bitmapData.framebufferheight,
 								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(bitmapData.bitmapPixels));
+					
+						bitmapDataPixelsLock.unlock();
 					}
 
 					
@@ -798,6 +807,9 @@ public class VncCanvas extends GLSurfaceView {
 	byte[] handleRawRectBuffer = new byte[128];
 	void handleRawRect(int x, int y, int w, int h, boolean paint) throws IOException {
 		boolean valid=bitmapData.validDraw(x, y, w, h);
+
+		bitmapDataPixelsLock.lock();
+
 		int[] pixels=bitmapData.bitmapPixels;
 		if (bytesPerPixel == 1) {
 			// 1 byte per pixel. Use palette lookup table.
@@ -834,6 +846,8 @@ public class VncCanvas extends GLSurfaceView {
 				}
 			}
 		}
+		
+		bitmapDataPixelsLock.unlock();
 		
 		if ( ! valid)
 			return;
@@ -1626,6 +1640,8 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		zlibInflater.setInput(zlibBuf, 0, nBytes);
 		
+		bitmapDataPixelsLock.lock();
+		
 		int[] pixels=bitmapData.bitmapPixels;
 
 		if (bytesPerPixel == 1) {
@@ -1661,6 +1677,9 @@ public class VncCanvas extends GLSurfaceView {
 				}
 			}
 		}
+		
+		bitmapDataPixelsLock.unlock();
+		
 		if ( ! valid)
 			return;
 		bitmapData.updateBitmap(x, y, w, h);
@@ -1812,11 +1831,16 @@ public class VncCanvas extends GLSurfaceView {
 
 	private void handleUpdatedZrleTile(int x, int y, int w, int h) {
 		int offsetSrc = 0;
+
+		bitmapDataPixelsLock.lock();
+		
 		int[] destPixels=bitmapData.bitmapPixels;
 		for (int j = 0; j < h; j++) {
 			System.arraycopy(zrleTilePixels, offsetSrc, destPixels, bitmapData.offset(x, y + j), w);
 			offsetSrc += w;
 		}
+		
+		bitmapDataPixelsLock.unlock();
 
 		bitmapData.updateBitmap(x, y, w, h);
 	}

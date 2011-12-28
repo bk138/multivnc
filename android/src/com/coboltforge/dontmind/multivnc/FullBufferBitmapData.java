@@ -53,7 +53,7 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	 * @see com.coboltforge.dontmind.multivnc.AbstractBitmapData#drawRect(int, int, int, int, android.graphics.Paint)
 	 */
 	@Override
-	void drawRect(int x, int y, int w, int h, Paint paint) {
+	synchronized void drawRect(int x, int y, int w, int h, Paint paint) {
 		int color = paint.getColor();
 		
 		int offset = offset(x,y);
