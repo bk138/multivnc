@@ -229,15 +229,14 @@ public class VncCanvas extends GLSurfaceView {
 							int blue = ((pix >> 16) & 0xFF); 
 							int green = ((pix >> 8) & 0xFF); 
 							int red = ((pix) & 0xFF); 
-							
-							if(alpha == 255) {
-								// mark
+
+							if(alpha == 255 || alpha == 0) {
+								// mark as converted
 								alpha = 254;
 								// convert to ARGB
 								bitmapData.bitmapPixels[i] = (alpha << 24 | red << 16 | green << 8 | blue); 
 							}
 						} 
-					
 						
 						// build texture from pixel array
 						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
