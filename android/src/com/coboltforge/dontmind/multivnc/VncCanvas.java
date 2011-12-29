@@ -225,12 +225,14 @@ public class VncCanvas extends GLSurfaceView {
 						 */
 						for(int i=0; i < bitmapData.bitmapPixels.length; ++i) {
 							int pix = bitmapData.bitmapPixels[i];
-							int alpha = ((pix >> 24) & 0xFF); 
-							int blue = ((pix >> 16) & 0xFF); 
-							int green = ((pix >> 8) & 0xFF); 
-							int red = ((pix) & 0xFF); 
 
-							if(alpha == 255 || alpha == 0) {
+							int alpha = ((pix >> 24) & 0xFF);
+							
+							if(alpha != 254) {
+								// extract the rest
+								int blue = ((pix >> 16) & 0xFF); 
+								int green = ((pix >> 8) & 0xFF); 
+								int red = ((pix) & 0xFF); 
 								// mark as converted
 								alpha = 254;
 								// convert to ARGB
