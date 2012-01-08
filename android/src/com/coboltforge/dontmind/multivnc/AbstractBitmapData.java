@@ -30,7 +30,6 @@ abstract class AbstractBitmapData {
 	Canvas memGraphics;
 	boolean waitingForInput;
 	VncCanvas vncCanvas;
-	private AbstractBitmapDrawable drawable;
 
 	AbstractBitmapData( RfbProto p, VncCanvas c)
 	{
@@ -49,10 +48,11 @@ abstract class AbstractBitmapData {
 	{
 		if (vncCanvas.connection.getUseLocalCursor())
 		{
-			if (drawable==null)
-				drawable = createDrawable();
-			drawable.setCursorRect(vncCanvas.mouseX,vncCanvas.mouseY);
-			vncCanvas.invalidate(drawable.cursorRect);
+			// OpenGL always draws the full framebuffer
+//			if (drawable==null)
+//				drawable = createDrawable();
+//			drawable.setCursorRect(vncCanvas.mouseX,vncCanvas.mouseY);
+//			vncCanvas.invalidate(drawable.cursorRect);
 		}
 	}
 	
@@ -108,23 +108,7 @@ abstract class AbstractBitmapData {
 	 */
 	abstract void updateBitmap( int x, int y, int w, int h);
 	
-	/**
-	 * Create drawable appropriate for this data
-	 * @return drawable
-	 */
-	abstract AbstractBitmapDrawable createDrawable();
 	
-	/**
-	 * Call in UI thread; tell ImageView we've changed
-	 * @param v ImageView displaying bitmap data
-	 */
-	void updateView(ImageView v)
-	{
-		if (drawable==null)
-			drawable = createDrawable();
-		v.setImageDrawable(drawable);
-		v.invalidate();
-	}
 	
 	/**
 	 * Copy a rectangle from one part of the bitmap to another

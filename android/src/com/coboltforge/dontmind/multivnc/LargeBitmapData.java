@@ -51,27 +51,7 @@ class LargeBitmapData extends AbstractBitmapData {
 		}		
 	};
 	
-	class LargeBitmapDrawable extends AbstractBitmapDrawable
-	{
-		LargeBitmapDrawable()
-		{
-			super(LargeBitmapData.this);
-		}
-		/* (non-Javadoc)
-		 * @see android.graphics.drawable.DrawableContainer#draw(android.graphics.Canvas)
-		 */
-		@Override
-		public void draw(Canvas canvas) {
-			//android.util.Log.i("LBM", "Drawing "+xoffset+" "+yoffset);
-			int xoff, yoff;
-			synchronized ( LargeBitmapData.this )
-			{
-				xoff=xoffset;
-				yoff=yoffset;
-			}
-			draw(canvas, xoff, yoff);
-		}
-	}
+
 	
 	/**
 	 * 
@@ -81,18 +61,14 @@ class LargeBitmapData extends AbstractBitmapData {
 	 * @param displayHeight
 	 * @param capacity Max process heap size in bytes
 	 */
-	LargeBitmapData(RfbProto p, VncCanvas c, int displayWidth, int displayHeight, int capacity)
+	LargeBitmapData(RfbProto p, VncCanvas c, int capacity)
 	{
 		super(p,c);
 		double scaleMultiplier = Math.sqrt((double)(capacity * 1024 * 1024) / (double)(CAPACITY_MULTIPLIER * framebufferwidth * framebufferheight));
 		if (scaleMultiplier > 1)
 			scaleMultiplier = 1;
 		bitmapwidth=(int)((double)framebufferwidth * scaleMultiplier);
-		if (bitmapwidth < displayWidth)
-			bitmapwidth = displayWidth;
 		bitmapheight=(int)((double)framebufferheight * scaleMultiplier);
-		if (bitmapheight < displayHeight)
-			bitmapheight = displayHeight;
 		android.util.Log.i("LBM", "bitmapsize = ("+bitmapwidth+","+bitmapheight+")");
 		mbitmap = Bitmap.createBitmap(bitmapwidth, bitmapheight, Bitmap.Config.RGB_565);
 		memGraphics = new Canvas(mbitmap);
@@ -103,11 +79,6 @@ class LargeBitmapData extends AbstractBitmapData {
 		defaultPaint = new Paint();
 	}
 	
-	@Override
-	AbstractBitmapDrawable createDrawable()
-	{
-		return new LargeBitmapDrawable();
-	}
 	
 	/* (non-Javadoc)
 	 * @see com.coboltforge.dontmind.multivnc.AbstractBitmapData#copyRect(android.graphics.Rect, android.graphics.Rect, android.graphics.Paint)

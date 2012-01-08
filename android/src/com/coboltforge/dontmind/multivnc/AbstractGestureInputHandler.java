@@ -3,6 +3,7 @@
  */
 package com.coboltforge.dontmind.multivnc;
 
+import android.opengl.GLSurfaceView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import com.antlersoft.android.bc.BCFactory;
@@ -77,6 +78,8 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		yInitialFocus = detector.getFocusY();
 		inScaling = false;
 		scale_orig = activity.vncCanvas.getScale();
+		// set to continuous drawing for smoother screen updates
+		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		//Log.i(TAG,"scale begin ("+xInitialFocus+","+yInitialFocus+")");
 		return true;
 	}
@@ -88,6 +91,8 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	public void onScaleEnd(IBCScaleGestureDetector detector) {
 		//Log.i(TAG,"scale end");
 		inScaling = false;
+		// reset to on-request drawing to save battery
+		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 		// show scale
 		if( activity.vncCanvas.getScale() != scale_orig )
 			activity.showScaleToast();

@@ -1,4 +1,5 @@
 //
+//  Copyright (C) 2011 Christian Beier
 //  Copyright (C) 2010 Michael A. MacDonald
 //  Copyright (C) 2004 Horizon Wimba.  All Rights Reserved.
 //  Copyright (C) 2001-2003 HorizonLive.com, Inc.  All Rights Reserved.
@@ -23,33 +24,45 @@
 //
 
 //
-// VncCanvas is a subclass of android.view.SurfaceView which draws a VNC
+// VncCanvas is a subclass of android.view.GLSurfaceView which draws a VNC
 // desktop on it.
 //
 
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
+import java.nio.IntBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Inflater;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11;
+import javax.microedition.khronos.opengles.GL11Ext;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.opengl.GLSurfaceView;
+import android.opengl.GLUtils;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.ImageView.ScaleType;
 
 
-public class VncCanvas extends ImageView {
+public class VncCanvas extends GLSurfaceView {
 	private final static String TAG = "VncCanvas";
 	private final static boolean LOCAL_LOGV = true;
 	
@@ -63,7 +76,7 @@ public class VncCanvas extends ImageView {
 
 	// Runtime control flags
 	private boolean maintainConnection = true;
-	private boolean showDesktopInfo = true;
+	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
 	private boolean framebufferUpdatesEnabled = true;
 	
@@ -87,6 +100,8 @@ public class VncCanvas extends ImageView {
 
 	// Internal bitmap data
 	AbstractBitmapData bitmapData;
+	Lock bitmapDataPixelsLock = new ReentrantLock(); 
+	
 	public Handler handler = new Handler();
 
 	// VNC Encoding parameters
@@ -122,6 +137,8 @@ public class VncCanvas extends ImageView {
 	 * full-frame coordinates
 	 */
 	int absoluteXPosition = 0, absoluteYPosition = 0;
+	
+
 
 	/**
 	 * Constructor used by the inflation apparatus
@@ -133,6 +150,136 @@ public class VncCanvas extends ImageView {
 		scrollRunnable = new MouseScrollRunnable();
 		handleRREPaint = new Paint();
 		handleRREPaint.setStyle(Style.FILL);
+		
+		setRenderer(new GLSurfaceView.Renderer() {
+			
+			int[] textureIDs = new int[1];   // Array for 1 texture-ID
+		    private int[] mTexCrop = new int[4];
+
+		    
+			@Override
+			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+				
+				if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
+
+				// Set color's clear-value to black
+				gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+				
+
+				/*
+				 * By default, OpenGL enables features that improve quality but reduce
+				 * performance. One might want to tweak that especially on software
+				 * renderer.
+				 */
+				gl.glDisable(GL10.GL_DITHER);
+				gl.glDisable(GL10.GL_LIGHTING);
+				gl.glDisable(GL10.GL_BLEND);
+				gl.glDisable(GL10.GL_DEPTH_TEST);
+				
+				/*
+				 * setup texture stuff
+				 */
+				// enable 2d textures
+				gl.glEnable(GL10.GL_TEXTURE_2D);
+				// Generate texture-ID array
+				gl.glDeleteTextures(1, textureIDs, 0);
+				gl.glGenTextures(1, textureIDs, 0);
+				 // this is a 2D texture
+				gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[0]);
+				// Set up texture filters --> nice smoothing
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+				// texture environment
+				gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE);
+
+			}
+			
+			// Call back after onSurfaceCreated() or whenever the window's size changes
+			@Override
+			public void onSurfaceChanged(GL10 gl, int width, int height) {
+				
+				if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
+
+				// nothing needed in here with glDrawTexOES()
+				// http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
+			}
+			
+			@Override
+			public void onDrawFrame(GL10 gl) {
+				
+				// TODO optimize: texSUBimage ?
+				// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
+				
+				try{
+					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+
+					if(bitmapData instanceof LargeBitmapData) {
+
+						bitmapDataPixelsLock.lock();
+						
+						// Build Texture from bitmap
+						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmapData.mbitmap, 0);
+
+						bitmapDataPixelsLock.unlock();
+
+					}
+					
+					if(bitmapData instanceof FullBufferBitmapData) {
+						
+						bitmapDataPixelsLock.lock();
+						
+						// build texture from pixel array
+						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
+								bitmapData.framebufferwidth, bitmapData.framebufferheight,
+								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(bitmapData.bitmapPixels));
+					
+						bitmapDataPixelsLock.unlock();
+					}
+
+					
+					/*
+					 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr. 
+					 * That is, "left"/"bottom"/width/height, although you can 
+					 * also have negative width and height to flip the image. 
+					 * 
+					 * This is the part of the framebuffer we show on-screen.
+					 * 
+					 */
+					mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
+					mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
+					mTexCrop[2] = (int) (VncCanvas.this.getWidth() < bitmapData.framebufferwidth*getScale() ? VncCanvas.this.getWidth() / getScale() : bitmapData.framebufferwidth);
+					mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < bitmapData.framebufferheight*getScale() ? VncCanvas.this.getHeight() / getScale() : bitmapData.framebufferheight);
+					
+					if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
+
+					((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mTexCrop, 0);
+
+					/*
+					 * Very fast, but very basic transforming: only transpose, flip and scale.
+					 * Uses the GL_OES_draw_texture extension to draw sprites on the screen without
+					 * any sort of projection or vertex buffers involved.
+					 * 
+					 * See http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
+					 * 
+					 * All parameters in GL screen coordinates!
+					 */
+					int x = (int) (VncCanvas.this.getWidth() < bitmapData.framebufferwidth*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (bitmapData.framebufferwidth*getScale())/2);
+					int y = (int) (VncCanvas.this.getHeight() < bitmapData.framebufferheight*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (bitmapData.framebufferheight*getScale())/2);
+					int w = (int) (VncCanvas.this.getWidth() < bitmapData.framebufferwidth*getScale() ? VncCanvas.this.getWidth(): bitmapData.framebufferwidth*getScale());
+					int h =(int) (VncCanvas.this.getHeight() < bitmapData.framebufferheight*getScale() ? VncCanvas.this.getHeight(): bitmapData.framebufferheight*getScale());
+					((GL11Ext) gl).glDrawTexfOES(x, y, 0, w, h);
+
+					if(Utils.DEBUG()) Log.d(TAG, "drawing to screen: x " + x + " y " + y + " w " + w + " h " + h);
+				}
+				catch(NullPointerException e) {
+				}
+
+			}
+			
+			
+		});
+		// only render upon request
+		setRenderMode(RENDERMODE_WHEN_DIRTY);
 		
 		int oldprio = android.os.Process.getThreadPriority(android.os.Process.myTid());
 		// GIVE US MAGIC POWER, O GREAT FAIR SCHEDULER!
@@ -280,7 +427,7 @@ public class VncCanvas extends ImageView {
 		else
 			useFull = (connection.getForceFull() == BitmapImplHint.FULL);
 		if (! useFull)
-			bitmapData=new LargeBitmapData(rfb,this,dx,dy,capacity);
+			bitmapData=new LargeBitmapData(rfb,this, capacity);
 		else
 			bitmapData=new FullBufferBitmapData(rfb,this, capacity);
 		mouseX=rfb.framebufferWidth/2;
@@ -290,7 +437,10 @@ public class VncCanvas extends ImageView {
 	}
 
 	private void setPixelFormat() throws IOException {
-		pendingColorModel.setPixelFormat(rfb);
+		if(bitmapData instanceof FullBufferBitmapData) 
+			pendingColorModel.setPixelFormat(rfb, true);
+		else
+			pendingColorModel.setPixelFormat(rfb, false);
 		bytesPerPixel = pendingColorModel.bpp();
 		colorPalette = pendingColorModel.palette();
 		colorModel = pendingColorModel;
@@ -532,6 +682,7 @@ public class VncCanvas extends ImageView {
 	 */
 	void scrollToAbsolute()
 	{
+		if(Utils.DEBUG()) Log.d(TAG, "scrollToAbsolute() " + absoluteXPosition + ", " + absoluteYPosition);
 		float scale = getScale();
 		scrollTo((int)((absoluteXPosition + ((float)getWidth() - getImageWidth()) / 2 ) * scale),
 				(int)((absoluteYPosition + ((float)getHeight() - getImageHeight()) / 2 ) * scale));
@@ -649,6 +800,9 @@ public class VncCanvas extends ImageView {
 	byte[] handleRawRectBuffer = new byte[128];
 	void handleRawRect(int x, int y, int w, int h, boolean paint) throws IOException {
 		boolean valid=bitmapData.validDraw(x, y, w, h);
+
+		bitmapDataPixelsLock.lock();
+
 		int[] pixels=bitmapData.bitmapPixels;
 		if (bytesPerPixel == 1) {
 			// 1 byte per pixel. Use palette lookup table.
@@ -686,6 +840,8 @@ public class VncCanvas extends ImageView {
 			}
 		}
 		
+		bitmapDataPixelsLock.unlock();
+		
 		if ( ! valid)
 			return;
 
@@ -695,26 +851,27 @@ public class VncCanvas extends ImageView {
 			reDraw();
 	}
 
-	private Runnable reDraw = new Runnable() {
-		public void run() {
-			if (showDesktopInfo) {
-				// Show a Toast with the desktop info on first frame draw.
-				showDesktopInfo = false;
-				showConnectionInfo();
-			}
-
-			if (bitmapData != null)
-			{
-				if(Utils.DEBUG()) Log.d(TAG, "redraw");
-				
-				bitmapData.updateView(VncCanvas.this);
-			}
-		}
-	};
 	
 	private void reDraw() {
-		if (repaintsEnabled)
-			handler.post(reDraw);
+		
+		if (repaintsEnabled && bitmapData != null) {
+
+			// request a redraw from GL thread
+			requestRender();
+			
+			// Show a Toast with the desktop info on first frame draw.
+			if (showDesktopInfo.get()) {
+				showDesktopInfo.set(false);
+				
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						showConnectionInfo();
+					}
+				});
+			}
+			
+		}
 	}
 	
 	public void disableRepaints() {
@@ -1477,6 +1634,8 @@ public class VncCanvas extends ImageView {
 		}
 		zlibInflater.setInput(zlibBuf, 0, nBytes);
 		
+		bitmapDataPixelsLock.lock();
+		
 		int[] pixels=bitmapData.bitmapPixels;
 
 		if (bytesPerPixel == 1) {
@@ -1512,6 +1671,9 @@ public class VncCanvas extends ImageView {
 				}
 			}
 		}
+		
+		bitmapDataPixelsLock.unlock();
+		
 		if ( ! valid)
 			return;
 		bitmapData.updateBitmap(x, y, w, h);
@@ -1663,12 +1825,32 @@ public class VncCanvas extends ImageView {
 
 	private void handleUpdatedZrleTile(int x, int y, int w, int h) {
 		int offsetSrc = 0;
+
+		bitmapDataPixelsLock.lock();
+		
 		int[] destPixels=bitmapData.bitmapPixels;
 		for (int j = 0; j < h; j++) {
 			System.arraycopy(zrleTilePixels, offsetSrc, destPixels, bitmapData.offset(x, y + j), w);
 			offsetSrc += w;
 		}
+		
+		bitmapDataPixelsLock.unlock();
 
 		bitmapData.updateBitmap(x, y, w, h);
+	}
+
+	public ScaleType getScaleType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// called by zoomer
+	public void setImageMatrix(Matrix matrix) {
+		reDraw();
+	}
+
+	public void setScaleType(ScaleType scaleType) {
+		// TODO Auto-generated method stub
+		
 	}
 }
