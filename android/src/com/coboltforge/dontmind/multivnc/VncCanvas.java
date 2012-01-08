@@ -1,4 +1,5 @@
 //
+//  Copyright (C) 2011 Christian Beier
 //  Copyright (C) 2010 Michael A. MacDonald
 //  Copyright (C) 2004 Horizon Wimba.  All Rights Reserved.
 //  Copyright (C) 2001-2003 HorizonLive.com, Inc.  All Rights Reserved.
@@ -23,7 +24,7 @@
 //
 
 //
-// VncCanvas is a subclass of android.view.SurfaceView which draws a VNC
+// VncCanvas is a subclass of android.view.GLSurfaceView which draws a VNC
 // desktop on it.
 //
 
@@ -31,6 +32,7 @@ package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
 import java.nio.IntBuffer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Inflater;
@@ -74,7 +76,7 @@ public class VncCanvas extends GLSurfaceView {
 
 	// Runtime control flags
 	private boolean maintainConnection = true;
-	private boolean showDesktopInfo = true;
+	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
 	private boolean framebufferUpdatesEnabled = true;
 	
@@ -99,7 +101,7 @@ public class VncCanvas extends GLSurfaceView {
 	// Internal bitmap data
 	AbstractBitmapData bitmapData;
 	Lock bitmapDataPixelsLock = new ReentrantLock(); 
-
+	
 	public Handler handler = new Handler();
 
 	// VNC Encoding parameters
@@ -290,7 +292,8 @@ public class VncCanvas extends GLSurfaceView {
 			
 			
 		});
-		
+		// only render upon request
+		setRenderMode(RENDERMODE_WHEN_DIRTY);
 		
 		int oldprio = android.os.Process.getThreadPriority(android.os.Process.myTid());
 		// GIVE US MAGIC POWER, O GREAT FAIR SCHEDULER!
@@ -859,26 +862,27 @@ public class VncCanvas extends GLSurfaceView {
 			reDraw();
 	}
 
-	private Runnable reDraw = new Runnable() {
-		public void run() {
-			if (showDesktopInfo) {
-				// Show a Toast with the desktop info on first frame draw.
-				showDesktopInfo = false;
-				showConnectionInfo();
-			}
-
-			if (bitmapData != null)
-			{
-				if(Utils.DEBUG()) Log.d(TAG, "redraw");
-				
-//				bitmapData.updateView(VncCanvas.this);
-			}
-		}
-	};
 	
 	private void reDraw() {
-		if (repaintsEnabled)
-			handler.post(reDraw);
+		
+		if (repaintsEnabled && bitmapData != null) {
+
+			// request a redraw from GL thread
+			requestRender();
+			
+			// Show a Toast with the desktop info on first frame draw.
+			if (showDesktopInfo.get()) {
+				showDesktopInfo.set(false);
+				
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						showConnectionInfo();
+					}
+				});
+			}
+			
+		}
 	}
 	
 	public void disableRepaints() {
@@ -1851,9 +1855,9 @@ public class VncCanvas extends GLSurfaceView {
 		return null;
 	}
 
+	// called by zoomer
 	public void setImageMatrix(Matrix matrix) {
-		// TODO Auto-generated method stub
-		
+		reDraw();
 	}
 
 	public void setScaleType(ScaleType scaleType) {
