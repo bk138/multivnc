@@ -214,33 +214,19 @@ public class VncCanvas extends GLSurfaceView {
 					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 					if(bitmapData instanceof LargeBitmapData) {
+
+						bitmapDataPixelsLock.lock();
+						
 						// Build Texture from bitmap
 						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmapData.mbitmap, 0);
+
+						bitmapDataPixelsLock.unlock();
+
 					}
 					
 					if(bitmapData instanceof FullBufferBitmapData) {
 						
 						bitmapDataPixelsLock.lock();
-
-						/*
-						 *  make sure pixel array is in the right format. ouch!!!
-						 */
-						for(int i=0; i < bitmapData.bitmapPixels.length; ++i) {
-							int pix = bitmapData.bitmapPixels[i];
-
-							int alpha = ((pix >> 24) & 0xFF);
-							
-							if(alpha != 254) {
-								// extract the rest
-								int blue = ((pix >> 16) & 0xFF); 
-								int green = ((pix >> 8) & 0xFF); 
-								int red = ((pix) & 0xFF); 
-								// mark as converted
-								alpha = 254;
-								// convert to ARGB
-								bitmapData.bitmapPixels[i] = (alpha << 24 | red << 16 | green << 8 | blue); 
-							}
-						} 
 						
 						// build texture from pixel array
 						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
@@ -451,7 +437,10 @@ public class VncCanvas extends GLSurfaceView {
 	}
 
 	private void setPixelFormat() throws IOException {
-		pendingColorModel.setPixelFormat(rfb);
+		if(bitmapData instanceof FullBufferBitmapData) 
+			pendingColorModel.setPixelFormat(rfb, true);
+		else
+			pendingColorModel.setPixelFormat(rfb, false);
 		bytesPerPixel = pendingColorModel.bpp();
 		colorPalette = pendingColorModel.palette();
 		colorModel = pendingColorModel;
