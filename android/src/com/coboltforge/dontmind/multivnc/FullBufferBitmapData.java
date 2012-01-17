@@ -59,14 +59,14 @@ class FullBufferBitmapData extends AbstractBitmapData {
 		int offset = offset(x,y);
 		if (w > 10)
 		{
-			for (int j = 0; j < h; j++, offset += framebufferwidth)
+			for (int j = 0; j < h; j++, offset += bitmapwidth)
 			{
 				Arrays.fill(bitmapPixels, offset, offset + w, color);
 			}
 		}
 		else
 		{
-			for (int j = 0; j < h; j++, offset += framebufferwidth - w)
+			for (int j = 0; j < h; j++, offset += bitmapwidth - w)
 			{
 				for (int k = 0; k < w; k++, offset++)
 				{
@@ -81,7 +81,7 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	 */
 	@Override
 	int offset(int x, int y) {
-		return x + y * framebufferwidth;
+		return x + y * bitmapwidth;
 	}
 
 	/* (non-Javadoc)
