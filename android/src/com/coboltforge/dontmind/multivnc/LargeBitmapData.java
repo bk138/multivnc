@@ -67,8 +67,8 @@ class LargeBitmapData extends AbstractBitmapData {
 		double scaleMultiplier = Math.sqrt((double)(capacity * 1024 * 1024) / (double)(CAPACITY_MULTIPLIER * framebufferwidth * framebufferheight));
 		if (scaleMultiplier > 1)
 			scaleMultiplier = 1;
-		bitmapwidth=(int)((double)framebufferwidth * scaleMultiplier);
-		bitmapheight=(int)((double)framebufferheight * scaleMultiplier);
+		bitmapwidth= Utils.nextPow2((int)((double)framebufferwidth * scaleMultiplier));
+		bitmapheight=Utils.nextPow2((int)((double)framebufferheight * scaleMultiplier));
 		android.util.Log.i("LBM", "bitmapsize = ("+bitmapwidth+","+bitmapheight+")");
 		mbitmap = Bitmap.createBitmap(bitmapwidth, bitmapheight, Bitmap.Config.RGB_565);
 		memGraphics = new Canvas(mbitmap);

@@ -32,10 +32,10 @@ class FullBufferBitmapData extends AbstractBitmapData {
 		super(p, c);
 		framebufferwidth=rfb.framebufferWidth;
 		framebufferheight=rfb.framebufferHeight;
-		bitmapwidth=framebufferwidth;
-		bitmapheight=framebufferheight;
+		bitmapwidth= Utils.nextPow2(framebufferwidth);
+		bitmapheight=Utils.nextPow2(framebufferheight);
 		android.util.Log.i("FBBM", "bitmapsize = ("+bitmapwidth+","+bitmapheight+")");
-		bitmapPixels = new int[framebufferwidth * framebufferheight];
+		bitmapPixels = new int[bitmapwidth * bitmapheight];
 	}
 
 	/* (non-Javadoc)

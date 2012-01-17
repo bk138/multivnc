@@ -230,7 +230,7 @@ public class VncCanvas extends GLSurfaceView {
 						
 						// build texture from pixel array
 						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
-								bitmapData.framebufferwidth, bitmapData.framebufferheight,
+								bitmapData.bitmapwidth, bitmapData.bitmapheight,
 								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(bitmapData.bitmapPixels));
 					
 						bitmapDataPixelsLock.unlock();
