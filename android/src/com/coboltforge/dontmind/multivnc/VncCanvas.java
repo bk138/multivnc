@@ -985,7 +985,12 @@ public class VncCanvas extends GLSurfaceView {
 	 * @return true if event was actually sent
 	 */
 	public boolean processPointerEvent(MotionEvent evt,boolean downEvent,boolean useRightButton) {
-		return processPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getAction(), evt.getMetaState(), downEvent, useRightButton);
+		try {
+			return processPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getAction(), evt.getMetaState(), downEvent, useRightButton);
+		}
+		catch(NullPointerException e) {
+			return false;
+		}
 	}
 	
 	boolean processPointerEvent(int x, int y, int action, int modifiers, boolean mouseIsDown, boolean useRightButton) {
