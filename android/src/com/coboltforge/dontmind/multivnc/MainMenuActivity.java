@@ -29,6 +29,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -55,6 +57,7 @@ import java.util.Hashtable;
 public class MainMenuActivity extends Activity implements ImDNSNotify {
 	
 	private static final String TAG = "MainMenuActivity";
+    public static final String PREFS_NAME = "MultiVNC";
 	
 	private EditText ipText;
 	private EditText portText;
@@ -105,9 +108,9 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 	
 	
 	@Override
-	public void onCreate(Bundle icicle) {
+	public void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(icicle);
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
 		// get package debug flag and set it 
@@ -186,6 +189,54 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 		});
 		
 		database = new VncDatabase(this);
+		
+		
+		final SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+		if(settings.getBoolean("firstRun", true)) // is the first run
+		{
+			SharedPreferences.Editor ed = settings.edit();
+			ed.putBoolean("firstRun", false);
+			ed.commit();
+		}
+		else // is some later run
+		{
+			if(settings.getBoolean("showSupportDialog", true) && savedInstanceState == null)
+			{
+				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+				dialog.setTitle(getString(R.string.support_dialog_title));
+				dialog.setIcon(getResources().getDrawable(R.drawable.icon));
+				dialog.setMessage(R.string.support_dialog_text);
+
+				dialog.setPositiveButton(getString(R.string.support_dialog_yes), new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(MainMenuActivity.this, AboutActivity.class));
+						dialog.dismiss();
+					}
+				});
+				dialog.setNeutralButton(getString(R.string.support_dialog_no), new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+				dialog.setNegativeButton(getString(R.string.support_dialog_neveragain), new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+						SharedPreferences.Editor ed = settings.edit();
+						ed.putBoolean("showSupportDialog", false);
+						ed.commit();
+						
+						dialog.dismiss();
+					}
+				});
+				
+				dialog.show();
+			}
+		}
+
 	}
 	
 	protected void onDestroy() {

@@ -1114,6 +1114,9 @@ public class VncCanvas extends GLSurfaceView {
 		      case KeyEvent.KEYCODE_DEL: 		  key = 0xff08; break;
 		      case KeyEvent.KEYCODE_ENTER:        key = 0xff0d; break;
 		      case KeyEvent.KEYCODE_DPAD_CENTER:  key = 0xff0d; break;
+		      case KeyEvent.KEYCODE_TAB:          key = 0xff09; break;
+		      case 113: 						  key = 0xffe3; break; // CTRL_L
+		      case KeyEvent.KEYCODE_ALT_LEFT:     key = 0xffe9; break;
 		      default: 							  
 		    	  key = evt.getUnicodeChar();
 		    	  metaState = 0;

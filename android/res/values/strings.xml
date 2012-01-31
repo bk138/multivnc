@@ -94,4 +94,10 @@
 <string name="yes">Yes</string>
 <string name="no">No</string>
 <string name="edit">Edit</string>
+<string name="support_dialog_title">Please Support MultiVNC</string>
+<string name="support_dialog_text">If you like MultiVNC, why not consider supporting its development? For the time being, you can do so by using PayPal or flattr. Thanks!</string>
+<string name="support_dialog_yes">Yes, good idea!</string>
+<string name="support_dialog_no">No, not now.</string>
+<string name="support_dialog_neveragain">Never ask again!</string>
+        
 </resources>
