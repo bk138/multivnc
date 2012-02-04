@@ -892,7 +892,7 @@ public class VncCanvas extends GLSurfaceView {
 				bitmapData.clear();
 				// request full non-incremental update to get going again
 				bitmapData.writeFullUpdateRequest(false);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
