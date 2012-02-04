@@ -7,10 +7,8 @@ import java.io.IOException;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.widget.ImageView;
 
 /**
  * Abstract interface between the VncCanvas and the bitmap and pixel data buffers that actually contain
@@ -47,13 +45,8 @@ abstract class AbstractBitmapData {
 	final void invalidateMousePosition()
 	{
 		if (vncCanvas.connection.getUseLocalCursor())
-		{
-			// OpenGL always draws the full framebuffer
-//			if (drawable==null)
-//				drawable = createDrawable();
-//			drawable.setCursorRect(vncCanvas.mouseX,vncCanvas.mouseY);
-//			vncCanvas.invalidate(drawable.cursorRect);
-		}
+			// OpenGL always draws the full framebuffer, request a redraw from GL thread
+			vncCanvas.requestRender();
 	}
 	
 	/**

@@ -216,6 +216,7 @@ public class MDNSService extends Service {
 						c.setNickname(ev.getName());
 						c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
 						c.setPort(ev.getInfo().getPort());
+						c.setUseLocalCursor(true); // always enable
 						
 						connections_discovered.put(ev.getInfo().getQualifiedName(), c);
 					
