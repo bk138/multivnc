@@ -44,7 +44,7 @@ abstract class AbstractBitmapData {
 	
 	final void invalidateMousePosition()
 	{
-		if (vncCanvas.connection.getUseLocalCursor())
+		if (vncCanvas.vncConn.getConnSettings().getUseLocalCursor())
 			// OpenGL always draws the full framebuffer, request a redraw from GL thread
 			vncCanvas.requestRender();
 	}

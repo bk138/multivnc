@@ -60,9 +60,6 @@ public class VncCanvas extends GLSurfaceView {
 	// Available to activity
 	int mouseX, mouseY;
 	
-	// Connection parameters
-	ConnectionBean connection;
-
 	// Runtime control flags
 	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
@@ -281,7 +278,7 @@ public class VncCanvas extends GLSurfaceView {
 	private void mouseFollowPan()
 	{
 		try {
-			if (connection.getFollowPan() & scaling.isAbleToPan())
+			if (vncConn.getConnSettings().getFollowPan() & scaling.isAbleToPan())
 			{
 				int scrollx = absoluteXPosition;
 				int scrolly = absoluteYPosition;
@@ -366,7 +363,7 @@ public class VncCanvas extends GLSurfaceView {
 	 */
 	void panToMouse()
 	{
-		if (! connection.getFollowMouse())
+		if (! vncConn.getConnSettings().getFollowMouse())
 			return;
 		
 		if (scaling != null && ! scaling.isAbleToPan())

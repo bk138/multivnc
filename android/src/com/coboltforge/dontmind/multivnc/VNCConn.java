@@ -35,7 +35,7 @@ public class VNCConn {
 	private VncCanvas parent;
 	// VNC protocol connection
 	public RfbProto rfb;
-	private ConnectionBean connection;
+	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 
 	// Runtime control flags
@@ -141,7 +141,7 @@ public class VNCConn {
 		
 		Log.d(TAG, "initializing");
 		
-		connection = bean;
+		connSettings = bean;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.getColorModel());
 
 		// Startup the RFB thread with a nifty progess dialog
@@ -160,7 +160,7 @@ public class VNCConn {
 		Thread t = new Thread() {
 			public void run() {
 				try {
-					connectAndAuthenticate(connection.getUserName(),connection.getPassword());
+					connectAndAuthenticate(connSettings.getUserName(),connSettings.getPassword());
 					doProtocolInitialisation(display.getWidth(), display.getHeight());
 					parent.handler.post(new Runnable() {
 						public void run() {
@@ -363,21 +363,24 @@ public class VNCConn {
 		return "";
 	}
 
+	public final ConnectionBean getConnSettings() {
+		return connSettings;
+	}
 	
 
 	private void connectAndAuthenticate(String us,String pw) throws Exception {
-		Log.i(TAG, "Connecting to " + connection.getAddress() + ", port " + connection.getPort() + "...");
+		Log.i(TAG, "Connecting to " + connSettings.getAddress() + ", port " + connSettings.getPort() + "...");
 
-		rfb = new RfbProto(connection.getAddress(), connection.getPort());
+		rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort());
 		Log.v(TAG, "Connected to server");
 
 		// <RepeaterMagic>
-		if (connection.getUseRepeater() && connection.getRepeaterId() != null && connection.getRepeaterId().length()>0) {
-			Log.i(TAG, "Negotiating repeater/proxy connection");
+		if (connSettings.getUseRepeater() && connSettings.getRepeaterId() != null && connSettings.getRepeaterId().length()>0) {
+			Log.i(TAG, "Negotiating repeater/proxy connSettings");
 			byte[] protocolMsg = new byte[12];
 			rfb.is.read(protocolMsg);
 			byte[] buffer = new byte[250];
-			System.arraycopy(connection.getRepeaterId().getBytes(), 0, buffer, 0, connection.getRepeaterId().length());
+			System.arraycopy(connSettings.getRepeaterId().getBytes(), 0, buffer, 0, connSettings.getRepeaterId().length());
 			rfb.os.write(buffer);
 		}
 		// </RepeaterMagic>
@@ -389,7 +392,7 @@ public class VNCConn {
 		Log.i(TAG, "Using RFB protocol version " + rfb.clientMajor + "." + rfb.clientMinor);
 
 		int bitPref=0;
-		if(connection.getUserName().length()>0)
+		if(connSettings.getUserName().length()>0)
 			bitPref|=1;
 		if(Utils.DEBUG()) Log.d("debug","bitPref="+bitPref);
 		int secType = rfb.negotiateSecurity(bitPref);
@@ -433,13 +436,13 @@ public class VNCConn {
 
 		boolean useFull = false;
 		int capacity = Utils.getActivityManager(parent.getContext()).getMemoryClass();
-		if (connection.getForceFull() == BitmapImplHint.AUTO)
+		if (connSettings.getForceFull() == BitmapImplHint.AUTO)
 		{
 			if (rfb.framebufferWidth * rfb.framebufferHeight * FullBufferBitmapData.CAPACITY_MULTIPLIER <= capacity * 1024 * 1024)
 				useFull = true;
 		}
 		else
-			useFull = (connection.getForceFull() == BitmapImplHint.FULL);
+			useFull = (connSettings.getForceFull() == BitmapImplHint.FULL);
 		if (! useFull)
 			bitmapData=new LargeBitmapData(rfb, parent, capacity);
 		else
