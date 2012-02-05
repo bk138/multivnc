@@ -1100,7 +1100,7 @@ class RfbProto {
 
   void writeCtrlAltDel() throws IOException {
 	  final int DELETE = 0xffff;
-	  final int CTRLALT = VncCanvas.CTRL_MASK | VncCanvas.ALT_MASK;
+	  final int CTRLALT = VNCConn.CTRL_MASK | VNCConn.ALT_MASK;
 	  try {
 		  // Press
 		  eventBufLen = 0;
@@ -1166,17 +1166,17 @@ class RfbProto {
   int oldModifiers = 0;
 
   void writeModifierKeyEvents(int newModifiers) {
-    if ((newModifiers & VncCanvas.CTRL_MASK) != (oldModifiers & VncCanvas.CTRL_MASK))
-      writeKeyEvent(0xffe3, (newModifiers & VncCanvas.CTRL_MASK) != 0);
+    if ((newModifiers & VNCConn.CTRL_MASK) != (oldModifiers & VNCConn.CTRL_MASK))
+      writeKeyEvent(0xffe3, (newModifiers & VNCConn.CTRL_MASK) != 0);
 
-    if ((newModifiers & VncCanvas.SHIFT_MASK) != (oldModifiers & VncCanvas.SHIFT_MASK))
-      writeKeyEvent(0xffe1, (newModifiers & VncCanvas.SHIFT_MASK) != 0);
+    if ((newModifiers & VNCConn.SHIFT_MASK) != (oldModifiers & VNCConn.SHIFT_MASK))
+      writeKeyEvent(0xffe1, (newModifiers & VNCConn.SHIFT_MASK) != 0);
 
-    if ((newModifiers & VncCanvas.META_MASK) != (oldModifiers & VncCanvas.META_MASK))
-      writeKeyEvent(0xffe7, (newModifiers & VncCanvas.META_MASK) != 0);
+    if ((newModifiers & VNCConn.META_MASK) != (oldModifiers & VNCConn.META_MASK))
+      writeKeyEvent(0xffe7, (newModifiers & VNCConn.META_MASK) != 0);
 
-    if ((newModifiers & VncCanvas.ALT_MASK) != (oldModifiers & VncCanvas.ALT_MASK))
-      writeKeyEvent(0xffe9, (newModifiers & VncCanvas.ALT_MASK) != 0);
+    if ((newModifiers & VNCConn.ALT_MASK) != (oldModifiers & VNCConn.ALT_MASK))
+      writeKeyEvent(0xffe9, (newModifiers & VNCConn.ALT_MASK) != 0);
 
     oldModifiers = newModifiers;
   }

@@ -29,7 +29,7 @@ class MouseMover extends Panner {
 		double scale = (double)interval / 50.0;
 		VncCanvas canvas = activity.vncCanvas;
 		//Log.v(TAG, String.format("panning %f %d %d", scale, (int)((double)velocity.x * scale), (int)((double)velocity.y * scale)));
-		if ( canvas.processPointerEvent((int)(canvas.mouseX + ((double)velocity.x * scale)), (int)(canvas.mouseY + ((double)velocity.y * scale)), MotionEvent.ACTION_MOVE, 0, false, false))
+		if ( canvas.vncConn.sendPointerEvent((int)(canvas.mouseX + ((double)velocity.x * scale)), (int)(canvas.mouseY + ((double)velocity.y * scale)), MotionEvent.ACTION_MOVE, 0, false, false))
 		{
 			if (updater.updateVelocity(velocity, interval))
 			{

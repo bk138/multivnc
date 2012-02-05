@@ -88,9 +88,9 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		
 		setListSpinner();
 		
-		_checkShift.setOnCheckedChangeListener(new MetaCheckListener(VncCanvas.SHIFT_MASK));
-		_checkAlt.setOnCheckedChangeListener(new MetaCheckListener(VncCanvas.ALT_MASK));
-		_checkCtrl.setOnCheckedChangeListener(new MetaCheckListener(VncCanvas.CTRL_MASK));
+		_checkShift.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.SHIFT_MASK));
+		_checkAlt.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.ALT_MASK));
+		_checkCtrl.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.CTRL_MASK));
 		
 				
 		
@@ -173,11 +173,11 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			{
 				if (0 != (flags & KeyEvent.META_SHIFT_ON))
 				{
-					currentFlags |= VncCanvas.SHIFT_MASK;
+					currentFlags |= VNCConn.SHIFT_MASK;
 				}
 				if (0 != (flags & KeyEvent.META_ALT_ON))
 				{
-					currentFlags |= VncCanvas.ALT_MASK;
+					currentFlags |= VNCConn.ALT_MASK;
 				}
 				_currentKeyBean.setKeyBase(base);
 			}
@@ -186,15 +186,15 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 				// Toggle flags according to meta keys
 				if (0 != (flags & KeyEvent.META_SHIFT_ON))
 				{
-					currentFlags ^= VncCanvas.SHIFT_MASK;
+					currentFlags ^= VNCConn.SHIFT_MASK;
 				}
 				if (0 != (flags & KeyEvent.META_ALT_ON))
 				{
-					currentFlags ^= VncCanvas.ALT_MASK;
+					currentFlags ^= VNCConn.ALT_MASK;
 				}
 				if (keyCode == KeyEvent.KEYCODE_SEARCH)
 				{
-					currentFlags ^= VncCanvas.CTRL_MASK;
+					currentFlags ^= VNCConn.CTRL_MASK;
 				}
 			}
 			_currentKeyBean.setMetaFlags(currentFlags);
@@ -295,9 +295,9 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 	private void updateDialogForCurrentKey()
 	{
 		int flags = _currentKeyBean.getMetaFlags();
-		_checkAlt.setChecked(0 != (flags & VncCanvas.ALT_MASK));
-		_checkShift.setChecked(0 != (flags & VncCanvas.SHIFT_MASK));
-		_checkCtrl.setChecked(0 != (flags & VncCanvas.CTRL_MASK));
+		_checkAlt.setChecked(0 != (flags & VNCConn.ALT_MASK));
+		_checkShift.setChecked(0 != (flags & VNCConn.SHIFT_MASK));
+		_checkCtrl.setChecked(0 != (flags & VNCConn.CTRL_MASK));
 		MetaKeyBase base = null;
 		if (_currentKeyBean.isMouseClick())
 		{

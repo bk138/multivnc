@@ -115,7 +115,7 @@ public class MouseButtonView extends View {
 					float newRemoteY = canvas.mouseY + deltaY;
 
 					try {
-						canvas.rfb.writePointerEvent((int)newRemoteX, (int)newRemoteY, e.getMetaState(), 1 << (buttonId-1));
+						canvas.vncConn.rfb.writePointerEvent((int)newRemoteX, (int)newRemoteY, e.getMetaState(), 1 << (buttonId-1));
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}
@@ -219,7 +219,7 @@ public class MouseButtonView extends View {
 			
 
 		try {
-			canvas.rfb.writePointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
+			canvas.vncConn.rfb.writePointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
