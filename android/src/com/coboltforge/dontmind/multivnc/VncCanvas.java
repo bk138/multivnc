@@ -168,25 +168,25 @@ public class VncCanvas extends GLSurfaceView {
 
 					if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
 
-						vncConn.bitmapDataPixelsLock.lock();
+						vncConn.lockFramebuffer();
 						
 						// Build Texture from bitmap
 						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, vncConn.getFramebuffer().mbitmap, 0);
 
-						vncConn.bitmapDataPixelsLock.unlock();
+						vncConn.unlockFramebuffer();
 
 					}
 					
 					if(vncConn.getFramebuffer() instanceof FullBufferBitmapData) {
 						
-						vncConn.bitmapDataPixelsLock.lock();
+						vncConn.lockFramebuffer();
 						
 						// build texture from pixel array
 						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
 								vncConn.getFramebuffer().bitmapwidth, vncConn.getFramebuffer().bitmapheight,
 								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.getFramebuffer().bitmapPixels));
 					
-						vncConn.bitmapDataPixelsLock.unlock();
+						vncConn.unlockFramebuffer();
 					}
 
 					

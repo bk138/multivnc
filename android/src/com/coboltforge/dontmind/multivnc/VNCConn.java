@@ -43,7 +43,7 @@ public class VNCConn {
 
 	// Internal bitmap data
 	private AbstractBitmapData bitmapData;
-	Lock bitmapDataPixelsLock = new ReentrantLock();
+	private Lock bitmapDataPixelsLock = new ReentrantLock();
 	
 	private Paint handleRREPaint;
 
@@ -376,6 +376,15 @@ public class VNCConn {
 	public final AbstractBitmapData getFramebuffer() {
 		return bitmapData;
 	}
+	
+	public void lockFramebuffer() {
+		bitmapDataPixelsLock.lock();
+	}
+	
+	public void unlockFramebuffer() {
+		bitmapDataPixelsLock.unlock();
+	}
+	
 	
 	public final ConnectionBean getConnSettings() {
 		return connSettings;
