@@ -818,7 +818,7 @@ public class VncCanvasActivity extends Activity {
 		for (int i = 0; i < choices.length; i++) {
 			COLORMODEL cm = COLORMODEL.values()[i];
 			choices[i] = cm.toString();
-			if (vncCanvas.vncConn.isColorModel(cm))
+			if(cm.equals(vncCanvas.vncConn.getColorModel()))
 				currentSelection = i;
 		}
 

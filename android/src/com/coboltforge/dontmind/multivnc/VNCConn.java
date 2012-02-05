@@ -9,7 +9,6 @@
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Inflater;
@@ -65,7 +64,7 @@ public class VNCConn {
 
 	private int[] colorPalette;
 
-	COLORMODEL colorModel; 
+	private COLORMODEL colorModel; 
 
 	// VNC Encoding parameters
 	private boolean useCopyRect = false; // TODO CopyRect is not working
@@ -337,8 +336,8 @@ public class VNCConn {
 			pendingColorModel = cm;
 	}
 
-	public boolean isColorModel(COLORMODEL cm) {
-		return (colorModel != null) && colorModel.equals(cm);
+	public final COLORMODEL getColorModel() {
+		return colorModel;
 	}
 	
 	
@@ -692,7 +691,7 @@ public class VNCConn {
 	// Handle a CopyRect rectangle.
 	//
 
-	final Paint handleCopyRectPaint = new Paint();
+	private final Paint handleCopyRectPaint = new Paint();
 	private void handleCopyRect(int x, int y, int w, int h) throws IOException {
 
 		/**
@@ -722,8 +721,8 @@ public class VNCConn {
 
 		parent.reDraw();
 	}
-	byte[] bg_buf = new byte[4];
-	byte[] rre_buf = new byte[128];
+	private byte[] bg_buf = new byte[4];
+	private byte[] rre_buf = new byte[128];
 	//
 	// Handle an RRE-encoded rectangle.
 	//
@@ -855,8 +854,8 @@ public class VNCConn {
 	// Handle one tile in the Hextile-encoded data.
 	//
 
-	Paint handleHextileSubrectPaint = new Paint();
-	byte[] backgroundColorBuffer = new byte[4];
+	private Paint handleHextileSubrectPaint = new Paint();
+	private byte[] backgroundColorBuffer = new byte[4];
 	private void handleHextileSubrect(int tx, int ty, int tw, int th) throws IOException {
 
 		int subencoding = rfb.is.readUnsignedByte();
@@ -964,8 +963,8 @@ public class VNCConn {
 	// Handle a ZRLE-encoded rectangle.
 	//
 
-	Paint handleZRLERectPaint = new Paint();
-	int[] handleZRLERectPalette = new int[128];
+	private Paint handleZRLERectPaint = new Paint();
+	private int[] handleZRLERectPalette = new int[128];
 	private void handleZRLERect(int x, int y, int w, int h) throws Exception {
 
 		if (zrleInStream == null)
@@ -1036,7 +1035,7 @@ public class VNCConn {
 	// Handle a Zlib-encoded rectangle.
 	//
 
-	byte[] handleZlibRectBuffer = new byte[128];
+	private byte[] handleZlibRectBuffer = new byte[128];
 	private void handleZlibRect(int x, int y, int w, int h) throws Exception {
 		boolean valid = bitmapData.validDraw(x, y, w, h);
 		int nBytes = rfb.is.readInt();
@@ -1112,7 +1111,7 @@ public class VNCConn {
 		return pix;
 	}
 
-	byte[] readPixelsBuffer = new byte[128];
+	private byte[] readPixelsBuffer = new byte[128];
 	private void readPixels(InStream is, int[] dst, int count) throws Exception {
 		if (bytesPerPixel == 1) {
 			if (count > readPixelsBuffer.length) {
@@ -1259,12 +1258,12 @@ public class VNCConn {
 
 
 
-	void handleRawRect(int x, int y, int w, int h) throws IOException {
+	private void handleRawRect(int x, int y, int w, int h) throws IOException {
 		handleRawRect(x, y, w, h, true);
 	}
 
-	byte[] handleRawRectBuffer = new byte[128];
-	void handleRawRect(int x, int y, int w, int h, boolean paint) throws IOException {
+	private byte[] handleRawRectBuffer = new byte[128];
+	private void handleRawRect(int x, int y, int w, int h, boolean paint) throws IOException {
 		boolean valid=bitmapData.validDraw(x, y, w, h);
 
 		bitmapDataPixelsLock.lock();

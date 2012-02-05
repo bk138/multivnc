@@ -506,10 +506,14 @@ public class VncCanvas extends GLSurfaceView {
 		msg += "\n" + vncConn.rfb.framebufferWidth + "x" + vncConn.rfb.framebufferHeight;
 		String enc = vncConn.getEncoding();
 		// Encoding might not be set when we display this message
-		if (enc != null && !enc.equals(""))
-			msg += ", " + vncConn.getEncoding() + " encoding, " + vncConn.colorModel.toString();
-		else
-			msg += ", " + vncConn.colorModel.toString();
+		try {
+			if (enc != null && !enc.equals(""))
+				msg += ", " + vncConn.getEncoding() + " encoding, " + vncConn.getColorModel().toString();
+			else
+				msg += ", " + vncConn.getColorModel().toString();
+		}
+		catch(NullPointerException e) {
+		}
 		Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
 	}
 
