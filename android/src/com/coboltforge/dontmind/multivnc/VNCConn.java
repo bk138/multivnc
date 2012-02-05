@@ -42,7 +42,7 @@ public class VNCConn {
 	private boolean framebufferUpdatesEnabled = true;
 
 	// Internal bitmap data
-	AbstractBitmapData bitmapData;
+	private AbstractBitmapData bitmapData;
 	Lock bitmapDataPixelsLock = new ReentrantLock();
 	
 	private Paint handleRREPaint;
@@ -371,6 +371,10 @@ public class VNCConn {
 	
 	public final int getFramebufferHeight() {
 		return bitmapData.framebufferheight;
+	}
+	
+	public final AbstractBitmapData getFramebuffer() {
+		return bitmapData;
 	}
 	
 	public final ConnectionBean getConnSettings() {

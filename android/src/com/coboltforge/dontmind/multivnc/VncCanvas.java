@@ -30,7 +30,6 @@
 
 package com.coboltforge.dontmind.multivnc;
 
-import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -167,25 +166,25 @@ public class VncCanvas extends GLSurfaceView {
 				try{
 					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-					if(vncConn.bitmapData instanceof LargeBitmapData) {
+					if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
 
 						vncConn.bitmapDataPixelsLock.lock();
 						
 						// Build Texture from bitmap
-						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, vncConn.bitmapData.mbitmap, 0);
+						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, vncConn.getFramebuffer().mbitmap, 0);
 
 						vncConn.bitmapDataPixelsLock.unlock();
 
 					}
 					
-					if(vncConn.bitmapData instanceof FullBufferBitmapData) {
+					if(vncConn.getFramebuffer() instanceof FullBufferBitmapData) {
 						
 						vncConn.bitmapDataPixelsLock.lock();
 						
 						// build texture from pixel array
 						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
-								vncConn.bitmapData.bitmapwidth, vncConn.bitmapData.bitmapheight,
-								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.bitmapData.bitmapPixels));
+								vncConn.getFramebuffer().bitmapwidth, vncConn.getFramebuffer().bitmapheight,
+								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.getFramebuffer().bitmapPixels));
 					
 						vncConn.bitmapDataPixelsLock.unlock();
 					}
@@ -201,8 +200,8 @@ public class VncCanvas extends GLSurfaceView {
 					 */
 					mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
 					mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
-					mTexCrop[2] = (int) (VncCanvas.this.getWidth() < vncConn.bitmapData.framebufferwidth*getScale() ? VncCanvas.this.getWidth() / getScale() : vncConn.bitmapData.framebufferwidth);
-					mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < vncConn.bitmapData.framebufferheight*getScale() ? VncCanvas.this.getHeight() / getScale() : vncConn.bitmapData.framebufferheight);
+					mTexCrop[2] = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth() / getScale() : vncConn.getFramebufferWidth());
+					mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : vncConn.getFramebufferWidth());
 					
 					if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
 
@@ -217,10 +216,10 @@ public class VncCanvas extends GLSurfaceView {
 					 * 
 					 * All parameters in GL screen coordinates!
 					 */
-					int x = (int) (VncCanvas.this.getWidth() < vncConn.bitmapData.framebufferwidth*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (vncConn.bitmapData.framebufferwidth*getScale())/2);
-					int y = (int) (VncCanvas.this.getHeight() < vncConn.bitmapData.framebufferheight*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (vncConn.bitmapData.framebufferheight*getScale())/2);
-					int w = (int) (VncCanvas.this.getWidth() < vncConn.bitmapData.framebufferwidth*getScale() ? VncCanvas.this.getWidth(): vncConn.bitmapData.framebufferwidth*getScale());
-					int h =(int) (VncCanvas.this.getHeight() < vncConn.bitmapData.framebufferheight*getScale() ? VncCanvas.this.getHeight(): vncConn.bitmapData.framebufferheight*getScale());
+					int x = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (vncConn.getFramebufferWidth()*getScale())/2);
+					int y = (int) (VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (vncConn.getFramebufferHeight()*getScale())/2);
+					int w = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth(): vncConn.getFramebufferWidth()*getScale());
+					int h =(int) (VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight(): vncConn.getFramebufferHeight()*getScale());
 					((GL11Ext) gl).glDrawTexfOES(x, y, 0, w, h);
 
 					if(Utils.DEBUG()) Log.d(TAG, "drawing to screen: x " + x + " y " + y + " w " + w + " h " + h);
@@ -345,8 +344,8 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		if(Utils.DEBUG()) Log.d(TAG, "scrollToAbsolute() " + absoluteXPosition + ", " + absoluteYPosition);
 		float scale = getScale();
-		scrollTo((int)((absoluteXPosition + ((float)getWidth() - getImageWidth()) / 2 ) * scale),
-				(int)((absoluteYPosition + ((float)getHeight() - getImageHeight()) / 2 ) * scale));
+		scrollTo((int)((absoluteXPosition + ((float)getWidth() - vncConn.getFramebufferWidth()) / 2 ) * scale),
+				(int)((absoluteYPosition + ((float)getHeight() - vncConn.getFramebufferHeight()) / 2 ) * scale));
 	}
 
 	/**
@@ -365,8 +364,8 @@ public class VncCanvas extends GLSurfaceView {
 		boolean panned = false;
 		int w = getVisibleWidth();
 		int h = getVisibleHeight();
-		int iw = getImageWidth();
-		int ih = getImageHeight();
+		int iw = vncConn.getFramebufferWidth();
+		int ih = vncConn.getFramebufferHeight();
 		
 		int newX = absoluteXPosition;
 		int newY = absoluteYPosition;
@@ -429,10 +428,10 @@ public class VncCanvas extends GLSurfaceView {
 			sY = -absoluteYPosition;
 
 		// Prevent panning right or below desktop image
-		if (absoluteXPosition + getVisibleWidth() + sX > getImageWidth())
-			sX = getImageWidth() - getVisibleWidth() - absoluteXPosition;
-		if (absoluteYPosition + getVisibleHeight() + sY > getImageHeight())
-			sY = getImageHeight() - getVisibleHeight() - absoluteYPosition;
+		if (absoluteXPosition + getVisibleWidth() + sX > vncConn.getFramebufferWidth())
+			sX = vncConn.getFramebufferWidth() - getVisibleWidth() - absoluteXPosition;
+		if (absoluteYPosition + getVisibleHeight() + sY >  vncConn.getFramebufferHeight())
+			sY = vncConn.getFramebufferHeight() - getVisibleHeight() - absoluteYPosition;
 
 		absoluteXPosition += sX;
 		absoluteYPosition += sY;
@@ -450,7 +449,7 @@ public class VncCanvas extends GLSurfaceView {
 	@Override
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
 		super.onScrollChanged(l, t, oldl, oldt);
-		vncConn.bitmapData.scrollChanged(absoluteXPosition, absoluteYPosition);
+		vncConn.getFramebuffer().scrollChanged(absoluteXPosition, absoluteYPosition);
 		mouseFollowPan();
 	}
 
@@ -458,7 +457,7 @@ public class VncCanvas extends GLSurfaceView {
 	
 	void reDraw() {
 		
-		if (repaintsEnabled && vncConn.bitmapData != null) {
+		if (repaintsEnabled && vncConn.getFramebuffer() != null) {
 
 			// request a redraw from GL thread
 			requestRender();
@@ -655,21 +654,14 @@ public class VncCanvas extends GLSurfaceView {
 		return (int)((double)getHeight() / getScale() + 0.5);
 	}
 
-	public int getImageWidth() {
-		return vncConn.bitmapData.framebufferwidth;
-	}
-
-	public int getImageHeight() {
-		return vncConn.bitmapData.framebufferheight;
-	}
 	
 	public int getCenteredXOffset() {
-		int xoffset = (vncConn.bitmapData.framebufferwidth - getWidth()) / 2;
+		int xoffset = (vncConn.getFramebufferWidth() - getWidth()) / 2;
 		return xoffset;
 	}
 
 	public int getCenteredYOffset() {
-		int yoffset = (vncConn.bitmapData.framebufferheight - getHeight()) / 2;
+		int yoffset = (vncConn.getFramebufferHeight() - getHeight()) / 2;
 		return yoffset;
 	}
 
