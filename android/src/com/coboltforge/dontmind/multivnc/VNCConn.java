@@ -494,7 +494,7 @@ public class VNCConn {
 
 	
 
-	public void setPixelFormatFromModel(COLORMODEL model, boolean reverserPixelOrder) throws IOException {
+	private void setPixelFormatFromModel(COLORMODEL model, boolean reverserPixelOrder) throws IOException {
 		switch (model) {
 		case C24bit:
 			// 24-bit color
