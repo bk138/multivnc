@@ -23,7 +23,6 @@ import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
 
@@ -34,7 +33,7 @@ public class VNCConn {
 
 	private VncCanvas parent;
 	// VNC protocol connection
-	public RfbProto rfb;
+	private RfbProto rfb;
 	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 
@@ -217,29 +216,9 @@ public class VNCConn {
 	}
 
 	
-	public boolean sendPointerEvent(int x, int y, int action, int modifiers, boolean mouseIsDown, boolean useRightButton) {
-		int pointerMask = 0;
+	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
+
 		if (rfb != null && rfb.inNormalProtocol) {
-		    if (action == MotionEvent.ACTION_DOWN || (mouseIsDown && action == MotionEvent.ACTION_MOVE)) {
-		      if (useRightButton) {
-		    	  if(action == MotionEvent.ACTION_MOVE) 
-		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, right mouse button down");
-		    	  else 
-		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: right mouse button down");
-		    	  
-		    	  pointerMask = MOUSE_BUTTON_RIGHT;
-		      } else {
-		    	  if(action == MotionEvent.ACTION_MOVE) 
-		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, left mouse button down");
-		    	  else 
-		    		  if(Utils.DEBUG()) Log.d(TAG, "Input: left mouse button down");
-		    	  
-		    	  pointerMask = MOUSE_BUTTON_LEFT;
-		      }
-		    } else if (action == MotionEvent.ACTION_UP) {
-		    	if(Utils.DEBUG()) Log.d(TAG, "Input: all mouse buttons up");
-		    	pointerMask = 0;
-		    }
 		    bitmapData.invalidateMousePosition();
 		   
 		    if (x<0) x=0;
@@ -303,8 +282,8 @@ public class VNCConn {
 		    	  break;
 		    }
 	    	try {
-	    		//Log.i(TAG,"key = " + key + " metastate = " + metaState + " keycode = " + keyCode);
 	    		rfb.writeKeyEvent(key, metaState, down);
+	    		return true;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -313,6 +292,18 @@ public class VNCConn {
 		return false;
 	}
 	
+
+	public boolean sendKeyEvent(int keycode, int metastate, boolean down) {
+		if (rfb != null && rfb.inNormalProtocol) {
+			try {
+	    		rfb.writeKeyEvent(keycode, metastate, down);
+	    		return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return false;
+	}
 	
 
 	public boolean toggleFramebufferUpdates()
@@ -340,6 +331,8 @@ public class VNCConn {
 		if (colorModel == null || !colorModel.equals(cm))
 			pendingColorModel = cm;
 	}
+	
+	
 
 	public final COLORMODEL getColorModel() {
 		return colorModel;
@@ -367,9 +360,24 @@ public class VNCConn {
 		return "";
 	}
 
+	
+	public final String getDesktopName() {
+		return rfb.desktopName;
+	}
+
+	public final int getFramebufferWidth() {
+		return bitmapData.framebufferwidth;
+	}
+	
+	public final int getFramebufferHeight() {
+		return bitmapData.framebufferheight;
+	}
+	
 	public final ConnectionBean getConnSettings() {
 		return connSettings;
 	}
+	
+	
 	
 
 	private void connectAndAuthenticate(String us,String pw) throws Exception {

@@ -259,18 +259,9 @@ public class VncCanvas extends GLSurfaceView {
 	 */
 	public void warpMouse(int x, int y)
 	{
-		vncConn.bitmapData.invalidateMousePosition();
 		mouseX=x;
 		mouseY=y;
-		vncConn.bitmapData.invalidateMousePosition();
-		try
-		{
-			vncConn.rfb.writePointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
-		}
-		catch ( IOException ioe)
-		{
-			Log.w(TAG,ioe);
-		}
+		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
 	}
 	
 
@@ -498,16 +489,16 @@ public class VncCanvas extends GLSurfaceView {
 	
 
 	public void showConnectionInfo() {
-		String msg = vncConn.rfb.desktopName;
-		int idx = vncConn.rfb.desktopName.indexOf("(");
+		String msg = vncConn.getDesktopName();
+		int idx = vncConn.getDesktopName().indexOf("(");
 		if (idx > -1) {
 			// Breakup actual desktop name from IP addresses for improved
 			// readability
-			String dn = vncConn.rfb.desktopName.substring(0, idx).trim();
-			String ip = vncConn.rfb.desktopName.substring(idx).trim();
+			String dn = vncConn.getDesktopName().substring(0, idx).trim();
+			String ip = vncConn.getDesktopName().substring(idx).trim();
 			msg = dn + "\n" + ip;
 		}
-		msg += "\n" + vncConn.rfb.framebufferWidth + "x" + vncConn.rfb.framebufferHeight;
+		msg += "\n" + vncConn.getFramebufferWidth() + "x" + vncConn.getFramebufferHeight();
 		String enc = vncConn.getEncoding();
 		// Encoding might not be set when we display this message
 		try {
@@ -544,9 +535,31 @@ public class VncCanvas extends GLSurfaceView {
 	 * @param useRightButton If true, event is interpreted as happening with right mouse button
 	 * @return true if event was actually sent
 	 */
-	public boolean processPointerEvent(MotionEvent evt,boolean downEvent,boolean useRightButton) {
+	public boolean processPointerEvent(MotionEvent evt,boolean mouseIsDown,boolean useRightButton) {
 		try {
-			return vncConn.sendPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getAction(), evt.getMetaState(), downEvent, useRightButton);
+			int action = evt.getAction();
+			 if (action == MotionEvent.ACTION_DOWN || (mouseIsDown && action == MotionEvent.ACTION_MOVE)) {
+			      if (useRightButton) {
+			    	  if(action == MotionEvent.ACTION_MOVE) 
+			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, right mouse button down");
+			    	  else 
+			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: right mouse button down");
+			    	  
+			    	  pointerMask = VNCConn.MOUSE_BUTTON_RIGHT;
+			      } else {
+			    	  if(action == MotionEvent.ACTION_MOVE) 
+			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, left mouse button down");
+			    	  else 
+			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: left mouse button down");
+			    	  
+			    	  pointerMask = VNCConn.MOUSE_BUTTON_LEFT;
+			      }
+			    } else if (action == MotionEvent.ACTION_UP) {
+			    	if(Utils.DEBUG()) Log.d(TAG, "Input: all mouse buttons up");
+			    	pointerMask = 0;
+			    }
+			
+			return vncConn.sendPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getMetaState(), pointerMask);
 		}
 		catch(NullPointerException e) {
 			return false;
@@ -570,17 +583,10 @@ public class VncCanvas extends GLSurfaceView {
 		 */
 		@Override
 		public void run() {
-			try
-			{
-				vncConn.rfb.writePointerEvent(mouseX, mouseY, 0, scrollButton);
-				vncConn.rfb.writePointerEvent(mouseX, mouseY, 0, 0);
-				
-				handler.postDelayed(this, delay);
-			}
-			catch (IOException ioe)
-			{
-				
-			}
+			vncConn.sendPointerEvent(mouseX, mouseY, 0, scrollButton);
+			vncConn.sendPointerEvent(mouseX, mouseY, 0, 0);
+
+			handler.postDelayed(this, delay);
 		}		
 	}
 
@@ -612,14 +618,9 @@ public class VncCanvas extends GLSurfaceView {
 				scrollRunnable.scrollButton = 0;
 				pointerMask &= ~mouseChange;
 			}
-			try
-			{
-				vncConn.rfb.writePointerEvent(mouseX, mouseY, evt.getMetaState(), pointerMask);
-			}
-			catch (IOException ioe)
-			{
-				// TODO: do something with exception
-			}
+			
+			vncConn.sendPointerEvent(mouseX, mouseY, evt.getMetaState(), pointerMask);
+			
 			return true;
 		}
 		
@@ -630,24 +631,12 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		if (meta.isMouseClick())
 		{
-			try {
-				vncConn.rfb.writePointerEvent(mouseX, mouseY, meta.getMetaFlags(), meta.getMouseButtons());
-				vncConn.rfb.writePointerEvent(mouseX, mouseY, meta.getMetaFlags(), 0);
-			}
-			catch (IOException ioe)
-			{
-				ioe.printStackTrace();
-			}
+			vncConn.sendPointerEvent(mouseX, mouseY, meta.getMetaFlags(), meta.getMouseButtons());
+			vncConn.sendPointerEvent(mouseX, mouseY, meta.getMetaFlags(), 0);
 		}
 		else {
-			try {
-				vncConn.rfb.writeKeyEvent(meta.getKeySym(), meta.getMetaFlags(), true);
-				vncConn.rfb.writeKeyEvent(meta.getKeySym(), meta.getMetaFlags(), false);
-			}
-			catch (IOException ioe)
-			{
-				ioe.printStackTrace();
-			}
+			vncConn.sendKeyEvent(meta.getKeySym(), meta.getMetaFlags(), true);
+			vncConn.sendKeyEvent(meta.getKeySym(), meta.getMetaFlags(), false);
 		}
 	}
 	
