@@ -117,7 +117,7 @@ public class MouseButtonView extends View {
 					canvas.vncConn.sendPointerEvent((int)newRemoteX, (int)newRemoteY, e.getMetaState(), 1 << (buttonId-1));
 
 					// update view
-					// FIXME use only canvas, not rfb directly
+					
 					canvas.mouseX = (int) newRemoteX;
 					canvas.mouseY = (int) newRemoteY;
 					canvas.panToMouse();
