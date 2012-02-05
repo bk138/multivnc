@@ -246,6 +246,10 @@ public class VNCConn {
 		    else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
 		    if (y<0) y=0;
 		    else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
+		    
+		    parent.mouseX = x;
+		    parent.mouseY = y;
+		    
 		    bitmapData.invalidateMousePosition();
 			try {
 				rfb.writePointerEvent(x,y,modifiers,pointerMask);
@@ -433,6 +437,9 @@ public class VNCConn {
 
 		Log.i(TAG, "Desktop name is " + rfb.desktopName);
 		Log.i(TAG, "Desktop size is " + rfb.framebufferWidth + " x " + rfb.framebufferHeight);
+		
+		parent.mouseX = rfb.framebufferWidth/2;
+		parent.mouseY = rfb.framebufferHeight/2;
 
 		boolean useFull = false;
 		int capacity = Utils.getActivityManager(parent.getContext()).getMemoryClass();
