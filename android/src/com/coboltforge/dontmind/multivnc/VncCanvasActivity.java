@@ -398,7 +398,6 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onDown(MotionEvent e) {
-			panner.stop();
 			return true;
 		}
 	}
@@ -411,7 +410,6 @@ public class VncCanvasActivity extends Activity {
 	private ConnectionBean connection;
 
 	ZoomControls zoomer;
-	Panner panner;
 	TouchpadInputHandler touchPad;
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
@@ -555,7 +553,6 @@ public class VncCanvasActivity extends Activity {
 			}
 
 		});
-		panner = new Panner(this, vncCanvas.handler);
 
 		touchPad =  new TouchpadInputHandler();
 		
