@@ -57,13 +57,10 @@ public class VNCConn {
 	private byte[] zlibBuf;
 	private Inflater zlibInflater;
 
-	private int mouseX;
-	private int mouseY;
+
 
 	private int bytesPerPixel;
-
 	private int[] colorPalette;
-
 	private COLORMODEL colorModel; 
 
 	// VNC Encoding parameters
@@ -244,15 +241,14 @@ public class VNCConn {
 		    	pointerMask = 0;
 		    }
 		    bitmapData.invalidateMousePosition();
-		    mouseX= x;
-		    mouseY= y;
-		    if ( mouseX<0) mouseX=0;
-		    else if ( mouseX>=rfb.framebufferWidth) mouseX=rfb.framebufferWidth-1;
-		    if ( mouseY<0) mouseY=0;
-		    else if ( mouseY>=rfb.framebufferHeight) mouseY=rfb.framebufferHeight-1;
+		   
+		    if (x<0) x=0;
+		    else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
+		    if (y<0) y=0;
+		    else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
 		    bitmapData.invalidateMousePosition();
 			try {
-				rfb.writePointerEvent(mouseX,mouseY,modifiers,pointerMask);
+				rfb.writePointerEvent(x,y,modifiers,pointerMask);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -448,8 +444,6 @@ public class VNCConn {
 			bitmapData=new LargeBitmapData(rfb, parent, capacity);
 		else
 			bitmapData=new FullBufferBitmapData(rfb, parent, capacity);
-		mouseX=rfb.framebufferWidth/2;
-		mouseY=rfb.framebufferHeight/2;
 
 		setPixelFormat();
 	}
@@ -525,8 +519,6 @@ public class VNCConn {
 
 						if (rfb.updateRectEncoding == RfbProto.EncodingPointerPos) {
 							// This never actually happens
-							mouseX=rx;
-							mouseY=ry;
 							Log.v(TAG, "rfb.EncodingPointerPos");
 							continue;
 						}
