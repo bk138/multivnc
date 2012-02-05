@@ -277,21 +277,24 @@ public class VncCanvas extends GLSurfaceView {
 	}
 	
 
-	
+
 	private void mouseFollowPan()
 	{
-		if (connection.getFollowPan() && scaling.isAbleToPan())
-		{
-			int scrollx = absoluteXPosition;
-			int scrolly = absoluteYPosition;
-			int width = getVisibleWidth();
-			int height = getVisibleHeight();
-			//Log.i(TAG,"scrollx " + scrollx + " scrolly " + scrolly + " mouseX " + mouseX +" Y " + mouseY + " w " + width + " h " + height);
-			if (mouseX < scrollx || mouseX >= scrollx + width || mouseY < scrolly || mouseY >= scrolly + height)
+		try {
+			if (connection.getFollowPan() & scaling.isAbleToPan())
 			{
-				//Log.i(TAG,"warp to " + scrollx+width/2 + "," + scrolly + height/2);
-				warpMouse(scrollx + width/2, scrolly + height / 2);
-			}
+				int scrollx = absoluteXPosition;
+				int scrolly = absoluteYPosition;
+				int width = getVisibleWidth();
+				int height = getVisibleHeight();
+				//Log.i(TAG,"scrollx " + scrollx + " scrolly " + scrolly + " mouseX " + mouseX +" Y " + mouseY + " w " + width + " h " + height);
+				if (mouseX < scrollx || mouseX >= scrollx + width || mouseY < scrolly || mouseY >= scrolly + height)
+				{
+					//Log.i(TAG,"warp to " + scrollx+width/2 + "," + scrolly + height/2);
+					warpMouse(scrollx + width/2, scrolly + height / 2);
+				}
+			}}
+		catch(NullPointerException e) {
 		}
 	}
 
@@ -317,10 +320,14 @@ public class VncCanvas extends GLSurfaceView {
 
 	public void onDestroy() {
 		Log.v(TAG, "Cleaning up resources");
-		if ( vncConn!=null) vncConn.shutdown();
+		try {
+			vncConn.shutdown();
+		}
+		catch(NullPointerException e) {
+		}
 		vncConn = null;
 	}
-	
+
 
 
 	/*

@@ -141,6 +141,9 @@ public class VNCConn {
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
 	public void init(ConnectionBean bean, final Runnable setModes) {
+		
+		Log.d(TAG, "initializing");
+		
 		connection = bean;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.getColorModel());
 
@@ -203,6 +206,8 @@ public class VNCConn {
 
 
 	public void shutdown() {
+		
+		Log.d(TAG, "shutting down");
 		
 		closeConnection();
 		
@@ -472,9 +477,13 @@ public class VNCConn {
 
 	private void processNormalProtocol(final Context context, ProgressDialog pd, final Runnable setModes) throws Exception {
 		try {
+			
+			Log.d(TAG, "Connection initialized");
+			
 			bitmapData.writeFullUpdateRequest(false);
 
 			parent.handler.post(setModes);
+			
 			//
 			// main dispatch loop
 			//
