@@ -703,6 +703,7 @@ public class VNCConn {
 		} finally {
 			Log.v(TAG, "Closing VNC Connection");
 			rfb.close();
+			System.gc();
 		}
 	}
 	
