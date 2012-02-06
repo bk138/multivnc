@@ -275,6 +275,13 @@ public class VNCConn {
 		      case 140: 						  key = 0xffc7; break; // F10
 		      case 141: 						  key = 0xffc8; break; // F11
 		      case 142: 						  key = 0xffc9; break; // F12
+		      case 124:							  key = 0xff63; break; // Insert
+		      case 112: 					      key = 0xffff; break; // Delete
+		      case 122: 					      key = 0xff50; break; // Home
+		      case 123: 					      key = 0xff57; break; // End
+		      case  92: 					      key = 0xff55; break; // PgUp
+		      case  93: 					      key = 0xff56; break; // PgDn
+
 
 		      default: 							  
 		    	  key = evt.getUnicodeChar();
