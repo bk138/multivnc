@@ -16,7 +16,7 @@ import android.view.MotionEvent;
 public class Utils {
 	
 	private static final String TAG = "Utils";
-	public static boolean debug = false;
+	private static boolean debug = false;
 
 	public static void showYesNoPrompt(Context _context, String title, String message, OnClickListener onYesListener, OnClickListener onNoListener) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(_context);

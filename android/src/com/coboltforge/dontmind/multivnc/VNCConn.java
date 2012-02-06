@@ -100,7 +100,13 @@ public class VNCConn {
 		handleRREPaint = new Paint();
 		handleRREPaint.setStyle(Style.FILL);
 
+		if(Utils.DEBUG()) Log.d(TAG, this + " constructed!");
 	}
+	
+	protected void finalize() {
+		if(Utils.DEBUG()) Log.d(TAG, this + " finalized!");
+	}
+	
 
 	/*
 		    to make a connection, call
@@ -147,7 +153,7 @@ public class VNCConn {
 		final ProgressDialog pd = ProgressDialog.show(parent.getContext(), "Connecting...", "Establishing handshake.\nPlease wait...", true, true, new DialogInterface.OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
-				closeConnection();
+				shutdown();
 				parent.handler.post(new Runnable() {
 					public void run() {
 						Utils.showErrorMessage(parent.getContext(), "VNC connection aborted!");
@@ -213,6 +219,7 @@ public class VNCConn {
 		catch(Exception e) {
 		}
 		bitmapData = null;
+		
 	}
 
 	

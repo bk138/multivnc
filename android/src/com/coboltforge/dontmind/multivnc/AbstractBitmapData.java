@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 /**
  * Abstract interface between the VncCanvas and the bitmap and pixel data buffers that actually contain
@@ -153,5 +154,9 @@ abstract class AbstractBitmapData {
 			mbitmap.recycle();
 		memGraphics = null;
 		bitmapPixels = null;
+	}
+	
+	protected void finalize() {
+		if(Utils.DEBUG()) Log.d("AbstractBitmapData", this + " finalized!");
 	}
 }
