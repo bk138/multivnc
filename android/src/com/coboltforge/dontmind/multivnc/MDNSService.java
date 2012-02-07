@@ -246,6 +246,9 @@ public class MDNSService extends Service {
 			} catch (IOException e) {
 				e.printStackTrace();
 				return;
+			} catch (NoSuchMethodError e) { // at leat on user got "java.lang.NoSuchMethodError: javax.jmdns.JmDNS.create". phew...
+				e.printStackTrace();
+				return;
 			}
 		}
 
