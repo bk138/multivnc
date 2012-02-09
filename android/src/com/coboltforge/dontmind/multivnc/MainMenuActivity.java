@@ -31,6 +31,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -39,6 +41,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -193,6 +196,9 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 		
 		final SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
+		/*
+		 * show support dialog on second (and maybe later) runs
+		 */
 		if(settings.getBoolean("firstRun", true)) // is the first run
 		{
 			SharedPreferences.Editor ed = settings.edit();
@@ -235,6 +241,45 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 				
 				dialog.show();
 			}
+		}
+		
+		
+
+		/*
+		 * show changelog if version changed
+		 */
+		try {
+			//current version
+			PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+			int versionCode = packageInfo.versionCode; 
+
+			int lastVersionCode = settings.getInt("lastVersionCode", 0);
+
+			if(lastVersionCode < versionCode) {
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putInt("lastVersionCode", versionCode);
+				editor.commit();
+				
+				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+				dialog.setTitle(getString(R.string.changelog_dialog_title));
+				dialog.setIcon(getResources().getDrawable(R.drawable.icon));
+				
+				WebView wv = new WebView(getApplicationContext());
+				wv.loadData(getString(R.string.changelog_dialog_text), "text/html", "utf-8");
+				dialog.setView(wv);
+
+				dialog.setPositiveButton(getString(android.R.string.ok), new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+			
+				dialog.show();
+				
+			}
+		} catch (NameNotFoundException e) {
+			Log.w("Unable to get version code. Will not show changelog", e);
 		}
 
 	}

@@ -99,5 +99,14 @@
 <string name="support_dialog_yes">Yes, good idea!</string>
 <string name="support_dialog_no">No, not now.</string>
 <string name="support_dialog_neveragain">Never ask again!</string>
-        
+<string name="changelog_dialog_title">What\'s new...</string>
+<string name="changelog_dialog_text">
+    <![CDATA[<b>Version 1.3.0:</b>
+     		<ul>
+     	     <li>Fixed some possible crashes on startup.</li>
+     	     <li>Made Ins, Delete, Home, End, PgUp and PgDn keys found on some keyboards work.</li>
+     		 <li>Added ChangeLog display ;-)</li>
+     		</ul> 
+    ]]>
+</string>
 </resources>
