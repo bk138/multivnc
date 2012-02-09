@@ -211,10 +211,11 @@ public class VNCConn {
 		
 		Log.d(TAG, "shutting down");
 		
-		closeConnection();
+		maintainConnection = false;
 		
 		try {
 			bitmapData.dispose();
+			rfb.close(); // close immediatly
 		}
 		catch(Exception e) {
 		}
@@ -559,11 +560,6 @@ public class VNCConn {
 		}
 	}
 	
-
-
-	private void closeConnection() {
-		maintainConnection = false;
-	}
 
 
 
