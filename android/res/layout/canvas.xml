@@ -43,21 +43,21 @@
 	      <com.coboltforge.dontmind.multivnc.MouseButtonView
 	      	  android:id="@+id/mousebutton1"
 	          android:gravity="center_horizontal"
-	          android:background="#aa7f7f7f"
+	          android:background="#997f7f7f"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:layout_weight="1"/>
 	      <com.coboltforge.dontmind.multivnc.MouseButtonView
 	       	  android:id="@+id/mousebutton2"
 	          android:gravity="center_horizontal"
-	          android:background="#cc7f7f7f"
+	          android:background="#bb7f7f7f"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:layout_weight="1"/>
 	      <com.coboltforge.dontmind.multivnc.MouseButtonView
 	          android:id="@+id/mousebutton3"
 	          android:gravity="center_horizontal"
-	          android:background="#aa7f7f7f"
+	          android:background="#997f7f7f"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:layout_weight="1"/>
