@@ -57,7 +57,6 @@ public class VNCConn {
 	private Inflater zlibInflater;
 
 
-
 	private int bytesPerPixel;
 	private int[] colorPalette;
 	private COLORMODEL colorModel; 
@@ -65,10 +64,6 @@ public class VNCConn {
 	// VNC Encoding parameters
 	private boolean useCopyRect = false; // TODO CopyRect is not working
 	private int preferredEncoding = -1;
-
-	// Unimplemented VNC encoding parameters
-	private boolean requestCursorUpdates = false;
-	private boolean ignoreCursorUpdates = true;
 
 	// Unimplemented TIGHT encoding parameters
 	private int compressLevel = -1;
@@ -612,8 +607,8 @@ public class VNCConn {
 						}
 
 						if (rfb.updateRectEncoding == RfbProto.EncodingPointerPos) {
-							// This never actually happens
-							Log.v(TAG, "rfb.EncodingPointerPos");
+							parent.mouseX = rx;
+							parent.mouseY = ry;
 							continue;
 						}
 
@@ -747,15 +742,10 @@ public class VNCConn {
 		if (jpegQuality >= 0 && jpegQuality <= 9)
 			encodings[nEncodings++] = RfbProto.EncodingQualityLevel0 + jpegQuality;
 
-		if (requestCursorUpdates) {
-			encodings[nEncodings++] = RfbProto.EncodingXCursor;
-			encodings[nEncodings++] = RfbProto.EncodingRichCursor;
-			if (!ignoreCursorUpdates)
-				encodings[nEncodings++] = RfbProto.EncodingPointerPos;
-		}
-
 		encodings[nEncodings++] = RfbProto.EncodingLastRect;
 		encodings[nEncodings++] = RfbProto.EncodingNewFBSize;
+		encodings[nEncodings++] = RfbProto.EncodingPointerPos;
+
 
 		boolean encodingsWereChanged = false;
 		if (nEncodings != nEncodingsSaved) {
