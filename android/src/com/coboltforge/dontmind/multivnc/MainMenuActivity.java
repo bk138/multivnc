@@ -42,11 +42,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,8 +68,7 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 	private EditText portText;
 	private EditText passwordText;
 	private TextView repeaterText;
-	//private RadioGroup groupForceFullScreen;
-	//private Spinner colorSpinner;
+	private Spinner colorSpinner;
 	private LinearLayout serverlist;
 	private LinearLayout bookmarkslist;
 
@@ -133,14 +134,13 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 		bookmarkslist = (LinearLayout) findViewById(R.id.bookmarks_list);
 
 		
-		//colorSpinner = (Spinner)findViewById(R.id.colorformat);
-		//COLORMODEL[] models=COLORMODEL.values();
-		//ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
-		//groupForceFullScreen = (RadioGroup)findViewById(R.id.groupForceFullScreen);
-		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
-		//colorSpinner.setAdapter(colorSpinnerAdapter);
+		colorSpinner = (Spinner)findViewById(R.id.spinnerColorMode);
+		COLORMODEL[] models=COLORMODEL.values();
+		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
+		colorSpinner.setAdapter(colorSpinnerAdapter);
 		//colorSpinner.setSelection(0);
 		
+		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
 		
 		repeaterText = (TextView)findViewById(R.id.textRepeaterId);
 		
@@ -553,11 +553,10 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 		catch (NumberFormatException nfe) {			
 		}
 		conn.setUserName(textUsername.getText().toString());
-		//conn_new.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
 		conn.setPassword(passwordText.getText().toString());
 		conn.setKeepPassword(checkboxKeepPassword.isChecked());
 		conn.setUseLocalCursor(true); // always enable
-		//conn_new.setColorModel(((COLORMODEL)colorSpinner.getbookmarkItem()).nameString());
+		conn.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
 		if (repeaterText.getText().length() > 0)
 		{
 			conn.setRepeaterId(repeaterText.getText().toString());

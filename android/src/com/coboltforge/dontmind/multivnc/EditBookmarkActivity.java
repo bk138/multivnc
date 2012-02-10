@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
@@ -28,6 +30,7 @@ public class EditBookmarkActivity extends Activity {
 	private EditText passwordText;
 	private CheckBox checkboxKeepPassword;
 	private TextView repeaterText;
+	private Spinner colorSpinner;
 
 
 	@Override
@@ -42,6 +45,10 @@ public class EditBookmarkActivity extends Activity {
 		usernameText = (EditText) findViewById(R.id.textUsernameBookmark);
 		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPasswordBookmark);
 		repeaterText = (TextView)findViewById(R.id.textRepeaterIdBookmark);
+		colorSpinner = (Spinner)findViewById(R.id.spinnerColorMode);
+		COLORMODEL[] models=COLORMODEL.values();
+		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
+		colorSpinner.setAdapter(colorSpinnerAdapter);
 		
 		database = new VncDatabase(this);
 
@@ -102,18 +109,17 @@ public class EditBookmarkActivity extends Activity {
 		if (bookmark.getKeepPassword() || bookmark.getPassword().length()>0) {
 			passwordText.setText(bookmark.getPassword());
 		}
-		//groupForceFullScreen.check(bookmark.getForceFull()==BitmapImplHint.AUTO ? R.id.radioForceFullScreenAuto : (bookmark.getForceFull() == BitmapImplHint.FULL ? R.id.radioForceFullScreenOn : R.id.radioForceFullScreenOff));
 		checkboxKeepPassword.setChecked(bookmark.getKeepPassword());
 		usernameText.setText(bookmark.getUserName());
+		
 		COLORMODEL cm = COLORMODEL.valueOf(bookmark.getColorModel());
 		COLORMODEL[] colors=COLORMODEL.values();
 		for (int i=0; i<colors.length; ++i)
-		{
 			if (colors[i] == cm) {
-				//colorSpinner.setSelection(i);
+				colorSpinner.setSelection(i);
 				break;
 			}
-		}
+
 		if(bookmark.getUseRepeater())
 			repeaterText.setText(bookmark.getRepeaterId());
 	}
@@ -132,11 +138,10 @@ public class EditBookmarkActivity extends Activity {
 		}
 		bookmark.setNickname(bookmarkNameText.getText().toString());
 		bookmark.setUserName(usernameText.getText().toString());
-		//bookmark.setForceFull(groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenAuto ? BitmapImplHint.AUTO : (groupForceFullScreen.getCheckedRadioButtonId()==R.id.radioForceFullScreenOn ? BitmapImplHint.FULL : BitmapImplHint.TILE));
 		bookmark.setPassword(passwordText.getText().toString());
 		bookmark.setKeepPassword(checkboxKeepPassword.isChecked());
 		bookmark.setUseLocalCursor(true); // always enable
-		//bookmark.setColorModel(((COLORMODEL)colorSpinner.getbookmarkItem()).nameString());
+		bookmark.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
 		if (repeaterText.getText().length() > 0)
 		{
 			bookmark.setRepeaterId(repeaterText.getText().toString());

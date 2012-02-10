@@ -71,8 +71,17 @@
 					<TextView android:text="@string/port_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
 					<EditText android:id="@+id/textPORT"
 						android:text="5900"
+						android:inputType="number"
 						android:layout_width="fill_parent"
 						android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" />
+				</TableRow>
+				<TableRow>
+					<TextView android:text="@string/colormode_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
+					<Spinner
+					    android:id="@+id/spinnerColorMode"
+					    android:layout_width="fill_parent"
+					    android:layout_height="wrap_content"
+					    android:prompt="@string/colormode_caption" />
 				</TableRow>
 				<TableRow>
 					<TextView android:text="@string/username_caption" android:paddingRight="10dip" android:gravity="right|center_vertical" android:textAppearance="?android:attr/textAppearanceMedium" />
