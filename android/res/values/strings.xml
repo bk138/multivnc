@@ -101,11 +101,14 @@
 <string name="support_dialog_neveragain">Never ask again!</string>
 <string name="changelog_dialog_title">What\'s new...</string>
 <string name="changelog_dialog_text">
-    <![CDATA[<b>Version 1.3.0:</b>
+    <![CDATA[<b>Version 1.3.1:</b>
      		<ul>
-     	     <li>Fixed some possible crashes on startup.</li>
-     	     <li>Made Ins, Delete, Home, End, PgUp and PgDn keys found on some keyboards work.</li>
-     		 <li>Added ChangeLog display ;-)</li>
+     	     <li>Use pointer position info from servers that send it.</li>
+     	     <li>Made port number input fields numeric-only.</li>
+     		 <li>Added colormode selectors to main menu and bookmark edit screen.</li>
+     		 <li>Made virtual mouse buttons a little more translucent.</li>
+     		 <li>Fix processing of mouse input after long press or double tap.</li>
+     		 <li>Added more distinguishable keyboard icon.</li>
      		</ul> 
     ]]>
 </string>
