@@ -17,6 +17,7 @@ import android.view.SurfaceView;
 
 
 public class TouchPointView extends SurfaceView implements SurfaceHolder.Callback {
+	@SuppressWarnings("unused")
 	private static final String TAG = "TouchPointView";
 
 	private static final int MAX_TOUCHPOINTS = 10;

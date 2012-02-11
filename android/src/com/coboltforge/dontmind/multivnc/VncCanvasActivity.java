@@ -58,15 +58,21 @@ public class VncCanvasActivity extends Activity {
 
 
 	public class TouchpadInputHandler extends AbstractGestureInputHandler {
+		
+		private static final String TAG = "TouchPadInputHandler";
+		
 		/**
 		 * In drag mode (entered with long press) you process mouse events
 		 * without sending them through the gesture detector
 		 */
 		private boolean dragMode;
 		float dragX, dragY;
+		private boolean dragModeButtonDown = false;
+		private boolean dragModeButton2insteadof1 = false;
 		
-		private boolean button2insteadof1 = false;
-		
+		/*
+		 * two-finger fling gesture stuff
+		 */
 		private long twoFingerFlingStart = -1;
 		private VelocityTracker twoFingerFlingVelocityTracker;
 		private boolean twoFingerFlingDetected = false;
@@ -156,16 +162,16 @@ public class VncCanvasActivity extends Activity {
 			if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 			
 			showZoomer(true);
-			
-			// disable if virtual mouse buttons are in use 
-			if(mousebuttons.getVisibility()== View.VISIBLE)
-				return;
-			
+		
 			vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
 					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
 			dragMode = true;
 			dragX = e.getX();
 			dragY = e.getY();
+			
+			// only interpret as button down if virtual mouse buttons are disabled 
+			if(mousebuttons.getVisibility() != View.VISIBLE) 
+				dragModeButtonDown = true;
 		}
 
 		/*
@@ -268,17 +274,20 @@ public class VncCanvasActivity extends Activity {
 						+ vncCanvas.mouseX + "," + vncCanvas.mouseY
 						+ " to " + (int)newRemoteX + "," + (int)newRemoteY);
 	
-				if (dragMode) {
-					if (e2.getAction() == MotionEvent.ACTION_UP)
-						dragMode = false;
-					dragX = e2.getX();
-					dragY = e2.getY();
-					e2.setLocation(newRemoteX, newRemoteY);
-					return vncCanvas.processPointerEvent(e2, true);
-				} else {
-						e2.setLocation(newRemoteX, newRemoteY);
-						vncCanvas.processPointerEvent(e2, false);
-				}
+//				if (dragMode) {
+//					
+//					Log.d(TAG, "dragmode in scroll!!!!");
+//					
+//					if (e2.getAction() == MotionEvent.ACTION_UP)
+//						dragMode = false;
+//					dragX = e2.getX();
+//					dragY = e2.getY();
+//					e2.setLocation(newRemoteX, newRemoteY);
+//					return vncCanvas.processPointerEvent(e2, true);
+//				} 
+
+				e2.setLocation(newRemoteX, newRemoteY);
+				vncCanvas.processPointerEvent(e2, false);
 			}
 			return true;
 		}
@@ -292,7 +301,7 @@ public class VncCanvasActivity extends Activity {
 		public boolean onTouchEvent(MotionEvent e) {
 			if (dragMode) {
 				
-				if(Utils.DEBUG()) Log.d(TAG, "Input: touch drag");
+				if(Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode");
 
 				// compute the relative movement offset on the remote screen.
 				float deltaX = (e.getX() - dragX) *vncCanvas.getScale();
@@ -309,11 +318,12 @@ public class VncCanvasActivity extends Activity {
 
 				if (e.getAction() == MotionEvent.ACTION_UP)
 				{
-					if(Utils.DEBUG()) Log.d(TAG, "Input: touch drag, finger up");
+					if(Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode, finger up");
 					
 					dragMode = false;
 					
-					button2insteadof1 = false;
+					dragModeButtonDown = false;
+					dragModeButton2insteadof1 = false;
 
 					remoteMouseStayPut(e);
 					vncCanvas.processPointerEvent(e, false);
@@ -322,19 +332,25 @@ public class VncCanvasActivity extends Activity {
 				e.setLocation(newRemoteX, newRemoteY);
 				
 				boolean status = false;
-				if(!button2insteadof1) // button 1 down
-					status = vncCanvas.processPointerEvent(e, true, false);
-				else // button2 down
-					status = vncCanvas.processPointerEvent(e, true, true);
+				if(dragModeButtonDown) {
+					if(!dragModeButton2insteadof1) // button 1 down
+						status = vncCanvas.processPointerEvent(e, true, false);
+					else // button2 down
+						status = vncCanvas.processPointerEvent(e, true, true);
+				}
+				else { // dragging without any button down
+					status = vncCanvas.processPointerEvent(e, false); 
+				}
+				
 				return status;
 
-			} else
-			{
-				if(Utils.DEBUG())
-					Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
-							
-				return super.onTouchEvent(e);
 			}
+			
+			
+			if(Utils.DEBUG())
+				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+							
+			return super.onTouchEvent(e);
 		}
 
 		/**
@@ -382,7 +398,8 @@ public class VncCanvasActivity extends Activity {
 			
 			if(Utils.DEBUG()) Log.d(TAG, "Input: double tap");
 
-			button2insteadof1 = true;
+			dragModeButtonDown = true;
+			dragModeButton2insteadof1 = true;
 			
 			remoteMouseStayPut(e);
 			vncCanvas.processPointerEvent(e, true, true);
