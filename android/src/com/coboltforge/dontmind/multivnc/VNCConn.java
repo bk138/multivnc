@@ -218,30 +218,35 @@ public class VNCConn {
 		
 	}
 
-	
+
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 
-		if (rfb != null && rfb.inNormalProtocol) {
-		    bitmapData.invalidateMousePosition();
-		   
-		    if (x<0) x=0;
-		    else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
-		    if (y<0) y=0;
-		    else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
-		    
-		    parent.mouseX = x;
-		    parent.mouseY = y;
-		    
-		    bitmapData.invalidateMousePosition();
-			try {
-				rfb.writePointerEvent(x,y,modifiers,pointerMask);
-			} catch (Exception e) {
-				e.printStackTrace();
+		try {
+			if (rfb.inNormalProtocol) {
+				bitmapData.invalidateMousePosition();
+
+				if (x<0) x=0;
+				else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
+				if (y<0) y=0;
+				else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
+
+				parent.mouseX = x;
+				parent.mouseY = y;
+
+				bitmapData.invalidateMousePosition();
+				try {
+					rfb.writePointerEvent(x,y,modifiers,pointerMask);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				parent.panToMouse();
+				return true;
 			}
-		    parent.panToMouse();
-			return true;
 		}
-		return false;		
+		catch(NullPointerException e) {
+		}
+		return false;
+		
 	}
 
 
