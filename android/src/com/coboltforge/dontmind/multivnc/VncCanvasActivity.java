@@ -535,9 +535,12 @@ public class VncCanvasActivity extends Activity {
 			 */
 			@Override
 			public void onClick(View v) {
-				showZoomer(true);
-				vncCanvas.scaling.zoomIn(VncCanvasActivity.this);
-
+				try {
+					showZoomer(true);
+					vncCanvas.scaling.zoomIn(VncCanvasActivity.this);
+				}
+				catch(NullPointerException e) {
+				}
 			}
 
 		});
@@ -550,9 +553,12 @@ public class VncCanvasActivity extends Activity {
 			 */
 			@Override
 			public void onClick(View v) {
-				showZoomer(true);
-				vncCanvas.scaling.zoomOut(VncCanvasActivity.this);
-
+				try {
+					showZoomer(true);
+					vncCanvas.scaling.zoomOut(VncCanvasActivity.this);
+				}
+				catch(NullPointerException e) {
+				}
 			}
 
 		});

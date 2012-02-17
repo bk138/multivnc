@@ -101,9 +101,9 @@
 <string name="support_dialog_neveragain">Never ask again!</string>
 <string name="changelog_dialog_title">What\'s new...</string>
 <string name="changelog_dialog_text">
-    <![CDATA[<b>Version 1.3.2:</b>
+    <![CDATA[<b>Version 1.3.3:</b>
      		<ul>
-     	     <li>Prevent possible crash on virtual mouse button click.</li>
+     	     <li>Prevent possible crash on zoom button click.</li>
      		</ul> 
     ]]>
 </string>
