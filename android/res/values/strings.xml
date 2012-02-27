@@ -35,8 +35,7 @@
 <string name="export_settings_path">Export to file</string>
 <string name="enter_text_title">Enter Text to Send</string>
 <string name="enter_text">Send text</string>
-<string name="fit_to_screen">Fit to Screen</string>
-<string name="force_full_check">Force full-screen bitmap</string>
+<string name="database_error_open">Error opening database!</string>
 <string name="import_export_settings">Import/Export</string>
 <string name="import_settings">Import</string>
 <string name="import_settings_file_url">Import from file or URL</string>
@@ -101,9 +100,9 @@
 <string name="support_dialog_neveragain">Never ask again!</string>
 <string name="changelog_dialog_title">What\'s new...</string>
 <string name="changelog_dialog_text">
-    <![CDATA[<b>Version 1.3.3:</b>
+    <![CDATA[<b>Version 1.3.4:</b>
      		<ul>
-     	     <li>Prevent possible crash on zoom button click.</li>
+     	     <li>Prevent possible crash when opening bookmark database.</li>
      		</ul> 
     ]]>
 </string>

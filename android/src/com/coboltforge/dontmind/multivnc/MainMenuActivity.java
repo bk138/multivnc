@@ -368,7 +368,14 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 	
 	void updateBookmarkView() {
 		ArrayList<ConnectionBean> bookmarked_connections=new ArrayList<ConnectionBean>();
-		ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, bookmarked_connections, ConnectionBean.newInstance);
+		try {
+			ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, bookmarked_connections, ConnectionBean.newInstance);
+		}
+		catch(android.database.sqlite.SQLiteException e) {
+			Toast.makeText(this, getString(R.string.database_error_open), Toast.LENGTH_LONG).show();
+			return;
+		}
+		
 		Collections.sort(bookmarked_connections);
 		
 		Log.d(TAG, "updateBookMarkView()");
