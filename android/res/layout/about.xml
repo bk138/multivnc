@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:flattr_sdk="http://schemas.flattr4android.com/sdk"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	
+      
 	  <ScrollView 
-		android:layout_gravity="center_vertical" android:layout_width="fill_parent"
-		android:layout_height="fill_parent">  
+		android:layout_gravity="center_vertical"
+		 android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_above="@+id/ad">  
 
 	<LinearLayout android:orientation="vertical"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:layout_weight="1" android:paddingTop="10dp"  android:padding="10dip"
 		android:gravity="center_horizontal">
+		
+	
 		<ImageView android:id="@+id/ImageView01"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:scaleType="fitCenter" android:src="@drawable/icon">
@@ -23,7 +28,7 @@
 			android:paddingBottom="10dp" 
 		/>
 		
-		<TextView
+		        <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -34,25 +39,37 @@
                 android:text="@string/madeby" 
                 />
 		
-		
-<com.flattr4android.sdk.FlattrButton
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		flattr_sdk:token="41e28ea212496725687036408604b16b"
-		flattr_sdk:token_secret="9cbb740e9f11c42948cbbc3f0549f2fe"
-		flattr_sdk:thing_id="183793" flattr_sdk:button_style="vertical"
-		android:layout_gravity="center"
-		android:layout_marginBottom="20dip"	/>
-		   
+		      <com.flattr4android.sdk.FlattrButton
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				flattr_sdk:token="41e28ea212496725687036408604b16b"
+				flattr_sdk:token_secret="9cbb740e9f11c42948cbbc3f0549f2fe"
+				flattr_sdk:thing_id="183793" flattr_sdk:button_style="vertical"
+				android:layout_gravity="center"
+				android:layout_marginBottom="20dip"	/>
+				   
 	      
-					<ImageButton android:id="@+id/paypal_button"
-						android:clickable="true" android:src="@drawable/paypal_button"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content" android:layout_gravity="center"
-						android:padding="0dip" />
-	
+				<ImageButton android:id="@+id/paypal_button"
+					android:clickable="true" android:src="@drawable/paypal_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_gravity="center"
+					android:padding="0dip"
+					android:layout_marginBottom="20dip"	 />
+
+					
       </LinearLayout>
-
+	    
  </ScrollView>
-
-</LinearLayout>
+	   
+       <com.google.ads.AdView
+           xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+           android:id="@+id/ad"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_alignParentBottom="true"
+           ads:adSize="BANNER"
+           ads:adUnitId=""
+           android:gravity="center_horizontal"
+           ads:loadAdOnCreate="true" />
+	  
+</RelativeLayout>
 

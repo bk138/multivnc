@@ -94,15 +94,16 @@
 <string name="no">No</string>
 <string name="edit">Edit</string>
 <string name="support_dialog_title">Please Support MultiVNC</string>
-<string name="support_dialog_text">If you like MultiVNC, why not consider supporting its development? For the time being, you can do so by using PayPal or flattr. Thanks!</string>
+<string name="support_dialog_text">If you like MultiVNC, why not consider supporting its development? For the time being, you can do so easily by clicking on the sponsor ad or by using PayPal or flattr. Thanks!</string>
 <string name="support_dialog_yes">Yes, good idea!</string>
 <string name="support_dialog_no">No, not now.</string>
 <string name="support_dialog_neveragain">Never ask again!</string>
 <string name="changelog_dialog_title">What\'s new...</string>
 <string name="changelog_dialog_text">
-    <![CDATA[<b>Version 1.3.4:</b>
+    <![CDATA[<b>Version 1.3.5:</b>
      		<ul>
-     	     <li>Prevent possible crash when opening bookmark database.</li>
+     	     <li>Added a really easy way to support the project: Now the About dialog - and ONLY the About dialog - features a sponsor
+     	     ad which you can click to easily support development.</li>
      		</ul> 
     ]]>
 </string>
