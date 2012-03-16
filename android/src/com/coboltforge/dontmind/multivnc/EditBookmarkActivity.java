@@ -1,5 +1,11 @@
 package com.coboltforge.dontmind.multivnc;
 
+/*
+ * Bookmark editing activity for MultiVNC.
+ * 
+ * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
+ */
+
 
 import android.app.Activity;
 import android.content.Intent;

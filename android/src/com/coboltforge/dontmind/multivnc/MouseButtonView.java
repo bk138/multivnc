@@ -1,6 +1,10 @@
 package com.coboltforge.dontmind.multivnc;
 
-import java.io.IOException;
+/*
+ * Views for virtual mouse buttons.
+ * 
+ * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
+ */
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

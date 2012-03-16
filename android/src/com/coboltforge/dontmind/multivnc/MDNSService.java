@@ -2,6 +2,8 @@ package com.coboltforge.dontmind.multivnc;
 
 /**
  * @author Christian Beier
+ * mDNS Service Discovery Service.
+ * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
  */
 
 import java.io.IOException;

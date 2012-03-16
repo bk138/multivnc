@@ -1,5 +1,13 @@
 package com.coboltforge.dontmind.multivnc;
 
+
+/*
+ * About activity for MultiVNC.
+ * 
+ * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
+ */
+
+
 import com.google.ads.*;
 import android.app.Activity;
 import android.content.Intent;
