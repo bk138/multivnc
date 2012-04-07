@@ -41,6 +41,7 @@ import javax.microedition.khronos.opengles.GL11Ext;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
+import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -56,8 +57,6 @@ public class VncCanvas extends GLSurfaceView {
 	
 	AbstractScaling scaling;
 	
-	// Available to activity
-	int mouseX, mouseY;
 	
 	// Runtime control flags
 	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
@@ -73,6 +72,8 @@ public class VncCanvas extends GLSurfaceView {
 	public VNCConn vncConn;
 
 	public Handler handler = new Handler();
+	
+	private VNCGLRenderer glRenderer;
 
 	/**
 	 * Current state of "mouse" buttons
@@ -85,7 +86,9 @@ public class VncCanvas extends GLSurfaceView {
 	private MouseScrollRunnable scrollRunnable;
 	
 
-	
+	// framebuffer coordinates of mouse pointer, Available to activity
+	int mouseX, mouseY;
+
 	/**
 	 * Position of the top left portion of the <i>visible</i> part of the screen, in
 	 * full-frame coordinates
@@ -93,6 +96,175 @@ public class VncCanvas extends GLSurfaceView {
 	int absoluteXPosition = 0, absoluteYPosition = 0;
 	
 
+	private class VNCGLRenderer implements GLSurfaceView.Renderer {
+
+		int[] textureIDs = new int[1];   // Array for 1 texture-ID
+	    private int[] mTexCrop = new int[4];
+	    float highlightCircleMs = 0;
+	    GLShape circle; 
+
+	    
+	    public void highlightPointer() {
+	    	highlightCircleMs = 2000;
+	    }
+
+	    
+		@Override
+		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+			
+			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
+			
+			circle = new GLShape(GLShape.CIRCLE); 
+
+			// Set color's clear-value to black
+			gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+
+			/*
+			 * By default, OpenGL enables features that improve quality but reduce
+			 * performance. One might want to tweak that especially on software
+			 * renderer.
+			 */
+			gl.glDisable(GL10.GL_DITHER); // Disable dithering for better performance
+			gl.glDisable(GL10.GL_LIGHTING);
+			gl.glDisable(GL10.GL_DEPTH_TEST);
+
+			/*
+			 * alpha blending has to be enabled manually!
+			 */
+			gl.glEnable(GL10.GL_BLEND);
+			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
+			
+			
+			/*
+			 * setup texture stuff
+			 */
+			// Enable 2d textures
+			gl.glEnable(GL10.GL_TEXTURE_2D);
+			// Generate texture-ID array
+			gl.glDeleteTextures(1, textureIDs, 0);
+			gl.glGenTextures(1, textureIDs, 0);
+			 // this is a 2D texture
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[0]);
+			// Set up texture filters --> nice smoothing
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+		}
+		
+		// Call back after onSurfaceCreated() or whenever the window's size changes
+		@Override
+		public void onSurfaceChanged(GL10 gl, int width, int height) {
+			
+			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
+		
+			// Set the viewport (display area) to cover the entire window
+			gl.glViewport(0, 0, width, height);
+
+			// Setup orthographic projection
+			gl.glMatrixMode(GL10.GL_PROJECTION); // Select projection matrix
+			gl.glLoadIdentity();                 // Reset projection matrix
+			gl.glOrthox(0, width, height, 0, 0, 100);
+
+
+			gl.glMatrixMode(GL10.GL_MODELVIEW);  // Select model-view matrix
+			gl.glLoadIdentity();                 // Reset
+		}
+		
+		@Override
+		public void onDrawFrame(GL10 gl) {
+			
+			// TODO optimize: texSUBimage ?
+			// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
+			
+			try{
+				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+
+				if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
+
+					vncConn.lockFramebuffer();
+					
+					// Build Texture from bitmap
+					GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, vncConn.getFramebuffer().mbitmap, 0);
+
+					vncConn.unlockFramebuffer();
+
+				}
+				
+				if(vncConn.getFramebuffer() instanceof FullBufferBitmapData) {
+					
+					vncConn.lockFramebuffer();
+					
+					// build texture from pixel array
+					gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
+							vncConn.getFramebuffer().bitmapwidth, vncConn.getFramebuffer().bitmapheight,
+							0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.getFramebuffer().bitmapPixels));
+				
+					vncConn.unlockFramebuffer();
+				}
+
+				
+				/*
+				 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr. 
+				 * That is, "left"/"bottom"/width/height, although you can 
+				 * also have negative width and height to flip the image. 
+				 * 
+				 * This is the part of the framebuffer we show on-screen.
+				 * 
+				 */
+				mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
+				mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
+				mTexCrop[2] = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth() / getScale() : vncConn.getFramebufferWidth());
+				mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : vncConn.getFramebufferWidth());
+				
+				if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
+
+				((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mTexCrop, 0);
+
+				/*
+				 * Very fast, but very basic transforming: only transpose, flip and scale.
+				 * Uses the GL_OES_draw_texture extension to draw sprites on the screen without
+				 * any sort of projection or vertex buffers involved.
+				 * 
+				 * See http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
+				 * 
+				 * All parameters in GL screen coordinates!
+				 */
+				int x = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (vncConn.getFramebufferWidth()*getScale())/2);
+				int y = (int) (VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (vncConn.getFramebufferHeight()*getScale())/2);
+				int w = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth(): vncConn.getFramebufferWidth()*getScale());
+				int h =(int) (VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight(): vncConn.getFramebufferHeight()*getScale());
+				gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // opaque!
+				((GL11Ext) gl).glDrawTexfOES(x, y, 0, w, h);
+
+				if(Utils.DEBUG()) Log.d(TAG, "drawing to screen: x " + x + " y " + y + " w " + w + " h " + h);
+				
+				
+				/*
+				 * do pointer highlight overlay if wanted
+				 */
+//				if(highlightCircleMs > 0) //FIXME
+				{
+					gl.glLoadIdentity();                 // Reset model-view matrix
+					gl.glTranslatex(mouseX - absoluteXPosition, mouseY-absoluteYPosition, 0);
+					gl.glScalef(0.001f, 0.001f, 0.0f);
+					gl.glColor4f(1.0f, 0.2f, 1.0f, 0.2f);
+					circle.draw(gl);
+					
+					gl.glScalef(0.95f, 0.95f, 0.0f);
+					circle.draw(gl);
+
+					
+					highlightCircleMs-= 33;
+				}
+			
+				
+			}
+			catch(NullPointerException e) {
+			}
+
+		}
+		
+	}
+	
 
 	/**
 	 * Constructor used by the inflation apparatus
@@ -103,134 +275,8 @@ public class VncCanvas extends GLSurfaceView {
 		super(context, attrs);
 		scrollRunnable = new MouseScrollRunnable();
 	
-		
-		setRenderer(new GLSurfaceView.Renderer() {
-			
-			int[] textureIDs = new int[1];   // Array for 1 texture-ID
-		    private int[] mTexCrop = new int[4];
-
-		    
-			@Override
-			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-				
-				if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
-
-				// Set color's clear-value to black
-				gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
-				
-
-				/*
-				 * By default, OpenGL enables features that improve quality but reduce
-				 * performance. One might want to tweak that especially on software
-				 * renderer.
-				 */
-				gl.glDisable(GL10.GL_DITHER);
-				gl.glDisable(GL10.GL_LIGHTING);
-				gl.glDisable(GL10.GL_BLEND);
-				gl.glDisable(GL10.GL_DEPTH_TEST);
-				
-				/*
-				 * setup texture stuff
-				 */
-				// enable 2d textures
-				gl.glEnable(GL10.GL_TEXTURE_2D);
-				// Generate texture-ID array
-				gl.glDeleteTextures(1, textureIDs, 0);
-				gl.glGenTextures(1, textureIDs, 0);
-				 // this is a 2D texture
-				gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[0]);
-				// Set up texture filters --> nice smoothing
-				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-				gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
-				// texture environment
-				gl.glTexEnvf(GL10.GL_TEXTURE_ENV, GL10.GL_TEXTURE_ENV_MODE, GL10.GL_REPLACE);
-
-			}
-			
-			// Call back after onSurfaceCreated() or whenever the window's size changes
-			@Override
-			public void onSurfaceChanged(GL10 gl, int width, int height) {
-				
-				if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
-
-				// nothing needed in here with glDrawTexOES()
-				// http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
-			}
-			
-			@Override
-			public void onDrawFrame(GL10 gl) {
-				
-				// TODO optimize: texSUBimage ?
-				// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
-				
-				try{
-					gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-
-					if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
-
-						vncConn.lockFramebuffer();
-						
-						// Build Texture from bitmap
-						GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, vncConn.getFramebuffer().mbitmap, 0);
-
-						vncConn.unlockFramebuffer();
-
-					}
-					
-					if(vncConn.getFramebuffer() instanceof FullBufferBitmapData) {
-						
-						vncConn.lockFramebuffer();
-						
-						// build texture from pixel array
-						gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
-								vncConn.getFramebuffer().bitmapwidth, vncConn.getFramebuffer().bitmapheight,
-								0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.getFramebuffer().bitmapPixels));
-					
-						vncConn.unlockFramebuffer();
-					}
-
-					
-					/*
-					 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr. 
-					 * That is, "left"/"bottom"/width/height, although you can 
-					 * also have negative width and height to flip the image. 
-					 * 
-					 * This is the part of the framebuffer we show on-screen.
-					 * 
-					 */
-					mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
-					mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
-					mTexCrop[2] = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth() / getScale() : vncConn.getFramebufferWidth());
-					mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : vncConn.getFramebufferWidth());
-					
-					if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
-
-					((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mTexCrop, 0);
-
-					/*
-					 * Very fast, but very basic transforming: only transpose, flip and scale.
-					 * Uses the GL_OES_draw_texture extension to draw sprites on the screen without
-					 * any sort of projection or vertex buffers involved.
-					 * 
-					 * See http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
-					 * 
-					 * All parameters in GL screen coordinates!
-					 */
-					int x = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (vncConn.getFramebufferWidth()*getScale())/2);
-					int y = (int) (VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? 0 : VncCanvas.this.getHeight()/2 - (vncConn.getFramebufferHeight()*getScale())/2);
-					int w = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth(): vncConn.getFramebufferWidth()*getScale());
-					int h =(int) (VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight(): vncConn.getFramebufferHeight()*getScale());
-					((GL11Ext) gl).glDrawTexfOES(x, y, 0, w, h);
-
-					if(Utils.DEBUG()) Log.d(TAG, "drawing to screen: x " + x + " y " + y + " w " + w + " h " + h);
-				}
-				catch(NullPointerException e) {
-				}
-
-			}
-			
-			
-		});
+		glRenderer = new VNCGLRenderer();
+		setRenderer(glRenderer);
 		// only render upon request
 		setRenderMode(RENDERMODE_WHEN_DIRTY);
 		
@@ -263,6 +309,17 @@ public class VncCanvas extends GLSurfaceView {
 		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
 	}
 	
+	public void highlightPointer() {
+		
+		 queueEvent(new Runnable() {
+			// This method will be called on the rendering thread:
+			@Override
+			public void run() {
+				glRenderer.highlightPointer();
+			}
+		});
+		
+	}
 
 
 	private void mouseFollowPan()
