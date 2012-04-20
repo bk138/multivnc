@@ -238,6 +238,72 @@ fi
 
 AM_CONDITIONAL(HAVE_LIBZ, test ! -z "$HAVE_ZLIB_H")
 
+# Check for OpenSSL
+AH_TEMPLATE(HAVE_LIBCRYPT, [libcrypt library present])
+AC_ARG_WITH(crypt,
+[  --without-crypt         disable support for libcrypt],,)
+if test "x$with_crypt" != "xno"; then
+	AC_CHECK_FUNCS([crypt], HAVE_LIBC_CRYPT="true")
+	if test -z "$HAVE_LIBC_CRYPT"; then
+		AC_CHECK_LIB(crypt, crypt,
+			CRYPT_LIBS="-lcrypt"
+			[AC_DEFINE(HAVE_LIBCRYPT)], ,)
+	fi
+fi
+AC_SUBST(CRYPT_LIBS)
+
+# some OS's need both -lssl and -lcrypto on link line:
+AH_TEMPLATE(HAVE_LIBCRYPTO, [openssl libcrypto library present])
+AC_ARG_WITH(crypto,
+[  --without-crypto        disable support for openssl libcrypto],,)
+
+AH_TEMPLATE(HAVE_LIBSSL, [openssl libssl library present])
+AC_ARG_WITH(ssl,
+[  --without-ssl           disable support for openssl libssl]
+[  --with-ssl=DIR          use openssl include/library files in DIR],,)
+
+if test "x$with_crypto" != "xno" -a "x$with_ssl" != "xno"; then
+	if test ! -z "$with_ssl" -a "x$with_ssl" != "xyes"; then
+		saved_CPPFLAGS="$CPPFLAGS"
+		saved_LDFLAGS="$LDFLAGS"
+		CPPFLAGS="$CPPFLAGS -I$with_ssl/include"
+		LDFLAGS="$LDFLAGS -L$with_ssl/lib"
+		if test "x$ld_minus_R" = "xno"; then
+			:
+		elif test "x$GCC" = "xyes"; then
+			LDFLAGS="$LDFLAGS -Xlinker -R$with_ssl/lib"
+		else
+			LDFLAGS="$LDFLAGS -R$with_ssl/lib"
+		fi
+	fi
+	AC_CHECK_LIB(crypto, RAND_file_name,
+		[AC_DEFINE(HAVE_LIBCRYPTO) HAVE_LIBCRYPTO="true"], ,)
+	if test ! -z "$with_ssl" -a "x$with_ssl" != "xyes"; then
+		if test "x$HAVE_LIBCRYPTO" != "xtrue"; then
+			CPPFLAGS="$saved_CPPFLAGS"
+			LDFLAGS="$saved_LDFLAGS"
+		fi
+	fi
+fi
+
+AH_TEMPLATE(HAVE_X509_PRINT_EX_FP, [open ssl X509_print_ex_fp available])
+if test "x$with_ssl" != "xno"; then
+	if test "x$HAVE_LIBCRYPTO" = "xtrue"; then
+		AC_CHECK_LIB(ssl, SSL_library_init,
+			SSL_LIBS="-lssl -lcrypto"
+			[AC_DEFINE(HAVE_LIBSSL) HAVE_LIBSSL="true"], ,
+			-lcrypto)
+	else
+		AC_CHECK_LIB(ssl, SSL_library_init,
+			SSL_LIBS="-lssl"
+			[AC_DEFINE(HAVE_LIBSSL) HAVE_LIBSSL="true"], ,)
+	fi
+fi
+AC_SUBST(SSL_LIBS)
+AM_CONDITIONAL(HAVE_LIBSSL, test ! -z "$SSL_LIBS")
+
+
+
 # Check for libgcrypt
 AH_TEMPLATE(WITH_CLIENT_GCRYPT, [Enable support for libgcrypt in libvncclient])
 AC_ARG_WITH(gcrypt,
@@ -254,20 +320,35 @@ if test "x$with_gcrypt" != "xno"; then
        fi
 fi
 
+
 # Checks for GnuTLS
-AH_TEMPLATE(WITH_CLIENT_TLS, [Enable support for gnutls in libvncclient])
+AH_TEMPLATE(HAVE_GNUTLS, [GnuTLS library present])
 AC_ARG_WITH(gnutls,
-[  --without-gnutls        disable support for gnutls],,)
-AC_ARG_WITH(client-tls,
-[  --without-client-tls    disable support for gnutls in libvncclient],,)
+[  --without-gnutls        disable support for gnutls]
+[  --with-gnutls=DIR       use gnutls include/library files in DIR],,)
 
 if test "x$with_gnutls" != "xno"; then
-	PKG_CHECK_MODULES(GNUTLS, gnutls >= 2.4.0, , with_client_tls=no)
+	PKG_CHECK_MODULES(GNUTLS, gnutls >= 2.4.0)
 	CFLAGS="$CFLAGS $GNUTLS_CFLAGS"
 	LIBS="$LIBS $GNUTLS_LIBS"
-	if test "x$with_client_tls" != "xno"; then
-		AC_DEFINE(WITH_CLIENT_TLS)
-	fi
+fi
+AM_CONDITIONAL(HAVE_GNUTLS, test ! -z "$GNUTLS_LIBS")
+if test ! -z "$GNUTLS_LIBS" ; then
+  AC_DEFINE(HAVE_GNUTLS)
+fi
+
+
+# warn if neither GnuTLS nor OpenSSL are available
+if test -z "$SSL_LIBS" -a -z "$GNUTLS_LIBS"; then
+		AC_MSG_WARN([
+==========================================================================
+*** No encryption library could be found. ***
+A libvncserver/libvncclient built this way will not support SSL encryption.
+To enable SSL install the necessary development packages (perhaps it is named
+something like libssl-dev or gnutls-dev) and run configure again.
+==========================================================================
+])
+	sleep 5
 fi
 
 
