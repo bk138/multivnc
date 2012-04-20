@@ -43,6 +43,15 @@ multivnc_LDADD += -lws2_32
 	 $(WX_RESCOMP) -o $@ $<
 endif
 
+if HAVE_GNUTLS
+multivnc_LDADD += @GNUTLS_LIBS@
+else
+if HAVE_LIBSSL
+multivnc_LDADD +=  @SSL_LIBS@ @CRYPT_LIBS@
+endif
+endif
+
+
 EXTRA_DIST = \
 	winres.rc\
 	icon.ico
