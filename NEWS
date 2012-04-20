@@ -4,6 +4,8 @@ MultiVNC 0.6 -
 	  registry.
         * Added record/replay of user input. You can now record a
 	  VNC session and replay this 'macro' later.
+	* Optional OpenSSL support (instead of GnuTLS)
+	* MultiVNC can now listen on an IPv6 connection.
 
 MultiVNC 0.5 - "Bag o' stuff"
 	* MulticastVNC now supports the Ultra encoding and features
