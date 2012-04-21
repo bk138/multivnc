@@ -166,7 +166,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // setup clipboard
 #ifdef __WXGTK__
   // always use middle mouse button paste
-  wxCriticalSectionLocker lock(wxGetApp().mutex_theclipboard); 
   if(wxTheClipboard->Open())
     {
       wxTheClipboard->UsePrimarySelection(true);
@@ -354,7 +353,6 @@ void MyFrameMain::onVNCConnFBResizeNotify(wxCommandEvent& event)
 
 void MyFrameMain::onVNCConnCuttextNotify(wxCommandEvent& event)
 { 
-  wxCriticalSectionLocker lock(wxGetApp().mutex_theclipboard); 
   if(wxTheClipboard->Open()) 
     {
       // get sender

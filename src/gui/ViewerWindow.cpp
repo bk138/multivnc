@@ -254,8 +254,6 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
       if(do_keyboard_grab)
 	grab_keyboard();
 
-      wxCriticalSectionLocker lock(wxGetApp().mutex_theclipboard); 
-      
       if(wxTheClipboard->Open()) 
 	{
 	  if(wxTheClipboard->IsSupported(wxDF_TEXT))

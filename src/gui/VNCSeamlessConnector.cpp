@@ -276,7 +276,6 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
 
       // set cuttext from clipboard
       {
-	wxCriticalSectionLocker lock(wxGetApp().mutex_theclipboard); 
 	if(wxTheClipboard->Open()) 
 	  {
 	    if(wxTheClipboard->IsSupported(wxDF_TEXT))
