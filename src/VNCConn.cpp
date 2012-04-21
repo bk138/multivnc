@@ -1086,6 +1086,10 @@ void VNCConn::Shutdown()
 #else
       close(cl->sock);
 #endif
+      // this one was strdup'ed before
+      if(!cl->listenSpecified)
+	free((void*)cl->appData.encodingsString);
+
       // in case we called listen, canceled that, and now want to connect to some
       // host via Init()
       cl->listenSpecified = FALSE;
@@ -1095,8 +1099,7 @@ void VNCConn::Shutdown()
 	  free(cl->frameBuffer);
 	  cl->frameBuffer = 0;
 	}
-      // this one was strdup'ed before
-      free((void*)cl->appData.encodingsString);
+
     }
 }
 
