@@ -214,10 +214,7 @@ bool MultiVNCApp::setLocale(int language)
   // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return 
   // false just because it failed to load wxstd catalog                                 
   if(! locale->Init(language) )                      
-    {  
-      wxLogError(_("This language is not supported by the system.")); 
-      return false;    
-    }            
+    return false;    
 
   // normally this wouldn't be necessary as the catalog files would be found  
   // in the default locations, but when the program is not installed the
