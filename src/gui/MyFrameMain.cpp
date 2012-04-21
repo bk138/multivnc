@@ -727,7 +727,7 @@ bool MyFrameMain::spawn_conn(wxString host, int listenPort)
   connections.push_back(cb);
 
   if(listenPort > 0)
-    notebook_connections->AddPage(win, _("Listening on port ") + listenPort, true);    
+    notebook_connections->AddPage(win, _("Listening on port ") + wxString() << listenPort, true);    
   else
     notebook_connections->AddPage(win, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")") , true);
 
