@@ -239,6 +239,8 @@ private:
   static wxCriticalSection mutex_log;
   static bool do_logfile;
 
+  // utility functions
+  static void parseHostString(const char *server, int defaultport, char **host, int *port);
  
   // messagequeues for posting events to the worker thread
   typedef wxMouseEvent pointerEvent;

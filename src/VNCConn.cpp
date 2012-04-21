@@ -990,10 +990,11 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
   resetStats();
 
   cl->programName = "VNCConn";
-  cl->serverHost = strdup(host.BeforeFirst(':').mb_str()); // this one gets freed by the library
-  cl->serverPort = wxAtoi(host.AfterFirst(':'));
-  if(cl->serverPort < 5900)
+  parseHostString(host.mb_str(), 5900, &cl->serverHost, &cl->serverPort);
+  // Support short-form (:0, :1) 
+  if(cl->serverPort < 100)
     cl->serverPort += 5900;
+
   cl->appData.compressLevel = compresslevel;
   cl->appData.qualityLevel = quality;
   cl->appData.encodingsString = strdup(encodings.mb_str());
@@ -1007,6 +1008,7 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
   else
     cl->canHandleMulticastVNC = FALSE;
 
+  rfbClientLog("About to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
 
   if(! rfbInitClient(cl, 0, NULL))
     {
@@ -1628,4 +1630,51 @@ int VNCConn::getMaxSocketRecvBufSize()
   close(sock);
 
   return recv_buf_got/1024;
+}
+
+
+/*
+  parse ipv4 or ipv6 address string.
+  taken from remmina, thanks!
+*/
+void VNCConn::parseHostString(const char *server, int defaultport, char **host, int *port)
+{
+	char *str, *ptr, *ptr2;
+
+	str = strdup(server);
+
+	/* [server]:port format */
+	ptr = strchr(str, '[');
+	if (ptr)
+	{
+		ptr++;
+		ptr2 = strchr(ptr, ']');
+		if (ptr2)
+			*ptr2++ = '\0';
+		if (*ptr2 == ':')
+			defaultport = atoi(ptr2 + 1);
+		if (host)
+			*host = strdup(ptr);
+		if (port)
+			*port = defaultport;
+		free(str);
+		return;
+	}
+
+	/* server:port format, IPv6 cannot use this format */
+	ptr = strchr(str, ':');
+	if (ptr)
+	{
+		ptr2 = strchr(ptr + 1, ':');
+		if (ptr2 == NULL)
+		{
+			*ptr++ = '\0';
+			defaultport = atoi(ptr);
+		}
+		/* More than one ':' means this is IPv6 address. Treat it as a whole address */
+	}
+	if (host)
+		*host = str;
+	if (port)
+		*port = defaultport;
 }

@@ -622,17 +622,9 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
+bool MyFrameMain::spawn_conn(wxString host, int listenPort)
 {
   wxBusyCursor busy;
-
-  // port can also be something like 'vnc', so look it up...
-  wxIPV4address host_addr;
-  if(host_addr.Service(port))
-    port = wxString() << host_addr.Service();
-  else
-    port = wxT("5900");
-  
 
   // get connection settings
   int compresslevel, quality, multicast_socketrecvbuf, multicast_recvbuf, fastrequest_interval;
@@ -685,10 +677,10 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
   VNCConn* c = new VNCConn(this);
   c->Setup(getpasswd);
 
-  if(listen)
+  if(listenPort > 0)
     {
-      wxLogStatus(_("Listening on port ") + port + wxT(" ..."));
-      if(!c->Listen(wxAtoi(port)))
+      wxLogStatus(_("Listening on port ") + wxString() << listenPort + wxT(" ..."));
+      if(!c->Listen(listenPort))
 	{
 	  wxLogError(c->getErr());
 	  delete c;
@@ -697,8 +689,8 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
     }
   else // normal init without previous listen
     {
-      wxLogStatus(_("Connecting to ") + host + _T(":") + port + wxT(" ..."));
-      if(!c->Init(host + wxT(":") + port, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
+      wxLogStatus(_("Connecting to ") + host + wxT(" ..."));
+      if(!c->Init(host, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -734,8 +726,8 @@ bool MyFrameMain::spawn_conn(bool listen, wxString host, wxString port)
 
   connections.push_back(cb);
 
-  if(listen)
-    notebook_connections->AddPage(win, _("Listening on port ") + port, true);    
+  if(listenPort > 0)
+    notebook_connections->AddPage(win, _("Listening on port ") + listenPort, true);    
   else
     notebook_connections->AddPage(win, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")") , true);
 
@@ -982,6 +974,10 @@ bool MyFrameMain::loadbookmarks()
 	  return false;
 	}
 
+      // add brackets if host is an IPv6 address
+      if(host.Freq(':') > 0)
+	 host = wxT("[") + host + wxT("]");
+
       // all fine, add it
       bookmarks.Add(host + wxT(":") + port);
 
@@ -1017,7 +1013,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 				 _("Connect to specific host"));
 				
   if(s != wxEmptyString)
-    spawn_conn(false, s.BeforeFirst(wxT(':')), s.AfterFirst(wxT(':')));
+    spawn_conn(s);
 }
 
 
@@ -1037,7 +1033,7 @@ void MyFrameMain::machine_listen(wxCommandEvent &event)
     }
 
   listen_ports.insert(port);
-  spawn_conn(true, wxEmptyString, wxString() << port);
+  spawn_conn(wxEmptyString, port);
 }
 
 
@@ -1674,7 +1670,7 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
 void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
 {
   listbox_services_select(event); // get the actual values
-  spawn_conn(false, services_addr, services_port);
+  spawn_conn(services_addr + wxT(":") + services_port);
 } 
  
 
@@ -1711,7 +1707,7 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
   if(event.m_callbackUserData)
     sel = wxAtoi(*(wxString*)event.m_callbackUserData);
       
-  spawn_conn(false, bookmarks[sel].BeforeFirst(wxT(':')), bookmarks[sel].AfterFirst(wxT(':')));
+  spawn_conn(bookmarks[sel]);
 }
 
 
@@ -1768,7 +1764,7 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
 
 bool MyFrameMain::cmdline_connect(wxString& hostarg)
 {
-  return spawn_conn(false, hostarg.BeforeFirst(wxT(':')), hostarg.AfterFirst(wxT(':')));
+  return spawn_conn(hostarg);
 }
 
 
