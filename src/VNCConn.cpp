@@ -953,7 +953,7 @@ bool VNCConn::Listen(int port)
 {
   wxLogDebug(wxT("VNCConn %p: Listen() port %d"), this, port);
 
-  cl->listenPort = port;
+  cl->listenPort = cl->listen6Port = port;
 
   thread_listenmode = true;
 
