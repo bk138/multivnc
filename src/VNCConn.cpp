@@ -1,5 +1,5 @@
 /* 
-   VNCConn.cpp: VNC connection class implemtation.
+   VNCConn.cpp: VNC connection class implementation.
 
    This file is part of MultiVNC, a multicast-enabled crossplatform 
    VNC viewer.
