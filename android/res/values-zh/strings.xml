@@ -54,7 +54,7 @@
 <string name="password_caption">密码</string>
 <string name="port_caption">端口</string>
 <string name="repeater_button">转发器</string>
-<string name="repeater_caption">输入转发器地址 &lt;b&gt;只有当&lt;/b&gt; 你正在使用&lt;br&gt;&lt;i&gt;UltraVNC&lt;/i&gt;-选中转发器</string>
+<string name="repeater_caption">转发器地址</string>
 <string name="repeater_clear">不使用转发器</string>
 <string name="repeater_dialog_title">转发器信息</string>
 <string name="repeater_empty_text">无转发器</string>
@@ -71,4 +71,6 @@
 <string name="special_keys">发送键</string>
 <string name="username_caption">用户名</string>
 <string name="username_hint">针对Windows授权</string>
+<string name="repeater_hint">输入转发器地址，只有当你正在使用UltraVNC时选中转发器</string>
+<string name="colormode_caption">颜色模式</string>
 </resources>
