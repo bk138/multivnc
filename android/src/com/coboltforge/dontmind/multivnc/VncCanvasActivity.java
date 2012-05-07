@@ -169,8 +169,6 @@ public class VncCanvasActivity extends Activity {
 			dragX = e.getX();
 			dragY = e.getY();
 			
-			vncCanvas.highlightPointer();
-			
 			// only interpret as button down if virtual mouse buttons are disabled 
 			if(mousebuttons.getVisibility() != View.VISIBLE) 
 				dragModeButtonDown = true;

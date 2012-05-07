@@ -100,13 +100,7 @@ public class VncCanvas extends GLSurfaceView {
 
 		int[] textureIDs = new int[1];   // Array for 1 texture-ID
 	    private int[] mTexCrop = new int[4];
-	    float highlightCircleMs = 0;
 	    GLShape circle; 
-
-	    
-	    public void highlightPointer() {
-	    	highlightCircleMs = 2000;
-	    }
 
 	    
 		@Override
@@ -239,22 +233,20 @@ public class VncCanvas extends GLSurfaceView {
 				
 				
 				/*
-				 * do pointer highlight overlay if wanted
+				 * do pointer highlight overlay
 				 */
-//				if(highlightCircleMs > 0) //FIXME
-				{
-					gl.glLoadIdentity();                 // Reset model-view matrix
-					gl.glTranslatex(mouseX - absoluteXPosition, mouseY-absoluteYPosition, 0);
-					gl.glScalef(0.001f, 0.001f, 0.0f);
-					gl.glColor4f(1.0f, 0.2f, 1.0f, 0.2f);
-					circle.draw(gl);
-					
-					gl.glScalef(0.95f, 0.95f, 0.0f);
-					circle.draw(gl);
+				int mouseXonScreen = (int)(getScale()*(mouseX-absoluteXPosition));
+				int mouseYonScreen = (int)(getScale()*(mouseY-absoluteYPosition));
+				
+				gl.glLoadIdentity();                 // Reset model-view matrix
+				gl.glTranslatex( mouseXonScreen, mouseYonScreen, 0);
+				
+				gl.glScalef(0.001f, 0.001f, 0.0f);
+				gl.glColor4f(1.0f, 0.2f, 1.0f, 0.2f);
+				circle.draw(gl);
 
-					
-					highlightCircleMs-= 33;
-				}
+				gl.glScalef(0.95f, 0.95f, 0.0f);
+				circle.draw(gl);
 			
 				
 			}
@@ -309,18 +301,6 @@ public class VncCanvas extends GLSurfaceView {
 		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
 	}
 	
-	public void highlightPointer() {
-		
-		 queueEvent(new Runnable() {
-			// This method will be called on the rendering thread:
-			@Override
-			public void run() {
-				glRenderer.highlightPointer();
-			}
-		});
-		
-	}
-
 
 	private void mouseFollowPan()
 	{
@@ -415,7 +395,8 @@ public class VncCanvas extends GLSurfaceView {
 		
 		if (scaling != null && ! scaling.isAbleToPan())
 			return;
-			
+		
+		
 		int x = mouseX;
 		int y = mouseY;
 		boolean panned = false;
@@ -489,9 +470,16 @@ public class VncCanvas extends GLSurfaceView {
 			sX = vncConn.getFramebufferWidth() - getVisibleWidth() - absoluteXPosition;
 		if (absoluteYPosition + getVisibleHeight() + sY >  vncConn.getFramebufferHeight())
 			sY = vncConn.getFramebufferHeight() - getVisibleHeight() - absoluteYPosition;
-
+		
 		absoluteXPosition += sX;
 		absoluteYPosition += sY;
+
+		if(scale < 1) { // the image is centered when zooming out!
+			absoluteXPosition /= 2;
+			absoluteYPosition /= 2;
+		}
+		
+			
 		if (sX != 0.0 || sY != 0.0)
 		{
 			scrollToAbsolute();
