@@ -41,7 +41,6 @@ import javax.microedition.khronos.opengles.GL11Ext;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -203,11 +202,14 @@ public class VncCanvas extends GLSurfaceView {
 				 * 
 				 * This is the part of the framebuffer we show on-screen.
 				 * 
+				 * If absolute[XY]Position are negative that means the framebuffer
+				 * is smaller than our viewer window.
+				 * 
 				 */
 				mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
-				mTexCrop[1] = (int) (absoluteYPosition + VncCanvas.this.getHeight() / getScale());
+				mTexCrop[1] = absoluteYPosition >= 0 ? (int)(absoluteYPosition + VncCanvas.this.getHeight() / getScale()) : vncConn.getFramebufferHeight();
 				mTexCrop[2] = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth() / getScale() : vncConn.getFramebufferWidth());
-				mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : vncConn.getFramebufferWidth());
+				mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : vncConn.getFramebufferHeight());
 				
 				if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
 
@@ -473,11 +475,13 @@ public class VncCanvas extends GLSurfaceView {
 		
 		absoluteXPosition += sX;
 		absoluteYPosition += sY;
-
-		if(scale < 1) { // the image is centered when zooming out!
+		
+		// whene the frame buffer is smaller than the view,
+		// it is is centered!
+		if(vncConn.getFramebufferWidth() < getVisibleWidth())
 			absoluteXPosition /= 2;
+		if(vncConn.getFramebufferHeight() < getVisibleHeight())
 			absoluteYPosition /= 2;
-		}
 		
 			
 		if (sX != 0.0 || sY != 0.0)
