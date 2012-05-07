@@ -124,10 +124,9 @@ public class VncCanvas extends GLSurfaceView {
 			/*
 			 * alpha blending has to be enabled manually!
 			 */
-			gl.glEnable(GL10.GL_BLEND);
+//			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE);
 			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-			
-			
+
 			/*
 			 * setup texture stuff
 			 */
@@ -237,6 +236,7 @@ public class VncCanvas extends GLSurfaceView {
 				/*
 				 * do pointer highlight overlay
 				 */
+				gl.glEnable(GL10.GL_BLEND);
 				int mouseXonScreen = (int)(getScale()*(mouseX-absoluteXPosition));
 				int mouseYonScreen = (int)(getScale()*(mouseY-absoluteYPosition));
 				
@@ -249,7 +249,8 @@ public class VncCanvas extends GLSurfaceView {
 
 				gl.glScalef(0.95f, 0.95f, 0.0f);
 				circle.draw(gl);
-			
+
+				gl.glDisable(GL10.GL_BLEND);
 				
 			}
 			catch(NullPointerException e) {
