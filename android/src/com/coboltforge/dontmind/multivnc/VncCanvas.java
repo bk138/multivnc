@@ -124,7 +124,6 @@ public class VncCanvas extends GLSurfaceView {
 			/*
 			 * alpha blending has to be enabled manually!
 			 */
-//			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE);
 			gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
 			/*
@@ -242,12 +241,16 @@ public class VncCanvas extends GLSurfaceView {
 				
 				gl.glLoadIdentity();                 // Reset model-view matrix
 				gl.glTranslatex( mouseXonScreen, mouseYonScreen, 0);
+				gl.glColor4f(1.0f, 0.2f, 1.0f, 0.1f);
 				
+				// simulate some anti-aliasing by drawing the shape 3x
 				gl.glScalef(0.001f, 0.001f, 0.0f);
-				gl.glColor4f(1.0f, 0.2f, 1.0f, 0.2f);
 				circle.draw(gl);
 
-				gl.glScalef(0.95f, 0.95f, 0.0f);
+				gl.glScalef(0.99f, 0.99f, 0.0f);
+				circle.draw(gl);
+				
+				gl.glScalef(0.99f, 0.99f, 0.0f);
 				circle.draw(gl);
 
 				gl.glDisable(GL10.GL_BLEND);
