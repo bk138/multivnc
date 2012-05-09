@@ -100,10 +100,11 @@
 <string name="support_dialog_neveragain">Never ask again!</string>
 <string name="changelog_dialog_title">What\'s new...</string>
 <string name="changelog_dialog_text">
-    <![CDATA[<b>Version 1.3.5:</b>
+    <![CDATA[<b>Version 1.3.6:</b>
      		<ul>
-     	     <li>Added a really easy way to support the project: Now the About dialog - and ONLY the About dialog - features a sponsor
-     	     ad which you can click to easily support development.</li>
+     		 <li>Added highlighting of cursor position.</li>
+     		 <li>Fix chinese translation. Thanks go out to Yao Chunlin.</li>
+     	     <li>Fix possible crash.</li>
      		</ul> 
     ]]>
 </string>
