@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="libs/java-flattr-rest-0.0.3.0.jar"/>
 	<classpathentry kind="lib" path="libs/signpost-commonshttp4-1.2.1.1.jar"/>
 	<classpathentry kind="lib" path="libs/GoogleAdMobAdsSdk-4.3.1.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
