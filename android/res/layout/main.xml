@@ -173,17 +173,20 @@
 		    <Button
 					android:id="@+id/buttonSaveBookmark"
 					android:text="@string/savebookmark_button"
-					android:layout_width="match_parent"
+					android:layout_width="200dp"
 					android:layout_height="wrap_content"
-					android:layout_marginBottom="8dip"
+					android:layout_gravity="center"
+					android:layout_marginBottom="10dip"
 					/>
 		       
 		     <Button 
-					    android:id="@+id/buttonGO" 
-					    android:text="@string/connect_button"
-					    android:textAppearance="?android:attr/textAppearanceLarge"
-						android:layout_height="wrap_content"
-					android:layout_width="match_parent"/>
+				    android:id="@+id/buttonGO" 
+				    android:text="@string/connect_button"
+				    android:textAppearance="?android:attr/textAppearanceLarge"
+					android:layout_width="200dp"
+					android:layout_height="100dp"
+					android:layout_gravity="center"
+					/>
 			       
 		 </LinearLayout>
 		       	       
