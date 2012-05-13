@@ -38,15 +38,20 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11Ext;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.os.Handler;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
@@ -719,7 +724,32 @@ public class VncCanvas extends GLSurfaceView {
 	}
 
 	
+	public void getCredFromUser(final ConnectionBean c) {
+		// this method is probably called from the vnc thread
+		post(new Runnable() {
+			@Override
+			public void run() {
+				final EditText input = new EditText(getContext());
+				input.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+				input.setTransformationMethod(new PasswordTransformationMethod());
 
+				new AlertDialog.Builder(getContext())
+			    .setTitle(getContext().getString(R.string.password_caption))
+			    .setView(input)
+			    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int whichButton) {
+			            c.setPassword(input.getText().toString());
+			            synchronized (vncConn) {
+				            vncConn.notify();
+						}
+			        }
+			    }).show();		
+			}
+		});
+
+	}
+	
+	
 
 	public ScaleType getScaleType() {
 		// TODO Auto-generated method stub

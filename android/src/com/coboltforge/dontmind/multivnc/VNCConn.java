@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.Display;
@@ -32,6 +33,9 @@ public class VNCConn {
 	private final static String TAG = "VNCConn";
 
 	private VncCanvas parent;
+
+	private Thread workerThread;
+	
 	// VNC protocol connection
 	private RfbProto rfb;
 	private ConnectionBean connSettings;
@@ -157,10 +161,10 @@ public class VNCConn {
 			}
 		});
 		final Display display = pd.getWindow().getWindowManager().getDefaultDisplay();
-		Thread t = new Thread() {
+		workerThread = new Thread() {
 			public void run() {
 				try {
-					connectAndAuthenticate(connSettings.getUserName(),connSettings.getPassword());
+					connectAndAuthenticate();
 					doProtocolInitialisation(display.getWidth(), display.getHeight());
 					parent.handler.post(new Runnable() {
 						public void run() {
@@ -197,7 +201,7 @@ public class VNCConn {
 				}
 			}
 		};
-		t.start();
+		workerThread.start();
 	}
 
 
@@ -354,7 +358,6 @@ public class VNCConn {
 	}
 	
 	
-
 	public String getEncoding() {
 		switch (preferredEncoding) {
 		case RfbProto.EncodingRaw:
@@ -408,7 +411,7 @@ public class VNCConn {
 	
 	
 
-	private void connectAndAuthenticate(String us,String pw) throws Exception {
+	private void connectAndAuthenticate() throws Exception {
 		Log.i(TAG, "Connecting to " + connSettings.getAddress() + ", port " + connSettings.getPort() + "...");
 
 		rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort());
@@ -455,10 +458,19 @@ public class VNCConn {
 			break;
 		case RfbProto.AuthVNC:
 			Log.i(TAG, "VNC authentication needed");
-			rfb.authenticateVNC(pw);
+			if(connSettings.getPassword() == null || connSettings.getPassword().isEmpty()) {
+				parent.getCredFromUser(connSettings);
+				synchronized (this) 
+				{
+					wait();  // wait for user input to finish
+				}
+			}			
+			rfb.authenticateVNC(connSettings.getPassword());
 			break;
 		case RfbProto.AuthUltra:
-			rfb.authenticateDH(us,pw);
+			if(connSettings.getPassword() == null || connSettings.getPassword().isEmpty())
+				parent.getCredFromUser(connSettings);
+			rfb.authenticateDH(connSettings.getUserName(),connSettings.getPassword());
 			break;
 		default:
 			throw new Exception("Unknown authentication scheme " + authType);
