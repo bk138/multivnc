@@ -1,9 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/itemSpecialKeys" android:title="@string/special_keys"
-		android:icon="@drawable/specialkeys" />
-	<item android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again" />
+		android:icon="@drawable/specialkeys"
+		android:showAsAction="ifRoom" />
+	<item android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again" 
+	    android:showAsAction="ifRoom"/>
 	<item android:id="@+id/itemToggleKeyboard" android:title="@string/toggle_keyboard"
-		android:icon="@drawable/keyboard"></item>
+		android:icon="@drawable/keyboard"
+		android:showAsAction="ifRoom"></item>
 	<item android:id="@+id/itemToggleFramebufferUpdate" android:title="@string/toggle_framebuffer_update"
 		android:icon="@android:drawable/ic_menu_view"></item>
 	<item android:id="@+id/itemToggleMouseButtons" android:title="@string/toggle_mouse_buttons"
@@ -13,7 +16,8 @@
 	<item android:id="@+id/itemInfo" android:title="@string/info"
 		android:icon="@android:drawable/ic_menu_info_details"></item>
 	<item android:id="@+id/itemSaveBookmark" android:title="@string/savebookmark_button"
-		android:icon="@android:drawable/ic_menu_save"></item>
+		android:icon="@android:drawable/ic_menu_save"
+		android:showAsAction="ifRoom"></item>
 	<item android:id="@+id/itemOpenDoc" android:title="@string/open_doc"
 		android:icon="@android:drawable/ic_menu_help" />
 </menu>

@@ -78,7 +78,7 @@
 <string name="scaling_zoomable">Zoomable</string>
 <!-- Send selected metakey -->
 <string name="send_button">Send</string>
-<string name="send_key_again">Send Special Key</string>
+<string name="send_key_again">Send Special Key Again</string>
 <string name="shift_check">Shift</string>
 <string name="shortcut_label">VNC Connection</string>
 <string name="showkbd_label">Keyboard</string>
