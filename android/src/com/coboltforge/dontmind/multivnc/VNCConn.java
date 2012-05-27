@@ -19,7 +19,6 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.Paint.Join;
 import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.Display;
@@ -146,7 +145,12 @@ public class VNCConn {
 		Log.d(TAG, "initializing");
 		
 		connSettings = bean;
-		this.pendingColorModel = COLORMODEL.valueOf(bean.getColorModel());
+		try {
+			this.pendingColorModel = COLORMODEL.valueOf(bean.getColorModel());
+		}
+		catch(IllegalArgumentException e) {
+			this.pendingColorModel = COLORMODEL.C24bit;
+		}
 
 		// Startup the RFB thread with a nifty progess dialog
 		final ProgressDialog pd = ProgressDialog.show(parent.getContext(), "Connecting...", "Establishing handshake.\nPlease wait...", true, true, new DialogInterface.OnCancelListener() {
