@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dip"
+        android:paddingTop="10dip"
+        android:text="@string/new_connection"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dip" >
+
+        <TableRow>
+
+            <TextView
+                android:gravity="right|center_vertical"
+                android:paddingRight="10dip"
+                android:text="@string/address_caption"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/textIP"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:inputType="text" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="right|center_vertical"
+                android:paddingRight="10dip"
+                android:text="@string/port_caption"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/textPORT"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="number"
+                android:singleLine="true"
+                android:text="5900" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="right|center_vertical"
+                android:paddingRight="10dip"
+                android:text="@string/colormode_caption"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Spinner
+                android:id="@+id/spinnerColorMode"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:prompt="@string/colormode_caption" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="right|center_vertical"
+                android:paddingRight="10dip"
+                android:text="@string/username_caption"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/textUsername"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/username_hint"
+                android:singleLine="true" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="right|center_vertical"
+                android:paddingRight="10dip"
+                android:text="@string/password_caption"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/textPASSWORD"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="textPassword"
+                    android:singleLine="true" />
+
+                <CheckBox
+                    android:id="@+id/checkboxKeepPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text="@string/keep_password_button" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:gravity="right|center_vertical"
+                android:paddingRight="10dip"
+                android:text="@string/repeater_caption"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/textRepeaterId"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/repeater_hint"
+                android:singleLine="true" />
+        </TableRow>
+    </TableLayout>
+    <!--
+			<TextView
+			    android:layout_height="wrap_content"
+			    android:layout_width="wrap_content"
+			    android:layout_gravity="left|center_vertical"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:text="@string/color_format_caption"
+			/>
+			<Spinner 
+			    android:id="@+id/colorformat" 
+			    android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+			/>
+    -->
+
+
+    <!--
+			<LinearLayout
+				android:orientation="horizontal"
+				android:padding="10dp"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				>
+				<TextView
+					android:text="@string/force_full_check"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					/> 
+				<RadioGroup
+					android:id="@+id/groupForceFullScreen"
+					android:orientation="horizontal"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					>
+					<RadioButton
+						android:id="@+id/radioForceFullScreenAuto"
+					    android:text="@string/auto"
+					    android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+					/>
+					<RadioButton
+						android:id="@+id/radioForceFullScreenOn"
+					    android:text="@string/on"
+					    android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+					/>
+					<RadioButton
+						android:id="@+id/radioForceFullScreenOff"
+					    android:text="@string/off"
+					    android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+					/>
+				</RadioGroup>
+			</LinearLayout>
+    -->
+
+    <Button
+        android:id="@+id/buttonSaveBookmark"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dip"
+        android:text="@string/savebookmark_button" />
+
+    <Button
+        android:id="@+id/buttonGO"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:text="@string/connect_button"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</merge>

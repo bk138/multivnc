@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal" >
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:scrollbars="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="10dip" >
+
+            <include
+                android:id="@+id/discovered_servers"
+                layout="@layout/discovered_servers_element" />
+
+            <include
+                android:id="@+id/bookmarks"
+                layout="@layout/bookmarks_element" />
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:scrollbars="vertical" >
+
+        <!-- this is focusable to start with view focus here! -->
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical"
+            android:padding="10dip" >
+
+            <include
+                android:id="@+id/new_conn"
+                layout="@layout/new_conn_element" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
