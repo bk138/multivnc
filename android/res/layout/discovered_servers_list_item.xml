@@ -5,10 +5,9 @@
     android:layout_height="wrap_content"
     android:padding="10dip">
         <TextView android:id="@+id/discovered_server_name"
-        	android:text="server name"
         	android:textAppearance="?android:attr/textAppearanceMedium"
         	android:layout_height="wrap_content"
-        	android:layout_width="wrap_content"
+        	android:layout_width="0dip"
         	android:layout_weight="1"
         android:layout_gravity="center_vertical"/>
         <ImageButton android:id="@+id/discovered_server_save_button"
