@@ -32,7 +32,7 @@ public class VNCConn {
 
 	private final static String TAG = "VNCConn";
 
-	private VncCanvas parent;
+	private VncCanvas canvas;
 
 	private VncThread workerThread;
 	
@@ -138,12 +138,12 @@ public class VNCConn {
 				
 				connectAndAuthenticate();
 				doProtocolInitialisation(display.getWidth(), display.getHeight());
-				parent.handler.post(new Runnable() {
+				canvas.handler.post(new Runnable() {
 					public void run() {
 						pd.setMessage("Downloading first frame.\nPlease wait...");
 					}
 				});
-				processNormalProtocol(parent.getContext(), pd, setModes);
+				processNormalProtocol(canvas.getContext(), pd, setModes);
 			} catch (Throwable e) {
 				if (maintainConnection) {
 					Log.e(TAG, e.toString());
@@ -163,9 +163,9 @@ public class VNCConn {
 							error = "VNC authentication failed!";
 						}
 						final String error_ = error + "<br>" + e.getLocalizedMessage();
-						parent.handler.post(new Runnable() {
+						canvas.handler.post(new Runnable() {
 							public void run() {
-								Utils.showFatalErrorMessage(parent.getContext(), error_);
+								Utils.showFatalErrorMessage(canvas.getContext(), error_);
 							}
 						});
 					}
@@ -181,7 +181,7 @@ public class VNCConn {
 				
 				bitmapData.writeFullUpdateRequest(false);
 
-				parent.handler.post(setModes);
+				canvas.handler.post(setModes);
 				
 				//
 				// main dispatch loop
@@ -233,8 +233,8 @@ public class VNCConn {
 							}
 
 							if (rfb.updateRectEncoding == RfbProto.EncodingPointerPos) {
-								parent.mouseX = rx;
-								parent.mouseY = ry;
+								canvas.mouseX = rx;
+								canvas.mouseY = ry;
 								continue;
 							}
 
@@ -291,7 +291,7 @@ public class VNCConn {
 						throw new Exception("Can't handle SetColourMapEntries message");
 
 					case RfbProto.Bell:
-						parent.handler.post( new Runnable() {
+						canvas.handler.post( new Runnable() {
 							public void run() { Toast.makeText( context, "VNC Beep", Toast.LENGTH_SHORT); }
 						});
 						break;
@@ -414,8 +414,7 @@ public class VNCConn {
     }
 
     
-	public VNCConn(VncCanvas p) {
-		parent = p;
+	public VNCConn() {
 		handleRREPaint = new Paint();
 		handleRREPaint.setStyle(Style.FILL);
 
@@ -459,9 +458,11 @@ public class VNCConn {
 	 * @param bean Connection settings
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
-	public void init(ConnectionBean bean, final Runnable setModes) {
+	public void init(ConnectionBean bean, VncCanvas c, final Runnable setModes) {
 		
 		Log.d(TAG, "initializing");
+		
+		setCanvas(c);
 		
 		connSettings = bean;
 		try {
@@ -472,13 +473,13 @@ public class VNCConn {
 		}
 
 		// Startup the RFB thread with a nifty progess dialog
-		final ProgressDialog pd = ProgressDialog.show(parent.getContext(), "Connecting...", "Establishing handshake.\nPlease wait...", true, true, new DialogInterface.OnCancelListener() {
+		final ProgressDialog pd = ProgressDialog.show(canvas.getContext(), "Connecting...", "Establishing handshake.\nPlease wait...", true, true, new DialogInterface.OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
 				shutdown();
-				parent.handler.post(new Runnable() {
+				canvas.handler.post(new Runnable() {
 					public void run() {
-						Utils.showErrorMessage(parent.getContext(), "VNC connection aborted!");
+						Utils.showErrorMessage(canvas.getContext(), "VNC connection aborted!");
 					}
 				});
 			}
@@ -505,15 +506,24 @@ public class VNCConn {
 		
 	}
 
+	/**
+	 * Set/unset the canvas for this connection.
+	 * Unset canvas when keeping the VNCConn across application restarts to avoid memleaks.
+	 * @param c
+	 */
+	public void setCanvas(VncCanvas c) {
+		canvas = c;
+	}
+	
 
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 		
 		InputEvent e = new InputEvent(x, y, modifiers, pointerMask);
 		inputQueue.add(e);
 		
-		parent.mouseX = x;
-		parent.mouseY = y;
-		parent.panToMouse();
+		canvas.mouseX = x;
+		canvas.mouseY = y;
+		canvas.panToMouse();
 		
 		return true;
 	}
@@ -663,7 +673,7 @@ public class VNCConn {
 		case RfbProto.AuthVNC:
 			Log.i(TAG, "VNC authentication needed");
 			if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-				parent.getCredFromUser(connSettings);
+				canvas.getCredFromUser(connSettings);
 				synchronized (this) 
 				{
 					wait();  // wait for user input to finish
@@ -673,7 +683,7 @@ public class VNCConn {
 			break;
 		case RfbProto.AuthUltra:
 			if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0)
-				parent.getCredFromUser(connSettings);
+				canvas.getCredFromUser(connSettings);
 			rfb.authenticateDH(connSettings.getUserName(),connSettings.getPassword());
 			break;
 		default:
@@ -690,11 +700,11 @@ public class VNCConn {
 		Log.i(TAG, "Desktop name is " + rfb.desktopName);
 		Log.i(TAG, "Desktop size is " + rfb.framebufferWidth + " x " + rfb.framebufferHeight);
 		
-		parent.mouseX = rfb.framebufferWidth/2;
-		parent.mouseY = rfb.framebufferHeight/2;
+		canvas.mouseX = rfb.framebufferWidth/2;
+		canvas.mouseY = rfb.framebufferHeight/2;
 
 		boolean useFull = false;
-		int capacity = Utils.getActivityManager(parent.getContext()).getMemoryClass();
+		int capacity = Utils.getActivityManager(canvas.getContext()).getMemoryClass();
 		if (connSettings.getForceFull() == BitmapImplHint.AUTO)
 		{
 			if (rfb.framebufferWidth * rfb.framebufferHeight * FullBufferBitmapData.CAPACITY_MULTIPLIER <= capacity * 1024 * 1024)
@@ -703,9 +713,9 @@ public class VNCConn {
 		else
 			useFull = (connSettings.getForceFull() == BitmapImplHint.FULL);
 		if (! useFull)
-			bitmapData=new LargeBitmapData(rfb, parent, capacity);
+			bitmapData=new LargeBitmapData(rfb, canvas, capacity);
 		else
-			bitmapData=new FullBufferBitmapData(rfb, parent, capacity);
+			bitmapData=new FullBufferBitmapData(rfb, canvas, capacity);
 
 		setPixelFormat();
 	}
@@ -886,7 +896,7 @@ public class VNCConn {
 
 		bitmapData.copyRect(new Rect(leftSrc, topSrc, rightSrc, bottomSrc), new Rect(leftDest, topDest, rightDest, bottomDest), handleCopyRectPaint);
 
-		parent.reDraw();
+		canvas.reDraw();
 	}
 	private byte[] bg_buf = new byte[4];
 	private byte[] rre_buf = new byte[128];
@@ -935,7 +945,7 @@ public class VNCConn {
 			bitmapData.drawRect(sx, sy, sw, sh, handleRREPaint);
 		}
 
-		parent.reDraw();
+		canvas.reDraw();
 	}
 
 	//
@@ -984,7 +994,7 @@ public class VNCConn {
 			bitmapData.drawRect(sx, sy, sw, sh, handleRREPaint);
 		}
 
-		parent.reDraw();
+		canvas.reDraw();
 	}
 
 	//
@@ -1013,7 +1023,7 @@ public class VNCConn {
 			}
 
 			// Finished with a row of tiles, now let's show it.
-			parent.reDraw();
+			canvas.reDraw();
 		}
 	}
 
@@ -1195,7 +1205,7 @@ public class VNCConn {
 
 		zrleInStream.reset();
 
-		parent.reDraw();
+		canvas.reDraw();
 	}
 
 	//
@@ -1262,7 +1272,7 @@ public class VNCConn {
 			return;
 		bitmapData.updateBitmap(x, y, w, h);
 
-		parent.reDraw();
+		canvas.reDraw();
 	}
 
 	private int readPixel(InStream is) throws Exception {
@@ -1480,7 +1490,7 @@ public class VNCConn {
 		bitmapData.updateBitmap( x, y, w, h);
 
 		if (paint)
-			parent.reDraw();
+			canvas.reDraw();
 	}
 
 }

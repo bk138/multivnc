@@ -296,8 +296,8 @@ public class VncCanvas extends GLSurfaceView {
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
 	void initializeVncCanvas(ConnectionBean bean, final Runnable setModes) {
-		vncConn = new VNCConn(this);
-		vncConn.init(bean, setModes);
+		vncConn = new VNCConn();
+		vncConn.init(bean, this, setModes);
 	}
 
 	/**
