@@ -692,8 +692,20 @@ public class VncCanvas extends GLSurfaceView {
 			vncConn.sendPointerEvent(mouseX, mouseY, meta.getMetaFlags(), 0);
 		}
 		else {
-			vncConn.sendKeyEvent(meta.getKeySym(), meta.getMetaFlags(), true);
-			vncConn.sendKeyEvent(meta.getKeySym(), meta.getMetaFlags(), false);
+			// KeyEvent(downTime, eventTime, action, code, repeat, metaState)
+			KeyEvent downEvent = new KeyEvent(
+					System.currentTimeMillis(), 
+					System.currentTimeMillis(),
+					KeyEvent.ACTION_DOWN,
+					meta.getKeySym(),
+					0,
+					meta.getMetaFlags());
+			vncConn.sendKeyEvent(downEvent.getKeyCode(), downEvent);
+			
+			// and up again
+			KeyEvent upEvent = KeyEvent.changeAction(downEvent, KeyEvent.ACTION_UP);
+			vncConn.sendKeyEvent(upEvent.getKeyCode(), upEvent);
+
 		}
 	}
 	

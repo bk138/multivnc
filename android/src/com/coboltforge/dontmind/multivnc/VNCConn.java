@@ -9,6 +9,7 @@
 package com.coboltforge.dontmind.multivnc;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Inflater;
@@ -33,7 +34,7 @@ public class VNCConn {
 
 	private VncCanvas parent;
 
-	private Thread workerThread;
+	private VncThread workerThread;
 	
 	// VNC protocol connection
 	private RfbProto rfb;
@@ -47,6 +48,9 @@ public class VNCConn {
 	// Internal bitmap data
 	private AbstractBitmapData bitmapData;
 	private Lock bitmapDataPixelsLock = new ReentrantLock();
+	
+	// message queue for communicating with the worker thread
+	private ConcurrentLinkedQueue<InputEvent> inputQueue = new ConcurrentLinkedQueue<VNCConn.InputEvent>(); 
 	
 	private Paint handleRREPaint;
 
@@ -90,6 +94,326 @@ public class VNCConn {
     public static final int MOUSE_BUTTON_SCROLL_DOWN = 16;
 	
 
+    private class InputEvent {
+    	
+    	public InputEvent(int x, int y, int modifiers, int pointerMask) {
+    		pointer = new PointerEvent();
+    		pointer.x = x;
+    		pointer.y = y;
+    		pointer.modifiers = modifiers;
+    		pointer.mask = pointerMask;
+    	}
+    	
+    	public InputEvent(int keyCode, KeyEvent evt) {
+    		this.key = evt;
+    	}
+    	
+    	private class PointerEvent {
+    		int x;
+    		int y;
+    		int mask;
+    		int modifiers;
+    	}
+    	
+    	public PointerEvent pointer;
+    	public KeyEvent key;
+    }
+    
+    
+    private class VncThread extends Thread {
+    	
+    	private ProgressDialog pd;
+    	private Runnable setModes;
+    	
+    	
+    	public VncThread(ProgressDialog pd, Runnable setModes) {
+    		this.pd = pd;
+    		this.setModes = setModes;
+    	}
+    	
+    	
+		public void run() {
+			try {
+				final Display display = pd.getWindow().getWindowManager().getDefaultDisplay();
+				
+				connectAndAuthenticate();
+				doProtocolInitialisation(display.getWidth(), display.getHeight());
+				parent.handler.post(new Runnable() {
+					public void run() {
+						pd.setMessage("Downloading first frame.\nPlease wait...");
+					}
+				});
+				processNormalProtocol(parent.getContext(), pd, setModes);
+			} catch (Throwable e) {
+				if (maintainConnection) {
+					Log.e(TAG, e.toString());
+					e.printStackTrace();
+					// Ensure we dismiss the progress dialog
+					// before we fatal error finish
+					if (pd.isShowing())
+						pd.dismiss();
+					if (e instanceof OutOfMemoryError) {
+						// TODO  Not sure if this will happen but...
+						// figure out how to gracefully notify the user
+						// Instantiating an alert dialog here doesn't work
+						// because we are out of memory. :(
+					} else {
+						String error = "VNC connection failed!";
+						if (e.getMessage() != null && (e.getMessage().indexOf("authentication") > -1)) {
+							error = "VNC authentication failed!";
+						}
+						final String error_ = error + "<br>" + e.getLocalizedMessage();
+						parent.handler.post(new Runnable() {
+							public void run() {
+								Utils.showFatalErrorMessage(parent.getContext(), error_);
+							}
+						});
+					}
+				}
+			}
+		}
+		
+
+		private void processNormalProtocol(final Context context, ProgressDialog pd, final Runnable setModes) throws Exception {
+			try {
+				
+				Log.d(TAG, "Connection initialized");
+				
+				bitmapData.writeFullUpdateRequest(false);
+
+				parent.handler.post(setModes);
+				
+				//
+				// main dispatch loop
+				//
+				while (maintainConnection) {
+
+					// check input queue
+					InputEvent input;
+					while( (input = inputQueue.poll()) != null ) {
+						if(input.pointer != null)
+							sendPointerEvent(input.pointer);
+						if(input.key != null)
+							sendKeyEvent(input.key);
+					}
+					
+					bitmapData.syncScroll();
+					// Read message type from the server.
+					int msgType = rfb.readServerMessageType();
+					bitmapData.doneWaiting();
+					// Process the message depending on its type.
+					switch (msgType) {
+					case RfbProto.FramebufferUpdate:
+						rfb.readFramebufferUpdate();
+
+						for (int i = 0; i < rfb.updateNRects; i++) {
+							rfb.readFramebufferUpdateRectHdr();
+							int rx = rfb.updateRectX, ry = rfb.updateRectY;
+							int rw = rfb.updateRectW, rh = rfb.updateRectH;
+
+							if (rfb.updateRectEncoding == RfbProto.EncodingLastRect) {
+								Log.v(TAG, "rfb.EncodingLastRect");
+								break;
+							}
+
+							if (rfb.updateRectEncoding == RfbProto.EncodingNewFBSize) {
+								rfb.setFramebufferSize(rw, rh);
+								// - updateFramebufferSize();
+								Log.v(TAG, "rfb.EncodingNewFBSize");
+								break;
+							}
+
+							if (rfb.updateRectEncoding == RfbProto.EncodingXCursor || rfb.updateRectEncoding == RfbProto.EncodingRichCursor) {
+								// - handleCursorShapeUpdate(rfb.updateRectEncoding,
+								// rx,
+								// ry, rw, rh);
+								Log.v(TAG, "rfb.EncodingCursor");
+								continue;
+
+							}
+
+							if (rfb.updateRectEncoding == RfbProto.EncodingPointerPos) {
+								parent.mouseX = rx;
+								parent.mouseY = ry;
+								continue;
+							}
+
+							rfb.startTiming();
+
+							switch (rfb.updateRectEncoding) {
+							case RfbProto.EncodingRaw:
+								handleRawRect(rx, ry, rw, rh);
+								break;
+							case RfbProto.EncodingCopyRect:
+								handleCopyRect(rx, ry, rw, rh);
+								Log.v(TAG, "CopyRect is Buggy!");
+								break;
+							case RfbProto.EncodingRRE:
+								handleRRERect(rx, ry, rw, rh);
+								break;
+							case RfbProto.EncodingCoRRE:
+								handleCoRRERect(rx, ry, rw, rh);
+								break;
+							case RfbProto.EncodingHextile:
+								handleHextileRect(rx, ry, rw, rh);
+								break;
+							case RfbProto.EncodingZRLE:
+								handleZRLERect(rx, ry, rw, rh);
+								break;
+							case RfbProto.EncodingZlib:
+								handleZlibRect(rx, ry, rw, rh);
+								break;
+							default:
+								Log.e(TAG, "Unknown RFB rectangle encoding " + rfb.updateRectEncoding + " (0x" + Integer.toHexString(rfb.updateRectEncoding) + ")");
+							}
+
+							rfb.stopTiming();
+
+							// Hide progress dialog
+							if (pd.isShowing())
+								pd.dismiss();
+						}
+
+						boolean fullUpdateNeeded = false;
+
+						if (pendingColorModel != null) {
+							setPixelFormat();
+							fullUpdateNeeded = true;
+						}
+
+						setEncodings(true);
+						if(framebufferUpdatesEnabled)
+							bitmapData.writeFullUpdateRequest(!fullUpdateNeeded);
+
+						break;
+
+					case RfbProto.SetColourMapEntries:
+						throw new Exception("Can't handle SetColourMapEntries message");
+
+					case RfbProto.Bell:
+						parent.handler.post( new Runnable() {
+							public void run() { Toast.makeText( context, "VNC Beep", Toast.LENGTH_SHORT); }
+						});
+						break;
+
+					case RfbProto.ServerCutText:
+						String s = rfb.readServerCutText();
+						if (s != null && s.length() > 0) {
+							// TODO implement cut & paste
+						}
+						break;
+
+					case RfbProto.TextChat:
+						// UltraVNC extension
+						String msg = rfb.readTextChatMsg();
+						if (msg != null && msg.length() > 0) {
+							// TODO implement chat interface
+						}
+						break;
+
+					default:
+						throw new Exception("Unknown RFB message type " + msgType);
+					}
+				}
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				Log.v(TAG, "Closing VNC Connection");
+				rfb.close();
+				System.gc();
+			}
+		}
+		
+		
+
+		private boolean sendPointerEvent(InputEvent.PointerEvent pe) {
+
+			try {
+				if (rfb.inNormalProtocol) {
+					bitmapData.invalidateMousePosition();
+
+					if (pe.x<0) pe.x=0;
+					else if (pe.x>=rfb.framebufferWidth) pe.x=rfb.framebufferWidth-1;
+					if (pe.y<0) pe.y=0;
+					else if (pe.y>=rfb.framebufferHeight) pe.y=rfb.framebufferHeight-1;
+
+					bitmapData.invalidateMousePosition();
+					try {
+						rfb.writePointerEvent(pe.x,pe.y,pe.modifiers,pe.mask);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return true;
+				}
+			}
+			catch(NullPointerException e) {
+			}
+			return false;
+			
+		}
+		
+		
+		private boolean sendKeyEvent(KeyEvent evt) {
+			if (rfb != null && rfb.inNormalProtocol) {
+			   boolean down = (evt.getAction() == KeyEvent.ACTION_DOWN);
+			   int key;
+			   int metaState = evt.getMetaState();
+			   int keyCode = evt.getKeyCode();
+			   
+			   switch(keyCode) {
+			   	  case KeyEvent.KEYCODE_BACK :        key = 0xff1b; break;
+			      case KeyEvent.KEYCODE_DPAD_LEFT:    key = 0xff51; break;
+			   	  case KeyEvent.KEYCODE_DPAD_UP:      key = 0xff52; break;
+			   	  case KeyEvent.KEYCODE_DPAD_RIGHT:   key = 0xff53; break;
+			   	  case KeyEvent.KEYCODE_DPAD_DOWN:    key = 0xff54; break;
+			      case KeyEvent.KEYCODE_DEL: 		  key = 0xff08; break;
+			      case KeyEvent.KEYCODE_ENTER:        key = 0xff0d; break;
+			      case KeyEvent.KEYCODE_DPAD_CENTER:  key = 0xff0d; break;
+			      case KeyEvent.KEYCODE_TAB:          key = 0xff09; break;
+			      case 113: 						  key = 0xffe3; break; // CTRL_L
+			      case 111: 						  key = 0xff1b; break; // ESC
+			      case KeyEvent.KEYCODE_ALT_LEFT:     key = 0xffe9; break;
+			      case 131: 						  key = 0xffbe; break; // F1
+			      case 132: 						  key = 0xffbf; break; // F2
+			      case 133: 						  key = 0xffc0; break; // F3
+			      case 134: 						  key = 0xffc1; break; // F4
+			      case 135: 						  key = 0xffc2; break; // F5
+			      case 136: 						  key = 0xffc3; break; // F6
+			      case 137: 						  key = 0xffc4; break; // F7
+			      case 138: 						  key = 0xffc5; break; // F8
+			      case 139: 						  key = 0xffc6; break; // F9
+			      case 140: 						  key = 0xffc7; break; // F10
+			      case 141: 						  key = 0xffc8; break; // F11
+			      case 142: 						  key = 0xffc9; break; // F12
+			      case 124:							  key = 0xff63; break; // Insert
+			      case 112: 					      key = 0xffff; break; // Delete
+			      case 122: 					      key = 0xff50; break; // Home
+			      case 123: 					      key = 0xff57; break; // End
+			      case  92: 					      key = 0xff55; break; // PgUp
+			      case  93: 					      key = 0xff56; break; // PgDn
+
+
+			      default: 							  
+			    	  key = evt.getUnicodeChar();
+			    	  metaState = 0;
+			    	  break;
+			    }
+		    	try {
+		    		rfb.writeKeyEvent(key, metaState, down);
+		    		return true;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return true;
+			}
+			return false;
+		}
+		
+
+		
+    }
+
+    
 	public VNCConn(VncCanvas p) {
 		parent = p;
 		handleRREPaint = new Paint();
@@ -119,8 +443,6 @@ public class VNCConn {
 	 */
 
 	boolean Setup() {
-
-
 
 		return true;
 	}
@@ -161,47 +483,7 @@ public class VNCConn {
 				});
 			}
 		});
-		final Display display = pd.getWindow().getWindowManager().getDefaultDisplay();
-		workerThread = new Thread() {
-			public void run() {
-				try {
-					connectAndAuthenticate();
-					doProtocolInitialisation(display.getWidth(), display.getHeight());
-					parent.handler.post(new Runnable() {
-						public void run() {
-							pd.setMessage("Downloading first frame.\nPlease wait...");
-						}
-					});
-					processNormalProtocol(parent.getContext(), pd, setModes);
-				} catch (Throwable e) {
-					if (maintainConnection) {
-						Log.e(TAG, e.toString());
-						e.printStackTrace();
-						// Ensure we dismiss the progress dialog
-						// before we fatal error finish
-						if (pd.isShowing())
-							pd.dismiss();
-						if (e instanceof OutOfMemoryError) {
-							// TODO  Not sure if this will happen but...
-							// figure out how to gracefully notify the user
-							// Instantiating an alert dialog here doesn't work
-							// because we are out of memory. :(
-						} else {
-							String error = "VNC connection failed!";
-							if (e.getMessage() != null && (e.getMessage().indexOf("authentication") > -1)) {
-								error = "VNC authentication failed!";
-							}
-							final String error_ = error + "<br>" + e.getLocalizedMessage();
-							parent.handler.post(new Runnable() {
-								public void run() {
-									Utils.showFatalErrorMessage(parent.getContext(), error_);
-								}
-							});
-						}
-					}
-				}
-			}
-		};
+		workerThread = new VncThread(pd, setModes); 	
 		workerThread.start();
 	}
 
@@ -225,106 +507,27 @@ public class VNCConn {
 
 
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
-
-		try {
-			if (rfb.inNormalProtocol) {
-				bitmapData.invalidateMousePosition();
-
-				if (x<0) x=0;
-				else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
-				if (y<0) y=0;
-				else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
-
-				parent.mouseX = x;
-				parent.mouseY = y;
-
-				bitmapData.invalidateMousePosition();
-				try {
-					rfb.writePointerEvent(x,y,modifiers,pointerMask);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				parent.panToMouse();
-				return true;
-			}
-		}
-		catch(NullPointerException e) {
-		}
-		return false;
 		
+		InputEvent e = new InputEvent(x, y, modifiers, pointerMask);
+		inputQueue.add(e);
+		
+		parent.mouseX = x;
+		parent.mouseY = y;
+		parent.panToMouse();
+		
+		return true;
 	}
 
 
-	
-	
 	public boolean sendKeyEvent(int keyCode, KeyEvent evt) {
-		if (rfb != null && rfb.inNormalProtocol) {
-		   boolean down = (evt.getAction() == KeyEvent.ACTION_DOWN);
-		   int key;
-		   int metaState = evt.getMetaState();
-		   
-		   switch(keyCode) {
-		   	  case KeyEvent.KEYCODE_BACK :        key = 0xff1b; break;
-		      case KeyEvent.KEYCODE_DPAD_LEFT:    key = 0xff51; break;
-		   	  case KeyEvent.KEYCODE_DPAD_UP:      key = 0xff52; break;
-		   	  case KeyEvent.KEYCODE_DPAD_RIGHT:   key = 0xff53; break;
-		   	  case KeyEvent.KEYCODE_DPAD_DOWN:    key = 0xff54; break;
-		      case KeyEvent.KEYCODE_DEL: 		  key = 0xff08; break;
-		      case KeyEvent.KEYCODE_ENTER:        key = 0xff0d; break;
-		      case KeyEvent.KEYCODE_DPAD_CENTER:  key = 0xff0d; break;
-		      case KeyEvent.KEYCODE_TAB:          key = 0xff09; break;
-		      case 113: 						  key = 0xffe3; break; // CTRL_L
-		      case 111: 						  key = 0xff1b; break; // ESC
-		      case KeyEvent.KEYCODE_ALT_LEFT:     key = 0xffe9; break;
-		      case 131: 						  key = 0xffbe; break; // F1
-		      case 132: 						  key = 0xffbf; break; // F2
-		      case 133: 						  key = 0xffc0; break; // F3
-		      case 134: 						  key = 0xffc1; break; // F4
-		      case 135: 						  key = 0xffc2; break; // F5
-		      case 136: 						  key = 0xffc3; break; // F6
-		      case 137: 						  key = 0xffc4; break; // F7
-		      case 138: 						  key = 0xffc5; break; // F8
-		      case 139: 						  key = 0xffc6; break; // F9
-		      case 140: 						  key = 0xffc7; break; // F10
-		      case 141: 						  key = 0xffc8; break; // F11
-		      case 142: 						  key = 0xffc9; break; // F12
-		      case 124:							  key = 0xff63; break; // Insert
-		      case 112: 					      key = 0xffff; break; // Delete
-		      case 122: 					      key = 0xff50; break; // Home
-		      case 123: 					      key = 0xff57; break; // End
-		      case  92: 					      key = 0xff55; break; // PgUp
-		      case  93: 					      key = 0xff56; break; // PgDn
-
-
-		      default: 							  
-		    	  key = evt.getUnicodeChar();
-		    	  metaState = 0;
-		    	  break;
-		    }
-	    	try {
-	    		rfb.writeKeyEvent(key, metaState, down);
-	    		return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return true;
-		}
-		return false;
+		
+		InputEvent e = new InputEvent(keyCode, evt);
+		inputQueue.add(e);
+		
+		return true;
 	}
 	
 
-	public boolean sendKeyEvent(int keycode, int metastate, boolean down) {
-		if (rfb != null && rfb.inNormalProtocol) {
-			try {
-	    		rfb.writeKeyEvent(keycode, metastate, down);
-	    		return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-	
 
 	public boolean toggleFramebufferUpdates()
 	{
@@ -576,146 +779,6 @@ public class VNCConn {
 
 
 
-	private void processNormalProtocol(final Context context, ProgressDialog pd, final Runnable setModes) throws Exception {
-		try {
-			
-			Log.d(TAG, "Connection initialized");
-			
-			bitmapData.writeFullUpdateRequest(false);
-
-			parent.handler.post(setModes);
-			
-			//
-			// main dispatch loop
-			//
-			while (maintainConnection) {
-				bitmapData.syncScroll();
-				// Read message type from the server.
-				int msgType = rfb.readServerMessageType();
-				bitmapData.doneWaiting();
-				// Process the message depending on its type.
-				switch (msgType) {
-				case RfbProto.FramebufferUpdate:
-					rfb.readFramebufferUpdate();
-
-					for (int i = 0; i < rfb.updateNRects; i++) {
-						rfb.readFramebufferUpdateRectHdr();
-						int rx = rfb.updateRectX, ry = rfb.updateRectY;
-						int rw = rfb.updateRectW, rh = rfb.updateRectH;
-
-						if (rfb.updateRectEncoding == RfbProto.EncodingLastRect) {
-							Log.v(TAG, "rfb.EncodingLastRect");
-							break;
-						}
-
-						if (rfb.updateRectEncoding == RfbProto.EncodingNewFBSize) {
-							rfb.setFramebufferSize(rw, rh);
-							// - updateFramebufferSize();
-							Log.v(TAG, "rfb.EncodingNewFBSize");
-							break;
-						}
-
-						if (rfb.updateRectEncoding == RfbProto.EncodingXCursor || rfb.updateRectEncoding == RfbProto.EncodingRichCursor) {
-							// - handleCursorShapeUpdate(rfb.updateRectEncoding,
-							// rx,
-							// ry, rw, rh);
-							Log.v(TAG, "rfb.EncodingCursor");
-							continue;
-
-						}
-
-						if (rfb.updateRectEncoding == RfbProto.EncodingPointerPos) {
-							parent.mouseX = rx;
-							parent.mouseY = ry;
-							continue;
-						}
-
-						rfb.startTiming();
-
-						switch (rfb.updateRectEncoding) {
-						case RfbProto.EncodingRaw:
-							handleRawRect(rx, ry, rw, rh);
-							break;
-						case RfbProto.EncodingCopyRect:
-							handleCopyRect(rx, ry, rw, rh);
-							Log.v(TAG, "CopyRect is Buggy!");
-							break;
-						case RfbProto.EncodingRRE:
-							handleRRERect(rx, ry, rw, rh);
-							break;
-						case RfbProto.EncodingCoRRE:
-							handleCoRRERect(rx, ry, rw, rh);
-							break;
-						case RfbProto.EncodingHextile:
-							handleHextileRect(rx, ry, rw, rh);
-							break;
-						case RfbProto.EncodingZRLE:
-							handleZRLERect(rx, ry, rw, rh);
-							break;
-						case RfbProto.EncodingZlib:
-							handleZlibRect(rx, ry, rw, rh);
-							break;
-						default:
-							Log.e(TAG, "Unknown RFB rectangle encoding " + rfb.updateRectEncoding + " (0x" + Integer.toHexString(rfb.updateRectEncoding) + ")");
-						}
-
-						rfb.stopTiming();
-
-						// Hide progress dialog
-						if (pd.isShowing())
-							pd.dismiss();
-					}
-
-					boolean fullUpdateNeeded = false;
-
-					if (pendingColorModel != null) {
-						setPixelFormat();
-						fullUpdateNeeded = true;
-					}
-
-					setEncodings(true);
-					if(framebufferUpdatesEnabled)
-						bitmapData.writeFullUpdateRequest(!fullUpdateNeeded);
-
-					break;
-
-				case RfbProto.SetColourMapEntries:
-					throw new Exception("Can't handle SetColourMapEntries message");
-
-				case RfbProto.Bell:
-					parent.handler.post( new Runnable() {
-						public void run() { Toast.makeText( context, "VNC Beep", Toast.LENGTH_SHORT); }
-					});
-					break;
-
-				case RfbProto.ServerCutText:
-					String s = rfb.readServerCutText();
-					if (s != null && s.length() > 0) {
-						// TODO implement cut & paste
-					}
-					break;
-
-				case RfbProto.TextChat:
-					// UltraVNC extension
-					String msg = rfb.readTextChatMsg();
-					if (msg != null && msg.length() > 0) {
-						// TODO implement chat interface
-					}
-					break;
-
-				default:
-					throw new Exception("Unknown RFB message type " + msgType);
-				}
-			}
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			Log.v(TAG, "Closing VNC Connection");
-			rfb.close();
-			System.gc();
-		}
-	}
-	
 	
 	
 	/**
