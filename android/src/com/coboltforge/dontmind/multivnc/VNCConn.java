@@ -90,9 +90,6 @@ public class VNCConn {
     public static final int MOUSE_BUTTON_SCROLL_DOWN = 16;
 	
 
-
-
-
 	public VNCConn(VncCanvas p) {
 		parent = p;
 		handleRREPaint = new Paint();
@@ -462,7 +459,7 @@ public class VNCConn {
 			break;
 		case RfbProto.AuthVNC:
 			Log.i(TAG, "VNC authentication needed");
-			if(connSettings.getPassword() == null || connSettings.getPassword().isEmpty()) {
+			if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
 				parent.getCredFromUser(connSettings);
 				synchronized (this) 
 				{
@@ -472,7 +469,7 @@ public class VNCConn {
 			rfb.authenticateVNC(connSettings.getPassword());
 			break;
 		case RfbProto.AuthUltra:
-			if(connSettings.getPassword() == null || connSettings.getPassword().isEmpty())
+			if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0)
 				parent.getCredFromUser(connSettings);
 			rfb.authenticateDH(connSettings.getUserName(),connSettings.getPassword());
 			break;
