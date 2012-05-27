@@ -35,6 +35,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -436,6 +437,13 @@ public class VncCanvasActivity extends Activity {
 	public void onCreate(Bundle icicle) {
 
 		super.onCreate(icicle);
+
+		// only do fullscreen on 2.x devices
+		if(Build.VERSION.SDK_INT < 11) {
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+					WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
 
 		database = new VncDatabase(this);
 
