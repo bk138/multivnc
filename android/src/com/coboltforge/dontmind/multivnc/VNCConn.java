@@ -51,7 +51,7 @@ public class VNCConn {
 	private Lock bitmapDataPixelsLock = new ReentrantLock();
 	
 	// message queue for communicating with the output worker thread
-	private ConcurrentLinkedQueue<InputEvent> inputEventQueue = new ConcurrentLinkedQueue<VNCConn.InputEvent>(); 
+	private ConcurrentLinkedQueue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<VNCConn.OutputEvent>(); 
 	
 	private Paint handleRREPaint;
 
@@ -95,9 +95,9 @@ public class VNCConn {
     public static final int MOUSE_BUTTON_SCROLL_DOWN = 16;
 	
 
-    private class InputEvent {
+    private class OutputEvent {
     	
-    	public InputEvent(int x, int y, int modifiers, int pointerMask) {
+    	public OutputEvent(int x, int y, int modifiers, int pointerMask) {
     		pointer = new PointerEvent();
     		pointer.x = x;
     		pointer.y = y;
@@ -105,8 +105,13 @@ public class VNCConn {
     		pointer.mask = pointerMask;
     	}
     	
-    	public InputEvent(int keyCode, KeyEvent evt) {
+    	public OutputEvent(int keyCode, KeyEvent evt) {
     		this.key = evt;
+    	}
+    	
+    	public OutputEvent(boolean incremental) {
+    		ffur = new FullFramebufferUpdateRequest();
+    		ffur.incremental = incremental;
     	}
     	
     	private class PointerEvent {
@@ -116,6 +121,11 @@ public class VNCConn {
     		int modifiers;
     	}
     	
+    	private class FullFramebufferUpdateRequest {
+    		boolean incremental;
+    	}
+    	
+    	public FullFramebufferUpdateRequest ffur;
     	public PointerEvent pointer;
     	public KeyEvent key;
     }
@@ -444,18 +454,24 @@ public class VNCConn {
     		while (maintainConnection) {
 
     			// check input queue
-    			InputEvent input;
-    			while( (input = inputEventQueue.poll()) != null ) {
-    				if(input.pointer != null)
-    					sendPointerEvent(input.pointer);
-    				if(input.key != null)
-    					sendKeyEvent(input.key);
+    			OutputEvent ev;
+    			while( (ev = outputEventQueue.poll()) != null ) {
+    				if(ev.pointer != null)
+    					sendPointerEvent(ev.pointer);
+    				if(ev.key != null)
+    					sendKeyEvent(ev.key);
+    				if(ev.ffur != null)
+						try {
+							bitmapData.writeFullUpdateRequest(ev.ffur.incremental);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
     			}
     			
     			// at this point, queue is empty, wait for input instead of hogging CPU
-    			synchronized (inputEventQueue) {
+    			synchronized (outputEventQueue) {
 					try {
-						inputEventQueue.wait();
+						outputEventQueue.wait();
 					} catch (InterruptedException e) {
 						// go on
 					}
@@ -468,7 +484,7 @@ public class VNCConn {
     	}
     	
 
-		private boolean sendPointerEvent(InputEvent.PointerEvent pe) {
+		private boolean sendPointerEvent(OutputEvent.PointerEvent pe) {
 
 			try {
 				if (rfb.inNormalProtocol) {
@@ -668,10 +684,10 @@ public class VNCConn {
 		if (y<0) y=0;
 		else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
 		
-		InputEvent e = new InputEvent(x, y, modifiers, pointerMask);
-		inputEventQueue.add(e);
-		synchronized (inputEventQueue) {
-			inputEventQueue.notify();
+		OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
+		outputEventQueue.add(e);
+		synchronized (outputEventQueue) {
+			outputEventQueue.notify();
 		}
 		
 		canvas.mouseX = x;
@@ -684,10 +700,10 @@ public class VNCConn {
 
 	public boolean sendKeyEvent(int keyCode, KeyEvent evt) {
 		
-		InputEvent e = new InputEvent(keyCode, evt);
-		inputEventQueue.add(e);
-		synchronized (inputEventQueue) {
-			inputEventQueue.notify();
+		OutputEvent e = new OutputEvent(keyCode, evt);
+		outputEventQueue.add(e);
+		synchronized (outputEventQueue) {
+			outputEventQueue.notify();
 		}
 		
 		return true;
@@ -704,7 +720,11 @@ public class VNCConn {
 				// clear old framebuffer
 				bitmapData.clear();
 				// request full non-incremental update to get going again
-				bitmapData.writeFullUpdateRequest(false);
+				OutputEvent e = new OutputEvent(false);
+				outputEventQueue.add(e);
+				synchronized (outputEventQueue) {
+					outputEventQueue.notify();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
