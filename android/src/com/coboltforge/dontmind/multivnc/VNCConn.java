@@ -181,6 +181,103 @@ public class VNCConn {
 			if(Utils.DEBUG()) Log.d(TAG, "InputThread done!");
 		}
 		
+		
+
+		private void connectAndAuthenticate() throws Exception {
+			Log.i(TAG, "Connecting to " + connSettings.getAddress() + ", port " + connSettings.getPort() + "...");
+
+			rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort());
+			Log.v(TAG, "Connected to server");
+
+			// <RepeaterMagic>
+			if (connSettings.getUseRepeater() && connSettings.getRepeaterId() != null && connSettings.getRepeaterId().length()>0) {
+				Log.i(TAG, "Negotiating repeater/proxy connSettings");
+				byte[] protocolMsg = new byte[12];
+				rfb.is.read(protocolMsg);
+				byte[] buffer = new byte[250];
+				System.arraycopy(connSettings.getRepeaterId().getBytes(), 0, buffer, 0, connSettings.getRepeaterId().length());
+				rfb.os.write(buffer);
+			}
+			// </RepeaterMagic>
+
+			rfb.readVersionMsg();
+			Log.i(TAG, "RFB server supports protocol version " + rfb.serverMajor + "." + rfb.serverMinor);
+
+			rfb.writeVersionMsg();
+			Log.i(TAG, "Using RFB protocol version " + rfb.clientMajor + "." + rfb.clientMinor);
+
+			int bitPref=0;
+			if(connSettings.getUserName().length()>0)
+				bitPref|=1;
+			if(Utils.DEBUG()) Log.d("debug","bitPref="+bitPref);
+			int secType = rfb.negotiateSecurity(bitPref);
+			int authType;
+			if (secType == RfbProto.SecTypeTight) {
+				rfb.initCapabilities();
+				rfb.setupTunneling();
+				authType = rfb.negotiateAuthenticationTight();
+			} else if (secType == RfbProto.SecTypeUltra34) {
+				rfb.prepareDH();
+				authType = RfbProto.AuthUltra;
+			} else {
+				authType = secType;
+			}
+
+			switch (authType) {
+			case RfbProto.AuthNone:
+				Log.i(TAG, "No authentication needed");
+				rfb.authenticateNone();
+				break;
+			case RfbProto.AuthVNC:
+				Log.i(TAG, "VNC authentication needed");
+				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
+					canvas.getCredFromUser(connSettings);
+					synchronized (this) 
+					{
+						wait();  // wait for user input to finish
+					}
+				}			
+				rfb.authenticateVNC(connSettings.getPassword());
+				break;
+			case RfbProto.AuthUltra:
+				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0)
+					canvas.getCredFromUser(connSettings);
+				rfb.authenticateDH(connSettings.getUserName(),connSettings.getPassword());
+				break;
+			default:
+				throw new Exception("Unknown authentication scheme " + authType);
+			}
+		}
+
+
+
+		private void doProtocolInitialisation(int dx, int dy) throws IOException {
+			rfb.writeClientInit();
+			rfb.readServerInit();
+
+			Log.i(TAG, "Desktop name is " + rfb.desktopName);
+			Log.i(TAG, "Desktop size is " + rfb.framebufferWidth + " x " + rfb.framebufferHeight);
+			
+			canvas.mouseX = rfb.framebufferWidth/2;
+			canvas.mouseY = rfb.framebufferHeight/2;
+
+			boolean useFull = false;
+			int capacity = Utils.getActivityManager(canvas.getContext()).getMemoryClass();
+			if (connSettings.getForceFull() == BitmapImplHint.AUTO)
+			{
+				if (rfb.framebufferWidth * rfb.framebufferHeight * FullBufferBitmapData.CAPACITY_MULTIPLIER <= capacity * 1024 * 1024)
+					useFull = true;
+			}
+			else
+				useFull = (connSettings.getForceFull() == BitmapImplHint.FULL);
+			if (! useFull)
+				bitmapData=new LargeBitmapData(rfb, canvas, capacity);
+			else
+				bitmapData=new FullBufferBitmapData(rfb, canvas, capacity);
+
+			setPixelFormat();
+		}
+		
 
 		private void processNormalProtocol(final Context context, ProgressDialog pd, final Runnable setModes) throws Exception {
 			try {
@@ -656,100 +753,6 @@ public class VNCConn {
 	
 	
 
-	private void connectAndAuthenticate() throws Exception {
-		Log.i(TAG, "Connecting to " + connSettings.getAddress() + ", port " + connSettings.getPort() + "...");
-
-		rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort());
-		Log.v(TAG, "Connected to server");
-
-		// <RepeaterMagic>
-		if (connSettings.getUseRepeater() && connSettings.getRepeaterId() != null && connSettings.getRepeaterId().length()>0) {
-			Log.i(TAG, "Negotiating repeater/proxy connSettings");
-			byte[] protocolMsg = new byte[12];
-			rfb.is.read(protocolMsg);
-			byte[] buffer = new byte[250];
-			System.arraycopy(connSettings.getRepeaterId().getBytes(), 0, buffer, 0, connSettings.getRepeaterId().length());
-			rfb.os.write(buffer);
-		}
-		// </RepeaterMagic>
-
-		rfb.readVersionMsg();
-		Log.i(TAG, "RFB server supports protocol version " + rfb.serverMajor + "." + rfb.serverMinor);
-
-		rfb.writeVersionMsg();
-		Log.i(TAG, "Using RFB protocol version " + rfb.clientMajor + "." + rfb.clientMinor);
-
-		int bitPref=0;
-		if(connSettings.getUserName().length()>0)
-			bitPref|=1;
-		if(Utils.DEBUG()) Log.d("debug","bitPref="+bitPref);
-		int secType = rfb.negotiateSecurity(bitPref);
-		int authType;
-		if (secType == RfbProto.SecTypeTight) {
-			rfb.initCapabilities();
-			rfb.setupTunneling();
-			authType = rfb.negotiateAuthenticationTight();
-		} else if (secType == RfbProto.SecTypeUltra34) {
-			rfb.prepareDH();
-			authType = RfbProto.AuthUltra;
-		} else {
-			authType = secType;
-		}
-
-		switch (authType) {
-		case RfbProto.AuthNone:
-			Log.i(TAG, "No authentication needed");
-			rfb.authenticateNone();
-			break;
-		case RfbProto.AuthVNC:
-			Log.i(TAG, "VNC authentication needed");
-			if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-				canvas.getCredFromUser(connSettings);
-				synchronized (this) 
-				{
-					wait();  // wait for user input to finish
-				}
-			}			
-			rfb.authenticateVNC(connSettings.getPassword());
-			break;
-		case RfbProto.AuthUltra:
-			if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0)
-				canvas.getCredFromUser(connSettings);
-			rfb.authenticateDH(connSettings.getUserName(),connSettings.getPassword());
-			break;
-		default:
-			throw new Exception("Unknown authentication scheme " + authType);
-		}
-	}
-
-
-
-	private void doProtocolInitialisation(int dx, int dy) throws IOException {
-		rfb.writeClientInit();
-		rfb.readServerInit();
-
-		Log.i(TAG, "Desktop name is " + rfb.desktopName);
-		Log.i(TAG, "Desktop size is " + rfb.framebufferWidth + " x " + rfb.framebufferHeight);
-		
-		canvas.mouseX = rfb.framebufferWidth/2;
-		canvas.mouseY = rfb.framebufferHeight/2;
-
-		boolean useFull = false;
-		int capacity = Utils.getActivityManager(canvas.getContext()).getMemoryClass();
-		if (connSettings.getForceFull() == BitmapImplHint.AUTO)
-		{
-			if (rfb.framebufferWidth * rfb.framebufferHeight * FullBufferBitmapData.CAPACITY_MULTIPLIER <= capacity * 1024 * 1024)
-				useFull = true;
-		}
-		else
-			useFull = (connSettings.getForceFull() == BitmapImplHint.FULL);
-		if (! useFull)
-			bitmapData=new LargeBitmapData(rfb, canvas, capacity);
-		else
-			bitmapData=new FullBufferBitmapData(rfb, canvas, capacity);
-
-		setPixelFormat();
-	}
 
 
 
