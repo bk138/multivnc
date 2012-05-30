@@ -134,6 +134,9 @@ public class VNCConn {
     	
     	
 		public void run() {
+			
+			if(Utils.DEBUG()) Log.d(TAG, "InputThread started!");
+			
 			try {
 				final Display display = pd.getWindow().getWindowManager().getDefaultDisplay();
 				
@@ -432,6 +435,8 @@ public class VNCConn {
     private class VNCOutputThread extends Thread {
     	
     	public void run() {
+    		
+			if(Utils.DEBUG()) Log.d(TAG, "OutputThread started!");
 
     		//
     		// main output loop
@@ -446,6 +451,16 @@ public class VNCConn {
     				if(input.key != null)
     					sendKeyEvent(input.key);
     			}
+    			
+    			// at this point, queue is empty, wait for input instead of hogging CPU
+    			synchronized (inputEventQueue) {
+					try {
+						inputEventQueue.wait();
+					} catch (InterruptedException e) {
+						// go on
+					}
+				}
+    			
     		}
     		
     		if(Utils.DEBUG()) Log.d(TAG, "OutputThread done!");
@@ -648,6 +663,9 @@ public class VNCConn {
 		
 		InputEvent e = new InputEvent(x, y, modifiers, pointerMask);
 		inputEventQueue.add(e);
+		synchronized (inputEventQueue) {
+			inputEventQueue.notify();
+		}
 		
 		canvas.mouseX = x;
 		canvas.mouseY = y;
@@ -661,6 +679,9 @@ public class VNCConn {
 		
 		InputEvent e = new InputEvent(keyCode, evt);
 		inputEventQueue.add(e);
+		synchronized (inputEventQueue) {
+			inputEventQueue.notify();
+		}
 		
 		return true;
 	}
