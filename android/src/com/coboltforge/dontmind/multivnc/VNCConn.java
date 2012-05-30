@@ -433,7 +433,72 @@ public class VNCConn {
 			}
 		}
 		
+
+		private void setPixelFormat() throws IOException {
+			if(bitmapData instanceof FullBufferBitmapData) 
+				setPixelFormatFromModel(pendingColorModel, true);
+			else
+				setPixelFormatFromModel(pendingColorModel, false);
+			bytesPerPixel = pendingColorModel.bpp();
+			colorPalette = pendingColorModel.palette();
+			colorModel = pendingColorModel;
+			pendingColorModel = null;
+		}
+
 		
+
+		private void setPixelFormatFromModel(COLORMODEL model, boolean reverserPixelOrder) throws IOException {
+			switch (model) {
+			case C24bit:
+				// 24-bit color
+				if(reverserPixelOrder)
+					rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 0, 8, 16, false);
+				else
+					rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0, false);
+				break;
+			case C256:
+				if(reverserPixelOrder)
+					rfb.writeSetPixelFormat(8, 8, false, true, 3, 7, 7, 6, 3, 0, false); // not ideal, but wtf...
+				else
+					rfb.writeSetPixelFormat(8, 8, false, true, 7, 7, 3, 0, 3, 6, false);
+				break;
+			case C64:
+				if(reverserPixelOrder)
+					rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 0, 2, 4, false);
+				else
+					rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 4, 2, 0, false);
+				break;
+			case C8:
+				if(reverserPixelOrder)
+					rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 0, 1, 2, false);
+				else
+					rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 2, 1, 0, false);
+				break;
+			case C4:
+				// Greyscale
+				if(reverserPixelOrder)
+					rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 0, 2, 4, true);
+				else
+					rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 4, 2, 0, true);
+				break;
+			case C2:
+				// B&W
+				if(reverserPixelOrder)
+					rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 0, 1, 2, true);
+				else
+					rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 2, 1, 0, true);
+				break;
+			default:
+				// Default is 24bit colors
+				if(reverserPixelOrder)
+					rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 0, 8, 16, false);
+				else
+					rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0, false);
+				break;
+			}
+		}
+		
+
 
 
 		
@@ -803,71 +868,6 @@ public class VNCConn {
 
 
 
-
-	private void setPixelFormat() throws IOException {
-		if(bitmapData instanceof FullBufferBitmapData) 
-			setPixelFormatFromModel(pendingColorModel, true);
-		else
-			setPixelFormatFromModel(pendingColorModel, false);
-		bytesPerPixel = pendingColorModel.bpp();
-		colorPalette = pendingColorModel.palette();
-		colorModel = pendingColorModel;
-		pendingColorModel = null;
-	}
-
-	
-
-	private void setPixelFormatFromModel(COLORMODEL model, boolean reverserPixelOrder) throws IOException {
-		switch (model) {
-		case C24bit:
-			// 24-bit color
-			if(reverserPixelOrder)
-				rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 0, 8, 16, false);
-			else
-				rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0, false);
-			break;
-		case C256:
-			if(reverserPixelOrder)
-				rfb.writeSetPixelFormat(8, 8, false, true, 3, 7, 7, 6, 3, 0, false); // not ideal, but wtf...
-			else
-				rfb.writeSetPixelFormat(8, 8, false, true, 7, 7, 3, 0, 3, 6, false);
-			break;
-		case C64:
-			if(reverserPixelOrder)
-				rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 0, 2, 4, false);
-			else
-				rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 4, 2, 0, false);
-			break;
-		case C8:
-			if(reverserPixelOrder)
-				rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 0, 1, 2, false);
-			else
-				rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 2, 1, 0, false);
-			break;
-		case C4:
-			// Greyscale
-			if(reverserPixelOrder)
-				rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 0, 2, 4, true);
-			else
-				rfb.writeSetPixelFormat(8, 6, false, true, 3, 3, 3, 4, 2, 0, true);
-			break;
-		case C2:
-			// B&W
-			if(reverserPixelOrder)
-				rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 0, 1, 2, true);
-			else
-				rfb.writeSetPixelFormat(8, 3, false, true, 1, 1, 1, 2, 1, 0, true);
-			break;
-		default:
-			// Default is 24bit colors
-			if(reverserPixelOrder)
-				rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 0, 8, 16, false);
-			else
-				rfb.writeSetPixelFormat(32, 24, false, true, 255, 255, 255, 16, 8, 0, false);
-			break;
-		}
-	}
-	
 
 
 
