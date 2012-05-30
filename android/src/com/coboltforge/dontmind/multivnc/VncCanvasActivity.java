@@ -83,18 +83,23 @@ public class VncCanvasActivity extends Activity {
 		TouchpadInputHandler() {
 			super(VncCanvasActivity.this);
 			twoFingerFlingVelocityTracker = VelocityTracker.obtain();
+			Log.d(TAG, "TouchpadInputHandler " + this +  " created!");
 		}
-		
+
 		@Override
 		protected void finalize() throws Throwable {
-			if(twoFingerFlingVelocityTracker != null)
+			try {
 				twoFingerFlingVelocityTracker.recycle();
-			
-			Log.d(TAG, "TouchpadInputHandler destroyed!");
+				twoFingerFlingVelocityTracker = null;
+			}
+			catch (NullPointerException e) {
+			}
+
+			Log.d(TAG, "TouchpadInputHandler " + this +  " destroyed!");
 			super.finalize();
 		}
 
-		
+
 		/**
 		 * scale down delta when it is small. This will allow finer control
 		 * when user is making a small movement on touch screen.
