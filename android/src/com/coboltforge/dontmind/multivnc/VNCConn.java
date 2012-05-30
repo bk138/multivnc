@@ -474,12 +474,6 @@ public class VNCConn {
 				if (rfb.inNormalProtocol) {
 					bitmapData.invalidateMousePosition();
 
-					if (pe.x<0) pe.x=0;
-					else if (pe.x>=rfb.framebufferWidth) pe.x=rfb.framebufferWidth-1;
-					if (pe.y<0) pe.y=0;
-					else if (pe.y>=rfb.framebufferHeight) pe.y=rfb.framebufferHeight-1;
-
-					bitmapData.invalidateMousePosition();
 					try {
 						rfb.writePointerEvent(pe.x,pe.y,pe.modifiers,pe.mask);
 					} catch (Exception e) {
@@ -667,6 +661,12 @@ public class VNCConn {
 	
 
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
+
+		// trim coodinates
+		if (x<0) x=0;
+		else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
+		if (y<0) y=0;
+		else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
 		
 		InputEvent e = new InputEvent(x, y, modifiers, pointerMask);
 		inputEventQueue.add(e);
