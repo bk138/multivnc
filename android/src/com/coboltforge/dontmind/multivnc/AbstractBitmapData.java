@@ -145,6 +145,11 @@ abstract class AbstractBitmapData {
 				bitmapPixels[i] = 0;
 	}
 	
+	
+	Bitmap getScreenShot() {
+		return Bitmap.createBitmap(bitmapPixels, 0, bitmapwidth, bitmapwidth, bitmapheight, Bitmap.Config.RGB_565);
+	}
+	
 	/**
 	 * Release resources
 	 */
