@@ -34,7 +34,8 @@ public class VNCConn {
 
 	private VncCanvas canvas;
 
-	private VncThread workerThread;
+	private VncInputThread inputThread;
+	private VNCOutputThread outputThread;
 	
 	// VNC protocol connection
 	private RfbProto rfb;
@@ -49,8 +50,8 @@ public class VNCConn {
 	private AbstractBitmapData bitmapData;
 	private Lock bitmapDataPixelsLock = new ReentrantLock();
 	
-	// message queue for communicating with the worker thread
-	private ConcurrentLinkedQueue<InputEvent> inputQueue = new ConcurrentLinkedQueue<VNCConn.InputEvent>(); 
+	// message queue for communicating with the output worker thread
+	private ConcurrentLinkedQueue<InputEvent> inputEventQueue = new ConcurrentLinkedQueue<VNCConn.InputEvent>(); 
 	
 	private Paint handleRREPaint;
 
@@ -120,13 +121,13 @@ public class VNCConn {
     }
     
     
-    private class VncThread extends Thread {
+    private class VncInputThread extends Thread {
     	
     	private ProgressDialog pd;
     	private Runnable setModes;
     	
     	
-    	public VncThread(ProgressDialog pd, Runnable setModes) {
+    	public VncInputThread(ProgressDialog pd, Runnable setModes) {
     		this.pd = pd;
     		this.setModes = setModes;
     	}
@@ -143,6 +144,11 @@ public class VNCConn {
 						pd.setMessage("Downloading first frame.\nPlease wait...");
 					}
 				});
+				
+				// start output thread here
+				outputThread = new VNCOutputThread();
+				outputThread.start();
+				
 				processNormalProtocol(canvas.getContext(), pd, setModes);
 			} catch (Throwable e) {
 				if (maintainConnection) {
@@ -171,6 +177,8 @@ public class VNCConn {
 					}
 				}
 			}
+			
+			if(Utils.DEBUG()) Log.d(TAG, "InputThread done!");
 		}
 		
 
@@ -184,19 +192,10 @@ public class VNCConn {
 				canvas.handler.post(setModes);
 				
 				//
-				// main dispatch loop
+				// main input loop
 				//
 				while (maintainConnection) {
 
-					// check input queue
-					InputEvent input;
-					while( (input = inputQueue.poll()) != null ) {
-						if(input.pointer != null)
-							sendPointerEvent(input.pointer);
-						if(input.key != null)
-							sendKeyEvent(input.key);
-					}
-					
 					bitmapData.syncScroll();
 					// Read message type from the server.
 					int msgType = rfb.readServerMessageType();
@@ -326,6 +325,37 @@ public class VNCConn {
 		
 		
 
+
+		
+    }
+
+    
+    
+    
+    private class VNCOutputThread extends Thread {
+    	
+    	public void run() {
+
+    		//
+    		// main output loop
+    		//
+    		while (maintainConnection) {
+
+    			// check input queue
+    			InputEvent input;
+    			while( (input = inputEventQueue.poll()) != null ) {
+    				if(input.pointer != null)
+    					sendPointerEvent(input.pointer);
+    				if(input.key != null)
+    					sendKeyEvent(input.key);
+    			}
+    		}
+    		
+    		if(Utils.DEBUG()) Log.d(TAG, "OutputThread done!");
+
+    	}
+    	
+
 		private boolean sendPointerEvent(InputEvent.PointerEvent pe) {
 
 			try {
@@ -409,10 +439,11 @@ public class VNCConn {
 			return false;
 		}
 		
-
-		
+    	
     }
-
+    
+    
+    
     
 	public VNCConn() {
 		handleRREPaint = new Paint();
@@ -484,8 +515,8 @@ public class VNCConn {
 				});
 			}
 		});
-		workerThread = new VncThread(pd, setModes); 	
-		workerThread.start();
+		inputThread = new VncInputThread(pd, setModes); 	
+		inputThread.start();
 	}
 
 
@@ -519,7 +550,7 @@ public class VNCConn {
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 		
 		InputEvent e = new InputEvent(x, y, modifiers, pointerMask);
-		inputQueue.add(e);
+		inputEventQueue.add(e);
 		
 		canvas.mouseX = x;
 		canvas.mouseY = y;
@@ -532,7 +563,7 @@ public class VNCConn {
 	public boolean sendKeyEvent(int keyCode, KeyEvent evt) {
 		
 		InputEvent e = new InputEvent(keyCode, evt);
-		inputQueue.add(e);
+		inputEventQueue.add(e);
 		
 		return true;
 	}
