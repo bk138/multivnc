@@ -13,9 +13,8 @@
         <ImageButton android:id="@+id/discovered_server_save_button"
         	android:src="@android:drawable/ic_menu_save"
         	android:layout_gravity="center_vertical"
-        	android:scaleType="centerInside"
-	        android:layout_height="50dip"
-	        android:layout_width="50dip"
+	        android:layout_height="50dp"
+	        android:layout_width="50dp"
 	    />
 	 
 </LinearLayout>

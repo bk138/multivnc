@@ -38,6 +38,7 @@
 <string name="bookmark_saved">Bookmark saved!</string>
 <string name="open_doc">About</string>
 <string name="password_caption">Password</string>
+<string name="keep_password_button">Keep</string>
 <string name="port_caption">Port</string>
 <string name="repeater_caption">Repeater</string>
 <string name="repeater_hint">For UltraVNC-style repeater address</string>
