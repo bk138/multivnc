@@ -642,11 +642,18 @@ public class VNCConn {
 		try {
 			bitmapData.dispose();
 			rfb.close(); // close immediatly
+
+			// the input thread stops by itself, but the putput thread not
+			outputThread.interrupt();
 		}
 		catch(Exception e) {
 		}
-		bitmapData = null;
 		
+		bitmapData = null;
+		canvas = null;
+		connSettings = null;
+		
+		System.gc();
 	}
 
 	/**
