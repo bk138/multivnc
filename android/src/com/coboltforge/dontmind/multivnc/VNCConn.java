@@ -765,6 +765,8 @@ public class VNCConn {
 
 	public boolean sendKeyEvent(int keyCode, KeyEvent evt) {
 		
+		if(Utils.DEBUG()) Log.d(TAG, "queueing key evt " + evt.toString());
+		
 		OutputEvent e = new OutputEvent(keyCode, evt);
 		outputEventQueue.add(e);
 		synchronized (outputEventQueue) {

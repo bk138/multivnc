@@ -4,6 +4,7 @@
 package com.coboltforge.dontmind.multivnc;
 
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import com.antlersoft.android.bc.BCFactory;
@@ -30,7 +31,10 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	AbstractGestureInputHandler(VncCanvasActivity c)
 	{
 		activity = c;
-		gestures= new GestureDetector(c, this);
+		if(Build.VERSION.SDK_INT < 8)
+			gestures  = new GestureDetector(c, this);
+		else
+			gestures= new GestureDetector(c, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
 		gestures.setOnDoubleTapListener(this);
 		scaleGestures=BCFactory.getInstance().getScaleGestureDetector(c, this);
 	}
