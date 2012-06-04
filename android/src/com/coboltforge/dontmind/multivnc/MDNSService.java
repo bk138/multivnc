@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -216,7 +217,11 @@ public class MDNSService extends Service {
 						ConnectionBean c = new ConnectionBean();
 						c.set_Id(0); // new!
 						c.setNickname(ev.getName());
-						c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
+						// use IPv4-only on gingerbread and lower
+						if(Build.VERSION.SDK_INT < 11) 
+							c.setAddress(ev.getInfo().getInet4Addresses()[0].toString().replace('/', ' ').trim());
+						else
+							c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
 						c.setPort(ev.getInfo().getPort());
 						c.setUseLocalCursor(true); // always enable
 						
