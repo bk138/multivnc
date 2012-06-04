@@ -30,7 +30,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	AbstractGestureInputHandler(VncCanvasActivity c)
 	{
 		activity = c;
-		gestures=BCFactory.getInstance().getBCGestureDetector().createGestureDetector(c, this);
+		gestures= new GestureDetector(c, this);
 		gestures.setOnDoubleTapListener(this);
 		scaleGestures=BCFactory.getInstance().getScaleGestureDetector(c, this);
 	}
