@@ -681,7 +681,7 @@ public class VncCanvas extends GLSurfaceView {
 			return true;
 		}
 		
-		return vncConn.sendKeyEvent(keyCode, evt);
+		return vncConn.sendKeyEvent(keyCode, evt, false);
 	}
 
 	void sendMetaKey(MetaKeyBean meta)
@@ -700,11 +700,11 @@ public class VncCanvas extends GLSurfaceView {
 					meta.getKeySym(),
 					0,
 					meta.getMetaFlags());
-			vncConn.sendKeyEvent(downEvent.getKeyCode(), downEvent);
+			vncConn.sendKeyEvent(downEvent.getKeyCode(), downEvent, true);
 			
 			// and up again
 			KeyEvent upEvent = KeyEvent.changeAction(downEvent, KeyEvent.ACTION_UP);
-			vncConn.sendKeyEvent(upEvent.getKeyCode(), upEvent);
+			vncConn.sendKeyEvent(upEvent.getKeyCode(), upEvent, true);
 
 		}
 	}

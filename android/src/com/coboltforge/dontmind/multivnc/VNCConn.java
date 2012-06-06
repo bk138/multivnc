@@ -23,7 +23,6 @@ import android.graphics.Rect;
 import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.Display;
-import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -106,8 +105,12 @@ public class VNCConn {
     		pointer.mask = pointerMask;
     	}
     	
-    	public OutputEvent(int keyCode, KeyEvent evt) {
-    		this.key = evt;
+    	public OutputEvent(int keyCode, int metaState, boolean down, boolean sendDirectly) {
+    		key = new KeyboardEvent();
+    		key.keyCode = keyCode;
+    		key.metaState = metaState;
+    		key.down = down;
+    		key.sendDirectly = sendDirectly;
     	}
     	
     	public OutputEvent(boolean incremental) {
@@ -122,13 +125,20 @@ public class VNCConn {
     		int modifiers;
     	}
     	
+    	private class KeyboardEvent {
+    		int keyCode;
+    		int metaState;
+    		boolean down;
+    		boolean sendDirectly;
+    	}
+    	
     	private class FullFramebufferUpdateRequest {
     		boolean incremental;
     	}
     	
     	public FullFramebufferUpdateRequest ffur;
     	public PointerEvent pointer;
-    	public KeyEvent key;
+    	public KeyboardEvent key;
     }
     
     
@@ -571,56 +581,59 @@ public class VNCConn {
 		}
 		
 		
-		private boolean sendKeyEvent(KeyEvent evt) {
+		private boolean sendKeyEvent(OutputEvent.KeyboardEvent evt) {
 			if (rfb != null && rfb.inNormalProtocol) {
-			   boolean down = (evt.getAction() == KeyEvent.ACTION_DOWN);
-			   int rfbKey = evt.getKeyCode();
-			   int metaState = evt.getMetaState();
-			   
-			   if(Utils.DEBUG()) Log.d(TAG, "sending key event " + evt.toString());
 			   
 			   // only do translation for events that were *not* synthesized
-			   if(evt.getSource() != InputDevice.SOURCE_UNKNOWN) {
-				   switch(rfbKey) {
-				   case KeyEvent.KEYCODE_BACK :        rfbKey = 0xff1b; break;
-				   case KeyEvent.KEYCODE_DPAD_LEFT:    rfbKey = 0xff51; break;
-				   case KeyEvent.KEYCODE_DPAD_UP:      rfbKey = 0xff52; break;
-				   case KeyEvent.KEYCODE_DPAD_RIGHT:   rfbKey = 0xff53; break;
-				   case KeyEvent.KEYCODE_DPAD_DOWN:    rfbKey = 0xff54; break;
-				   case KeyEvent.KEYCODE_DEL: 		   rfbKey = 0xff08; break;
-				   case KeyEvent.KEYCODE_ENTER:        rfbKey = 0xff0d; break;
-				   case KeyEvent.KEYCODE_DPAD_CENTER:  rfbKey = 0xff0d; break;
-				   case KeyEvent.KEYCODE_TAB:          rfbKey = 0xff09; break;
-				   case 113: 						   rfbKey = 0xffe3; break; // CTRL_L
-				   case 111: 						   rfbKey = 0xff1b; break; // ESC
-				   case KeyEvent.KEYCODE_ALT_LEFT:     rfbKey = 0xffe9; break;
-				   case 131: 						   rfbKey = 0xffbe; break; // F1
-				   case 132: 						   rfbKey = 0xffbf; break; // F2
-				   case 133: 						   rfbKey = 0xffc0; break; // F3
-				   case 134: 						   rfbKey = 0xffc1; break; // F4
-				   case 135: 						   rfbKey = 0xffc2; break; // F5
-				   case 136: 						   rfbKey = 0xffc3; break; // F6
-				   case 137: 						   rfbKey = 0xffc4; break; // F7
-				   case 138: 						   rfbKey = 0xffc5; break; // F8
-				   case 139: 						   rfbKey = 0xffc6; break; // F9
-				   case 140: 						   rfbKey = 0xffc7; break; // F10
-				   case 141: 						   rfbKey = 0xffc8; break; // F11
-				   case 142: 						   rfbKey = 0xffc9; break; // F12
-				   case 124:						   rfbKey = 0xff63; break; // Insert
-				   case 112: 					       rfbKey = 0xffff; break; // Delete
-				   case 122: 					       rfbKey = 0xff50; break; // Home
-				   case 123: 					       rfbKey = 0xff57; break; // End
-				   case  92: 					       rfbKey = 0xff55; break; // PgUp
-				   case  93: 					       rfbKey = 0xff56; break; // PgDn
-				   default: 							  
-					   rfbKey = evt.getUnicodeChar();
-					   metaState = 0;
+			   if(!evt.sendDirectly) {
+				   switch(evt.keyCode) {
+				   case KeyEvent.KEYCODE_BACK :        evt.keyCode = 0xff1b; break;
+				   case KeyEvent.KEYCODE_DPAD_LEFT:    evt.keyCode = 0xff51; break;
+				   case KeyEvent.KEYCODE_DPAD_UP:      evt.keyCode = 0xff52; break;
+				   case KeyEvent.KEYCODE_DPAD_RIGHT:   evt.keyCode = 0xff53; break;
+				   case KeyEvent.KEYCODE_DPAD_DOWN:    evt.keyCode = 0xff54; break;
+				   case KeyEvent.KEYCODE_DEL: 		   evt.keyCode = 0xff08; break;
+				   case KeyEvent.KEYCODE_ENTER:        evt.keyCode = 0xff0d; break;
+				   case KeyEvent.KEYCODE_DPAD_CENTER:  evt.keyCode = 0xff0d; break;
+				   case KeyEvent.KEYCODE_TAB:          evt.keyCode = 0xff09; break;
+				   case 113: 						   evt.keyCode = 0xffe3; break; // CTRL_L
+				   case 111: 						   evt.keyCode = 0xff1b; break; // ESC
+				   case KeyEvent.KEYCODE_ALT_LEFT:     evt.keyCode = 0xffe9; break;
+				   case 131: 						   evt.keyCode = 0xffbe; break; // F1
+				   case 132: 						   evt.keyCode = 0xffbf; break; // F2
+				   case 133: 						   evt.keyCode = 0xffc0; break; // F3
+				   case 134: 						   evt.keyCode = 0xffc1; break; // F4
+				   case 135: 						   evt.keyCode = 0xffc2; break; // F5
+				   case 136: 						   evt.keyCode = 0xffc3; break; // F6
+				   case 137: 						   evt.keyCode = 0xffc4; break; // F7
+				   case 138: 						   evt.keyCode = 0xffc5; break; // F8
+				   case 139: 						   evt.keyCode = 0xffc6; break; // F9
+				   case 140: 						   evt.keyCode = 0xffc7; break; // F10
+				   case 141: 						   evt.keyCode = 0xffc8; break; // F11
+				   case 142: 						   evt.keyCode = 0xffc9; break; // F12
+				   case 124:						   evt.keyCode = 0xff63; break; // Insert
+				   case 112: 					       evt.keyCode = 0xffff; break; // Delete
+				   case 122: 					       evt.keyCode = 0xff50; break; // Home
+				   case 123: 					       evt.keyCode = 0xff57; break; // End
+				   case  92: 					       evt.keyCode = 0xff55; break; // PgUp
+				   case  93: 					       evt.keyCode = 0xff56; break; // PgDn
+				   default:
+					   // do keycode -> UTF-8 symbol conversion
+					   KeyEvent tmp = new KeyEvent(
+							   0, 
+							   0,
+							   0,
+							   evt.keyCode,
+							   0,
+							   evt.metaState);
+					   evt.keyCode = tmp.getUnicodeChar();
+					   evt.metaState = 0;
 					   break;
 				   }
 			   }
 			   
 		    	try {
-		    		rfb.writeKeyEvent(rfbKey, metaState, down);
+		    		rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
 		    		return true;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -766,12 +779,18 @@ public class VNCConn {
 		return true;
 	}
 
+	/**
+	 * queue key event for sending
+	 * @param keyCode
+	 * @param evt
+	 * @param sendDirectly send key event directly without doing local->rfbKeySym translation
+	 * @return
+	 */
+	public boolean sendKeyEvent(int keyCode, KeyEvent evt, boolean sendDirectly) {
 
-	public boolean sendKeyEvent(int keyCode, KeyEvent evt) {
-		
 		if(Utils.DEBUG()) Log.d(TAG, "queueing key evt " + evt.toString() + " code 0x" + Integer.toHexString(keyCode));
-		
-		OutputEvent e = new OutputEvent(keyCode, evt);
+
+		OutputEvent e = new OutputEvent(keyCode, evt.getMetaState(), evt.getAction() == KeyEvent.ACTION_DOWN, sendDirectly);
 		outputEventQueue.add(e);
 		synchronized (outputEventQueue) {
 			outputEventQueue.notify();
