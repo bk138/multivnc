@@ -262,7 +262,7 @@ public class VncCanvasActivity extends Activity {
 					
 				}
 
-				return true;
+				return twoFingerFlingDetected;
 			}
 			else
 			{
@@ -295,7 +295,7 @@ public class VncCanvasActivity extends Activity {
 				e2.setLocation(newRemoteX, newRemoteY);
 				vncCanvas.processPointerEvent(e2, false);
 			}
-			return true;
+			return false;
 		}
 
 		/*
