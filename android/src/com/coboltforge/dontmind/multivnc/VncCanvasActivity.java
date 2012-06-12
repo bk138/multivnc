@@ -532,7 +532,7 @@ public class VncCanvasActivity extends Activity {
 		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
 		zoomer = (ZoomControls) findViewById(R.id.zoomer);
 
-		vncCanvas.initializeVncCanvas(connection, new Runnable() {
+		vncCanvas.initializeVncCanvas(this, connection, new Runnable() {
 			public void run() {
 				setModes();
 			}

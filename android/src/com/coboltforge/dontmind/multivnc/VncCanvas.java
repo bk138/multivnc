@@ -71,6 +71,7 @@ public class VncCanvas extends GLSurfaceView {
 	 */
 	boolean cameraButtonDown = false;
 	
+	public VncCanvasActivity activity;
 
 	// VNC protocol connection
 	public VNCConn vncConn;
@@ -295,7 +296,8 @@ public class VncCanvas extends GLSurfaceView {
 	 * @param bean Connection settings
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
-	void initializeVncCanvas(ConnectionBean bean, final Runnable setModes) {
+	void initializeVncCanvas(VncCanvasActivity a, ConnectionBean bean, final Runnable setModes) {
+		activity = a;
 		vncConn = new VNCConn();
 		vncConn.init(bean, this, setModes);
 	}

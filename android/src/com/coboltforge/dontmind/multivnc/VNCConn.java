@@ -162,6 +162,7 @@ public class VNCConn {
 				final Display display = pd.getWindow().getWindowManager().getDefaultDisplay();
 				
 				connectAndAuthenticate();
+				
 				doProtocolInitialisation(display.getWidth(), display.getHeight());
 				canvas.handler.post(new Runnable() {
 					public void run() {
@@ -708,17 +709,19 @@ public class VNCConn {
 		}
 
 		// Startup the RFB thread with a nifty progess dialog
-		final ProgressDialog pd = ProgressDialog.show(canvas.getContext(), "Connecting...", "Establishing handshake.\nPlease wait...", true, true, new DialogInterface.OnCancelListener() {
-			@Override
-			public void onCancel(DialogInterface dialog) {
-				shutdown();
-				canvas.handler.post(new Runnable() {
-					public void run() {
-						Utils.showErrorMessage(canvas.getContext(), "VNC connection aborted!");
-					}
-				});
-			}
-		});
+		final ProgressDialog pd = new ProgressDialog(canvas.getContext());
+		pd.setCancelable(false); // on ICS, clicking somewhere cancels the dialog. not what we want...
+	    pd.setTitle("Connecting...");
+	    pd.setMessage("Establishing handshake.\nPlease wait...");
+	    pd.setButton(DialogInterface.BUTTON_NEGATIVE, canvas.getContext().getString(android.R.string.cancel), new DialogInterface.OnClickListener() 
+	    {
+	        public void onClick(DialogInterface dialog, int which) 
+	        {
+	        	canvas.activity.finish();
+	        }
+	    });
+	    pd.show();
+	    
 		inputThread = new VncInputThread(pd, setModes); 	
 		inputThread.start();
 	}
