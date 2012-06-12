@@ -1,10 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/itemMDNSRestart" android:title="@string/restartMDNS"
-		android:showAsAction="ifRoom" />
+        android:icon="@drawable/refresh"
+		android:showAsAction="ifRoom|withText" />
     <item android:id="@+id/itemImportExport" android:title="@string/import_export_settings"
 		android:icon="@android:drawable/ic_menu_save"
-		android:showAsAction="ifRoom" />
+		android:showAsAction="ifRoom|withText" />
 	<item android:id="@+id/itemOpenDoc" android:title="@string/open_doc"
 		android:icon="@android:drawable/ic_menu_help"
-		android:showAsAction="ifRoom" />
+		android:showAsAction="ifRoom|withText" />
 </menu>

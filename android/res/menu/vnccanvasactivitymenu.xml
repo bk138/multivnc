@@ -1,16 +1,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/itemSpecialKeys" android:title="@string/special_keys"
 		android:icon="@drawable/specialkeys"
-		android:showAsAction="ifRoom" />
-	<item android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again" 
-	    android:showAsAction="ifRoom"/>
+		android:showAsAction="ifRoom|withText" />
+	<item android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again"
+	    android:icon="@drawable/refresh" 
+	    android:showAsAction="ifRoom|withText"/>
 	<item android:id="@+id/itemToggleKeyboard" android:title="@string/toggle_keyboard"
 		android:icon="@drawable/keyboard"
 		android:showAsAction="ifRoom"></item>
 	<item android:id="@+id/itemToggleFramebufferUpdate" android:title="@string/toggle_framebuffer_update"
 		android:icon="@android:drawable/ic_menu_view"></item>
 	<item android:id="@+id/itemToggleMouseButtons" android:title="@string/toggle_mouse_buttons"
-		android:icon="@drawable/mouse_icon"></item>
+		android:icon="@drawable/mouse_icon"	></item>
 	<item android:id="@+id/itemColorMode" android:title="@string/color_mode"
 		android:icon="@android:drawable/ic_menu_preferences"></item>
 	<item android:id="@+id/itemInfo" android:title="@string/info"
