@@ -765,10 +765,12 @@ public class VNCConn {
 		if (y<0) y=0;
 		else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
 		
-		OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
-		outputEventQueue.add(e);
-		synchronized (outputEventQueue) {
-			outputEventQueue.notify();
+		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+			OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
+			outputEventQueue.add(e);
+			synchronized (outputEventQueue) {
+				outputEventQueue.notify();
+			}
 		}
 		
 		canvas.mouseX = x;
