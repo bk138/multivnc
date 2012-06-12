@@ -841,6 +841,28 @@ public class VncCanvasActivity extends Activity {
 		return super.onKeyUp(keyCode, evt);
 	}
 
+	
+	// this is called for unicode symbols like €
+	// multiple duplicate key events have occurred in a row, or a complex string is being delivered.
+	// If the key code is not KEYCODE_UNKNOWN then the getRepeatCount() method returns the number of
+	// times the given key code should be executed.
+	// Otherwise, if the key code is KEYCODE_UNKNOWN, then this is a sequence of characters as returned by getCharacters().
+	@Override
+	public boolean onKeyMultiple (int keyCode, int count, KeyEvent evt) {
+		if(Utils.DEBUG()) Log.d(TAG, "Input: key mult: " + evt.toString());
+
+		// we only deal with the special char case for now
+		if(evt.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN) {
+			if (vncCanvas.processLocalKeyEvent(keyCode, evt))
+				return true;
+		}
+		
+		return super.onKeyMultiple(keyCode, count, evt);
+	}
+	
+	
+	
+	
 
 	private void selectColorModel() {
 		// Stop repainting the desktop

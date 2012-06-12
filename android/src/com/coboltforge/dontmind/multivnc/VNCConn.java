@@ -104,12 +104,11 @@ public class VNCConn {
     		pointer.mask = pointerMask;
     	}
     	
-    	public OutputEvent(int keyCode, int metaState, boolean down, boolean sendDirectly) {
+    	public OutputEvent(int keyCode, int metaState, boolean down) {
     		key = new KeyboardEvent();
     		key.keyCode = keyCode;
     		key.metaState = metaState;
     		key.down = down;
-    		key.sendDirectly = sendDirectly;
     	}
     	
     	public OutputEvent(boolean incremental) {
@@ -128,7 +127,6 @@ public class VNCConn {
     		int keyCode;
     		int metaState;
     		boolean down;
-    		boolean sendDirectly;
     	}
     	
     	private class FullFramebufferUpdateRequest {
@@ -565,10 +563,10 @@ public class VNCConn {
 
 					try {
 						rfb.writePointerEvent(pe.x,pe.y,pe.modifiers,pe.mask);
+						return true;
 					} catch (Exception e) {
-						e.printStackTrace();
+						return false;
 					}
-					return true;
 				}
 			}
 			catch(NullPointerException e) {
@@ -581,61 +579,13 @@ public class VNCConn {
 		private boolean sendKeyEvent(OutputEvent.KeyboardEvent evt) {
 			if (rfb != null && rfb.inNormalProtocol) {
 			   
-			   // only do translation for events that were *not* synthesized
-			   if(!evt.sendDirectly) {
-				   switch(evt.keyCode) {
-				   case KeyEvent.KEYCODE_BACK :        evt.keyCode = 0xff1b; break;
-				   case KeyEvent.KEYCODE_DPAD_LEFT:    evt.keyCode = 0xff51; break;
-				   case KeyEvent.KEYCODE_DPAD_UP:      evt.keyCode = 0xff52; break;
-				   case KeyEvent.KEYCODE_DPAD_RIGHT:   evt.keyCode = 0xff53; break;
-				   case KeyEvent.KEYCODE_DPAD_DOWN:    evt.keyCode = 0xff54; break;
-				   case KeyEvent.KEYCODE_DEL: 		   evt.keyCode = 0xff08; break;
-				   case KeyEvent.KEYCODE_ENTER:        evt.keyCode = 0xff0d; break;
-				   case KeyEvent.KEYCODE_DPAD_CENTER:  evt.keyCode = 0xff0d; break;
-				   case KeyEvent.KEYCODE_TAB:          evt.keyCode = 0xff09; break;
-				   case 113: 						   evt.keyCode = 0xffe3; break; // CTRL_L
-				   case 111: 						   evt.keyCode = 0xff1b; break; // ESC
-				   case KeyEvent.KEYCODE_ALT_LEFT:     evt.keyCode = 0xffe9; break;
-				   case 131: 						   evt.keyCode = 0xffbe; break; // F1
-				   case 132: 						   evt.keyCode = 0xffbf; break; // F2
-				   case 133: 						   evt.keyCode = 0xffc0; break; // F3
-				   case 134: 						   evt.keyCode = 0xffc1; break; // F4
-				   case 135: 						   evt.keyCode = 0xffc2; break; // F5
-				   case 136: 						   evt.keyCode = 0xffc3; break; // F6
-				   case 137: 						   evt.keyCode = 0xffc4; break; // F7
-				   case 138: 						   evt.keyCode = 0xffc5; break; // F8
-				   case 139: 						   evt.keyCode = 0xffc6; break; // F9
-				   case 140: 						   evt.keyCode = 0xffc7; break; // F10
-				   case 141: 						   evt.keyCode = 0xffc8; break; // F11
-				   case 142: 						   evt.keyCode = 0xffc9; break; // F12
-				   case 124:						   evt.keyCode = 0xff63; break; // Insert
-				   case 112: 					       evt.keyCode = 0xffff; break; // Delete
-				   case 122: 					       evt.keyCode = 0xff50; break; // Home
-				   case 123: 					       evt.keyCode = 0xff57; break; // End
-				   case  92: 					       evt.keyCode = 0xff55; break; // PgUp
-				   case  93: 					       evt.keyCode = 0xff56; break; // PgDn
-				   default:
-					   // do keycode -> UTF-8 symbol conversion
-					   KeyEvent tmp = new KeyEvent(
-							   0, 
-							   0,
-							   0,
-							   evt.keyCode,
-							   0,
-							   evt.metaState);
-					   evt.keyCode = tmp.getUnicodeChar();
-					   evt.metaState = 0;
-					   break;
-				   }
-			   }
-			   
-		    	try {
-		    		rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
-		    		return true;
+			   try {
+				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
+				   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
+				   return true;
 				} catch (Exception e) {
-					e.printStackTrace();
+					return false;
 				}
-				return true;
 			}
 			return false;
 		}
@@ -771,13 +721,15 @@ public class VNCConn {
 			synchronized (outputEventQueue) {
 				outputEventQueue.notify();
 			}
+			
+			canvas.mouseX = x;
+			canvas.mouseY = y;
+			canvas.panToMouse();
+			
+			return true;
 		}
-		
-		canvas.mouseX = x;
-		canvas.mouseY = y;
-		canvas.panToMouse();
-		
-		return true;
+		else
+			return false;
 	}
 
 	/**
@@ -789,17 +741,101 @@ public class VNCConn {
 	 */
 	public boolean sendKeyEvent(int keyCode, KeyEvent evt, boolean sendDirectly) {
 
-		if(Utils.DEBUG()) Log.d(TAG, "queueing key evt " + evt.toString() + " code 0x" + Integer.toHexString(keyCode));
+		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
 
-		OutputEvent e = new OutputEvent(keyCode, evt.getMetaState(), evt.getAction() == KeyEvent.ACTION_DOWN, sendDirectly);
-		outputEventQueue.add(e);
-		synchronized (outputEventQueue) {
-			outputEventQueue.notify();
+			if(Utils.DEBUG()) Log.d(TAG, "queueing key evt " + evt.toString() + " code 0x" + Integer.toHexString(keyCode));
+
+			// check if special char
+			if(evt.getAction() == KeyEvent.ACTION_MULTIPLE && evt.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN) {
+				OutputEvent down = new OutputEvent(
+						evt.getCharacters().codePointAt(0),
+						evt.getMetaState(), 
+						true);
+				outputEventQueue.add(down);
+				
+				OutputEvent up = new OutputEvent(
+						evt.getCharacters().codePointAt(0),
+						evt.getMetaState(), 
+						false);
+				outputEventQueue.add(up);
+				
+				synchronized (outputEventQueue) {
+					outputEventQueue.notify();
+				}
+
+			}
+			// 'normal' key, i.e. either up or down
+			else  { 
+
+				int metaState = evt.getMetaState();
+				
+				// only do translation for events that were *not* synthesized,
+				// i.e. coming from a metakeybean which already is translated
+				if(!sendDirectly) {
+					switch(keyCode) {
+					case KeyEvent.KEYCODE_BACK :        keyCode = 0xff1b; break;
+					case KeyEvent.KEYCODE_DPAD_LEFT:    keyCode = 0xff51; break;
+					case KeyEvent.KEYCODE_DPAD_UP:      keyCode = 0xff52; break;
+					case KeyEvent.KEYCODE_DPAD_RIGHT:   keyCode = 0xff53; break;
+					case KeyEvent.KEYCODE_DPAD_DOWN:    keyCode = 0xff54; break;
+					case KeyEvent.KEYCODE_DEL: 		    keyCode = 0xff08; break;
+					case KeyEvent.KEYCODE_ENTER:        keyCode = 0xff0d; break;
+					case KeyEvent.KEYCODE_DPAD_CENTER:  keyCode = 0xff0d; break;
+					case KeyEvent.KEYCODE_TAB:          keyCode = 0xff09; break;
+					case 113: 						    keyCode = 0xffe3; break; // CTRL_L
+					case 111: 						    keyCode = 0xff1b; break; // ESC
+					case KeyEvent.KEYCODE_ALT_LEFT:     keyCode = 0xffe9; break;
+					case 131: 						    keyCode = 0xffbe; break; // F1
+					case 132: 						    keyCode = 0xffbf; break; // F2
+					case 133: 						    keyCode = 0xffc0; break; // F3
+					case 134: 						    keyCode = 0xffc1; break; // F4
+					case 135: 						    keyCode = 0xffc2; break; // F5
+					case 136: 						    keyCode = 0xffc3; break; // F6
+					case 137: 						    keyCode = 0xffc4; break; // F7
+					case 138: 						    keyCode = 0xffc5; break; // F8
+					case 139: 						    keyCode = 0xffc6; break; // F9
+					case 140: 						    keyCode = 0xffc7; break; // F10
+					case 141: 						    keyCode = 0xffc8; break; // F11
+					case 142: 						    keyCode = 0xffc9; break; // F12
+					case 124:						    keyCode = 0xff63; break; // Insert
+					case 112: 					        keyCode = 0xffff; break; // Delete
+					case 122: 					        keyCode = 0xff50; break; // Home
+					case 123: 					        keyCode = 0xff57; break; // End
+					case  92: 					        keyCode = 0xff55; break; // PgUp
+					case  93: 					        keyCode = 0xff56; break; // PgDn
+					default:
+						// do keycode -> UTF-8 keysym conversion
+						KeyEvent tmp = new KeyEvent(
+								0, 
+								0,
+								0,
+								keyCode,
+								0,
+								metaState);
+						keyCode = tmp.getUnicodeChar();
+						metaState = 0;
+						break;
+
+					}
+				}
+
+				OutputEvent e = new OutputEvent(
+						keyCode,
+						metaState, 
+						evt.getAction() == KeyEvent.ACTION_DOWN);
+				outputEventQueue.add(e);
+				synchronized (outputEventQueue) {
+					outputEventQueue.notify();
+				}
+
+			}
+			
+			return true;
 		}
-		
-		return true;
+		else
+			return false;
 	}
-	
+
 
 
 	public boolean toggleFramebufferUpdates()

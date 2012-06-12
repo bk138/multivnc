@@ -29,7 +29,7 @@
 <string name="intro_version_text">&lt;br&gt;--Sent text is remembered across sessions (optionally)&lt;br&gt;--Import/Export settings to file&lt;br&gt;--Button with zoom controls to bring up keyboard&lt;br&gt;--Can force tiling mode (very large screens)</string>
 <string name="intro_dont_show">Don\'t show again</string>
 <string name="local_mouse_check">Local mouse pointer</string>
-<string name="meta_key_title">Send Special Key</string>
+<string name="meta_key_title">Send Key Combo</string>
 <string name="new_connection">New Connection</string>
 <string name="nickname_caption">Bookmark</string>
 <string name="discovered_servers">Discovered Servers</string>
@@ -48,11 +48,11 @@
 <string name="save_as_copy">Save as Copy</string>
 <!-- Send selected metakey -->
 <string name="send_button">Send</string>
-<string name="send_key_again">Send Special Key Again</string>
+<string name="send_key_again">Send Key Combo Again</string>
 <string name="shift_check">Shift</string>
 <string name="shortcut_label">VNC Connection</string>
 <string name="showkbd_label">Keyboard</string>
-<string name="special_keys">Special Keys</string>
+<string name="special_keys">Key Combo</string>
 <string name="username_caption">Username</string>
 <string name="username_hint">For Windows authentication</string>
 <string name="editbookmark_title">Edit Bookmark</string>
@@ -74,6 +74,7 @@
      		<ul>
      		 <li>ICS and Tablet Support!</li>
      		 <li>Added password prompt. Shown when no password was given but one is required.</li>
+     		 <li>Greatly improved key handling. Most special symbols work now.</li>
      		 <li>Fixed a nasty app restart bug on 3.0+ devicess.</li>
      	     <li>Fixed some possible crashes.</li>
      		</ul> 
