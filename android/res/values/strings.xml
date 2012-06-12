@@ -74,6 +74,7 @@
      		<ul>
      		 <li>ICS and Tablet Support!</li>
      		 <li>Added password prompt. Shown when no password was given but one is required.</li>
+     		 <li>Fixed a nasty app restart bug on 3.0+ devicess.</li>
      	     <li>Fixed some possible crashes.</li>
      		</ul> 
     ]]>

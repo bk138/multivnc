@@ -82,21 +82,23 @@ public class VncCanvasActivity extends Activity {
 		
 		TouchpadInputHandler() {
 			super(VncCanvasActivity.this);
-			twoFingerFlingVelocityTracker = VelocityTracker.obtain();
 			Log.d(TAG, "TouchpadInputHandler " + this +  " created!");
 		}
+		
+		
+		public void init() {
+			twoFingerFlingVelocityTracker = VelocityTracker.obtain();
+			Log.d(TAG, "TouchpadInputHandler " + this +  " init!");
+		}
 
-		@Override
-		protected void finalize() throws Throwable {
+		public void shutdown() {
 			try {
 				twoFingerFlingVelocityTracker.recycle();
 				twoFingerFlingVelocityTracker = null;
 			}
 			catch (NullPointerException e) {
 			}
-
-			Log.d(TAG, "TouchpadInputHandler " + this +  " destroyed!");
-			super.finalize();
+			Log.d(TAG, "TouchpadInputHandler " + this +  " shutdown!");
 		}
 
 
@@ -588,6 +590,7 @@ public class VncCanvasActivity extends Activity {
 		});
 
 		touchPad =  new TouchpadInputHandler();
+		touchPad.init();
 		
 		mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
 		MouseButtonView mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
@@ -775,6 +778,7 @@ public class VncCanvasActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 		if (isFinishing()) {
+			touchPad.shutdown();
 			vncCanvas.vncConn.shutdown();
 			vncCanvas.onDestroy();
 			database.close();
