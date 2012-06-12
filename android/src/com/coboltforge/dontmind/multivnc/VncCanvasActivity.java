@@ -451,6 +451,9 @@ public class VncCanvasActivity extends Activity {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
+		else { // 3+ here
+			getActionBar().setHomeButtonEnabled(false);
+		}
 
 		database = new VncDatabase(this);
 

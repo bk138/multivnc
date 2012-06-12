@@ -34,6 +34,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -41,6 +42,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -119,6 +122,10 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 		
 		// get package debug flag and set it 
 		Utils.DEBUG(this);
+		
+		if(Build.VERSION.SDK_INT >= 11) {
+			getActionBar().setHomeButtonEnabled(false);
+		}
 		
 		// start the MDNS service
 		startMDNSService();
