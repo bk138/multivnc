@@ -22,7 +22,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
 import android.util.Log;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -159,11 +158,8 @@ public class VNCConn {
 			if(Utils.DEBUG()) Log.d(TAG, "InputThread started!");
 			
 			try {
-				final Display display = pd.getWindow().getWindowManager().getDefaultDisplay();
-				
 				connectAndAuthenticate();
-				
-				doProtocolInitialisation(display.getWidth(), display.getHeight());
+				doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
 				canvas.handler.post(new Runnable() {
 					public void run() {
 						pd.setMessage("Downloading first frame.\nPlease wait...");
