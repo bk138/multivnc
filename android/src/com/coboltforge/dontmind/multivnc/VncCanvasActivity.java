@@ -452,7 +452,8 @@ public class VncCanvasActivity extends Activity {
 					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 		else { // 3+ here
-			getActionBar().setHomeButtonEnabled(false);
+			// disable home button as this sometimes takes keyboard focus
+			getActionBar().setDisplayShowHomeEnabled(false);
 		}
 
 		database = new VncDatabase(this);
@@ -971,5 +972,11 @@ public class VncCanvasActivity extends Activity {
 		notificationToast.show();
 	}
 
+	public void setTitle(String text) {
+
+		if(Build.VERSION.SDK_INT >= 11) 
+			getActionBar().setTitle(text);
+		
+	}
 	
 }

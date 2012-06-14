@@ -160,6 +160,7 @@ public class VNCConn {
 				doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
 				canvas.handler.post(new Runnable() {
 					public void run() {
+						canvas.activity.setTitle(getDesktopName());
 						pd.setMessage("Downloading first frame.\nPlease wait...");
 					}
 				});

@@ -123,9 +123,6 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 		// get package debug flag and set it 
 		Utils.DEBUG(this);
 		
-		if(Build.VERSION.SDK_INT >= 11) {
-			getActionBar().setHomeButtonEnabled(false);
-		}
 		
 		// start the MDNS service
 		startMDNSService();
