@@ -78,6 +78,7 @@
      		 <li>Fixed a nasty app restart bug on Honeycomb and newer devices.</li>
      	     <li>Fixed some possible crashes.</li>
      	     <li>1.4.1: fixed app not starting on Honeycomb devices.</li>
+     	     <li>1.4.2: fixed crash on mouse button press.</li>
      		</ul> 
     ]]>
 </string>

@@ -902,11 +902,21 @@ public class VNCConn {
 	}
 
 	public final int getFramebufferWidth() {
-		return bitmapData.framebufferwidth;
+		try {
+			return bitmapData.framebufferwidth;
+		}
+		catch(NullPointerException e) {
+			return 0;
+		}
 	}
 	
 	public final int getFramebufferHeight() {
-		return bitmapData.framebufferheight;
+		try {
+			return bitmapData.framebufferheight;
+		}
+		catch(NullPointerException e) {
+			return 0;
+		}
 	}
 	
 	public final AbstractBitmapData getFramebuffer() {
