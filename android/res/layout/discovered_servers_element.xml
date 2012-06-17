@@ -9,6 +9,12 @@
         android:text="@string/discovered_servers"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+      <ProgressBar
+        android:id="@+id/discovered_servers_waitwheel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+    
     <LinearLayout
         android:id="@+id/discovered_servers_list"
         android:layout_width="fill_parent"

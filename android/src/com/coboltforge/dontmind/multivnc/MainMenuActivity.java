@@ -34,7 +34,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -42,8 +41,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -62,7 +59,7 @@ import java.util.Hashtable;
 
 
 
-public class MainMenuActivity extends Activity implements ImDNSNotify {
+public class MainMenuActivity extends Activity implements IMDNS {
 	
 	private static final String TAG = "MainMenuActivity";
     public static final String PREFS_NAME = "MultiVNC";
@@ -327,6 +324,7 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 		switch (item.getItemId())
 		{
 		case R.id.itemMDNSRestart :
+			findViewById(R.id.discovered_servers_waitwheel).setVisibility(View.VISIBLE);
 			try {
 				boundMDNSService.restart();
 			}
@@ -607,7 +605,7 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 	}
 
 	@Override
-	public void mDNSnotify(final String conn_name, final ConnectionBean conn, final Hashtable<String,ConnectionBean> connections_discovered ) {
+	public void onMDNSnotify(final String conn_name, final ConnectionBean conn, final Hashtable<String,ConnectionBean> connections_discovered ) {
 		handler.postDelayed(new Runnable() {
 			public void run() {
 
@@ -686,5 +684,15 @@ public class MainMenuActivity extends Activity implements ImDNSNotify {
 			}
 		}, 1);
 
+	}
+
+	@Override
+	public void onMDNSstartupCompleted(boolean wasSuccessful) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				findViewById(R.id.discovered_servers_waitwheel).setVisibility(View.GONE);
+			}
+		});
 	}
 }
