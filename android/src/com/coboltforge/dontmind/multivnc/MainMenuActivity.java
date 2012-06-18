@@ -324,7 +324,9 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		switch (item.getItemId())
 		{
 		case R.id.itemMDNSRestart :
+			serverlist.removeAllViews();
 			findViewById(R.id.discovered_servers_waitwheel).setVisibility(View.VISIBLE);
+			
 			try {
 				boundMDNSService.restart();
 			}

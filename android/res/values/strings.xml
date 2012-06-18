@@ -70,15 +70,16 @@
 <string name="support_dialog_neveragain">Never ask again!</string>
 <string name="changelog_dialog_title">What\'s new...</string>
 <string name="changelog_dialog_text">
-    <![CDATA[<b>Version 1.4.1:</b>
+    <![CDATA[<b>Version 1.4.x:</b>
      		<ul>
      		 <li>ICS and Tablet Support!</li>
      		 <li>Added password prompt. Shown when no password was given but one is required.</li>
      		 <li>Greatly improved key handling. Most special symbols work now.</li>
      		 <li>Fixed a nasty app restart bug on Honeycomb and newer devices.</li>
      	     <li>Fixed some possible crashes.</li>
-     	     <li>1.4.1: fixed app not starting on Honeycomb devices.</li>
-     	     <li>1.4.2: fixed crash on mouse button press.</li>
+     	     <li>1.4.1: Fixed app not starting on Honeycomb devices.</li>
+     	     <li>1.4.2: Fixed crash on mouse button press.</li>
+     	     <li>1.4.3: Hopefully fixed keyboard disappearing bug.</li>
      		</ul> 
     ]]>
 </string>
