@@ -774,7 +774,7 @@ public class VncCanvasActivity extends Activity {
 	
 	private void toggleKeyboard() {
 		InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+		inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
 	@Override
