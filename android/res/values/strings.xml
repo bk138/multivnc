@@ -80,6 +80,7 @@
      	     <li>1.4.1: Fixed app not starting on Honeycomb devices.</li>
      	     <li>1.4.2: Fixed crash on mouse button press.</li>
      	     <li>1.4.3: Hopefully fixed keyboard disappearing bug.</li>
+     	     <li>1.4.4: Fix crash on startup on Honeycomb or newer devices.</li>
      		</ul> 
     ]]>
 </string>

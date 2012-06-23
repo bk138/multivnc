@@ -445,17 +445,6 @@ public class VncCanvasActivity extends Activity {
 
 		super.onCreate(icicle);
 
-		// only do fullscreen on 2.x devices
-		if(Build.VERSION.SDK_INT < 11) {
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
-		else { // 3+ here
-			// disable home button as this sometimes takes keyboard focus
-			getActionBar().setDisplayShowHomeEnabled(false);
-		}
-
 		database = new VncDatabase(this);
 
 		Intent i = getIntent();
@@ -609,6 +598,17 @@ public class VncCanvasActivity extends Activity {
 		// create an empty toast. we do this do be able to cancel
 		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
 		notificationToast.setGravity(Gravity.TOP, 0, 0);
+		
+		// only do fullscreen on 2.x devices
+		if(Build.VERSION.SDK_INT < 11) {
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+					WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		else { // 3+ here
+			// disable home button as this sometimes takes keyboard focus
+			getActionBar().setDisplayShowHomeEnabled(false);
+		}
 	}
 
 	/**
