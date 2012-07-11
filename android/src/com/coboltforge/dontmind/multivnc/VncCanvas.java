@@ -79,6 +79,9 @@ public class VncCanvas extends GLSurfaceView {
 	public Handler handler = new Handler();
 	
 	private VNCGLRenderer glRenderer;
+	
+	//whether to do pointer highlighting
+	boolean doPointerHighLight = true;
 
 	/**
 	 * Current state of "mouse" buttons
@@ -241,25 +244,27 @@ public class VncCanvas extends GLSurfaceView {
 				/*
 				 * do pointer highlight overlay
 				 */
-				gl.glEnable(GL10.GL_BLEND);
-				int mouseXonScreen = (int)(getScale()*(mouseX-absoluteXPosition));
-				int mouseYonScreen = (int)(getScale()*(mouseY-absoluteYPosition));
-				
-				gl.glLoadIdentity();                 // Reset model-view matrix
-				gl.glTranslatex( mouseXonScreen, mouseYonScreen, 0);
-				gl.glColor4f(1.0f, 0.2f, 1.0f, 0.1f);
-				
-				// simulate some anti-aliasing by drawing the shape 3x
-				gl.glScalef(0.001f, 0.001f, 0.0f);
-				circle.draw(gl);
+				if(doPointerHighLight) {
+					gl.glEnable(GL10.GL_BLEND);
+					int mouseXonScreen = (int)(getScale()*(mouseX-absoluteXPosition));
+					int mouseYonScreen = (int)(getScale()*(mouseY-absoluteYPosition));
 
-				gl.glScalef(0.99f, 0.99f, 0.0f);
-				circle.draw(gl);
-				
-				gl.glScalef(0.99f, 0.99f, 0.0f);
-				circle.draw(gl);
+					gl.glLoadIdentity();                 // Reset model-view matrix
+					gl.glTranslatex( mouseXonScreen, mouseYonScreen, 0);
+					gl.glColor4f(1.0f, 0.2f, 1.0f, 0.1f);
 
-				gl.glDisable(GL10.GL_BLEND);
+					// simulate some anti-aliasing by drawing the shape 3x
+					gl.glScalef(0.001f, 0.001f, 0.0f);
+					circle.draw(gl);
+
+					gl.glScalef(0.99f, 0.99f, 0.0f);
+					circle.draw(gl);
+
+					gl.glScalef(0.99f, 0.99f, 0.0f);
+					circle.draw(gl);
+
+					gl.glDisable(GL10.GL_BLEND);
+				}
 				
 			}
 			catch(NullPointerException e) {
@@ -543,6 +548,14 @@ public class VncCanvas extends GLSurfaceView {
 
 	public void enableRepaints() {
 		repaintsEnabled = true;
+	}
+	
+	public void setPointerHighlight(boolean enable) {
+		doPointerHighLight = enable;
+	}
+	
+	public final boolean getPointerHighlight() {
+		return doPointerHighLight;
 	}
 	
 	

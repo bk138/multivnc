@@ -727,6 +727,13 @@ public class VncCanvasActivity extends Activity {
 			else
 				mousebuttons.setVisibility(View.VISIBLE);	
 			return true;	
+			
+		case R.id.itemTogglePointerHighlight:
+			if(vncCanvas.getPointerHighlight())
+				vncCanvas.setPointerHighlight(false);
+			else
+				vncCanvas.setPointerHighlight(true);
+			return true;
 
 		case R.id.itemToggleKeyboard:
 			toggleKeyboard();

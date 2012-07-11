@@ -16,6 +16,7 @@
 <string name="disconnect">Disconnect</string>
 <string name="toggle_framebuffer_update">Toggle View</string>
 <string name="toggle_mouse_buttons">Toggle Mouse Buttons</string>
+<string name="toggle_pointer_highlight">Toggle Pointer Highlighting</string>
 <string name="toggle_keyboard">Toggle Keyboard</string>
 <string name="export_settings">Export</string>
 <string name="export_settings_path">Export to file</string>
@@ -72,16 +73,20 @@
 <string name="changelog_dialog_text">
     <![CDATA[<b>Version 1.4.x:</b>
      		<ul>
-     		 <li>ICS and Tablet Support!</li>
-     		 <li>Added password prompt. Shown when no password was given but one is required.</li>
-     		 <li>Greatly improved key handling. Most special symbols work now.</li>
-     		 <li>Fixed a nasty app restart bug on Honeycomb and newer devices.</li>
-     	     <li>Fixed some possible crashes.</li>
-     	     <li>1.4.1: Fixed app not starting on Honeycomb devices.</li>
-     	     <li>1.4.2: Fixed crash on mouse button press.</li>
-     	     <li>1.4.3: Hopefully fixed keyboard disappearing bug.</li>
-     	     <li>1.4.4: Fix crash on startup on Honeycomb or newer devices.</li>
+     		 <li>1.4.6: Add menu item to toggle pointer highlighting.</li>
      	     <li>1.4.5: Fix the 1.4.4 fix.</li>
+     	      <li>1.4.4: Fix crash on startup on Honeycomb or newer devices.</li>
+     	       <li>1.4.3: Hopefully fixed keyboard disappearing bug.</li>
+     	            <li>1.4.2: Fixed crash on mouse button press.</li>
+     	             <li>1.4.1: Fixed app not starting on Honeycomb devices.</li>
+     	             <li>1.4.0</li>
+     	             <ul>
+			     		 <li>ICS and Tablet Support!</li>
+			     		 <li>Added password prompt. Shown when no password was given but one is required.</li>
+			     		 <li>Greatly improved key handling. Most special symbols work now.</li>
+			     		 <li>Fixed a nasty app restart bug on Honeycomb and newer devices.</li>
+			     	     <li>Fixed some possible crashes.</li>
+     	      	  </ul>
      		</ul> 
     ]]>
 </string>

@@ -1,24 +1,64 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/itemSpecialKeys" android:title="@string/special_keys"
-		android:icon="@drawable/specialkeys"
-		android:showAsAction="ifRoom|withText" />
-	<item android:id="@+id/itemSendKeyAgain" android:title="@string/send_key_again"
-	    android:icon="@drawable/refresh" 
-	    android:showAsAction="ifRoom|withText"/>
-	<item android:id="@+id/itemToggleKeyboard" android:title="@string/toggle_keyboard"
-		android:icon="@drawable/keyboard"
-		android:showAsAction="ifRoom"></item>
-	<item android:id="@+id/itemToggleFramebufferUpdate" android:title="@string/toggle_framebuffer_update"
-		android:icon="@android:drawable/ic_menu_view"></item>
-	<item android:id="@+id/itemToggleMouseButtons" android:title="@string/toggle_mouse_buttons"
-		android:icon="@drawable/mouse_icon"	></item>
-	<item android:id="@+id/itemColorMode" android:title="@string/color_mode"
-		android:icon="@android:drawable/ic_menu_preferences"></item>
-	<item android:id="@+id/itemInfo" android:title="@string/info"
-		android:icon="@android:drawable/ic_menu_info_details"></item>
-	<item android:id="@+id/itemSaveBookmark" android:title="@string/savebookmark_button"
-		android:icon="@android:drawable/ic_menu_save"
-		android:showAsAction="ifRoom"></item>
-	<item android:id="@+id/itemOpenDoc" android:title="@string/open_doc"
-		android:icon="@android:drawable/ic_menu_help" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/itemSpecialKeys"
+        android:icon="@drawable/specialkeys"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/special_keys"/>
+
+    <item
+        android:id="@+id/itemSendKeyAgain"
+        android:icon="@drawable/refresh"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/send_key_again"/>
+
+    <item
+        android:id="@+id/itemToggleKeyboard"
+        android:icon="@drawable/keyboard"
+        android:showAsAction="ifRoom"
+        android:title="@string/toggle_keyboard">
+    </item>
+
+    <item
+        android:id="@+id/itemToggleFramebufferUpdate"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/toggle_framebuffer_update">
+    </item>
+
+    <item
+        android:id="@+id/itemToggleMouseButtons"
+        android:icon="@drawable/mouse_icon"
+        android:title="@string/toggle_mouse_buttons">
+    </item>
+
+    <item
+        android:id="@+id/itemTogglePointerHighlight"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:title="@string/toggle_pointer_highlight">
+    </item>
+
+    <item
+        android:id="@+id/itemColorMode"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/color_mode">
+    </item>
+
+    <item
+        android:id="@+id/itemInfo"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/info">
+    </item>
+
+    <item
+        android:id="@+id/itemSaveBookmark"
+        android:icon="@android:drawable/ic_menu_save"
+        android:showAsAction="ifRoom"
+        android:title="@string/savebookmark_button">
+    </item>
+
+    <item
+        android:id="@+id/itemOpenDoc"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="@string/open_doc"/>
+
 </menu>
