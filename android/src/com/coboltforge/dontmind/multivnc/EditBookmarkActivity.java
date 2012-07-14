@@ -65,7 +65,7 @@ public class EditBookmarkActivity extends Activity {
 
 		// read connection from DB
 		Intent intent = getIntent();
-		long connID = intent.getLongExtra(VncConstants.CONNECTION, 0);
+		long connID = intent.getLongExtra(Constants.CONNECTION, 0);
 		if (bookmark.Gen_read(database.getReadableDatabase(), connID))
 		{
 			Log.d(TAG, "Successfully read connection " + connID + " from database");

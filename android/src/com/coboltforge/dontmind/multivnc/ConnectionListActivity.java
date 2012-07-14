@@ -92,7 +92,7 @@ public class ConnectionListActivity extends ListActivity {
             
             Intent launchIntent = new Intent(this,VncCanvasActivity.class);
             Uri.Builder builder = new Uri.Builder();
-            builder.authority(VncConstants.CONNECTION + ":" + connection.get_Id());
+            builder.authority(Constants.CONNECTION + ":" + connection.get_Id());
             builder.scheme("vnc");
             launchIntent.setData(builder.build());
             

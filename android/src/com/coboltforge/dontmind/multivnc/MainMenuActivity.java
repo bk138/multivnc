@@ -62,7 +62,6 @@ import java.util.Hashtable;
 public class MainMenuActivity extends Activity implements IMDNS {
 	
 	private static final String TAG = "MainMenuActivity";
-    public static final String PREFS_NAME = "MultiVNC";
 	
 	private EditText ipText;
 	private EditText portText;
@@ -155,7 +154,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 				writeRecent(conn);
 				Log.d(TAG, "Starting NEW connection " + conn.toString());
 				Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-				intent.putExtra(VncConstants.CONNECTION,conn.Gen_getValues());
+				intent.putExtra(Constants.CONNECTION,conn.Gen_getValues());
 				startActivity(intent);
 			}
 		});
@@ -195,7 +194,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		database = new VncDatabase(this);
 		
 		
-		final SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		final SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
 		/*
 		 * show support dialog on second (and maybe later) runs
@@ -208,7 +207,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		}
 		else // is some later run
 		{
-			if(settings.getBoolean("showSupportDialog", true) && savedInstanceState == null)
+			if(settings.getBoolean(Constants.PREFS__KEY_SUPPORTDLG, true) && savedInstanceState == null)
 			{
 				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 				dialog.setTitle(getString(R.string.support_dialog_title));
@@ -231,9 +230,9 @@ public class MainMenuActivity extends Activity implements IMDNS {
 				dialog.setNegativeButton(getString(R.string.support_dialog_neveragain), new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+						SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 						SharedPreferences.Editor ed = settings.edit();
-						ed.putBoolean("showSupportDialog", false);
+						ed.putBoolean(Constants.PREFS__KEY_SUPPORTDLG, false);
 						ed.commit();
 						
 						dialog.dismiss();
@@ -420,7 +419,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					Log.d(TAG, "Starting bookmarked connection " + conn.toString());
 					writeRecent(conn);
 					Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-					intent.putExtra(VncConstants.CONNECTION , conn.Gen_getValues());
+					intent.putExtra(Constants.CONNECTION , conn.Gen_getValues());
 					startActivity(intent);
 				}
 			});
@@ -478,7 +477,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					    	case 2: // edit
 								Log.d(TAG, "Editing bookmark " + conn.get_Id());
 					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
-					    		intent.putExtra(VncConstants.CONNECTION, conn.get_Id());
+					    		intent.putExtra(Constants.CONNECTION, conn.get_Id());
 					    		startActivity(intent);
 					    		break;
 					    		
@@ -642,7 +641,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 								Log.d(TAG, "Starting discovered connection " + conn.toString());
 								writeRecent(conn);
 								Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-								intent.putExtra(VncConstants.CONNECTION , c.Gen_getValues());
+								intent.putExtra(Constants.CONNECTION , c.Gen_getValues());
 								startActivity(intent);
 							}
 						});

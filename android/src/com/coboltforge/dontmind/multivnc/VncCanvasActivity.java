@@ -31,6 +31,7 @@ import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -439,6 +440,8 @@ public class VncCanvasActivity extends Activity {
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
 	Toast notificationToast;
+	
+	private SharedPreferences prefs;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -451,6 +454,8 @@ public class VncCanvasActivity extends Activity {
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
+		
+		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
 		database = new VncDatabase(this);
 
@@ -479,7 +484,7 @@ public class VncCanvasActivity extends Activity {
 			{
 				port = data.getPort();
 			}
-			if (host.equals(VncConstants.CONNECTION))
+			if (host.equals(Constants.CONNECTION))
 			{
 				if (connection.Gen_read(database.getReadableDatabase(), port))
 				{
@@ -511,7 +516,7 @@ public class VncCanvasActivity extends Activity {
 
 		    if (extras != null) {
 		  	    connection.Gen_populate((ContentValues) extras
-				  	.getParcelable(VncConstants.CONNECTION));
+				  	.getParcelable(Constants.CONNECTION));
 		    }
 		    if (connection.getPort() == 0)
 			    connection.setPort(5900);
@@ -599,6 +604,12 @@ public class VncCanvasActivity extends Activity {
 		mousebutton1.init(1, vncCanvas);
 		mousebutton2.init(2, vncCanvas);
 		mousebutton3.init(3, vncCanvas);
+		if(! prefs.getBoolean(Constants.PREFS__KEY_MOUSEBUTTONS, true)) {
+			mousebutton1.setVisibility(View.GONE);
+			mousebutton2.setVisibility(View.GONE);
+			mousebutton3.setVisibility(View.GONE);
+		}
+
 		
 		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
 		
@@ -611,6 +622,10 @@ public class VncCanvasActivity extends Activity {
 			// disable home button as this sometimes takes keyboard focus
 			getActionBar().setDisplayShowHomeEnabled(false);
 		}
+		
+		if(! prefs.getBoolean(Constants.PREFS__KEY_POINTERHIGHLIGHT, true))
+			vncCanvas.setPointerHighlight(false);
+		
 	}
 
 	/**
@@ -698,6 +713,9 @@ public class VncCanvasActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+
+		SharedPreferences.Editor ed = prefs.edit();
+		
 		switch (item.getItemId()) {
 		case R.id.itemInfo:
 			vncCanvas.showConnectionInfo();
@@ -722,10 +740,15 @@ public class VncCanvasActivity extends Activity {
 			return true;	
 			
 		case R.id.itemToggleMouseButtons:
-			if(mousebuttons.getVisibility()== View.VISIBLE)
+			if(mousebuttons.getVisibility()== View.VISIBLE) {
 				mousebuttons.setVisibility(View.GONE);
-			else
+				ed.putBoolean(Constants.PREFS__KEY_MOUSEBUTTONS, false);
+			}
+			else {
 				mousebuttons.setVisibility(View.VISIBLE);	
+				ed.putBoolean(Constants.PREFS__KEY_MOUSEBUTTONS, true);
+			}
+			ed.commit();
 			return true;	
 			
 		case R.id.itemTogglePointerHighlight:
@@ -733,6 +756,9 @@ public class VncCanvasActivity extends Activity {
 				vncCanvas.setPointerHighlight(false);
 			else
 				vncCanvas.setPointerHighlight(true);
+			
+			ed.putBoolean(Constants.PREFS__KEY_POINTERHIGHLIGHT, vncCanvas.getPointerHighlight());
+			ed.commit();
 			return true;
 
 		case R.id.itemToggleKeyboard:
