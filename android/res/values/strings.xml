@@ -73,6 +73,7 @@
 <string name="changelog_dialog_text">
     <![CDATA[<b>Version 1.4.x:</b>
      		<ul>
+     		 <li>1.4.7: Fix hang after password entry. Should also work with bookmarks now.</li>
      		 <li>1.4.6: Add menu item to toggle pointer highlighting.</li>
      	     <li>1.4.5: Fix the 1.4.4 fix.</li>
      	      <li>1.4.4: Fix crash on startup on Honeycomb or newer devices.</li>
