@@ -252,16 +252,19 @@ public class VNCConn {
 				Log.i(TAG, "VNC authentication needed");
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
 					canvas.getCredFromUser(connSettings);
-					synchronized (this) 
-					{
-						wait();  // wait for user input to finish
+					synchronized (VNCConn.this) {
+						VNCConn.this.wait();  // wait for user input to finish
 					}
 				}			
 				rfb.authenticateVNC(connSettings.getPassword());
 				break;
 			case RfbProto.AuthUltra:
-				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0)
+				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
 					canvas.getCredFromUser(connSettings);
+					synchronized (VNCConn.this) {
+						VNCConn.this.wait();  // wait for user input to finish
+					}
+				}
 				rfb.authenticateDH(connSettings.getUserName(),connSettings.getPassword());
 				break;
 			default:
