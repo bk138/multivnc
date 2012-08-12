@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-    package="com.coboltforge.dontmind.multivnc" android:installLocation="auto" android:versionCode="26" android:versionName="1.4.7">
+    package="com.coboltforge.dontmind.multivnc" android:installLocation="auto" android:versionCode="27" android:versionName="1.4.8">
   
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="13"></uses-sdk>
 	<supports-screens android:anyDensity="true" />

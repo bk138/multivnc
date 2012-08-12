@@ -369,6 +369,19 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		vncConn = null;
 	}
+	
+	@Override
+	public void onPause() {
+		/* 
+		 * this is to avoid a deadlock between GUI thread and GLThread:
+		 * 
+		 * the GUI thread would call onPause on the GLThread which would never return since
+		 * the GL thread's GLThreadManager object is waiting on the GLThread.
+		 */
+		vncConn.unlockFramebuffer();
+
+		super.onPause();
+	}
 
 
 
@@ -392,6 +405,8 @@ public class VncCanvas extends GLSurfaceView {
 	 * @return
 	 */
 	
+	
+
 	/**
 	 * Change to Canvas's scroll position to match the absoluteXPosition
 	 */
