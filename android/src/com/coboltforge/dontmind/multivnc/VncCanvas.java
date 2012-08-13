@@ -378,7 +378,12 @@ public class VncCanvas extends GLSurfaceView {
 		 * the GUI thread would call onPause on the GLThread which would never return since
 		 * the GL thread's GLThreadManager object is waiting on the GLThread.
 		 */
-		vncConn.unlockFramebuffer();
+		try {
+			vncConn.unlockFramebuffer();
+		}
+		catch(IllegalMonitorStateException e) {
+			// thrown when mutex was not locked
+		}
 
 		super.onPause();
 	}
