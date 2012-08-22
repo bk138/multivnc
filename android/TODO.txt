@@ -1,6 +1,5 @@
 
 * add help page
-* add app rater
 * make rotatable
 
 * port to libvncclient

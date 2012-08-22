@@ -49,6 +49,7 @@
                 android:layout_marginBottom="20dip"
                 android:text="@string/pleaserate" 
                 android:drawableTop="@drawable/love"
+                android:background="@android:color/transparent"
                 />
 		
 		      <com.flattr4android.sdk.FlattrButton
