@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -36,9 +37,16 @@ public class AboutActivity extends Activity {
 			String v = getString(R.string.app_name) +  " " + pinfo.versionName;
 			tw.setText(v);
 		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Button loveButton = (Button) findViewById(R.id.love_button);
+		loveButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName())));
+			}
+		});
 		
 		ImageButton donateButton = (ImageButton) findViewById(R.id.paypal_button);
 		donateButton.setOnClickListener(new View.OnClickListener() {

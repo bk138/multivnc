@@ -34,11 +34,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_marginBottom="30dip"
+                android:layout_marginBottom="10dip"
                 android:layout_marginTop="10dip"
                 android:autoLink="web"
                 android:padding="10dip"
                 android:text="@string/madeby" 
+                />
+		        
+		        
+		        <Button
+		            android:id="@+id/love_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dip"
+                android:text="@string/pleaserate" 
+                android:drawableTop="@drawable/love"
                 />
 		
 		      <com.flattr4android.sdk.FlattrButton

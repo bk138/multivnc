@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -17,6 +18,10 @@ public class Utils {
 	
 	private static final String TAG = "Utils";
 	private static boolean debug = false;
+	/**
+	 * number of app starts
+	 */
+	public static int appstarts;
 
 	public static void showYesNoPrompt(Context _context, String title, String message, OnClickListener onYesListener, OnClickListener onNoListener) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(_context);
@@ -117,4 +122,15 @@ public class Utils {
 		return x;
 	}
 	
+	/**
+	 * get and set number of successful app starts
+	 */
+	public static void updateAppStartCount(Context c) {
+		SharedPreferences settings = c.getSharedPreferences(Constants.PREFSNAME, 0);
+		Utils.appstarts = settings.getInt(Constants.PREFS_KEY_APPSTARTS, 0);
+		Utils.appstarts++;
+		SharedPreferences.Editor ed = settings.edit();
+		ed.putInt(Constants.PREFS_KEY_APPSTARTS, Utils.appstarts);
+		ed.commit();
+	}
 }

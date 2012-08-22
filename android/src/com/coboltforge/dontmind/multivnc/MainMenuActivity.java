@@ -118,7 +118,8 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		
 		// get package debug flag and set it 
 		Utils.DEBUG(this);
-		
+		// update appstart cound
+		Utils.updateAppStartCount(this);
 		
 		// start the MDNS service
 		startMDNSService();
@@ -195,19 +196,14 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		
 		
 		final SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
-
+		
+		
 		/*
-		 * show support dialog on second (and maybe later) runs
+		 * show support dialog on third (and maybe later) runs
 		 */
-		if(settings.getBoolean("firstRun", true)) // is the first run
+		if(Utils.appstarts > 2)
 		{
-			SharedPreferences.Editor ed = settings.edit();
-			ed.putBoolean("firstRun", false);
-			ed.commit();
-		}
-		else // is some later run
-		{
-			if(settings.getBoolean(Constants.PREFS__KEY_SUPPORTDLG, true) && savedInstanceState == null)
+			if(settings.getBoolean(Constants.PREFS_KEY_SUPPORTDLG, true) && savedInstanceState == null)
 			{
 				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 				dialog.setTitle(getString(R.string.support_dialog_title));
@@ -232,7 +228,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					public void onClick(DialogInterface dialog, int which) {
 						SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 						SharedPreferences.Editor ed = settings.edit();
-						ed.putBoolean(Constants.PREFS__KEY_SUPPORTDLG, false);
+						ed.putBoolean(Constants.PREFS_KEY_SUPPORTDLG, false);
 						ed.commit();
 						
 						dialog.dismiss();
@@ -281,6 +277,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		} catch (NameNotFoundException e) {
 			Log.w("Unable to get version code. Will not show changelog", e);
 		}
+		
 
 	}
 	
