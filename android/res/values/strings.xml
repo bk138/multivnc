@@ -69,11 +69,11 @@
 <string name="support_dialog_yes">Yes, good idea!</string>
 <string name="support_dialog_no">No, not now.</string>
 <string name="support_dialog_neveragain">Never ask again!</string>
-<string name="changelog_dialog_title">What\'s new...</string>
+<string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
     <![CDATA[<b>Version 1.4.x:</b>
      		<ul>
-     		 <li>1.4.9: Fix ceash introduced by the 1.4.8 fix.</li>
+     		 <li>1.4.9: Fix crash introduced by the 1.4.8 fix.</li>
      	     <li>1.4.8: Fix an ANR error when pausing the app.</li>
      		 <li>1.4.7: Fix hang after password entry. Should also work with bookmarks now.</li>
      		 <li>1.4.6: Add menu item to toggle pointer highlighting.</li>

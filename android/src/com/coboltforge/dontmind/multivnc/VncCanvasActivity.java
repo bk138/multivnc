@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -618,10 +619,7 @@ public class VncCanvasActivity extends Activity {
 		notificationToast.setGravity(Gravity.TOP, 0, 0);
 		
 		// honeycomb or newer 
-		if(Build.VERSION.SDK_INT >= 11) { 
-			// disable home button as this sometimes takes keyboard focus
-			getActionBar().setDisplayShowHomeEnabled(false);
-		}
+		setupActionBar();
 		
 		if(! prefs.getBoolean(Constants.PREFS__KEY_POINTERHIGHLIGHT, true))
 			vncCanvas.setPointerHighlight(false);
@@ -1006,11 +1004,18 @@ public class VncCanvasActivity extends Activity {
 		notificationToast.show();
 	}
 
+	@SuppressLint("NewApi")
 	public void setTitle(String text) {
-
 		if(Build.VERSION.SDK_INT >= 11) 
 			getActionBar().setTitle(text);
-		
+	}
+	
+	@SuppressLint("NewApi")
+	private void setupActionBar() {
+		if(Build.VERSION.SDK_INT >= 11) { 
+			// disable home button as this sometimes takes keyboard focus
+			getActionBar().setDisplayShowHomeEnabled(false);
+		}
 	}
 	
 }
