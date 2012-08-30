@@ -65,7 +65,7 @@ class ConnectionBean extends AbstractConnectionBean implements Comparable<Connec
 	
 	@Override
 	public String toString() {
-		return get_Id() + " " + getNickname()+":"+getAddress()+":"+getPort();
+		return get_Id() + " " + getNickname()+": "+getAddress()+", port "+getPort();
 	}
 
 	/* (non-Javadoc)

@@ -1,13 +1,18 @@
 package com.coboltforge.dontmind.multivnc;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.ActivityManager.MemoryInfo;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.text.Html;
@@ -133,4 +138,27 @@ public class Utils {
 		ed.putInt(Constants.PREFS_KEY_APPSTARTS, Utils.appstarts);
 		ed.commit();
 	}
+	
+	
+	public static NetworkInterface getActiveNetworkInterface(Context c) {
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				
+				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (inetAddress.isLoopbackAddress()) 
+						break; // break inner loop, continue with outer loop
+					
+					return intf; // this is not the loopback and it has an IP address assigned
+				}
+			}
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		// nothing found
+		return null;
+	}
+	
+	
 }
