@@ -599,12 +599,8 @@ public class VncCanvasActivity extends Activity {
 		mousebutton1.init(1, vncCanvas);
 		mousebutton2.init(2, vncCanvas);
 		mousebutton3.init(3, vncCanvas);
-		if(! prefs.getBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, true)) {
-			mousebutton1.setVisibility(View.GONE);
-			mousebutton2.setVisibility(View.GONE);
-			mousebutton3.setVisibility(View.GONE);
-		}
-
+		if(! prefs.getBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, true))
+			mousebuttons.setVisibility(View.GONE);
 		
 		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
 		touchpoints.setInputHandler(touchPad);
