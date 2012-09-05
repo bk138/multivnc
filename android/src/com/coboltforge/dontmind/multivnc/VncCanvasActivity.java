@@ -465,6 +465,9 @@ public class VncCanvasActivity extends Activity {
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
 		database = new VncDatabase(this);
+		
+		touchPad =  new TouchpadInputHandler();
+		touchPad.init();
 
 		Intent i = getIntent();
 		connection = new ConnectionBean();
@@ -532,7 +535,7 @@ public class VncCanvasActivity extends Activity {
 			connection.parseHostPort(connection.getAddress());
 		}
 		
-		vncCanvas.initializeVncCanvas(this, connection, new Runnable() {
+		vncCanvas.initializeVncCanvas(this, touchPad, connection, new Runnable() {
 			public void run() {
 				setModes();
 			}
@@ -588,9 +591,6 @@ public class VncCanvasActivity extends Activity {
 
 		});
 
-		touchPad =  new TouchpadInputHandler();
-		touchPad.init();
-		
 		mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
 		MouseButtonView mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
 		MouseButtonView mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
@@ -607,9 +607,11 @@ public class VncCanvasActivity extends Activity {
 
 		
 		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
+		touchpoints.setInputHandler(touchPad);
 		
 		// create an empty toast. we do this do be able to cancel
 		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
+		notificationToast.setGravity(Gravity.TOP, 0, 60);
 		
 		// honeycomb or newer 
 		setupActionBar();
@@ -818,15 +820,6 @@ public class VncCanvasActivity extends Activity {
 		}
 	}
 
-	
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if(touchpoints.getVisibility()== View.VISIBLE)
-			touchpoints.handleEvent(event);
-		
-		return touchPad.onTouchEvent(event);
-	}
-	
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent evt) {

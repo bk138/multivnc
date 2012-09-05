@@ -78,6 +78,8 @@ public class VncCanvas extends GLSurfaceView {
 
 	public Handler handler = new Handler();
 	
+	private AbstractGestureInputHandler inputHandler;
+	
 	private VNCGLRenderer glRenderer;
 	
 	//whether to do pointer highlighting
@@ -303,8 +305,9 @@ public class VncCanvas extends GLSurfaceView {
 	 * @param bean Connection settings
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
-	void initializeVncCanvas(VncCanvasActivity a, ConnectionBean bean, final Runnable setModes) {
+	void initializeVncCanvas(VncCanvasActivity a, AbstractGestureInputHandler inputHandler, ConnectionBean bean, final Runnable setModes) {
 		activity = a;
+		this.inputHandler = inputHandler;
 		vncConn = new VNCConn();
 		vncConn.init(bean, this, setModes);
 	}
@@ -549,6 +552,11 @@ public class VncCanvas extends GLSurfaceView {
 
 
 	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		return inputHandler.onTouchEvent(event);
+	}
+
 	void reDraw() {
 		
 		if (repaintsEnabled && vncConn.getFramebuffer() != null) {
