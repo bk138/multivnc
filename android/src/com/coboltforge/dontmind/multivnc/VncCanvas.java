@@ -284,6 +284,8 @@ public class VncCanvas extends GLSurfaceView {
 		super(context, attrs);
 		scrollRunnable = new MouseScrollRunnable();
 	
+		setFocusable(true);
+		
 		glRenderer = new VNCGLRenderer();
 		setRenderer(glRenderer);
 		// only render upon request
