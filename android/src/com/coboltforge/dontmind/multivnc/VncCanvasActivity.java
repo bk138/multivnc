@@ -690,15 +690,27 @@ public class VncCanvasActivity extends Activity {
 		vncCanvas.onResume();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
 		return true;
 	}
+	
 
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
 
+		if(touchpoints.getVisibility() == View.VISIBLE) {
+			menu.findItem(R.id.itemColorMode).setVisible(false);
+			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
+		}
+		else {
+			menu.findItem(R.id.itemColorMode).setVisible(true);
+			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
+		}
 
+		return super.onPrepareOptionsMenu(menu);
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -726,6 +738,8 @@ public class VncCanvasActivity extends Activity {
 				vncCanvas.setVisibility(View.GONE);
 				touchpoints.setVisibility(View.VISIBLE);
 			}
+			// trigger onCreateOptions
+			invalidateMyOptionsMenu();
 			return true;	
 			
 		case R.id.itemToggleMouseButtons:
@@ -1001,6 +1015,13 @@ public class VncCanvasActivity extends Activity {
 		if(Build.VERSION.SDK_INT >= 11) { 
 			// disable home button as this sometimes takes keyboard focus
 			getActionBar().setDisplayShowHomeEnabled(false);
+		}
+	}
+	
+	@SuppressLint("NewApi")
+	private void invalidateMyOptionsMenu() {
+		if(Build.VERSION.SDK_INT >= 11) {
+			invalidateOptionsMenu();
 		}
 	}
 	
