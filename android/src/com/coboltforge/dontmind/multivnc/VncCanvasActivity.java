@@ -775,9 +775,13 @@ public class VncCanvasActivity extends Activity {
 			connection.save(database.getWritableDatabase());
 			Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
 			return true;
-		case R.id.itemOpenDoc:
+		case R.id.itemAbout:
 			Intent intent = new Intent (this, AboutActivity.class);
 			this.startActivity(intent);
+			return true;
+		case R.id.itemHelp:
+			Intent helpIntent = new Intent (this, HelpActivity.class);
+			this.startActivity(helpIntent);
 			return true;
 		default:
 			break;
@@ -842,12 +846,12 @@ public class VncCanvasActivity extends Activity {
 			
 			new AlertDialog.Builder(this)
 			.setMessage(getString(R.string.disconnect_question))
-			.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+			.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					vncCanvas.vncConn.shutdown();
 					finish();
 				}
-			}).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+			}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int whichButton) {
 					// Do nothing.
 				}

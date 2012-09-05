@@ -57,8 +57,13 @@
     </item>
 
     <item
-        android:id="@+id/itemOpenDoc"
+        android:id="@+id/itemHelp"
         android:icon="@android:drawable/ic_menu_help"
-        android:title="@string/open_doc"/>
+        android:title="@string/help"/>
+    
+     <item
+        android:id="@+id/itemAbout"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/about"/>
 
 </menu>

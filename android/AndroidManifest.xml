@@ -49,7 +49,12 @@
        	</activity>
         
         <activity android:name="AboutActivity"
-             android:label="@string/open_doc"
+             android:label="@string/about"
+             >
+		</activity>
+		
+         <activity android:name="HelpActivity"
+             android:label="@string/help"
              >
 		</activity>
 		

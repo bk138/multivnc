@@ -453,7 +453,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					    		AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
 								builder.setMessage(getString(R.string.bookmark_delete_question))
 								.setCancelable(false)
-								.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+								.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
 										Log.d(TAG, "Deleting bookmark " + conn.get_Id());
 										// delete from DB
@@ -462,7 +462,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 										updateBookmarkView();
 									}
 								})
-								.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+								.setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
 										dialog.cancel();
 									}
@@ -651,7 +651,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 								AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
 								builder.setMessage(getString(R.string.bookmark_save_question))
 								.setCancelable(false)
-								.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+								.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
 										Log.d(TAG, "Bookmarking connection " + c.get_Id());
 										// save bookmark
@@ -662,7 +662,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 										updateBookmarkView();
 									}
 								})
-								.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+								.setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
 										dialog.cancel();
 									}
