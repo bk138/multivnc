@@ -456,6 +456,11 @@ public class VncCanvasActivity extends Activity {
 					WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		}
 		
+		setContentView(R.layout.canvas);
+
+		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
+		zoomer = (ZoomControls) findViewById(R.id.zoomer);
+		
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
 		database = new VncDatabase(this);
@@ -463,32 +468,25 @@ public class VncCanvasActivity extends Activity {
 		Intent i = getIntent();
 		connection = new ConnectionBean();
 		Uri data = i.getData();
-		if ((data != null) && (data.getScheme().equals("vnc"))) {
-			String host = data.getHost();
+		if ((data != null) && (data.getScheme().equals("vnc"))) { // started from outer world
+			
 			// This should not happen according to Uri contract, but bug introduced in Froyo (2.2)
-			// has made this parsing of host necessary
-			int index = host.indexOf(':');
-			int port;
-			if (index != -1)
-			{
-				try
-				{
-					port = Integer.parseInt(host.substring(index + 1));
-				}
-				catch (NumberFormatException nfe)
-				{
-					port = 0;
-				}
-				host = host.substring(0,index);
+			// has made this parsing of host necessary, i.e. getPort() returns -1 and the stuff after the colon is
+			// still in the host part...
+			// http://code.google.com/p/android/issues/detail?id=9952
+			if(! connection.parseHostPort(data.getHost())) {
+				// no colons in getHost()
+				connection.setPort(data.getPort());
+				connection.setAddress(data.getHost());
 			}
-			else
+
+			if (connection.getAddress().equals(Constants.CONNECTION)) // this is a bookmarked connection
 			{
-				port = data.getPort();
-			}
-			if (host.equals(Constants.CONNECTION))
-			{
-				if (connection.Gen_read(database.getReadableDatabase(), port))
+				Log.d(TAG, "Starting bookmarked connection " + connection.getPort());
+				// read in this bookmarked connection
+				if (connection.Gen_read(database.getReadableDatabase(), connection.getPort()))
 				{
+					// and set to most recently used
 					MostRecentBean bean = MainMenuActivity.getMostRecent(database.getReadableDatabase());
 					if (bean != null)
 					{
@@ -496,12 +494,15 @@ public class VncCanvasActivity extends Activity {
 						bean.Gen_update(database.getWritableDatabase());
 					}
 				}
+				else {
+					Log.e(TAG, "Bookmarked connection " + connection.getPort() + " does not exist!");
+					Utils.showFatalErrorMessage(this, getString(R.string.bookmark_invalid));
+					return;
+				}
 			}
-			else
+			else // well, not a boomarked connection
 			{
-			    connection.setAddress(host);
 			    connection.setNickname(connection.getAddress());
-			    connection.setPort(port);
 			    List<String> path = data.getPathSegments();
 			    if (path.size() >= 1) {
 			        connection.setColorModel(path.get(0));
@@ -511,8 +512,10 @@ public class VncCanvasActivity extends Activity {
 			    }
 			    connection.save(database.getWritableDatabase());
 			}
-		} else {
-		
+		}
+		// Uri == null
+		else { // i.e. started from main menu
+			
 		    Bundle extras = i.getExtras();
 
 		    if (extras != null) {
@@ -522,22 +525,12 @@ public class VncCanvasActivity extends Activity {
 		    if (connection.getPort() == 0)
 			    connection.setPort(5900);
 
-            // Parse a HOST:PORT entry
-		    String host = connection.getAddress();
-		    if (host.indexOf(':') > -1) {
-			    String p = host.substring(host.indexOf(':') + 1);
-			    try {
-				    connection.setPort(Integer.parseInt(p));
-			    } catch (Exception e) {
-			    }
-			    connection.setAddress(host.substring(0, host.indexOf(':')));
-	  	    }
+			Log.d(TAG, "Got raw intent " + connection.toString());
+		    
+			// Parse a HOST:PORT entry
+			connection.parseHostPort(connection.getAddress());
 		}
-		setContentView(R.layout.canvas);
-
-		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
-		zoomer = (ZoomControls) findViewById(R.id.zoomer);
-
+		
 		vncCanvas.initializeVncCanvas(this, connection, new Runnable() {
 			public void run() {
 				setModes();
@@ -814,10 +807,14 @@ public class VncCanvasActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 		if (isFinishing()) {
-			touchPad.shutdown();
-			vncCanvas.vncConn.shutdown();
-			vncCanvas.onDestroy();
-			database.close();
+			try {
+				touchPad.shutdown();
+				vncCanvas.vncConn.shutdown();
+				vncCanvas.onDestroy();
+				database.close(); 
+			}
+			catch(NullPointerException e) {
+			}
 		}
 	}
 

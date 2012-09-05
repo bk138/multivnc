@@ -82,4 +82,34 @@ class ConnectionBean extends AbstractConnectionBean implements Comparable<Connec
 		}
 		return result;
 	}
+	
+	/**
+	 * parse host:port or [host]:port and split into address and port fields
+	 * @param hostport_str
+	 * @return true if there was a port, false if not
+	 */
+	boolean parseHostPort(String hostport_str) {
+		int nr_colons = hostport_str.replaceAll("[^:]", "").length();
+		int nr_endbrackets = hostport_str.replaceAll("[^]]", "").length();
+		
+		if (nr_colons == 1) { // IPv4
+			String p = hostport_str.substring(hostport_str.indexOf(':') + 1);
+			try {
+				setPort(Integer.parseInt(p));
+			} catch (Exception e) {
+			}
+			setAddress(hostport_str.substring(0, hostport_str.indexOf(':')));
+			return true;
+		}
+		if(nr_colons > 1 && nr_endbrackets == 1) {
+			String p = hostport_str.substring(hostport_str.indexOf(']') + 2); // it's [addr]:port
+			try {
+				setPort(Integer.parseInt(p));
+			} catch (Exception e) {
+			}
+			setAddress(hostport_str.substring(0, hostport_str.indexOf(']') + 1));
+			return true;
+		}
+		return false;
+	}
 }

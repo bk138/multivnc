@@ -384,6 +384,9 @@ public class VncCanvas extends GLSurfaceView {
 		catch(IllegalMonitorStateException e) {
 			// thrown when mutex was not locked
 		}
+		catch(NullPointerException e) {
+			// thrown if we fatal out at the very beginning
+		}
 
 		super.onPause();
 	}
