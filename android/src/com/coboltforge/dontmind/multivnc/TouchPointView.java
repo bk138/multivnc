@@ -48,8 +48,8 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 		background.setTileModeX(Shader.TileMode.REPEAT);
 		background.setTileModeY(Shader.TileMode.REPEAT);
 
-		// a 40 dip radius
-		radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics());
+		// a 50 dip radius
+		radius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
 
 		colors[0] = Color.RED;
 		colors[1] = Color.WHITE;
