@@ -25,11 +25,6 @@
 <string name="import_settings">Import</string>
 <string name="import_settings_file_url">Import from file or URL</string>
 <string name="info">Connection Info</string>
-<string name="intro_text">If you need help, please check the &lt;a href="http://code.google.com/p/android-vnc-viewer/wiki/Documentation"&gt;manual&lt;/a&gt; (press phone\'s Menu button to access manual and other menu items), or the &lt;a href="http://code.google.com/p/android-vnc-viewer/wiki/faq"&gt;FAQ&lt;/a&gt;.&lt;br&gt;</string>
-<string name="intro_title">Welcome</string>
-<string name="intro_version_text">&lt;br&gt;--Sent text is remembered across sessions (optionally)&lt;br&gt;--Import/Export settings to file&lt;br&gt;--Button with zoom controls to bring up keyboard&lt;br&gt;--Can force tiling mode (very large screens)</string>
-<string name="intro_dont_show">Don\'t show again</string>
-<string name="local_mouse_check">Local mouse pointer</string>
 <string name="meta_key_title">Send Key Combo</string>
 <string name="new_connection">New Connection</string>
 <string name="nickname_caption">Bookmark</string>
@@ -44,15 +39,12 @@
 <string name="repeater_caption">Repeater</string>
 <string name="repeater_hint">For UltraVNC-style repeater address</string>
 <string name="repeater_clear">Don\'t use repeater</string>
-<string name="repeater_dialog_title">Repeater Information</string>
-<string name="repeater_save">Use this repeater address</string>
 <string name="save_as_copy">Save as Copy</string>
 <!-- Send selected metakey -->
 <string name="send_button">Send</string>
 <string name="send_key_again">Send Key Combo Again</string>
 <string name="shift_check">Shift</string>
 <string name="shortcut_label">VNC Connection Shortcut</string>
-<string name="showkbd_label">Keyboard</string>
 <string name="special_keys">Key Combo</string>
 <string name="username_caption">Username</string>
 <string name="username_hint">For Windows authentication</string>
@@ -72,8 +64,16 @@
 <string name="pleaserate">Show some love by clicking the heart ;-)</string>
 <string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
-    <![CDATA[<b>Version 1.4.x:</b>
+<![CDATA[<b>Version 1.4.x:</b>
      		<ul>
+     		 <li>1.5.0</li>
+     	             <ul>
+			     		 <li>Full IPv6 support on Honeycomb and newer!</li>
+					     <li>Added help screen.</li>
+			             <li>Improved touchpad mode.</li>
+			     		 <li>Fixed 'Key Combo' button being focused when soft keyboard was activated.</li>
+			     	     <li>Fixed virtual mouse button toggling.</li>
+     	      	  </ul>
      		 <li>1.4.10: Added button to be able to rate the app.</li>
      		 <li>1.4.9: Fix crash introduced by the 1.4.8 fix.</li>
      	     <li>1.4.8: Fix an ANR error when pausing the app.</li>
@@ -94,5 +94,6 @@
      	      	  </ul>
      		</ul> 
     ]]>
+
 </string>
 </resources>
