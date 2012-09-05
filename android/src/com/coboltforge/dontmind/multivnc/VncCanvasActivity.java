@@ -444,6 +444,7 @@ public class VncCanvasActivity extends Activity {
 	
 	private SharedPreferences prefs;
 
+	@SuppressLint("ShowToast")
 	@Override
 	public void onCreate(Bundle icicle) {
 
@@ -609,7 +610,6 @@ public class VncCanvasActivity extends Activity {
 		
 		// create an empty toast. we do this do be able to cancel
 		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
-		notificationToast.setGravity(Gravity.TOP, 0, 0);
 		
 		// honeycomb or newer 
 		setupActionBar();

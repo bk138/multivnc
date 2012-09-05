@@ -6,11 +6,14 @@
 package com.coboltforge.dontmind.multivnc;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.BlurMaskFilter.Blur;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -25,6 +28,8 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 
 	private Paint touchPaints[] = new Paint[MAX_TOUCHPOINTS];
 	private int colors[] = new int[MAX_TOUCHPOINTS];
+	
+	private BitmapDrawable background;
 
 	private float scale = 1.0f;
 
@@ -35,7 +40,11 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 		holder.addCallback(this);
 		setFocusable(true); // make sure we get key events
 		setFocusableInTouchMode(true); // make sure we get touch events
-
+		
+		background = new BitmapDrawable(getResources(), BitmapFactory.decodeResource(getResources(), R.drawable.touchpad));
+		background.setTileModeX(Shader.TileMode.REPEAT);
+		background.setTileModeY(Shader.TileMode.REPEAT);
+		  
 		colors[0] = Color.RED;
 		colors[1] = Color.WHITE;
 		colors[2] = Color.GREEN;
@@ -62,7 +71,9 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 		Canvas c = getHolder().lockCanvas();
 		if (c != null) {
-			c.drawColor(Color.BLACK);
+			
+			background.draw(c);
+			
 			if (event.getAction() == MotionEvent.ACTION_UP) {
 				// clear everything
 			} else {
@@ -83,6 +94,7 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 		c.drawCircle(x, y, 40 * scale, paint);
 	}
 
+	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		if (width > height) {
 			this.scale = width / 480f;
@@ -91,8 +103,9 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 		Canvas c = getHolder().lockCanvas();
 		if (c != null) {
+			background.setBounds(0, 0, width , height);
 			// clear screen
-			c.drawColor(Color.BLACK);
+			background.draw(c);
 			getHolder().unlockCanvasAndPost(c);
 		}
 	}
