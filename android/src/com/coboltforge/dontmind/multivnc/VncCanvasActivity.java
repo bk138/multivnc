@@ -699,14 +699,16 @@ public class VncCanvasActivity extends Activity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-
-		if(touchpoints.getVisibility() == View.VISIBLE) {
-			menu.findItem(R.id.itemColorMode).setVisible(false);
-			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
-		}
-		else {
-			menu.findItem(R.id.itemColorMode).setVisible(true);
-			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
+		try {
+			if(touchpoints.getVisibility() == View.VISIBLE) {
+				menu.findItem(R.id.itemColorMode).setVisible(false);
+				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
+			}
+			else {
+				menu.findItem(R.id.itemColorMode).setVisible(true);
+				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
+			}}
+		catch(NullPointerException e) { // when menu is initially created
 		}
 
 		return super.onPrepareOptionsMenu(menu);
