@@ -3,6 +3,7 @@
  */
 package com.coboltforge.dontmind.multivnc;
 
+import android.annotation.SuppressLint;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.view.GestureDetector;
@@ -13,21 +14,22 @@ import com.antlersoft.android.bc.OnScaleGestureListener;
 
 /**
  * An AbstractInputHandler that uses GestureDetector to detect standard gestures in touch events
- * 
+ *
  * @author Michael A. MacDonald
  */
+@SuppressLint("NewApi")
 abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestureListener implements OnScaleGestureListener {
 	protected GestureDetector gestures;
 	protected IBCScaleGestureDetector scaleGestures;
 	private VncCanvasActivity activity;
-	
+
 	float xInitialFocus;
 	float yInitialFocus;
 	float scale_orig;
 	boolean inScaling;
-	
+
 	private static final String TAG = "AbstractGestureInputHandler";
-	
+
 	AbstractGestureInputHandler(VncCanvasActivity c)
 	{
 		activity = c;
@@ -40,7 +42,11 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	}
 
 	public boolean onTouchEvent(MotionEvent evt) {
-		scaleGestures.onTouchEvent(evt);
+		try {
+			scaleGestures.onTouchEvent(evt);
+		}
+		catch(IllegalArgumentException e) {
+		}
 		return gestures.onTouchEvent(evt);
 	}
 
@@ -54,7 +60,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		//Log.i(TAG,"Focus("+detector.getFocusX()+","+detector.getFocusY()+") scaleFactor = "+detector.getScaleFactor());
 		// Calculate focus shift
 		float fx = detector.getFocusX();
-		float fy = detector.getFocusY(); 
+		float fy = detector.getFocusY();
 		double xfs = fx - xInitialFocus;
 		double yfs = fy - yInitialFocus;
 		double fs = Math.sqrt(xfs * xfs + yfs * yfs);
