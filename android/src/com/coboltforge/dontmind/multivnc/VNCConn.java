@@ -1,7 +1,7 @@
 /**
- * 
- * This represents an *active* VNC connection (as opposed to ConnectionBean, which is more like a bookmark.). 
- * 
+ *
+ * This represents an *active* VNC connection (as opposed to ConnectionBean, which is more like a bookmark.).
+ *
  * Copyright (C) 2012 Christian Beier <dontmind@freeshell.org>
  */
 
@@ -38,7 +38,7 @@ public class VNCConn {
 
 	private VncInputThread inputThread;
 	private VNCOutputThread outputThread;
-	
+
 	// VNC protocol connection
 	private RfbProto rfb;
 	private ConnectionBean connSettings;
@@ -51,10 +51,10 @@ public class VNCConn {
 	// Internal bitmap data
 	private AbstractBitmapData bitmapData;
 	private Lock bitmapDataPixelsLock = new ReentrantLock();
-	
+
 	// message queue for communicating with the output worker thread
-	private ConcurrentLinkedQueue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<VNCConn.OutputEvent>(); 
-	
+	private ConcurrentLinkedQueue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<VNCConn.OutputEvent>();
+
 	private Paint handleRREPaint;
 
 	// ZRLE encoder's data.
@@ -69,7 +69,7 @@ public class VNCConn {
 
 	private int bytesPerPixel;
 	private int[] colorPalette;
-	private COLORMODEL colorModel; 
+	private COLORMODEL colorModel;
 
 	// VNC Encoding parameters
 	private boolean useCopyRect = false; // TODO CopyRect is not working
@@ -82,23 +82,23 @@ public class VNCConn {
 	// Used to determine if encoding update is necessary
 	private int[] encodingsSaved = new int[20];
 	private int nEncodingsSaved = 0;
-	
+
 	// Useful shortcuts for modifier masks.
     public final static int CTRL_MASK  = KeyEvent.META_SYM_ON;
     public final static int SHIFT_MASK = KeyEvent.META_SHIFT_ON;
     public final static int META_MASK  = 0;
     public final static int ALT_MASK   = KeyEvent.META_ALT_ON;
-    
+
     public static final int MOUSE_BUTTON_NONE = 0;
     public static final int MOUSE_BUTTON_LEFT = 1;
     public static final int MOUSE_BUTTON_MIDDLE = 2;
     public static final int MOUSE_BUTTON_RIGHT = 4;
     public static final int MOUSE_BUTTON_SCROLL_UP = 8;
     public static final int MOUSE_BUTTON_SCROLL_DOWN = 16;
-	
+
 
     private class OutputEvent {
-    	
+
     	public OutputEvent(int x, int y, int modifiers, int pointerMask) {
     		pointer = new PointerEvent();
     		pointer.x = x;
@@ -106,58 +106,58 @@ public class VNCConn {
     		pointer.modifiers = modifiers;
     		pointer.mask = pointerMask;
     	}
-    	
+
     	public OutputEvent(int keyCode, int metaState, boolean down) {
     		key = new KeyboardEvent();
     		key.keyCode = keyCode;
     		key.metaState = metaState;
     		key.down = down;
     	}
-    	
+
     	public OutputEvent(boolean incremental) {
     		ffur = new FullFramebufferUpdateRequest();
     		ffur.incremental = incremental;
     	}
-    	
+
     	private class PointerEvent {
     		int x;
     		int y;
     		int mask;
     		int modifiers;
     	}
-    	
+
     	private class KeyboardEvent {
     		int keyCode;
     		int metaState;
     		boolean down;
     	}
-    	
+
     	private class FullFramebufferUpdateRequest {
     		boolean incremental;
     	}
-    	
+
     	public FullFramebufferUpdateRequest ffur;
     	public PointerEvent pointer;
     	public KeyboardEvent key;
     }
-    
-    
+
+
     private class VncInputThread extends Thread {
-    	
+
     	private ProgressDialog pd;
     	private Runnable setModes;
-    	
-    	
+
+
     	public VncInputThread(ProgressDialog pd, Runnable setModes) {
     		this.pd = pd;
     		this.setModes = setModes;
     	}
-    	
-    	
+
+
 		public void run() {
-			
+
 			if(Utils.DEBUG()) Log.d(TAG, "InputThread started!");
-			
+
 			try {
 				connectAndAuthenticate();
 				doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
@@ -167,11 +167,11 @@ public class VNCConn {
 						pd.setMessage("Downloading first frame.\nPlease wait...");
 					}
 				});
-				
+
 				// start output thread here
 				outputThread = new VNCOutputThread();
 				outputThread.start();
-				
+
 				processNormalProtocol(canvas.getContext(), pd, setModes);
 			} catch (Throwable e) {
 				if (maintainConnection) {
@@ -180,7 +180,11 @@ public class VNCConn {
 					// Ensure we dismiss the progress dialog
 					// before we fatal error finish
 					if (pd.isShowing())
-						pd.dismiss();
+						try{
+							pd.dismiss();
+						}
+						catch(Exception e2) {
+						}
 					if (e instanceof OutOfMemoryError) {
 						// TODO  Not sure if this will happen but...
 						// figure out how to gracefully notify the user
@@ -200,25 +204,25 @@ public class VNCConn {
 					}
 				}
 			}
-			
+
 			if(Utils.DEBUG()) Log.d(TAG, "InputThread done!");
 		}
-		
-		
+
+
 
 		private void connectAndAuthenticate() throws Exception {
-			
+
 			/*
 		     * if IPv6 address, add scope id
 		     */
 		    try {
 				InetAddress address = InetAddress.getByName(connSettings.getAddress());
-				
+
 				Inet6Address in6 = Inet6Address.getByAddress(
-						address.getHostName(), 
-						address.getAddress(), 
+						address.getHostName(),
+						address.getAddress(),
 						Utils.getActiveNetworkInterface(canvas.getContext()));
-				
+
 				connSettings.setAddress(in6.getHostAddress());
 				Log.i(TAG, "Using IPv6");
 
@@ -227,9 +231,9 @@ public class VNCConn {
 			} catch (NullPointerException ne) {
 				Log.e(TAG, ne.toString());
 			}
-			
-		    
-		    
+
+
+
 			Log.i(TAG, "Connecting to " + connSettings.getAddress() + ", port " + connSettings.getPort() + "...");
 
 			rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort());
@@ -281,7 +285,7 @@ public class VNCConn {
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
-				}			
+				}
 				rfb.authenticateVNC(connSettings.getPassword());
 				break;
 			case RfbProto.AuthUltra:
@@ -306,7 +310,7 @@ public class VNCConn {
 
 			Log.i(TAG, "Desktop name is " + rfb.desktopName);
 			Log.i(TAG, "Desktop size is " + rfb.framebufferWidth + " x " + rfb.framebufferHeight);
-			
+
 			canvas.mouseX = rfb.framebufferWidth/2;
 			canvas.mouseY = rfb.framebufferHeight/2;
 
@@ -326,17 +330,17 @@ public class VNCConn {
 
 			setPixelFormat();
 		}
-		
+
 
 		private void processNormalProtocol(final Context context, ProgressDialog pd, final Runnable setModes) throws Exception {
 			try {
-				
+
 				Log.d(TAG, "Connection initialized");
-				
+
 				bitmapData.writeFullUpdateRequest(false);
 
 				canvas.handler.post(setModes);
-				
+
 				//
 				// main input loop
 				//
@@ -416,7 +420,11 @@ public class VNCConn {
 
 							// Hide progress dialog
 							if (pd.isShowing())
-								pd.dismiss();
+								try{
+									pd.dismiss();
+								}
+								catch(Exception e) {
+								}
 						}
 
 						boolean fullUpdateNeeded = false;
@@ -468,10 +476,10 @@ public class VNCConn {
 				System.gc();
 			}
 		}
-		
+
 
 		private void setPixelFormat() throws IOException {
-			if(bitmapData instanceof FullBufferBitmapData) 
+			if(bitmapData instanceof FullBufferBitmapData)
 				setPixelFormatFromModel(pendingColorModel, true);
 			else
 				setPixelFormatFromModel(pendingColorModel, false);
@@ -481,7 +489,7 @@ public class VNCConn {
 			pendingColorModel = null;
 		}
 
-		
+
 
 		private void setPixelFormatFromModel(COLORMODEL model, boolean reverserPixelOrder) throws IOException {
 			switch (model) {
@@ -533,20 +541,20 @@ public class VNCConn {
 				break;
 			}
 		}
-		
 
 
 
-		
+
+
     }
 
-    
-    
-    
+
+
+
     private class VNCOutputThread extends Thread {
-    	
+
     	public void run() {
-    		
+
 			if(Utils.DEBUG()) Log.d(TAG, "OutputThread started!");
 
     		//
@@ -568,7 +576,7 @@ public class VNCConn {
 							e.printStackTrace();
 						}
     			}
-    			
+
     			// at this point, queue is empty, wait for input instead of hogging CPU
     			synchronized (outputEventQueue) {
 					try {
@@ -577,13 +585,13 @@ public class VNCConn {
 						// go on
 					}
 				}
-    			
+
     		}
-    		
+
     		if(Utils.DEBUG()) Log.d(TAG, "OutputThread done!");
 
     	}
-    	
+
 
 		private boolean sendPointerEvent(OutputEvent.PointerEvent pe) {
 
@@ -602,13 +610,13 @@ public class VNCConn {
 			catch(NullPointerException e) {
 			}
 			return false;
-			
+
 		}
-		
-		
+
+
 		private boolean sendKeyEvent(OutputEvent.KeyboardEvent evt) {
 			if (rfb != null && rfb.inNormalProtocol) {
-			   
+
 			   try {
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
 				   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
@@ -619,24 +627,24 @@ public class VNCConn {
 			}
 			return false;
 		}
-		
-    	
+
+
     }
-    
-    
-    
-    
+
+
+
+
 	public VNCConn() {
 		handleRREPaint = new Paint();
 		handleRREPaint.setStyle(Style.FILL);
 
 		if(Utils.DEBUG()) Log.d(TAG, this + " constructed!");
 	}
-	
+
 	protected void finalize() {
 		if(Utils.DEBUG()) Log.d(TAG, this + " finalized!");
 	}
-	
+
 
 	/*
 		    to make a connection, call
@@ -671,11 +679,11 @@ public class VNCConn {
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
 	public void init(ConnectionBean bean, VncCanvas c, final Runnable setModes) {
-		
+
 		Log.d(TAG, "initializing");
-		
+
 		setCanvas(c);
-		
+
 		connSettings = bean;
 		try {
 			this.pendingColorModel = COLORMODEL.valueOf(bean.getColorModel());
@@ -689,28 +697,28 @@ public class VNCConn {
 		pd.setCancelable(false); // on ICS, clicking somewhere cancels the dialog. not what we want...
 	    pd.setTitle("Connecting...");
 	    pd.setMessage("Establishing handshake.\nPlease wait...");
-	    pd.setButton(DialogInterface.BUTTON_NEGATIVE, canvas.getContext().getString(android.R.string.cancel), new DialogInterface.OnClickListener() 
+	    pd.setButton(DialogInterface.BUTTON_NEGATIVE, canvas.getContext().getString(android.R.string.cancel), new DialogInterface.OnClickListener()
 	    {
-	        public void onClick(DialogInterface dialog, int which) 
+	        public void onClick(DialogInterface dialog, int which)
 	        {
 	        	canvas.activity.finish();
 	        }
 	    });
 	    pd.show();
-	    
-	    
-		inputThread = new VncInputThread(pd, setModes); 	
+
+
+		inputThread = new VncInputThread(pd, setModes);
 		inputThread.start();
 	}
 
 
 
 	public void shutdown() {
-		
+
 		Log.d(TAG, "shutting down");
-		
+
 		maintainConnection = false;
-		
+
 		try {
 			bitmapData.dispose();
 			rfb.close(); // close immediatly
@@ -720,11 +728,11 @@ public class VNCConn {
 		}
 		catch(Exception e) {
 		}
-		
+
 		bitmapData = null;
 		canvas = null;
 		connSettings = null;
-		
+
 		System.gc();
 	}
 
@@ -736,7 +744,7 @@ public class VNCConn {
 	public void setCanvas(VncCanvas c) {
 		canvas = c;
 	}
-	
+
 
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 
@@ -745,18 +753,18 @@ public class VNCConn {
 		else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
 		if (y<0) y=0;
 		else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
-		
+
 		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
 			OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
 			outputEventQueue.add(e);
 			synchronized (outputEventQueue) {
 				outputEventQueue.notify();
 			}
-			
+
 			canvas.mouseX = x;
 			canvas.mouseY = y;
 			canvas.panToMouse();
-			
+
 			return true;
 		}
 		else
@@ -780,26 +788,26 @@ public class VNCConn {
 			if(evt.getAction() == KeyEvent.ACTION_MULTIPLE && evt.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN) {
 				OutputEvent down = new OutputEvent(
 						evt.getCharacters().codePointAt(0),
-						evt.getMetaState(), 
+						evt.getMetaState(),
 						true);
 				outputEventQueue.add(down);
-				
+
 				OutputEvent up = new OutputEvent(
 						evt.getCharacters().codePointAt(0),
-						evt.getMetaState(), 
+						evt.getMetaState(),
 						false);
 				outputEventQueue.add(up);
-				
+
 				synchronized (outputEventQueue) {
 					outputEventQueue.notify();
 				}
 
 			}
 			// 'normal' key, i.e. either up or down
-			else  { 
+			else  {
 
 				int metaState = evt.getMetaState();
-				
+
 				// only do translation for events that were *not* synthesized,
 				// i.e. coming from a metakeybean which already is translated
 				if(!sendDirectly) {
@@ -837,7 +845,7 @@ public class VNCConn {
 					default:
 						// do keycode -> UTF-8 keysym conversion
 						KeyEvent tmp = new KeyEvent(
-								0, 
+								0,
 								0,
 								0,
 								keyCode,
@@ -852,7 +860,7 @@ public class VNCConn {
 
 				OutputEvent e = new OutputEvent(
 						keyCode,
-						metaState, 
+						metaState,
 						evt.getAction() == KeyEvent.ACTION_DOWN);
 				outputEventQueue.add(e);
 				synchronized (outputEventQueue) {
@@ -860,7 +868,7 @@ public class VNCConn {
 				}
 
 			}
-			
+
 			return true;
 		}
 		else
@@ -887,25 +895,25 @@ public class VNCConn {
 				e.printStackTrace();
 			}
 		}
-	
+
 		return framebufferUpdatesEnabled;
 	}
 
-	
+
 
 	public void setColorModel(COLORMODEL cm) {
 		// Only update if color model changes
 		if (colorModel == null || !colorModel.equals(cm))
 			pendingColorModel = cm;
 	}
-	
-	
+
+
 
 	public final COLORMODEL getColorModel() {
 		return colorModel;
 	}
-	
-	
+
+
 	public String getEncoding() {
 		switch (preferredEncoding) {
 		case RfbProto.EncodingRaw:
@@ -926,7 +934,7 @@ public class VNCConn {
 		return "";
 	}
 
-	
+
 	public final String getDesktopName() {
 		return rfb.desktopName;
 	}
@@ -939,7 +947,7 @@ public class VNCConn {
 			return 0;
 		}
 	}
-	
+
 	public final int getFramebufferHeight() {
 		try {
 			return bitmapData.framebufferheight;
@@ -948,37 +956,37 @@ public class VNCConn {
 			return 0;
 		}
 	}
-	
+
 	public final AbstractBitmapData getFramebuffer() {
 		return bitmapData;
 	}
-	
+
 	public void lockFramebuffer() {
 		bitmapDataPixelsLock.lock();
 	}
-	
+
 	public void unlockFramebuffer() {
 		bitmapDataPixelsLock.unlock();
 	}
-	
-	
+
+
 	public final ConnectionBean getConnSettings() {
 		return connSettings;
 	}
-	
-	
-	
 
 
 
 
 
 
-	
-	
+
+
+
+
+
 	/**
 	 * Additional Encodings
-	 * 
+	 *
 	 */
 
 	private void setEncodings(boolean autoSelectOnly) {

@@ -38,8 +38,8 @@ class ImportExportDialog extends Dialog {
 	private MainMenuActivity _configurationDialog;
 	private EditText _textLoadUrl;
 	private EditText _textSaveUrl;
-	
-	
+
+
 	/**
 	 * @param context
 	 */
@@ -59,21 +59,21 @@ class ImportExportDialog extends Dialog {
 		setTitle(R.string.import_export_settings);
 		_textLoadUrl = (EditText)findViewById(R.id.textImportUrl);
 		_textSaveUrl = (EditText)findViewById(R.id.textExportPath);
-		
+
 		File f = BCFactory.getInstance().getStorageContext().getExternalStorageDir(_configurationDialog, null);
 		// Sdcard not mounted; nothing else to do
 		if (f == null)
 			return;
-		
+
 		f = new File(f, "vnc_settings.xml");
-		
+
 		_textSaveUrl.setText(f.getAbsolutePath());
 		try {
 			_textLoadUrl.setText(f.toURL().toString());
 		} catch (MalformedURLException e) {
 			// Do nothing; default value not set
 		}
-		
+
 		Button export = (Button)findViewById(R.id.buttonExport);
 		export.setOnClickListener(new View.OnClickListener() {
 
@@ -84,7 +84,11 @@ class ImportExportDialog extends Dialog {
 					Writer writer = new OutputStreamWriter(new FileOutputStream(f, false));
 					SqliteElement.exportDbAsXmlToStream(_configurationDialog.getDatabaseHelper().getReadableDatabase(), writer);
 					writer.close();
-					dismiss();
+					try{
+						dismiss();
+					}
+					catch(Exception e) {
+					}
 				}
 				catch (IOException ioe)
 				{
@@ -93,9 +97,9 @@ class ImportExportDialog extends Dialog {
 					errorNotify("XML Exception exporting config", e);
 				}
 			}
-			
+
 		});
-		
+
 		((Button)findViewById(R.id.buttonImport)).setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -110,7 +114,11 @@ class ImportExportDialog extends Dialog {
 							_configurationDialog.getDatabaseHelper().getWritableDatabase(),
 							reader,
 							ReplaceStrategy.REPLACE_EXISTING);
-					dismiss();
+					try{
+						dismiss();
+					}
+					catch(Exception e) {
+					}
 					_configurationDialog.updateBookmarkView();
 				}
 				catch (MalformedURLException mfe)
@@ -126,10 +134,10 @@ class ImportExportDialog extends Dialog {
 					errorNotify("XML or format error reading configuration", e);
 				}
 			}
-			
+
 		});
 	}
-	
+
 	private void errorNotify(String msg, Throwable t)
 	{
 		Log.i("com.coboltforge.dontmind.multivnc.ImportExportDialog", msg, t);

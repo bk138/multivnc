@@ -1,14 +1,14 @@
-/* 
+/*
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
@@ -60,9 +60,9 @@ import java.util.Hashtable;
 
 
 public class MainMenuActivity extends Activity implements IMDNS {
-	
+
 	private static final String TAG = "MainMenuActivity";
-	
+
 	private EditText ipText;
 	private EditText portText;
 	private EditText passwordText;
@@ -74,12 +74,12 @@ public class MainMenuActivity extends Activity implements IMDNS {
 	private VncDatabase database;
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
-	
+
 	// service discovery stuff
 	private MDNSService boundMDNSService;
 	private ServiceConnection connection_MDNSService;
 	private android.os.Handler handler = new android.os.Handler();
-	
+
 
 	public class MDNSServiceConnection implements ServiceConnection {
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -89,13 +89,13 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			// service that we know is running in our own process, we can
 			// cast its IBinder to a concrete class and directly access it.
 			boundMDNSService = ((MDNSService.LocalBinder) service).getService();
-			
+
 			// register our callback to be notified about changes
 			boundMDNSService.registerCallback(MainMenuActivity.this);
-			
+
 			// and force a dump of discovered connections
 			boundMDNSService.dump();
-			
+
 			Log.d(TAG, "bound to MDNSService " + boundMDNSService);
 		}
 
@@ -107,44 +107,44 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			boundMDNSService = null;
 		}
 	};
-	
-	
-	
+
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
-		// get package debug flag and set it 
+
+		// get package debug flag and set it
 		Utils.DEBUG(this);
 		// update appstart cound
 		Utils.updateAppStartCount(this);
-		
+
 		// start the MDNS service
 		startMDNSService();
 		// and (re-)bind to MDNS service
 		bindToMDNSService(new Intent(this, MDNSService.class));
-		
+
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
 		textUsername = (EditText) findViewById(R.id.textUsername);
-		
+
 		serverlist = (LinearLayout) findViewById(R.id.discovered_servers_list);
 		bookmarkslist = (LinearLayout) findViewById(R.id.bookmarks_list);
 
-		
+
 		colorSpinner = (Spinner)findViewById(R.id.spinnerColorMode);
 		COLORMODEL[] models=COLORMODEL.values();
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
 		colorSpinner.setAdapter(colorSpinnerAdapter);
 		//colorSpinner.setSelection(0);
-		
+
 		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
-		
+
 		repeaterText = (TextView)findViewById(R.id.textRepeaterId);
-		
+
 		Button goButton = (Button) findViewById(R.id.buttonGO);
 		goButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -159,12 +159,12 @@ public class MainMenuActivity extends Activity implements IMDNS {
 				startActivity(intent);
 			}
 		});
-		
+
 		Button saveBookmarkButton = (Button) findViewById(R.id.buttonSaveBookmark);
 		saveBookmarkButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
+
 				final ConnectionBean conn = makeNewConnFromView();
 				if(conn == null)
 					return;
@@ -177,8 +177,8 @@ public class MainMenuActivity extends Activity implements IMDNS {
 				.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String name = input.getText().toString();
-						if(name.length() == 0) 
-							name = conn.getAddress() + ":" + conn.getPort(); 
+						if(name.length() == 0)
+							name = conn.getAddress() + ":" + conn.getPort();
 						conn.setNickname(name);
 						saveBookmark(conn);
 						updateBookmarkView();
@@ -191,13 +191,13 @@ public class MainMenuActivity extends Activity implements IMDNS {
 
 			}
 		});
-		
+
 		database = new VncDatabase(this);
-		
-		
+
+
 		final SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
-		
-		
+
+
 		/*
 		 * show support dialog on third (and maybe later) runs
 		 */
@@ -214,13 +214,21 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						startActivity(new Intent(MainMenuActivity.this, AboutActivity.class));
-						dialog.dismiss();
+						try{
+							dialog.dismiss();
+						}
+						catch(Exception e) {
+						}
 					}
 				});
 				dialog.setNeutralButton(getString(R.string.support_dialog_no), new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
+						try{
+							dialog.dismiss();
+						}
+						catch(Exception e) {
+						}
 					}
 				});
 				dialog.setNegativeButton(getString(R.string.support_dialog_neveragain), new OnClickListener() {
@@ -230,16 +238,20 @@ public class MainMenuActivity extends Activity implements IMDNS {
 						SharedPreferences.Editor ed = settings.edit();
 						ed.putBoolean(Constants.PREFS_KEY_SUPPORTDLG, false);
 						ed.commit();
-						
-						dialog.dismiss();
+
+						try{
+							dialog.dismiss();
+						}
+						catch(Exception e) {
+						}
 					}
 				});
-				
+
 				dialog.show();
 			}
 		}
-		
-		
+
+
 
 		/*
 		 * show changelog if version changed
@@ -247,7 +259,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		try {
 			//current version
 			PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-			int versionCode = packageInfo.versionCode; 
+			int versionCode = packageInfo.versionCode;
 
 			int lastVersionCode = settings.getInt("lastVersionCode", 0);
 
@@ -255,11 +267,11 @@ public class MainMenuActivity extends Activity implements IMDNS {
 				SharedPreferences.Editor editor = settings.edit();
 				editor.putInt("lastVersionCode", versionCode);
 				editor.commit();
-				
+
 				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 				dialog.setTitle(getString(R.string.changelog_dialog_title));
 				dialog.setIcon(getResources().getDrawable(R.drawable.icon));
-				
+
 				WebView wv = new WebView(getApplicationContext());
 				wv.loadData(getString(R.string.changelog_dialog_text), "text/html", "utf-8");
 				dialog.setView(wv);
@@ -267,28 +279,32 @@ public class MainMenuActivity extends Activity implements IMDNS {
 				dialog.setPositiveButton(getString(android.R.string.ok), new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
+						try{
+							dialog.dismiss();
+						}
+						catch(Exception e) {
+						}
 					}
 				});
-			
+
 				dialog.show();
-				
+
 			}
 		} catch (NameNotFoundException e) {
 			Log.w("Unable to get version code. Will not show changelog", e);
 		}
-		
+
 
 	}
-	
+
 	protected void onDestroy() {
 		super.onDestroy();
 
 		database.close();
-		
+
 		unbindFromMDNSService();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateDialog(int)
 	 */
@@ -296,11 +312,11 @@ public class MainMenuActivity extends Activity implements IMDNS {
 	protected Dialog onCreateDialog(int id) {
 		if (id == R.layout.importexport)
 			return new ImportExportDialog(this);
-		
+
 		return null;
 	}
-	
-	
+
+
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -322,7 +338,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		case R.id.itemMDNSRestart :
 			serverlist.removeAllViews();
 			findViewById(R.id.discovered_servers_waitwheel).setVisibility(View.VISIBLE);
-			
+
 			try {
 				boundMDNSService.restart();
 			}
@@ -341,15 +357,15 @@ public class MainMenuActivity extends Activity implements IMDNS {
 	}
 
 
-	
-	
+
+
 	protected void onStart() {
 		super.onStart();
 		updateBookmarkView();
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Return the object representing the app global state in the database, or null
 	 * if the object hasn't been set up yet
@@ -365,7 +381,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			return null;
 		return recents.get(0);
 	}
-	
+
 	void updateBookmarkView() {
 		ArrayList<ConnectionBean> bookmarked_connections=new ArrayList<ConnectionBean>();
 		try {
@@ -375,11 +391,11 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			Toast.makeText(this, getString(R.string.database_error_open), Toast.LENGTH_LONG).show();
 			return;
 		}
-		
+
 		Collections.sort(bookmarked_connections);
-		
+
 		Log.d(TAG, "updateBookMarkView()");
-		
+
 //		int connectionIndex=0;
 //		if ( bookmarked_connections.size()>1)
 //		{
@@ -404,7 +420,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		{
 			final ConnectionBean conn = bookmarked_connections.get(i);
 			View v = vi.inflate(R.layout.bookmarks_list_item, null);
-			
+
 			Log.d(TAG, "Displaying bookmark: " + conn.toString());
 
 			// name
@@ -420,16 +436,16 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					startActivity(intent);
 				}
 			});
-			
+
 			// button
 			ImageButton button = (ImageButton) v.findViewById(R.id.bookmark_edit_button);
 			button.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
-					
+
 					final CharSequence[] items = {
-							getString(R.string.save_as_copy), 
-							getString(R.string.delete_connection), 
+							getString(R.string.save_as_copy),
+							getString(R.string.delete_connection),
 							getString(R.string.edit)
 					};
 
@@ -437,7 +453,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					builder.setItems(items, new DialogInterface.OnClickListener() {
 					    public void onClick(DialogInterface dialog, int item) {
 					    	switch(item) {
-					    	
+
 					    	case 0: // save as copy
 					    		/* the ConnectionBean objects are transient and generated
 					    		   anew with each call to this function
@@ -448,7 +464,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 								// update
 								updateBookmarkView();
 					    		break;
-					    		
+
 					    	case 1: // delete
 					    		AlertDialog.Builder builder = new AlertDialog.Builder(MainMenuActivity.this);
 								builder.setMessage(getString(R.string.bookmark_delete_question))
@@ -470,14 +486,14 @@ public class MainMenuActivity extends Activity implements IMDNS {
 								AlertDialog saveornot = builder.create();
 								saveornot.show();
 					    		break;
-					    		
+
 					    	case 2: // edit
 								Log.d(TAG, "Editing bookmark " + conn.get_Id());
 					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
 					    		intent.putExtra(Constants.CONNECTION, conn.get_Id());
 					    		startActivity(intent);
 					    		break;
-					    		
+
 					    	}
 					    }
 					});
@@ -488,18 +504,18 @@ public class MainMenuActivity extends Activity implements IMDNS {
 
 			bookmarkslist.addView(v);
 		}
-		
-	
+
+
 	}
-	
-	
+
+
 	VncDatabase getDatabaseHelper()
 	{
 		return database;
 	}
-	
-	
-	
+
+
+
 	private void writeRecent(ConnectionBean conn)
 	{
 		SQLiteDatabase db = database.getWritableDatabase();
@@ -525,7 +541,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			db.endTransaction();
 		}
 	}
-	
+
 	private void saveBookmark(ConnectionBean conn) 	{
 		SQLiteDatabase db = database.getWritableDatabase();
 		db.beginTransaction();
@@ -541,23 +557,23 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			db.endTransaction();
 		}
 	}
-	
+
 
 	private ConnectionBean makeNewConnFromView() {
-	
+
 		ConnectionBean conn = new ConnectionBean();
-		
+
 		conn.setAddress(ipText.getText().toString());
-		
+
 		if(conn.getAddress().length() == 0)
 			return null;
-		
+
 		conn.set_Id(0); // is new!!
-		
+
 		try {
 			conn.setPort(Integer.parseInt(portText.getText().toString()));
 		}
-		catch (NumberFormatException nfe) {			
+		catch (NumberFormatException nfe) {
 		}
 		conn.setUserName(textUsername.getText().toString());
 		conn.setPassword(passwordText.getText().toString());
@@ -570,14 +586,14 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			conn.setUseRepeater(true);
 		}
 		else
-		{			
+		{
 			conn.setUseRepeater(false);
 		}
-		
+
 		return conn;
 	}
-	
-	
+
+
 
 
 	void startMDNSService() {
@@ -592,7 +608,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			Toast.makeText(this, "Could not bind to MDNSService!", Toast.LENGTH_LONG).show();
 	}
 
-	void unbindFromMDNSService() 
+	void unbindFromMDNSService()
 	{
 		if(connection_MDNSService != null)
 		{
@@ -612,15 +628,15 @@ public class MainMenuActivity extends Activity implements IMDNS {
 					msg = getString(R.string.server_found) + ": " + conn_name;
 				else
 					msg = getString(R.string.server_removed) + ": " + conn_name;
-				
+
 				Toast.makeText(getApplicationContext(), msg , Toast.LENGTH_SHORT).show();
 
-				// update 
+				// update
 				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 				/*
 				 * we don't care whether this is a conn add or removal (conn!=null or conn==null),
-				 * we always rebuild the whole view for the sake of code simplicity  
+				 * we always rebuild the whole view for the sake of code simplicity
 				 */
 				serverlist.removeAllViews();
 				// refill

@@ -42,18 +42,18 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 	CheckBox _checkAlt;
 	TextView _textKeyDesc;
 	Spinner _spinnerKeySelect;
-	
+
 	VncDatabase _database;
 	static ArrayList<MetaList> _lists;
 	ArrayList<MetaKeyBean> _keysInList;
 	long _listId;
 	VncCanvasActivity _canvasActivity;
 	MetaKeyBean _currentKeyBean;
-	
+
 	static final String[] EMPTY_ARGS = new String[0];
-	
+
 	ConnectionBean _connection;
-	
+
 	/**
 	 * @param context
 	 */
@@ -63,7 +63,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		_canvasActivity = (VncCanvasActivity)context;
 	}
 
-	
+
 	/* (non-Javadoc)
 	 * @see android.app.Dialog#onCreate(android.os.Bundle)
 	 */
@@ -77,7 +77,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		_checkAlt = (CheckBox)findViewById(R.id.checkboxAlt);
 		_textKeyDesc = (TextView)findViewById(R.id.textKeyDesc);
 		_spinnerKeySelect = (Spinner)findViewById(R.id.spinnerKeySelect);
-		
+
 		_database = _canvasActivity.database;
 		if (_lists == null) {
 			_lists = new ArrayList<MetaList>();
@@ -85,16 +85,16 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		}
 		_spinnerKeySelect.setAdapter(new ArrayAdapter<String>(getOwnerActivity(), android.R.layout.simple_spinner_item, MetaKeyBean.allKeysNames));
 		_spinnerKeySelect.setSelection(0);
-		
+
 		setListSpinner();
-		
+
 		_checkShift.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.SHIFT_MASK));
 		_checkAlt.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.ALT_MASK));
 		_checkCtrl.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.CTRL_MASK));
-		
-				
-		
-		
+
+
+
+
 		_spinnerKeySelect.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			/* (non-Javadoc)
@@ -117,7 +117,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			public void onNothingSelected(AdapterView<?> parent) {
 			}
 		});
-		
+
 		((Button)findViewById(R.id.buttonSend)).setOnClickListener(new View.OnClickListener() {
 
 			/* (non-Javadoc)
@@ -125,17 +125,21 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			 */
 			public void onClick(View v) {
 				sendCurrentKey();
-				dismiss();
+				try{
+					dismiss();
+				}
+				catch(Exception e) {
+				}
 			}
-			
+
 		});
-		
-		
-	
+
+
+
 	}
-	
+
 	private boolean _justStarted;
-	
+
 	/* (non-Javadoc)
 	 * @see android.app.Dialog#onStart()
 	 */
@@ -214,14 +218,18 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			if (MetaKeyBean.keysByKeyCode.get(keyCode) != null)
 			{
 				sendCurrentKey();
-				dismiss();
+				try{
+					dismiss();
+				}
+				catch(Exception e) {
+				}
 			}
 			return true;
 		}
 		_justStarted = false;
 		return super.onKeyUp(keyCode, event);
 	}
-	
+
 
 	void sendCurrentKey()
 	{
@@ -242,7 +250,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		_connection.Gen_update(db);
 		_canvasActivity.vncCanvas.sendMetaKey(_currentKeyBean);
 	}
-	
+
 	void setMetaKeyList()
 	{
 		long listId = _connection.getMetaListId();
@@ -279,7 +287,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 					if (keys.size()>0)
 					{
 						_currentKeyBean = new MetaKeyBean(_keysInList.get(selectedOffset));
-					}	
+					}
 					else
 					{
 						_currentKeyBean = new MetaKeyBean(listId, 0, MetaKeyBean.allKeys.get(0));
@@ -291,7 +299,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			_listId = listId;
 		}
 	}
-	
+
 	private void updateDialogForCurrentKey()
 	{
 		int flags = _currentKeyBean.getMetaFlags();
@@ -313,7 +321,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		}
 		_textKeyDesc.setText(_currentKeyBean.getKeyDesc());
 	}
-	
+
 	public void setConnection(ConnectionBean conn)
 	{
 		if ( _connection != conn) {
@@ -321,7 +329,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			setMetaKeyList();
 		}
 	}
-	
+
 	void setListSpinner()
 	{
 		ArrayList<String> listNames = new ArrayList<String>(_lists.size());
@@ -337,7 +345,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 	 *
 	 */
 	class MetaCheckListener implements OnCheckedChangeListener {
-				
+
 		private int _mask;
 
 		MetaCheckListener(int mask) {
