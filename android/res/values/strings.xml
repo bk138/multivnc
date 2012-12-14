@@ -73,6 +73,9 @@
 			             <li>Improved touchpad mode.</li>
 			     		 <li>Fixed \'Key Combo\' button being focused when soft keyboard was activated.</li>
 			     	     <li>Fixed virtual mouse button toggling.</li>
+			     	     <li>Fixed bookmarked connections.</li>
+			     	     <li>Fixed ActionBar taking focus on soft keyboard toggle.</li>
+                         <li>Fixed a lot of maybe-crash situations.</li>
 			     	     <li>Removed broken flattr button.</li>
      	      	  </ul>
      		 <li>1.4.10: Added button to be able to rate the app.</li>
