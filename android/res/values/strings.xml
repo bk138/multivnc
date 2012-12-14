@@ -66,8 +66,9 @@
 <string name="pleaserate">Show some love by clicking the heart ;-)</string>
 <string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
-<![CDATA[<b>Version 1.4.x:</b>
-     		<ul>
+<![CDATA[
+<b>Version 1.5.x:</b>
+	<ul>
      		 <li>1.5.0</li>
      	             <ul>
 			     		 <li>Full IPv6 support on Honeycomb and newer!</li>
@@ -80,6 +81,10 @@
                          <li>Fixed a lot of maybe-crash situations.</li>
 			     	     <li>Removed broken flattr button.</li>
      	      	  </ul>
+     </ul>
+
+<b>Version 1.4.x:</b>
+     		<ul>
      		 <li>1.4.10: Added button to be able to rate the app.</li>
      		 <li>1.4.9: Fix crash introduced by the 1.4.8 fix.</li>
      	     <li>1.4.8: Fix an ANR error when pausing the app.</li>
