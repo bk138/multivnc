@@ -2,21 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
     package="com.coboltforge.dontmind.multivnc" android:installLocation="auto" android:versionCode="29" android:versionName="1.4.10">
-  
+
     <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="13"></uses-sdk>
 	<supports-screens android:anyDensity="true" />
-    
+
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
-	<uses-permission android:name="com.flattr4android.permission.READ_THING"/>
-		
-    
+
+
     <application android:icon="@drawable/icon" android:label="MultiVNC" android:hardwareAccelerated="true">
 
-		<activity android:label="@string/app_name" 
+		<activity android:label="@string/app_name"
 		          android:name="MainMenuActivity"
 		    	  >
 			<intent-filter>
@@ -34,7 +33,7 @@
                 <data android:scheme="vnc" />
             </intent-filter>
 		</activity>
-       <activity android:name=".ConnectionListActivity" 
+       <activity android:name=".ConnectionListActivity"
                  android:label="@string/shortcut_label"
                  >
         	<intent-filter>
@@ -42,30 +41,30 @@
         		<category android:name="android.intent.category.DEFAULT" />
         	</intent-filter>
         </activity>
-        
+
         <activity android:name="EditBookmarkActivity"
             android:label="@string/editbookmark_title"
             >
        	</activity>
-        
+
         <activity android:name="AboutActivity"
              android:label="@string/about"
              >
 		</activity>
-		
+
          <activity android:name="HelpActivity"
              android:label="@string/help"
              >
 		</activity>
-		
+
         <service
             android:enabled="true"
             android:name=".MDNSService" >
         </service>
-        
+
         <activity android:name="com.google.ads.AdActivity"
               android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-        
+
 	</application>
-  
-</manifest> 
+
+</manifest>

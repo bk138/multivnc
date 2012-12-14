@@ -73,6 +73,7 @@
 			             <li>Improved touchpad mode.</li>
 			     		 <li>Fixed \'Key Combo\' button being focused when soft keyboard was activated.</li>
 			     	     <li>Fixed virtual mouse button toggling.</li>
+			     	     <li>Removed broken flattr button.</li>
      	      	  </ul>
      		 <li>1.4.10: Added button to be able to rate the app.</li>
      		 <li>1.4.9: Fix crash introduced by the 1.4.8 fix.</li>
@@ -92,7 +93,7 @@
 			     		 <li>Fixed a nasty app restart bug on Honeycomb and newer devices.</li>
 			     	     <li>Fixed some possible crashes.</li>
      	      	  </ul>
-     		</ul> 
+     		</ul>
     ]]>
 
 </string>
