@@ -615,6 +615,29 @@ public class VncCanvasActivity extends Activity {
 		if(! prefs.getBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, true))
 			vncCanvas.setPointerHighlight(false);
 
+
+		/*
+		 * ask whether to show help on first run
+		 */
+		if(Utils.appstarts == 1) {
+			new AlertDialog.Builder(this)
+			.setMessage(R.string.firstrun_help_dialog_text)
+			.setTitle(R.string.firstrun_help_dialog_title)
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					Intent helpIntent = new Intent (VncCanvasActivity.this, HelpActivity.class);
+					VncCanvasActivity.this.startActivity(helpIntent);
+				}
+			})
+			.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			})
+			.show();
+		}
+
+
 	}
 
 	/**
