@@ -58,30 +58,30 @@ import android.widget.ImageView.ScaleType;
 
 public class VncCanvas extends GLSurfaceView {
 	private final static String TAG = "VncCanvas";
-	
+
 	AbstractScaling scaling;
-	
-	
+
+
 	// Runtime control flags
 	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
-	
+
 	/**
 	 * Use camera button as meta key for right mouse button
 	 */
 	boolean cameraButtonDown = false;
-	
+
 	public VncCanvasActivity activity;
 
 	// VNC protocol connection
 	public VNCConn vncConn;
 
 	public Handler handler = new Handler();
-	
+
 	private AbstractGestureInputHandler inputHandler;
-	
+
 	private VNCGLRenderer glRenderer;
-	
+
 	//whether to do pointer highlighting
 	boolean doPointerHighLight = true;
 
@@ -94,7 +94,7 @@ public class VncCanvas extends GLSurfaceView {
 	 */
 	private int pointerMask = VNCConn.MOUSE_BUTTON_NONE;
 	private MouseScrollRunnable scrollRunnable;
-	
+
 
 	// framebuffer coordinates of mouse pointer, Available to activity
 	int mouseX, mouseY;
@@ -104,24 +104,24 @@ public class VncCanvas extends GLSurfaceView {
 	 * full-frame coordinates
 	 */
 	int absoluteXPosition = 0, absoluteYPosition = 0;
-	
+
 
 	private class VNCGLRenderer implements GLSurfaceView.Renderer {
 
 		int[] textureIDs = new int[1];   // Array for 1 texture-ID
 	    private int[] mTexCrop = new int[4];
-	    GLShape circle; 
+	    GLShape circle;
 
-	    
+
 		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-			
+
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
-			
-			circle = new GLShape(GLShape.CIRCLE); 
+
+			circle = new GLShape(GLShape.CIRCLE);
 
 			// Set color's clear-value to black
-			gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+			gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 			/*
 			 * By default, OpenGL enables features that improve quality but reduce
@@ -149,15 +149,15 @@ public class VncCanvas extends GLSurfaceView {
 			gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[0]);
 			// Set up texture filters --> nice smoothing
 			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
-			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR); 
+			gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
 		}
-		
+
 		// Call back after onSurfaceCreated() or whenever the window's size changes
 		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
-			
+
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
-		
+
 			// Set the viewport (display area) to cover the entire window
 			gl.glViewport(0, 0, width, height);
 
@@ -170,56 +170,56 @@ public class VncCanvas extends GLSurfaceView {
 			gl.glMatrixMode(GL10.GL_MODELVIEW);  // Select model-view matrix
 			gl.glLoadIdentity();                 // Reset
 		}
-		
+
 		@Override
 		public void onDrawFrame(GL10 gl) {
-			
+
 			// TODO optimize: texSUBimage ?
 			// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
-			
+
 			try{
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 				if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
 
 					vncConn.lockFramebuffer();
-					
+
 					// Build Texture from bitmap
 					GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, vncConn.getFramebuffer().mbitmap, 0);
 
 					vncConn.unlockFramebuffer();
 
 				}
-				
+
 				if(vncConn.getFramebuffer() instanceof FullBufferBitmapData) {
-					
+
 					vncConn.lockFramebuffer();
-					
+
 					// build texture from pixel array
-					gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA, 
+					gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA,
 							vncConn.getFramebuffer().bitmapwidth, vncConn.getFramebuffer().bitmapheight,
 							0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.getFramebuffer().bitmapPixels));
-				
+
 					vncConn.unlockFramebuffer();
 				}
 
-				
+
 				/*
-				 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr. 
-				 * That is, "left"/"bottom"/width/height, although you can 
-				 * also have negative width and height to flip the image. 
-				 * 
+				 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr.
+				 * That is, "left"/"bottom"/width/height, although you can
+				 * also have negative width and height to flip the image.
+				 *
 				 * This is the part of the framebuffer we show on-screen.
-				 * 
+				 *
 				 * If absolute[XY]Position are negative that means the framebuffer
 				 * is smaller than our viewer window.
-				 * 
+				 *
 				 */
 				mTexCrop[0] = absoluteXPosition >= 0 ? absoluteXPosition : 0; // don't let this be <0
 				mTexCrop[1] = absoluteYPosition >= 0 ? (int)(absoluteYPosition + VncCanvas.this.getHeight() / getScale()) : vncConn.getFramebufferHeight();
 				mTexCrop[2] = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? VncCanvas.this.getWidth() / getScale() : vncConn.getFramebufferWidth());
 				mTexCrop[3] = (int) -(VncCanvas.this.getHeight() < vncConn.getFramebufferHeight()*getScale() ? VncCanvas.this.getHeight() / getScale() : vncConn.getFramebufferHeight());
-				
+
 				if(Utils.DEBUG()) Log.d(TAG, "cropRect: u:" + mTexCrop[0] + " v:" + mTexCrop[1] + " w:" + mTexCrop[2] + " h:" + mTexCrop[3]);
 
 				((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D, GL11Ext.GL_TEXTURE_CROP_RECT_OES, mTexCrop, 0);
@@ -228,9 +228,9 @@ public class VncCanvas extends GLSurfaceView {
 				 * Very fast, but very basic transforming: only transpose, flip and scale.
 				 * Uses the GL_OES_draw_texture extension to draw sprites on the screen without
 				 * any sort of projection or vertex buffers involved.
-				 * 
+				 *
 				 * See http://www.khronos.org/registry/gles/extensions/OES/OES_draw_texture.txt
-				 * 
+				 *
 				 * All parameters in GL screen coordinates!
 				 */
 				int x = (int) (VncCanvas.this.getWidth() < vncConn.getFramebufferWidth()*getScale() ? 0 : VncCanvas.this.getWidth()/2 - (vncConn.getFramebufferWidth()*getScale())/2);
@@ -241,8 +241,8 @@ public class VncCanvas extends GLSurfaceView {
 				((GL11Ext) gl).glDrawTexfOES(x, y, 0, w, h);
 
 				if(Utils.DEBUG()) Log.d(TAG, "drawing to screen: x " + x + " y " + y + " w " + w + " h " + h);
-				
-				
+
+
 				/*
 				 * do pointer highlight overlay
 				 */
@@ -267,15 +267,15 @@ public class VncCanvas extends GLSurfaceView {
 
 					gl.glDisable(GL10.GL_BLEND);
 				}
-				
+
 			}
 			catch(NullPointerException e) {
 			}
 
 		}
-		
+
 	}
-	
+
 
 	/**
 	 * Constructor used by the inflation apparatus
@@ -285,14 +285,14 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		super(context, attrs);
 		scrollRunnable = new MouseScrollRunnable();
-	
+
 		setFocusable(true);
-		
+
 		glRenderer = new VNCGLRenderer();
 		setRenderer(glRenderer);
 		// only render upon request
 		setRenderMode(RENDERMODE_WHEN_DIRTY);
-		
+
 		int oldprio = android.os.Process.getThreadPriority(android.os.Process.myTid());
 		// GIVE US MAGIC POWER, O GREAT FAIR SCHEDULER!
 		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
@@ -323,7 +323,7 @@ public class VncCanvas extends GLSurfaceView {
 		mouseY=y;
 		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
 	}
-	
+
 
 	private void mouseFollowPan()
 	{
@@ -345,7 +345,7 @@ public class VncCanvas extends GLSurfaceView {
 		}
 	}
 
-	
+
 	/**
 	 * Apply scroll offset and scaling to convert touch-space coordinates to the corresponding
 	 * point on the full frame.
@@ -356,12 +356,12 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		//Log.v(TAG, String.format("tap at %f,%f", e.getX(), e.getY()));
 		float scale = getScale();
-		
+
 		// Adjust coordinates for Android notification bar.
 		e.offsetLocation(0, -1f * getTop());
 
 		e.setLocation(absoluteXPosition + e.getX() / scale, absoluteYPosition + e.getY() / scale);
-		
+
 		return e;
 	}
 
@@ -374,12 +374,12 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		vncConn = null;
 	}
-	
+
 	@Override
 	public void onPause() {
-		/* 
+		/*
 		 * this is to avoid a deadlock between GUI thread and GLThread:
-		 * 
+		 *
 		 * the GUI thread would call onPause on the GLThread which would never return since
 		 * the GL thread's GLThreadManager object is waiting on the GLThread.
 		 */
@@ -401,14 +401,14 @@ public class VncCanvas extends GLSurfaceView {
 	/*
 	 * f(x,s) is a function that returns the coordinate in screen/scroll space corresponding
 	 * to the coordinate x in full-frame space with scaling s.
-	 * 
+	 *
 	 * This function returns the difference between f(x,s1) and f(x,s2)
-	 * 
+	 *
 	 * f(x,s) = (x - i/2) * s + ((i - w)/2)) * s
 	 *        = s (x - i/2 + i/2 + w/2)
 	 *        = s (x + w/2)
-	 * 
-	 * 
+	 *
+	 *
 	 * f(x,s) = (x - ((i - w)/2)) * s
 	 * @param oldscaling
 	 * @param scaling
@@ -417,8 +417,8 @@ public class VncCanvas extends GLSurfaceView {
 	 * @param offset
 	 * @return
 	 */
-	
-	
+
+
 
 	/**
 	 * Change to Canvas's scroll position to match the absoluteXPosition
@@ -438,11 +438,11 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		if (! vncConn.getConnSettings().getFollowMouse())
 			return;
-		
+
 		if (scaling != null && ! scaling.isAbleToPan())
 			return;
-		
-		
+
+
 		int x = mouseX;
 		int y = mouseY;
 		boolean panned = false;
@@ -450,10 +450,10 @@ public class VncCanvas extends GLSurfaceView {
 		int h = getVisibleHeight();
 		int iw = vncConn.getFramebufferWidth();
 		int ih = vncConn.getFramebufferHeight();
-		
+
 		int newX = absoluteXPosition;
 		int newY = absoluteYPosition;
-		
+
 		if (x - newX >= w - 5)
 		{
 			newX = x - w + 5;
@@ -489,9 +489,9 @@ public class VncCanvas extends GLSurfaceView {
 		if (panned)
 		{
 			scrollToAbsolute();
-		}		
+		}
 	}
-	
+
 	/**
 	 * Pan by a number of pixels (relative pan)
 	 * @param dX
@@ -499,12 +499,12 @@ public class VncCanvas extends GLSurfaceView {
 	 * @return True if the pan changed the view (did not move view out of bounds); false otherwise
 	 */
 	boolean pan(int dX, int dY) {
-		
+
 		double scale = getScale();
-		
+
 		double sX = (double)dX / scale;
 		double sY = (double)dY / scale;
-		
+
 		if (absoluteXPosition + sX < 0)
 			// dX = diff to 0
 			sX = -absoluteXPosition;
@@ -516,18 +516,18 @@ public class VncCanvas extends GLSurfaceView {
 			sX = vncConn.getFramebufferWidth() - getVisibleWidth() - absoluteXPosition;
 		if (absoluteYPosition + getVisibleHeight() + sY >  vncConn.getFramebufferHeight())
 			sY = vncConn.getFramebufferHeight() - getVisibleHeight() - absoluteYPosition;
-		
+
 		absoluteXPosition += sX;
 		absoluteYPosition += sY;
-		
+
 		// whene the frame buffer is smaller than the view,
 		// it is is centered!
 		if(vncConn.getFramebufferWidth() < getVisibleWidth())
 			absoluteXPosition /= 2;
 		if(vncConn.getFramebufferHeight() < getVisibleHeight())
 			absoluteYPosition /= 2;
-		
-			
+
+
 		if (sX != 0.0 || sY != 0.0)
 		{
 			scrollToAbsolute();
@@ -551,23 +551,23 @@ public class VncCanvas extends GLSurfaceView {
 	}
 
 
-	
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		return inputHandler.onTouchEvent(event);
 	}
 
 	void reDraw() {
-		
+
 		if (repaintsEnabled && vncConn.getFramebuffer() != null) {
 
 			// request a redraw from GL thread
 			requestRender();
-			
+
 			// Show a Toast with the desktop info on first frame draw.
 			if (showDesktopInfo.get()) {
 				showDesktopInfo.set(false);
-				
+
 				handler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -575,10 +575,10 @@ public class VncCanvas extends GLSurfaceView {
 					}
 				});
 			}
-			
+
 		}
 	}
-	
+
 	public void disableRepaints() {
 		repaintsEnabled = false;
 	}
@@ -586,16 +586,16 @@ public class VncCanvas extends GLSurfaceView {
 	public void enableRepaints() {
 		repaintsEnabled = true;
 	}
-	
+
 	public void setPointerHighlight(boolean enable) {
 		doPointerHighLight = enable;
 	}
-	
+
 	public final boolean getPointerHighlight() {
 		return doPointerHighLight;
 	}
-	
-	
+
+
 
 	public void showConnectionInfo() {
 		String msg = vncConn.getDesktopName();
@@ -621,8 +621,8 @@ public class VncCanvas extends GLSurfaceView {
 		Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
 	}
 
-  
-	
+
+
 	/**
 	 * Convert a motion event to a format suitable for sending over the wire
 	 * @param evt motion event; x and y must already have been converted from screen coordinates
@@ -635,7 +635,7 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		return processPointerEvent(evt,downEvent,cameraButtonDown);
 	}
-	
+
 	/**
 	 * Convert a motion event to a format suitable for sending over the wire
 	 * @param evt motion event; x and y must already have been converted from screen coordinates
@@ -649,34 +649,34 @@ public class VncCanvas extends GLSurfaceView {
 			int action = evt.getAction();
 			 if (action == MotionEvent.ACTION_DOWN || (mouseIsDown && action == MotionEvent.ACTION_MOVE)) {
 			      if (useRightButton) {
-			    	  if(action == MotionEvent.ACTION_MOVE) 
+			    	  if(action == MotionEvent.ACTION_MOVE)
 			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, right mouse button down");
-			    	  else 
+			    	  else
 			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: right mouse button down");
-			    	  
+
 			    	  pointerMask = VNCConn.MOUSE_BUTTON_RIGHT;
 			      } else {
-			    	  if(action == MotionEvent.ACTION_MOVE) 
+			    	  if(action == MotionEvent.ACTION_MOVE)
 			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: moving, left mouse button down");
-			    	  else 
+			    	  else
 			    		  if(Utils.DEBUG()) Log.d(TAG, "Input: left mouse button down");
-			    	  
+
 			    	  pointerMask = VNCConn.MOUSE_BUTTON_LEFT;
 			      }
 			    } else if (action == MotionEvent.ACTION_UP) {
 			    	if(Utils.DEBUG()) Log.d(TAG, "Input: all mouse buttons up");
 			    	pointerMask = 0;
 			    }
-			
+
 			return vncConn.sendPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getMetaState(), pointerMask);
 		}
 		catch(NullPointerException e) {
 			return false;
 		}
 	}
-	
 
-	
+
+
 	/**
 	 * Moves the scroll while the volume key is held down
 	 * @author Michael A. MacDonald
@@ -684,9 +684,9 @@ public class VncCanvas extends GLSurfaceView {
 	class MouseScrollRunnable implements Runnable
 	{
 		int delay = 100;
-		
+
 		int scrollButton = 0;
-		
+
 		/* (non-Javadoc)
 		 * @see java.lang.Runnable#run()
 		 */
@@ -696,11 +696,14 @@ public class VncCanvas extends GLSurfaceView {
 			vncConn.sendPointerEvent(mouseX, mouseY, 0, 0);
 
 			handler.postDelayed(this, delay);
-		}		
+		}
 	}
 
 	public boolean processLocalKeyEvent(int keyCode, KeyEvent evt) {
-		
+
+		// prevent actionbar from stealing focus on key down
+		requestFocus();
+
 		if (keyCode == KeyEvent.KEYCODE_MENU)
 			// Ignore menu key
 			return true;
@@ -727,12 +730,12 @@ public class VncCanvas extends GLSurfaceView {
 				scrollRunnable.scrollButton = 0;
 				pointerMask &= ~mouseChange;
 			}
-			
+
 			vncConn.sendPointerEvent(mouseX, mouseY, evt.getMetaState(), pointerMask);
-			
+
 			return true;
 		}
-		
+
 		return vncConn.sendKeyEvent(keyCode, evt, false);
 	}
 
@@ -746,28 +749,28 @@ public class VncCanvas extends GLSurfaceView {
 		else {
 			// KeyEvent(downTime, eventTime, action, code, repeat, metaState)
 			KeyEvent downEvent = new KeyEvent(
-					System.currentTimeMillis(), 
+					System.currentTimeMillis(),
 					System.currentTimeMillis(),
 					KeyEvent.ACTION_DOWN,
 					meta.getKeySym(),
 					0,
 					meta.getMetaFlags());
 			vncConn.sendKeyEvent(downEvent.getKeyCode(), downEvent, true);
-			
+
 			// and up again
 			KeyEvent upEvent = KeyEvent.changeAction(downEvent, KeyEvent.ACTION_UP);
 			vncConn.sendKeyEvent(upEvent.getKeyCode(), upEvent, true);
 
 		}
 	}
-	
+
 	float getScale()
 	{
 		if (scaling == null)
 			return 1;
 		return scaling.getScale();
 	}
-	
+
 	public int getVisibleWidth() {
 		return (int)((double)getWidth() / getScale() + 0.5);
 	}
@@ -776,7 +779,7 @@ public class VncCanvas extends GLSurfaceView {
 		return (int)((double)getHeight() / getScale() + 0.5);
 	}
 
-	
+
 	public int getCenteredXOffset() {
 		int xoffset = (vncConn.getFramebufferWidth() - getWidth()) / 2;
 		return xoffset;
@@ -787,7 +790,7 @@ public class VncCanvas extends GLSurfaceView {
 		return yoffset;
 	}
 
-	
+
 	public void getCredFromUser(final ConnectionBean c) {
 		// this method is probably called from the vnc thread
 		post(new Runnable() {
@@ -807,13 +810,13 @@ public class VncCanvas extends GLSurfaceView {
 				            vncConn.notify();
 						}
 			        }
-			    }).show();		
+			    }).show();
 			}
 		});
 
 	}
-	
-	
+
+
 
 	public ScaleType getScaleType() {
 		// TODO Auto-generated method stub
@@ -827,6 +830,6 @@ public class VncCanvas extends GLSurfaceView {
 
 	public void setScaleType(ScaleType scaleType) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
