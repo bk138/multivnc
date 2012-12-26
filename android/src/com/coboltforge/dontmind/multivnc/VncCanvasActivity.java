@@ -631,7 +631,11 @@ public class VncCanvasActivity extends Activity {
 			})
 			.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
-					dialog.dismiss();
+					try {
+						dialog.dismiss();
+					}
+					catch(Exception e) {
+					}
 				}
 			})
 			.show();
