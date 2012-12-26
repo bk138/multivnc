@@ -69,6 +69,7 @@
 <![CDATA[
 <b>Version 1.5.x:</b>
 	<ul>
+	        <li>1.5.2: Hopefully fix crash on dialog dismissal.</li>
 		    <li>1.5.1: Prevent ActionBar from stealing keyboard focus.</li>
      		 <li>1.5.0</li>
      	             <ul>
