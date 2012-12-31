@@ -1,5 +1,7 @@
 
-* add help page
+* add swipe gestures to help page
+* add clipboard http://stackoverflow.com/questions/238284/how-to-copy-text-programatically-in-my-android-app
+* add physical mouse and keyboard patch
 * make rotatable
 
 * port to libvncclient
