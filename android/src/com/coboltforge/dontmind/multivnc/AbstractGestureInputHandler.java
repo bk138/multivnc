@@ -3,9 +3,11 @@
  */
 package com.coboltforge.dontmind.multivnc;
 
+import android.annotation.TargetApi;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.view.GestureDetector;
+import android.view.InputDevice;
 import android.view.MotionEvent;
 import com.antlersoft.android.bc.BCFactory;
 import com.antlersoft.android.bc.IBCScaleGestureDetector;
@@ -28,6 +30,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	
 	private static final String TAG = "AbstractGestureInputHandler";
 	
+	@TargetApi(8)
 	AbstractGestureInputHandler(VncCanvasActivity c)
 	{
 		activity = c;
@@ -100,5 +103,22 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		// show scale
 		if( activity.vncCanvas.getScale() != scale_orig )
 			activity.showScaleToast();
+	}
+	
+	
+	@TargetApi(9)
+	protected boolean isValidEvent(MotionEvent event) {
+		if(Build.VERSION.SDK_INT >= 9) {
+			if ((event.getSource() == InputDevice.SOURCE_TOUCHSCREEN) ||
+				(event.getSource() == InputDevice.SOURCE_TOUCHPAD)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
+		// Make sure older APIs get the event
+		return true;
 	}
 }

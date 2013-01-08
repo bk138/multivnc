@@ -26,6 +26,7 @@ import java.util.List;
 
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -169,6 +170,9 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public void onLongPress(MotionEvent e) {
 
+			if (isValidEvent(e) == false)
+				return;
+			
 			if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 			
 			showZoomer(true);
@@ -193,6 +197,12 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
+			
+			if (isValidEvent(e1) == false)
+				return false;
+			
+			if (isValidEvent(e2) == false)
+				return false;
 			
 			if (e2.getPointerCount() > 1)
 			{
@@ -309,6 +319,9 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onTouchEvent(MotionEvent e) {
+			if (isValidEvent(e) == false)
+				return false;
+			
 			if (dragMode) {
 				
 				if(Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode");
@@ -380,6 +393,9 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
 			
+			if (isValidEvent(e) == false)
+				return false;
+			
 			// disable if virtual mouse buttons are in use 
 			if(mousebuttons.getVisibility()== View.VISIBLE)
 				return false;
@@ -401,6 +417,9 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
+
+			if (isValidEvent(e) == false)
+				return false;
 			
 			// disable if virtual mouse buttons are in use 
 			if(mousebuttons.getVisibility()== View.VISIBLE)
@@ -425,8 +444,107 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onDown(MotionEvent e) {
+			if (isValidEvent(e) == false)
+				return false;
+			
 			return true;
 		}
+	}
+	
+    public class PhysicalInputHandler extends AbstractPhysicalInputHandler {
+
+
+		private static final String TAG = "PhysicalInputHandler";
+		
+		PhysicalInputHandler() {
+			Log.d(TAG, "PhysicalInputHandler " + this +  " created!");
+		}
+		
+		public void init() {
+			Log.d(TAG, "PhysicalInputHandler " + this +  " init!");
+		}
+
+		public void shutdown() {
+			Log.d(TAG, "PhysicalInputHandler " + this +  " shutdown!");
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.coboltforge.dontmind.multivnc.AbstractGestureInputHandler#onTouchEvent(android.view.MotionEvent)
+		 */
+		@Override
+		public boolean onTouchEvent(MotionEvent e) {
+			if (isValidEvent(e) == false) {
+				return false;
+			}
+			
+			e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
+			
+			vncCanvas.processPointerEvent(e, true, false);
+			vncCanvas.panToMouse();
+
+			return true;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.coboltforge.dontmind.multivnc.AbstractGestureInputHandler#onGenericMotionEvent(android.view.MotionEvent)
+		 */
+		@TargetApi(14)
+		@Override
+		public boolean onGenericMotionEvent(MotionEvent e) {
+			int action = MotionEvent.ACTION_MASK;
+			boolean button = false;
+			boolean secondary = false;
+			
+			if (isValidEvent(e) == false) {
+				return false;
+			}
+			
+			e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
+
+			if(Build.VERSION.SDK_INT >= 14) {
+				//Translate the event into onTouchEvent type language
+				if (e.getButtonState() != 0) {
+					if ((e.getButtonState() & MotionEvent.BUTTON_PRIMARY) != 0) {
+						button = true;
+						secondary = false;
+						action = MotionEvent.ACTION_DOWN;
+					} else if ((e.getButtonState() & MotionEvent.BUTTON_SECONDARY) != 0) {
+						button = true;
+						secondary = true;
+						action = MotionEvent.ACTION_DOWN;
+					}
+					if (e.getAction() == MotionEvent.ACTION_MOVE) {
+						action = MotionEvent.ACTION_MOVE;
+					}
+				} else if ((e.getActionMasked() == MotionEvent.ACTION_HOVER_MOVE) || 
+						(e.getActionMasked() == MotionEvent.ACTION_UP)){
+					action = MotionEvent.ACTION_UP;
+					button = false;
+					secondary = false;
+				}
+				
+				if (action != MotionEvent.ACTION_MASK) {
+					e.setAction(action);
+					if (button == false) {
+						vncCanvas.processPointerEvent(e, false);
+					}
+					else {
+						vncCanvas.processPointerEvent(e, true, secondary);
+					}
+					vncCanvas.panToMouse();
+				}
+			}
+			
+			if(Utils.DEBUG())
+				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+							
+			return true;
+		}
+
 	}
 	
 	private final static String TAG = "VncCanvasActivity";
@@ -438,6 +556,8 @@ public class VncCanvasActivity extends Activity {
 
 	ZoomControls zoomer;
 	TouchpadInputHandler touchPad;
+	PhysicalInputHandler physicalInput;
+	
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
 	Toast notificationToast;
@@ -466,9 +586,12 @@ public class VncCanvasActivity extends Activity {
 
 		database = new VncDatabase(this);
 		
-		touchPad =  new TouchpadInputHandler();
+		touchPad = new TouchpadInputHandler();
 		touchPad.init();
-
+		
+		physicalInput = new PhysicalInputHandler();
+		physicalInput.init();
+		
 		Intent i = getIntent();
 		connection = new ConnectionBean();
 		Uri data = i.getData();
@@ -535,7 +658,7 @@ public class VncCanvasActivity extends Activity {
 			connection.parseHostPort(connection.getAddress());
 		}
 		
-		vncCanvas.initializeVncCanvas(this, touchPad, connection, new Runnable() {
+		vncCanvas.initializeVncCanvas(this, touchPad, physicalInput, connection, new Runnable() {
 			public void run() {
 				setModes();
 			}
@@ -785,6 +908,20 @@ public class VncCanvasActivity extends Activity {
 			Intent helpIntent = new Intent (this, HelpActivity.class);
 			this.startActivity(helpIntent);
 			return true;
+		case R.id.itemDisconnect:
+			new AlertDialog.Builder(this)
+			.setMessage(getString(R.string.disconnect_question))
+			.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					vncCanvas.vncConn.shutdown();
+					finish();
+				}
+			}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					// Do nothing.
+				}
+			}).show();
+			return true;
 		default:
 			break;
 		}
@@ -827,6 +964,7 @@ public class VncCanvasActivity extends Activity {
 		if (isFinishing()) {
 			try {
 				touchPad.shutdown();
+				physicalInput.shutdown();
 				vncCanvas.vncConn.shutdown();
 				vncCanvas.onDestroy();
 				database.close(); 
@@ -845,21 +983,10 @@ public class VncCanvasActivity extends Activity {
 			return super.onKeyDown(keyCode, evt);
 		
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			
-			new AlertDialog.Builder(this)
-			.setMessage(getString(R.string.disconnect_question))
-			.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					vncCanvas.vncConn.shutdown();
-					finish();
-				}
-			}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					// Do nothing.
-				}
-			}).show();
-			
-			return true;
+			//if ((evt.getFlags() && KeyEvent.FLAG_VIRTUAL_HARD_KEY) != 0) {
+			//	Key was from the on screen back button
+			//}
+			keyCode = KeyEvent.KEYCODE_ESCAPE;
 		}
 
 		// use search key to toggle soft keyboard
