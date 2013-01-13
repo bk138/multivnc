@@ -46,6 +46,8 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		scaleGestures.onTouchEvent(evt);
 		return gestures.onTouchEvent(evt);
 	}
+	
+	abstract public boolean onGenericMotionEvent(MotionEvent event);
 
 	/* (non-Javadoc)
 	 * @see com.antlersoft.android.bc.OnScaleGestureListener#onScale(com.antlersoft.android.bc.IBCScaleGestureDetector)
@@ -107,7 +109,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	
 	
 	@TargetApi(9)
-	protected boolean isValidEvent(MotionEvent event) {
+	protected boolean isTouchEvent(MotionEvent event) {
 		if(Build.VERSION.SDK_INT >= 9) {
 			if ((event.getSource() == InputDevice.SOURCE_TOUCHSCREEN) ||
 				(event.getSource() == InputDevice.SOURCE_TOUCHPAD)) {

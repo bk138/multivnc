@@ -61,7 +61,7 @@ import android.content.Context;
 public class VncCanvasActivity extends Activity {
 
 
-	public class TouchpadInputHandler extends AbstractGestureInputHandler {
+	public class MightyInputHandler extends AbstractGestureInputHandler {
 		
 		private static final String TAG = "TouchPadInputHandler";
 		
@@ -83,15 +83,15 @@ public class VncCanvasActivity extends Activity {
 		private final int TWO_FINGER_FLING_UNITS = 1000;
 		private final float TWO_FINGER_FLING_THRESHOLD = 1000;
 		
-		TouchpadInputHandler() {
+		MightyInputHandler() {
 			super(VncCanvasActivity.this);
-			Log.d(TAG, "TouchpadInputHandler " + this +  " created!");
+			Log.d(TAG, "MightyInputHandler " + this +  " created!");
 		}
 		
 		
 		public void init() {
 			twoFingerFlingVelocityTracker = VelocityTracker.obtain();
-			Log.d(TAG, "TouchpadInputHandler " + this +  " init!");
+			Log.d(TAG, "MightyInputHandler " + this +  " init!");
 		}
 
 		public void shutdown() {
@@ -101,7 +101,7 @@ public class VncCanvasActivity extends Activity {
 			}
 			catch (NullPointerException e) {
 			}
-			Log.d(TAG, "TouchpadInputHandler " + this +  " shutdown!");
+			Log.d(TAG, "MightyInputHandler " + this +  " shutdown!");
 		}
 
 
@@ -170,7 +170,7 @@ public class VncCanvasActivity extends Activity {
 		@Override
 		public void onLongPress(MotionEvent e) {
 
-			if (isValidEvent(e) == false)
+			if (isTouchEvent(e) == false)
 				return;
 			
 			if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
@@ -198,10 +198,10 @@ public class VncCanvasActivity extends Activity {
 		public boolean onScroll(MotionEvent e1, MotionEvent e2,
 				float distanceX, float distanceY) {
 			
-			if (isValidEvent(e1) == false)
+			if (isTouchEvent(e1) == false)
 				return false;
 			
-			if (isValidEvent(e2) == false)
+			if (isTouchEvent(e2) == false)
 				return false;
 			
 			if (e2.getPointerCount() > 1)
@@ -319,8 +319,15 @@ public class VncCanvasActivity extends Activity {
 		 */
 		@Override
 		public boolean onTouchEvent(MotionEvent e) {
-			if (isValidEvent(e) == false)
-				return false;
+			if (isTouchEvent(e) == false) { // physical input device
+				
+				e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
+
+				vncCanvas.processPointerEvent(e, true, false);
+				vncCanvas.panToMouse();
+
+				return true;
+			}
 			
 			if (dragMode) {
 				
@@ -375,123 +382,10 @@ public class VncCanvasActivity extends Activity {
 							
 			return super.onTouchEvent(e);
 		}
-
-		/**
-		 * Modify the event so that it does not move the mouse on the
-		 * remote server.
-		 * @param e
-		 */
-		private void remoteMouseStayPut(MotionEvent e) {
-			e.setLocation(vncCanvas.mouseX, vncCanvas.mouseY);
-			
-		}
-		/*
-		 * (non-Javadoc)
-		 * confirmed single tap: do a left mouse down and up click on remote without moving the mouse.
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onSingleTapConfirmed(MotionEvent e) {
-			
-			if (isValidEvent(e) == false)
-				return false;
-			
-			// disable if virtual mouse buttons are in use 
-			if(mousebuttons.getVisibility()== View.VISIBLE)
-				return false;
-			
-			if(Utils.DEBUG()) Log.d(TAG, "Input: single tap");
-			
-			boolean multiTouch = e.getPointerCount() > 1;
-			remoteMouseStayPut(e);
-
-			vncCanvas.processPointerEvent(e, true, multiTouch||vncCanvas.cameraButtonDown);
-			e.setAction(MotionEvent.ACTION_UP);
-			return vncCanvas.processPointerEvent(e, false, multiTouch||vncCanvas.cameraButtonDown);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * double tap: do right mouse down and up click on remote without moving the mouse.
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onDoubleTap(MotionEvent e) {
-
-			if (isValidEvent(e) == false)
-				return false;
-			
-			// disable if virtual mouse buttons are in use 
-			if(mousebuttons.getVisibility()== View.VISIBLE)
-				return false;
-			
-			if(Utils.DEBUG()) Log.d(TAG, "Input: double tap");
-
-			dragModeButtonDown = true;
-			dragModeButton2insteadof1 = true;
-			
-			remoteMouseStayPut(e);
-			vncCanvas.processPointerEvent(e, true, true);
-			e.setAction(MotionEvent.ACTION_UP);
-			return vncCanvas.processPointerEvent(e, false, true);
-		}
 		
 		
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onDown(MotionEvent e) {
-			if (isValidEvent(e) == false)
-				return false;
-			
-			return true;
-		}
-	}
 	
-    public class PhysicalInputHandler extends AbstractPhysicalInputHandler {
-
-
-		private static final String TAG = "PhysicalInputHandler";
 		
-		PhysicalInputHandler() {
-			Log.d(TAG, "PhysicalInputHandler " + this +  " created!");
-		}
-		
-		public void init() {
-			Log.d(TAG, "PhysicalInputHandler " + this +  " init!");
-		}
-
-		public void shutdown() {
-			Log.d(TAG, "PhysicalInputHandler " + this +  " shutdown!");
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.coboltforge.dontmind.multivnc.AbstractGestureInputHandler#onTouchEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTouchEvent(MotionEvent e) {
-			if (isValidEvent(e) == false) {
-				return false;
-			}
-			
-			e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
-			
-			vncCanvas.processPointerEvent(e, true, false);
-			vncCanvas.panToMouse();
-
-			return true;
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see com.coboltforge.dontmind.multivnc.AbstractGestureInputHandler#onGenericMotionEvent(android.view.MotionEvent)
-		 */
 		@TargetApi(14)
 		@Override
 		public boolean onGenericMotionEvent(MotionEvent e) {
@@ -499,7 +393,7 @@ public class VncCanvasActivity extends Activity {
 			boolean button = false;
 			boolean secondary = false;
 			
-			if (isValidEvent(e) == false) {
+			if (isTouchEvent(e) == false) {
 				return false;
 			}
 			
@@ -545,7 +439,83 @@ public class VncCanvasActivity extends Activity {
 			return true;
 		}
 
+		
+
+		/**
+		 * Modify the event so that it does not move the mouse on the
+		 * remote server.
+		 * @param e
+		 */
+		private void remoteMouseStayPut(MotionEvent e) {
+			e.setLocation(vncCanvas.mouseX, vncCanvas.mouseY);
+			
+		}
+		/*
+		 * (non-Javadoc)
+		 * confirmed single tap: do a left mouse down and up click on remote without moving the mouse.
+		 * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
+		 */
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			
+			if (isTouchEvent(e) == false)
+				return false;
+			
+			// disable if virtual mouse buttons are in use 
+			if(mousebuttons.getVisibility()== View.VISIBLE)
+				return false;
+			
+			if(Utils.DEBUG()) Log.d(TAG, "Input: single tap");
+			
+			boolean multiTouch = e.getPointerCount() > 1;
+			remoteMouseStayPut(e);
+
+			vncCanvas.processPointerEvent(e, true, multiTouch||vncCanvas.cameraButtonDown);
+			e.setAction(MotionEvent.ACTION_UP);
+			return vncCanvas.processPointerEvent(e, false, multiTouch||vncCanvas.cameraButtonDown);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * double tap: do right mouse down and up click on remote without moving the mouse.
+		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
+		 */
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+
+			if (isTouchEvent(e) == false)
+				return false;
+			
+			// disable if virtual mouse buttons are in use 
+			if(mousebuttons.getVisibility()== View.VISIBLE)
+				return false;
+			
+			if(Utils.DEBUG()) Log.d(TAG, "Input: double tap");
+
+			dragModeButtonDown = true;
+			dragModeButton2insteadof1 = true;
+			
+			remoteMouseStayPut(e);
+			vncCanvas.processPointerEvent(e, true, true);
+			e.setAction(MotionEvent.ACTION_UP);
+			return vncCanvas.processPointerEvent(e, false, true);
+		}
+		
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
+		 */
+		@Override
+		public boolean onDown(MotionEvent e) {
+			if (isTouchEvent(e) == false)
+				return false;
+			
+			return true;
+		}
 	}
+	
 	
 	private final static String TAG = "VncCanvasActivity";
 
@@ -555,8 +525,7 @@ public class VncCanvasActivity extends Activity {
 	private ConnectionBean connection;
 
 	ZoomControls zoomer;
-	TouchpadInputHandler touchPad;
-	PhysicalInputHandler physicalInput;
+	MightyInputHandler inputHandler;
 	
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
@@ -586,11 +555,8 @@ public class VncCanvasActivity extends Activity {
 
 		database = new VncDatabase(this);
 		
-		touchPad = new TouchpadInputHandler();
-		touchPad.init();
-		
-		physicalInput = new PhysicalInputHandler();
-		physicalInput.init();
+		inputHandler = new MightyInputHandler();
+		inputHandler.init();
 		
 		Intent i = getIntent();
 		connection = new ConnectionBean();
@@ -658,7 +624,7 @@ public class VncCanvasActivity extends Activity {
 			connection.parseHostPort(connection.getAddress());
 		}
 		
-		vncCanvas.initializeVncCanvas(this, touchPad, physicalInput, connection, new Runnable() {
+		vncCanvas.initializeVncCanvas(this, inputHandler, connection, new Runnable() {
 			public void run() {
 				setModes();
 			}
@@ -726,7 +692,7 @@ public class VncCanvasActivity extends Activity {
 			mousebuttons.setVisibility(View.GONE);
 		
 		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
-		touchpoints.setInputHandler(touchPad);
+		touchpoints.setInputHandler(inputHandler);
 		
 		// create an empty toast. we do this do be able to cancel
 		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
@@ -963,8 +929,7 @@ public class VncCanvasActivity extends Activity {
 		super.onDestroy();
 		if (isFinishing()) {
 			try {
-				touchPad.shutdown();
-				physicalInput.shutdown();
+				inputHandler.shutdown();
 				vncCanvas.vncConn.shutdown();
 				vncCanvas.onDestroy();
 				database.close(); 
