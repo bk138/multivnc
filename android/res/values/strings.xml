@@ -67,6 +67,14 @@
 <string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
 <![CDATA[
+<b>Version 1.6.x:</b>
+	<ul>
+     		 <li>1.6.0</li>
+     	             <ul>
+			     		 <li>A bit more screen real estate on ICS and newer devices by hiding the status bar.</li>
+					     
+     	      	  </ul>
+     </ul>
 <b>Version 1.5.x:</b>
 	<ul>
 	        <li>1.5.2: Hopefully fix crash on dialog dismissal.</li>

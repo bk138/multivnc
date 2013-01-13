@@ -450,12 +450,12 @@ public class VncCanvasActivity extends Activity {
 
 		super.onCreate(icicle);
 
-		// only do fullscreen on 2.x devices
-		if(Build.VERSION.SDK_INT < 11) {
+		// only do complete fullscreen on 2.x devices
+		if(Build.VERSION.SDK_INT < 11) 
 			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-					WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		}
+		// but hide status bar everywhere
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		setContentView(R.layout.canvas);
 
