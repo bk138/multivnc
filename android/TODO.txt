@@ -1,4 +1,5 @@
 
+* fix virtual mouse button stuff
 * add swipe gestures to help page
 * add clipboard http://stackoverflow.com/questions/238284/how-to-copy-text-programatically-in-my-android-app
 * add physical mouse and keyboard patch
