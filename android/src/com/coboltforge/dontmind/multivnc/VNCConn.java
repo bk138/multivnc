@@ -821,27 +821,29 @@ public class VNCConn {
 					case KeyEvent.KEYCODE_ENTER:        keyCode = 0xff0d; break;
 					case KeyEvent.KEYCODE_DPAD_CENTER:  keyCode = 0xff0d; break;
 					case KeyEvent.KEYCODE_TAB:          keyCode = 0xff09; break;
-					case 113: 						    keyCode = 0xffe3; break; // CTRL_L
-					case 111: 						    keyCode = 0xff1b; break; // ESC
+					case KeyEvent.KEYCODE_ESCAPE:	    keyCode = 0xff1b; break;
 					case KeyEvent.KEYCODE_ALT_LEFT:     keyCode = 0xffe9; break;
-					case 131: 						    keyCode = 0xffbe; break; // F1
-					case 132: 						    keyCode = 0xffbf; break; // F2
-					case 133: 						    keyCode = 0xffc0; break; // F3
-					case 134: 						    keyCode = 0xffc1; break; // F4
-					case 135: 						    keyCode = 0xffc2; break; // F5
-					case 136: 						    keyCode = 0xffc3; break; // F6
-					case 137: 						    keyCode = 0xffc4; break; // F7
-					case 138: 						    keyCode = 0xffc5; break; // F8
-					case 139: 						    keyCode = 0xffc6; break; // F9
-					case 140: 						    keyCode = 0xffc7; break; // F10
-					case 141: 						    keyCode = 0xffc8; break; // F11
-					case 142: 						    keyCode = 0xffc9; break; // F12
-					case 124:						    keyCode = 0xff63; break; // Insert
-					case 112: 					        keyCode = 0xffff; break; // Delete
-					case 122: 					        keyCode = 0xff50; break; // Home
-					case 123: 					        keyCode = 0xff57; break; // End
-					case  92: 					        keyCode = 0xff55; break; // PgUp
-					case  93: 					        keyCode = 0xff56; break; // PgDn
+					case KeyEvent.KEYCODE_ALT_RIGHT:    keyCode = 0xffea; break;
+					case KeyEvent.KEYCODE_F1: 			keyCode = 0xffbe; break;
+					case KeyEvent.KEYCODE_F2:		    keyCode = 0xffbf; break;
+					case KeyEvent.KEYCODE_F3: 			keyCode = 0xffc0; break;
+					case KeyEvent.KEYCODE_F4: 			keyCode = 0xffc1; break;
+					case KeyEvent.KEYCODE_F5: 			keyCode = 0xffc2; break;
+					case KeyEvent.KEYCODE_F6: 			keyCode = 0xffc3; break;
+					case KeyEvent.KEYCODE_F7: 			keyCode = 0xffc4; break;
+					case KeyEvent.KEYCODE_F8: 			keyCode = 0xffc5; break;
+					case KeyEvent.KEYCODE_F9: 			keyCode = 0xffc6; break;
+					case KeyEvent.KEYCODE_F10: 			keyCode = 0xffc7; break;
+					case KeyEvent.KEYCODE_F11: 			keyCode = 0xffc8; break;
+					case KeyEvent.KEYCODE_F12: 			keyCode = 0xffc9; break;
+					case KeyEvent.KEYCODE_INSERT:	    keyCode = 0xff63; break;
+					case KeyEvent.KEYCODE_FORWARD_DEL:	keyCode = 0xffff; break;
+					case KeyEvent.KEYCODE_MOVE_HOME:    keyCode = 0xff50; break;
+					case KeyEvent.KEYCODE_MOVE_END:     keyCode = 0xff57; break;
+					case KeyEvent.KEYCODE_PAGE_UP:      keyCode = 0xff55; break;
+					case KeyEvent.KEYCODE_PAGE_DOWN:    keyCode = 0xff56; break;
+					case KeyEvent.KEYCODE_CTRL_LEFT:    keyCode = 0xffe3; break;
+					case KeyEvent.KEYCODE_CTRL_RIGHT:   keyCode = 0xffe4; break;
 					default:
 						// do keycode -> UTF-8 keysym conversion
 						KeyEvent tmp = new KeyEvent(
@@ -851,7 +853,16 @@ public class VNCConn {
 								keyCode,
 								0,
 								metaState);
+						
 						keyCode = tmp.getUnicodeChar();
+						
+						// Ctrl-C for example needs this...
+						if (keyCode == 0) {
+							metaState &= ~KeyEvent.META_CTRL_MASK;
+							metaState &= ~KeyEvent.META_ALT_MASK;
+							keyCode = tmp.getUnicodeChar(metaState);
+						}
+							
 						metaState = 0;
 						break;
 

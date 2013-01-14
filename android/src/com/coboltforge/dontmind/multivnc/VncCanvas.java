@@ -556,6 +556,12 @@ public class VncCanvas extends GLSurfaceView {
 	public boolean onTouchEvent(MotionEvent event) {
 		return inputHandler.onTouchEvent(event);
 	}
+	
+	
+	@Override
+	public boolean onGenericMotionEvent(MotionEvent event) {
+		return inputHandler.onGenericMotionEvent(event);
+	}
 
 	void reDraw() {
 
