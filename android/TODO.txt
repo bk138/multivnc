@@ -1,7 +1,6 @@
 
 * fix virtual mouse button stuff
 * add clipboard http://stackoverflow.com/questions/238284/how-to-copy-text-programatically-in-my-android-app
-* add physical mouse and keyboard patch
 * make rotatable
 
 * port to libvncclient
