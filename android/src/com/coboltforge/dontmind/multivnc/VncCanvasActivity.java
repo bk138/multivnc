@@ -975,10 +975,23 @@ public class VncCanvasActivity extends Activity {
 
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 
-			//TODO if ((evt.getFlags() && KeyEvent.FLAG_VIRTUAL_HARD_KEY) != 0) {
-			//	Key was from the on screen back button
-			//}
-			keyCode = KeyEvent.KEYCODE_ESCAPE;
+			if(evt.getFlags() == KeyEvent.FLAG_FROM_SYSTEM) // from hardware keyboard
+				keyCode = KeyEvent.KEYCODE_ESCAPE;
+			else {
+				new AlertDialog.Builder(this)
+				.setMessage(getString(R.string.disconnect_question))
+				.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						vncCanvas.vncConn.shutdown();
+						finish();
+					}
+				}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// Do nothing.
+					}
+				}).show();
+				return true;
+			}
 		}
 
 		// use search key to toggle soft keyboard
