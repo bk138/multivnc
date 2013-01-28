@@ -1,5 +1,4 @@
 
-* fix virtual mouse button stuff
 * add clipboard http://stackoverflow.com/questions/238284/how-to-copy-text-programatically-in-my-android-app
 * make rotatable
 

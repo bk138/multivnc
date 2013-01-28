@@ -91,8 +91,11 @@ public class VncCanvas extends GLSurfaceView {
 	 * 0 = none
 	 * 1 = default button
 	 * 2 = second button
+	 * 4 = third button
 	 */
 	private int pointerMask = VNCConn.MOUSE_BUTTON_NONE;
+	private int overridePointerMask = VNCConn.MOUSE_BUTTON_NONE; // this takes precedence over pointerMask if set to >= 0
+
 	private MouseScrollRunnable scrollRunnable;
 
 
@@ -104,6 +107,8 @@ public class VncCanvas extends GLSurfaceView {
 	 * full-frame coordinates
 	 */
 	int absoluteXPosition = 0, absoluteYPosition = 0;
+
+
 
 
 	private class VNCGLRenderer implements GLSurfaceView.Renderer {
@@ -556,8 +561,8 @@ public class VncCanvas extends GLSurfaceView {
 	public boolean onTouchEvent(MotionEvent event) {
 		return inputHandler.onTouchEvent(event);
 	}
-	
-	
+
+
 	@Override
 	public boolean onGenericMotionEvent(MotionEvent event) {
 		return inputHandler.onGenericMotionEvent(event);
@@ -628,6 +633,13 @@ public class VncCanvas extends GLSurfaceView {
 	}
 
 
+	/** Set which mouse buttons are down.
+	 * @param pointerMask
+	 */
+	public void setOverridePointerMask(int pointerMask) {
+		overridePointerMask = pointerMask;
+	}
+
 
 	/**
 	 * Convert a motion event to a format suitable for sending over the wire
@@ -674,7 +686,11 @@ public class VncCanvas extends GLSurfaceView {
 			    	pointerMask = 0;
 			    }
 
-			return vncConn.sendPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getMetaState(), pointerMask);
+			 if(overridePointerMask > 0)
+				 return vncConn.sendPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getMetaState(), overridePointerMask);
+			 else
+				 return vncConn.sendPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getMetaState(), pointerMask);
+
 		}
 		catch(NullPointerException e) {
 			return false;

@@ -2,7 +2,7 @@ package com.coboltforge.dontmind.multivnc;
 
 /*
  * Views for virtual mouse buttons.
- * 
+ *
  * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
  */
 
@@ -57,17 +57,17 @@ public class MouseButtonView extends View {
 	public void init(int buttonId, VncCanvas canvas)
 	{
 		this.buttonId = buttonId;
-		this.canvas = canvas; 
+		this.canvas = canvas;
 	}
 
 
 	@Override
-	public boolean onTouchEvent(MotionEvent e) 
+	public boolean onTouchEvent(MotionEvent e)
 	{
 
 		final int action = e.getAction();
 
-		/* 
+		/*
 		 * in case one pointer holds the button down and another one tries
 		 * to move the mouse
 		 */
@@ -77,7 +77,7 @@ public class MouseButtonView extends View {
 						|| action_masked == MotionEvent.ACTION_POINTER_UP
 						|| action_masked == MotionEvent.ACTION_POINTER_DOWN))
 		{
-			if(Utils.DEBUG()) 
+			if(Utils.DEBUG())
 				Utils.inspectEvent(e);
 
 			// calc button view origin
@@ -93,8 +93,8 @@ public class MouseButtonView extends View {
 				if((pointerTwoIndex = e.findPointerIndex(pointerTwoId)) >= 0)
 				{
 					// get second pointer's _absolute_ coords
-					final float pointerTwoX = origin_x + e.getX(pointerTwoIndex); 
-					final float pointerTwoY = origin_y + e.getY(pointerTwoIndex); 
+					final float pointerTwoX = origin_x + e.getX(pointerTwoIndex);
+					final float pointerTwoY = origin_y + e.getY(pointerTwoIndex);
 
 					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId + " idx:" + pointerTwoIndex + " pos: " + pointerTwoX + "," + pointerTwoY + " MOVE");
 
@@ -105,7 +105,7 @@ public class MouseButtonView extends View {
 						dragY = pointerTwoY;
 						drag_started = false;
 					}
-					
+
 					// compute the relative movement offset on the remote screen.
 					float deltaX = (pointerTwoX - dragX) * canvas.getScale();
 					float deltaY = (pointerTwoY - dragY) * canvas.getScale();
@@ -121,7 +121,7 @@ public class MouseButtonView extends View {
 					canvas.vncConn.sendPointerEvent((int)newRemoteX, (int)newRemoteY, e.getMetaState(), 1 << (buttonId-1));
 
 					// update view
-					
+
 					canvas.mouseX = (int) newRemoteX;
 					canvas.mouseY = (int) newRemoteY;
 					canvas.panToMouse();
@@ -139,19 +139,19 @@ public class MouseButtonView extends View {
 					 * ID and set the drag start flag.
 					 */
 					drag_started = true;
-					
+
 					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer ID:" + pointerTwoId + " idx:" + pointerTwoIndex + " DOWN");
 				}
 				break;
 			case MotionEvent.ACTION_POINTER_UP:
 				if(pointerTwoId // this was actually pointerTwo going up
-						== e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT)) 
+						== e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT))
 				{
 					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " second pointer UP");
 					pointerTwoId = -1;	// set invalid again
 				}
 				if(pointerOneId // this was  pointerOne going up
-						== e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT)) 
+						== e.getPointerId((action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT))
 				{
 					if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " first pointer UP");
 					pointerOneId = -1;	// set invalid again
@@ -167,7 +167,7 @@ public class MouseButtonView extends View {
 		// only one pointer
 		if(action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP)
 		{
-			if(Utils.DEBUG()) 
+			if(Utils.DEBUG())
 				Log.d(TAG, "Input: button " + buttonId + " single pointer:" + action);
 
 			if(action == MotionEvent.ACTION_DOWN)
@@ -190,7 +190,7 @@ public class MouseButtonView extends View {
 		// check for gestures here
 		gestureDetector.onTouchEvent(e);
 
-		// we have to return true to get the ACTION_UP event 
+		// we have to return true to get the ACTION_UP event
 		return true;
 	}
 
@@ -199,7 +199,7 @@ public class MouseButtonView extends View {
 	{
 		if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " CLICK");
 
-		// bzzt!	
+		// bzzt!
 		performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
 				HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
 
@@ -216,7 +216,9 @@ public class MouseButtonView extends View {
 		{
 			setBackgroundDrawable(dfltBackground);
 		}
-			
+
+		canvas.setOverridePointerMask(pointerMask);
+
 		canvas.vncConn.sendPointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
 	}
 
@@ -246,5 +248,5 @@ public class MouseButtonView extends View {
 		}
 		return sign * delta;
 	}
-	
+
 }

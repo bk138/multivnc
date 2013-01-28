@@ -72,6 +72,7 @@
      		 <li>1.6.0</li>
      	             <ul>
      	                <li>Added support for hardware keyboards and mice. Kudos to Kevin Pansky.</li>
+     	                <li>Virtual mouse button click-and-drag now also works on Honeycomb and newer devices.</li>
 			     		<li>A bit more screen real estate on ICS and newer devices by hiding the status bar.</li>
 
      	      	  </ul>
