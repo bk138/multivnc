@@ -26,7 +26,6 @@
 <string name="force_full_check">Forza immagine a schermo intero</string>
 <string name="info">Info</string>
 <string name="input_mode">Modalità inserimento</string>
-<string name="input_mode_fit_to_screen">Nessun cursore; Mouse Trackball</string>
 <string name="input_mode_mouse">Modalità controllo puntatore Mouse</string>
 <string name="input_mode_panning">Modalità panoramica Desktop</string>
 <string name="input_mode_touch_pan_zoom_mouse">Panoramica tocca cursore ed Ingrandisci</string>
