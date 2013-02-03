@@ -71,6 +71,8 @@ public class VNCConn {
 	private int[] colorPalette;
 	private COLORMODEL colorModel;
 
+	private String serverCutText;
+
 	// VNC Encoding parameters
 	private boolean useCopyRect = false; // TODO CopyRect is not working
 	private int preferredEncoding = -1;
@@ -119,6 +121,11 @@ public class VNCConn {
     		ffur.incremental = incremental;
     	}
 
+    	public OutputEvent(String text) {
+    		cuttext = new ClientCutText();
+    		cuttext.text = text;
+    	}
+
     	private class PointerEvent {
     		int x;
     		int y;
@@ -136,9 +143,14 @@ public class VNCConn {
     		boolean incremental;
     	}
 
+    	private class ClientCutText {
+    		String text;
+    	}
+
     	public FullFramebufferUpdateRequest ffur;
     	public PointerEvent pointer;
     	public KeyboardEvent key;
+    	public ClientCutText cuttext;
     }
 
 
@@ -450,10 +462,8 @@ public class VNCConn {
 						break;
 
 					case RfbProto.ServerCutText:
-						String s = rfb.readServerCutText();
-						if (s != null && s.length() > 0) {
-							// TODO implement cut & paste
-						}
+						serverCutText = rfb.readServerCutText();
+						Log.d(TAG, "got server cuttext: " + serverCutText);
 						break;
 
 					case RfbProto.TextChat:
@@ -575,6 +585,8 @@ public class VNCConn {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+    				if(ev.cuttext != null)
+    					sendCutText(ev.cuttext.text);
     			}
 
     			// at this point, queue is empty, wait for input instead of hogging CPU
@@ -621,6 +633,21 @@ public class VNCConn {
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
 				   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
 				   return true;
+				} catch (Exception e) {
+					return false;
+				}
+			}
+			return false;
+		}
+
+
+		private boolean sendCutText(String text) {
+			if (rfb != null && rfb.inNormalProtocol) {
+
+				try {
+					if(Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
+					rfb.writeClientCutText(text);
+					return true;
 				} catch (Exception e) {
 					return false;
 				}
@@ -746,6 +773,22 @@ public class VNCConn {
 	}
 
 
+	public boolean sendCutText(String text) {
+
+		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+			OutputEvent e = new OutputEvent(text);
+			outputEventQueue.add(e);
+			synchronized (outputEventQueue) {
+				outputEventQueue.notify();
+			}
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 
 		// trim coodinates
@@ -853,16 +896,16 @@ public class VNCConn {
 								keyCode,
 								0,
 								metaState);
-						
+
 						keyCode = tmp.getUnicodeChar();
-						
+
 						// Ctrl-C for example needs this...
 						if (keyCode == 0) {
 							metaState &= ~KeyEvent.META_CTRL_MASK;
 							metaState &= ~KeyEvent.META_ALT_MASK;
 							keyCode = tmp.getUnicodeChar(metaState);
 						}
-							
+
 						metaState = 0;
 						break;
 
@@ -966,6 +1009,10 @@ public class VNCConn {
 		catch(NullPointerException e) {
 			return 0;
 		}
+	}
+
+	public String getCutText() {
+		return serverCutText;
 	}
 
 	public final AbstractBitmapData getFramebuffer() {
@@ -1696,6 +1743,8 @@ public class VNCConn {
 		if (paint)
 			canvas.reDraw();
 	}
+
+
 
 }
 

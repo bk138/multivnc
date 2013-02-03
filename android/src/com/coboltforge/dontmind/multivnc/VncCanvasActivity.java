@@ -30,6 +30,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.text.ClipboardManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -58,6 +59,7 @@ import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
+@SuppressWarnings("deprecation")
 public class VncCanvasActivity extends Activity {
 
 
@@ -532,6 +534,8 @@ public class VncCanvasActivity extends Activity {
 
 	private SharedPreferences prefs;
 
+	private ClipboardManager mClipboardManager;
+
 	@SuppressLint("ShowToast")
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -554,6 +558,9 @@ public class VncCanvasActivity extends Activity {
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
 		database = new VncDatabase(this);
+
+		mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+
 
 		inputHandler = new MightyInputHandler();
 		inputHandler.init();
@@ -796,6 +803,10 @@ public class VncCanvasActivity extends Activity {
 		super.onPause();
 		// needed for the GLSurfaceView
 		vncCanvas.onPause();
+
+		// get VNC cuttext and post to Android
+		if(vncCanvas.vncConn.getCutText() != null)
+			mClipboardManager.setText(vncCanvas.vncConn.getCutText());
 	}
 
 	@Override
@@ -803,6 +814,11 @@ public class VncCanvasActivity extends Activity {
 		super.onResume();
 		// needed for the GLSurfaceView
 		vncCanvas.onResume();
+
+		// get Android clipboard contents
+		if (mClipboardManager.hasText())
+			vncCanvas.vncConn.sendCutText(mClipboardManager.getText().toString());
+
 	}
 
 	@Override
