@@ -20,7 +20,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 public class Utils {
-	
+
 	private static final String TAG = "Utils";
 	private static boolean debug = false;
 	/**
@@ -38,7 +38,7 @@ public class Utils {
 		builder.setNegativeButton("No", onNoListener);
 		builder.show();
 	}
-	
+
 	public static ActivityManager getActivityManager(Context context)
 	{
 		ActivityManager result = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
@@ -46,13 +46,13 @@ public class Utils {
 			throw new UnsupportedOperationException("Could not retrieve ActivityManager");
 		return result;
 	}
-	
+
 	public static MemoryInfo getMemoryInfo(Context _context) {
 		MemoryInfo info = new MemoryInfo();
 		getActivityManager(_context).getMemoryInfo(info);
 		return info;
 	}
-	
+
 	private static int nextNoticeID = 0;
 	public static int nextNoticeID() {
 		nextNoticeID++;
@@ -71,17 +71,21 @@ public class Utils {
 			}
 		});
 	}
-	
+
 	public static void showMessage(Context _context, String title, String message, int icon, DialogInterface.OnClickListener ackHandler) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-		builder.setTitle(title);
-		builder.setMessage(Html.fromHtml(message));
-		builder.setCancelable(false);
-		builder.setPositiveButton("Acknowledged", ackHandler);
-		builder.setIcon(icon);
-		builder.show();
+		try {
+			AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+			builder.setTitle(title);
+			builder.setMessage(Html.fromHtml(message));
+			builder.setCancelable(false);
+			builder.setPositiveButton("Acknowledged", ackHandler);
+			builder.setIcon(icon);
+			builder.show();
+		}
+		catch(Exception e) {
+		}
 	}
-	
+
 	public static void DEBUG(Context c)
 	{
 		try {
@@ -91,17 +95,17 @@ public class Utils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static boolean DEBUG()
 	{
 		return debug;
 	}
-	
+
 	public static void inspectEvent(MotionEvent e)
 	{
 		if(e == null)
 			return;
-		
+
 		final int pointerCount = e.getPointerCount();
 
 		Log.d(TAG, "Input: event time: " + e.getEventTime());
@@ -113,7 +117,7 @@ public class Utils {
 					+ " action:" + e.getAction());
 		}
 	}
-	
+
 	public static int nextPow2(int x) {
 
 		x--;
@@ -123,10 +127,10 @@ public class Utils {
 		x |= (x >> 8);
 		x |= (x >> 16);
 		x++;
-		
+
 		return x;
 	}
-	
+
 	/**
 	 * get and set number of successful app starts
 	 */
@@ -138,18 +142,18 @@ public class Utils {
 		ed.putInt(Constants.PREFS_KEY_APPSTARTS, Utils.appstarts);
 		ed.commit();
 	}
-	
-	
+
+
 	public static NetworkInterface getActiveNetworkInterface(Context c) {
 		try {
 			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				NetworkInterface intf = en.nextElement();
-				
+
 				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					InetAddress inetAddress = enumIpAddr.nextElement();
-					if (inetAddress.isLoopbackAddress()) 
+					if (inetAddress.isLoopbackAddress())
 						break; // break inner loop, continue with outer loop
-					
+
 					return intf; // this is not the loopback and it has an IP address assigned
 				}
 			}
@@ -159,6 +163,6 @@ public class Utils {
 		// nothing found
 		return null;
 	}
-	
-	
+
+
 }
