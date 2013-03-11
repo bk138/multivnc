@@ -191,12 +191,12 @@ public class VNCConn {
 					e.printStackTrace();
 					// Ensure we dismiss the progress dialog
 					// before we fatal error finish
-					if (pd.isShowing())
-						try{
-							pd.dismiss();
+					canvas.handler.post(new Runnable() {
+						public void run() {
+							if(pd.isShowing())
+								pd.dismiss();
 						}
-						catch(Exception e2) {
-						}
+					});
 					if (e instanceof OutOfMemoryError) {
 						// TODO  Not sure if this will happen but...
 						// figure out how to gracefully notify the user
@@ -344,7 +344,7 @@ public class VNCConn {
 		}
 
 
-		private void processNormalProtocol(final Context context, ProgressDialog pd, final Runnable setModes) throws Exception {
+		private void processNormalProtocol(final Context context, final ProgressDialog pd, final Runnable setModes) throws Exception {
 			try {
 
 				Log.d(TAG, "Connection initialized");
@@ -431,12 +431,12 @@ public class VNCConn {
 							rfb.stopTiming();
 
 							// Hide progress dialog
-							if (pd.isShowing())
-								try{
-									pd.dismiss();
+							canvas.handler.post(new Runnable() {
+								public void run() {
+									if(pd.isShowing())
+										pd.dismiss();
 								}
-								catch(Exception e) {
-								}
+							});
 						}
 
 						boolean fullUpdateNeeded = false;
