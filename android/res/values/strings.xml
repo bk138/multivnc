@@ -69,6 +69,12 @@
 <![CDATA[
 <b>Version 1.6.x:</b>
 	<ul>
+             <li>1.6.1</li>
+     	             <ul>
+     	                <li>Fixed ANR that could sometimes occur when connection broke.</li>
+                        <li>Fixed crash in discovered servers list.</li>
+
+     	      	  </ul>
      		 <li>1.6.0</li>
      	             <ul>
      	                <li>Added support for hardware keyboards and mice. Kudos to Kevin Pansky.</li>
