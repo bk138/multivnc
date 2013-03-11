@@ -651,8 +651,8 @@ public class MainMenuActivity extends Activity implements IMDNS {
 						name.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
-								Log.d(TAG, "Starting discovered connection " + conn.toString());
-								writeRecent(conn);
+								Log.d(TAG, "Starting discovered connection " + c.toString());
+								writeRecent(c);
 								Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 								intent.putExtra(Constants.CONNECTION , c.Gen_getValues());
 								startActivity(intent);
