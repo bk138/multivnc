@@ -481,6 +481,14 @@ public class VNCConn {
 			} catch (Exception e) {
 				throw e;
 			} finally {
+
+				// unlock this lock, probably was held when IO exception occured
+				try {
+					bitmapDataPixelsLock.unlock();
+				}
+				catch(Exception e) {
+				}
+
 				Log.v(TAG, "Closing VNC Connection");
 				rfb.close();
 				System.gc();
