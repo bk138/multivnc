@@ -6,7 +6,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="libs/com.antlersoft.android.contentxml.jar" sourcepath="/dbimpl/src"/>
 	<classpathentry kind="lib" path="libs/jmdns.jar"/>
-	<classpathentry kind="lib" path="libs/GoogleAdMobAdsSdk-4.3.1.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="libs/GoogleAdMobAdsSdk-6.3.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
