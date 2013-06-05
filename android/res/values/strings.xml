@@ -56,13 +56,33 @@
 <string name="about">About</string>
 <string name="help">Help</string>
 <string name="edit">Edit</string>
+
 <string name="support_dialog_title">Please Support MultiVNC</string>
 <string name="support_dialog_text">If you like MultiVNC, why not consider supporting its development? For the time being, you can do so easily by rating the app, clicking on the sponsor ad or by using PayPal. Thanks!</string>
 <string name="support_dialog_yes">Yes, good idea!</string>
 <string name="support_dialog_no">No, not now.</string>
 <string name="support_dialog_neveragain">Never ask again!</string>
+
+<string name="commercial_dialog_title">New file sharing app available!</string>
+<string name="commercial_dialog_text">
+<![CDATA[
+<div align="center">
+    The team that brought you MultiVNC has new ad-hoc WiFi file sharing app out called <b>shoutr</b>!<br/><br/>
+    shoutr is an easy to use application that enables its users to wirelessly transfer any kind of data between Android powered devices.
+     What makes shoutr stand out is that it doesn\'t need an Internet connection nor a Wi-Fi hotspot.<br/><br/>
+     Thus it works everywhere - in the subway, abroad, even on the moon! Since shoutr uses ad-hoc Wi-Fi, it is an order of magnitude faster
+     than Bluetooth and even 4G Internet. And of course, shoutr is secure: all data sent with shoutr is protected by industry-standard encryption.
+
+</div>
+ ]]>
+      </string>
+<string name="commercial_dialog_yes">Yes, let me try it out!</string>
+<string name="commercial_dialog_no">No, not now.</string>
+<string name="commercial_dialog_neveragain">Never ask again!</string>
+
 <string name="firstrun_help_dialog_title">Show Help?</string>
 <string name="firstrun_help_dialog_text">Seems it\'s the first time you use MultiVNC. Do you want to read the app manual? It\'s not very long yet informative...</string>
+
 <string name="pleaserate">Show some love by clicking the heart ;-)</string>
 <string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
