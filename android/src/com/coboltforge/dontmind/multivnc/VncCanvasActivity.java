@@ -52,6 +52,7 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -1173,6 +1174,12 @@ public class VncCanvasActivity extends Activity {
 		if(Build.VERSION.SDK_INT >= 11) {
 			// disable home button as this sometimes takes keyboard focus
 			getActionBar().setDisplayShowHomeEnabled(false);
+		}
+
+		if(Build.VERSION.SDK_INT >= 14) {
+			// hideactionbar when there is a hardware menu button
+			if(ViewConfiguration.get(this).hasPermanentMenuKey())
+				getActionBar().hide();
 		}
 	}
 
