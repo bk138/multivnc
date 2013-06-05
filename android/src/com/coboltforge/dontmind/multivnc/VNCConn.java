@@ -713,11 +713,9 @@ public class VNCConn {
 	 * @param bean Connection settings
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
-	public void init(ConnectionBean bean, VncCanvas c, final Runnable setModes) {
+	public void init(ConnectionBean bean, final Runnable setModes) {
 
 		Log.d(TAG, "initializing");
-
-		setCanvas(c);
 
 		connSettings = bean;
 		try {

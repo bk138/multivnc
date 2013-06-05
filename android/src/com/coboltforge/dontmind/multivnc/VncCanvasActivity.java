@@ -539,9 +539,9 @@ public class VncCanvasActivity extends Activity {
 
 	@SuppressLint("ShowToast")
 	@Override
-	public void onCreate(Bundle icicle) {
+	public void onCreate(Bundle savedInstanceState) {
 
-		super.onCreate(icicle);
+		super.onCreate(savedInstanceState);
 
 		// only do complete fullscreen on 2.x devices
 		if(Build.VERSION.SDK_INT < 11)
@@ -566,8 +566,14 @@ public class VncCanvasActivity extends Activity {
 		inputHandler = new MightyInputHandler();
 		inputHandler.init();
 
-		Intent i = getIntent();
+
+
+
+		/*
+		 * Setup connection bean.
+		 */
 		connection = new ConnectionBean();
+		Intent i = getIntent();
 		Uri data = i.getData();
 		if ((data != null) && (data.getScheme().equals("vnc"))) { // started from outer world
 
@@ -632,11 +638,24 @@ public class VncCanvasActivity extends Activity {
 			connection.parseHostPort(connection.getAddress());
 		}
 
-		vncCanvas.initializeVncCanvas(this, inputHandler, connection, new Runnable() {
+
+		/*
+		 * Setup canvas and conn.
+		 */
+		VNCConn conn = new VNCConn();
+		vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
+		conn.setCanvas(vncCanvas); // add canvas to conn. be sure to call this before init!
+		// the actual connection init
+		conn.init(connection, new Runnable() {
 			public void run() {
 				setModes();
 			}
 		});
+
+
+
+
+
 		zoomer.hide();
 		zoomer.setOnZoomInClickListener(new View.OnClickListener() {
 
@@ -780,11 +799,6 @@ public class VncCanvasActivity extends Activity {
 			((ConnectionSettable) dialog).setConnection(connection);
 	}
 
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		// ignore orientation/keyboard change
-		super.onConfigurationChanged(newConfig);
-	}
 
 	@Override
 	protected void onStop() {
