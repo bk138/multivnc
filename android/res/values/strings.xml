@@ -89,7 +89,13 @@
 <![CDATA[
 <b>Version 1.6.x:</b>
 	<ul>
-             <li>1.6.1</li>
+             <li>1.6.2</li>
+     	             <ul>
+     	                <li>Hide Actionbar when there is a hardware menu button.</li>
+                        <li>Removed broken hungarian translation.</li>
+
+     	      	  </ul>
+              <li>1.6.1</li>
      	             <ul>
      	                <li>Fixed ANR that could sometimes occur when connection broke.</li>
                         <li>Fixed crash in discovered servers list.</li>
