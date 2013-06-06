@@ -312,10 +312,9 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			dialog.setPositiveButton(getString(R.string.commercial_dialog_yes), new OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					String appPackageName= "net.shoutr.shoutr";
-					Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id="+appPackageName));
-					marketIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-					startActivity(marketIntent);
+					Intent commercialIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://hello.shoutr.net/vnc.html"));
+					commercialIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+					startActivity(commercialIntent);
 					try{
 						dialog.dismiss();
 					}
