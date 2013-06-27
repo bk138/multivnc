@@ -89,6 +89,12 @@
 <![CDATA[
 <b>Version 1.6.x:</b>
 	<ul>
+           <li>1.6.3</li>
+     	             <ul>
+     	                <li>Fix hidden menu items on some devices.</li>
+                        <li>Fix Zeroconf/Bonjour/mDNS VNC server discovery on Android 4.2 devices.</li>
+
+     	      	  </ul>
              <li>1.6.2</li>
      	             <ul>
      	                <li>Hide Actionbar when there is a hardware menu button.</li>

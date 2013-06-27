@@ -299,7 +299,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		/*
 		 *  show commercial
 		 */
-		if(Utils.appstarts > 1 && settings.getBoolean(Constants.PREFS_KEY_COMMERCIALDLG, true) && savedInstanceState == null)
+		if(Utils.appstarts > 1 && Utils.appstarts % 2 != 0 && settings.getBoolean(Constants.PREFS_KEY_COMMERCIALDLG, true) && savedInstanceState == null)
 		{
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 			dialog.setTitle(getString(R.string.commercial_dialog_title));

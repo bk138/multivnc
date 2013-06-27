@@ -72,7 +72,7 @@
            android:layout_height="wrap_content"
            android:layout_alignParentBottom="true"
            ads:adSize="BANNER"
-           ads:adUnitId=""
+           ads:adUnitId="a14f58d316c19d5"
            android:gravity="center_horizontal"
            ads:loadAdOnCreate="true" />
 
