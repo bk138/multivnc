@@ -36,7 +36,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -543,13 +542,6 @@ public class VncCanvasActivity extends Activity {
 
 		super.onCreate(savedInstanceState);
 
-		// only do complete fullscreen on 2.x devices
-		if(Build.VERSION.SDK_INT < 11)
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-		// but hide status bar everywhere
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 
 		setContentView(R.layout.canvas);
 
@@ -725,8 +717,8 @@ public class VncCanvasActivity extends Activity {
 		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
 		notificationToast.setGravity(Gravity.TOP, 0, 60);
 
-		// honeycomb or newer
-		setupActionBar();
+		// hide or show actionbar, title bar, status bar
+		setupWindowSize();
 
 		if(! prefs.getBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, true))
 			vncCanvas.setPointerHighlight(false);
@@ -836,9 +828,24 @@ public class VncCanvasActivity extends Activity {
 
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
+
+		try {
+			if(Build.VERSION.SDK_INT >= 11 && getActionBar().isShowing()) {
+				menu.findItem(R.id.itemSpecialKeys).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+				menu.findItem(R.id.itemSendKeyAgain).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+				menu.findItem(R.id.itemToggleKeyboard).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+				menu.findItem(R.id.itemSaveBookmark).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+				menu.findItem(R.id.itemDisconnect).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			}
+		}
+		catch(NullPointerException e) {
+		}
+
+
 		return true;
 	}
 
@@ -1184,7 +1191,15 @@ public class VncCanvasActivity extends Activity {
 	}
 
 	@SuppressLint("NewApi")
-	private void setupActionBar() {
+	private void setupWindowSize() {
+
+		// only do complete fullscreen on 2.x devices
+		if(Build.VERSION.SDK_INT < 11)
+			requestWindowFeature(Window.FEATURE_NO_TITLE);
+		// but hide status bar everywhere
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		if(Build.VERSION.SDK_INT >= 11) {
 			// disable home button as this sometimes takes keyboard focus
 			getActionBar().setDisplayShowHomeEnabled(false);

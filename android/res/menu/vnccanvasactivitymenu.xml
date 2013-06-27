@@ -3,19 +3,16 @@
     <item
         android:id="@+id/itemSpecialKeys"
         android:icon="@drawable/specialkeys"
-        android:showAsAction="ifRoom|withText"
         android:title="@string/special_keys"/>
 
     <item
         android:id="@+id/itemSendKeyAgain"
         android:icon="@drawable/refresh"
-        android:showAsAction="ifRoom|withText"
         android:title="@string/send_key_again"/>
 
     <item
         android:id="@+id/itemToggleKeyboard"
         android:icon="@drawable/keyboard"
-        android:showAsAction="ifRoom"
         android:title="@string/toggle_keyboard">
     </item>
 
@@ -52,7 +49,6 @@
     <item
         android:id="@+id/itemSaveBookmark"
         android:icon="@android:drawable/ic_menu_save"
-        android:showAsAction="ifRoom"
         android:title="@string/savebookmark_button">
     </item>
 
@@ -60,16 +56,15 @@
         android:id="@+id/itemHelp"
         android:icon="@android:drawable/ic_menu_help"
         android:title="@string/help"/>
-    
+
      <item
         android:id="@+id/itemAbout"
         android:icon="@android:drawable/ic_menu_info_details"
         android:title="@string/about"/>
-     
+
      <item
         android:id="@+id/itemDisconnect"
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
-        android:showAsAction="ifRoom"
         android:title="@string/disconnect"/>
 
 </menu>
