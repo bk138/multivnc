@@ -7,6 +7,7 @@ package com.coboltforge.dontmind.multivnc;
  */
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Hashtable;
 
 import javax.jmdns.JmDNS;
@@ -211,7 +212,11 @@ public class MDNSService extends Service {
 				multicastLock.acquire();
 				try {
 
-					jmdns = JmDNS.create(Utils.intToInetAddress(wifi.getConnectionInfo().getIpAddress()));
+					InetAddress addr = Utils.intToInetAddress(wifi.getConnectionInfo().getIpAddress());
+
+					Log.d(TAG, "Creating MDNS with address " + addr.toString());
+
+					jmdns = JmDNS.create(addr);
 					jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
 
 						@Override
