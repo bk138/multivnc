@@ -3,6 +3,7 @@ package com.coboltforge.dontmind.multivnc;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 import android.app.Activity;
@@ -164,5 +165,20 @@ public class Utils {
 		return null;
 	}
 
+
+	public static InetAddress intToInetAddress(int hostAddress) {
+		InetAddress inetAddress;
+		byte[] addressBytes = { (byte) (0xff & hostAddress),
+				(byte) (0xff & (hostAddress >> 8)),
+				(byte) (0xff & (hostAddress >> 16)),
+				(byte) (0xff & (hostAddress >> 24)) };
+
+		try {
+			inetAddress = InetAddress.getByAddress(addressBytes);
+		} catch (UnknownHostException e) {
+			return null;
+		}
+		return inetAddress;
+	}
 
 }

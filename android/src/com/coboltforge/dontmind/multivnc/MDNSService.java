@@ -68,7 +68,7 @@ public class MDNSService extends Service {
 
 		workerThread.start();
 
-		// listen for scan results 
+		// listen for scan results
 		netStateChangedReceiver = new BroadcastReceiver() {
 			//@Override
 			public void onReceive(Context context, Intent intent)
@@ -84,7 +84,7 @@ public class MDNSService extends Service {
 				catch(NullPointerException e) {
 				}
 
-				//  (re)start 
+				//  (re)start
 				try {
 					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_START).sendToTarget();
 				}
@@ -119,7 +119,7 @@ public class MDNSService extends Service {
 			Log.d(TAG, "Restart!");
 
 		return START_STICKY;
-	} 
+	}
 
 	// NB: this is called from the worker thread!!
 	public void registerCallback(IMDNS c) {
@@ -147,7 +147,7 @@ public class MDNSService extends Service {
 		private String mdnstype = "_rfb._tcp.local.";
 		private JmDNS jmdns = null;
 		private ServiceListener listener = null;
-		private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> (); 
+		private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> ();
 		private Handler handler;
 
 		public final static int MESSAGE_START = 0;
@@ -210,7 +210,8 @@ public class MDNSService extends Service {
 				multicastLock.setReferenceCounted(true);
 				multicastLock.acquire();
 				try {
-					jmdns = JmDNS.create();
+
+					jmdns = JmDNS.create(Utils.intToInetAddress(wifi.getConnectionInfo().getIpAddress()));
 					jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
 
 						@Override
@@ -219,7 +220,7 @@ public class MDNSService extends Service {
 							c.set_Id(0); // new!
 							c.setNickname(ev.getName());
 							// use IPv4-only on gingerbread and lower
-							if(Build.VERSION.SDK_INT < 11) 
+							if(Build.VERSION.SDK_INT < 11)
 								c.setAddress(ev.getInfo().getInet4Addresses()[0].toString().replace('/', ' ').trim());
 							else
 								c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
@@ -228,7 +229,7 @@ public class MDNSService extends Service {
 
 							connections_discovered.put(ev.getInfo().getQualifiedName(), c);
 
-							Log.d(TAG, "discovered server :" + ev.getName() 
+							Log.d(TAG, "discovered server :" + ev.getName()
 									+ ", now " + connections_discovered.size());
 
 							mDNSnotify(ev.getName(), c);
@@ -238,7 +239,7 @@ public class MDNSService extends Service {
 						public void serviceRemoved(ServiceEvent ev) {
 							connections_discovered.remove(ev.getInfo().getQualifiedName());
 
-							Log.d(TAG, "server gone:" + ev.getName() 
+							Log.d(TAG, "server gone:" + ev.getName()
 									+ ", now " + connections_discovered.size());
 
 							mDNSnotify(ev.getName(), null);
@@ -292,7 +293,7 @@ public class MDNSService extends Service {
 			}
 
 			// notify our callback about our internal state, i.e. the removals
-			for(ConnectionBean c: connections_discovered.values()) 
+			for(ConnectionBean c: connections_discovered.values())
 				mDNSnotify(c.getNickname(), null);
 			// and clear internal state
 			connections_discovered.clear();
