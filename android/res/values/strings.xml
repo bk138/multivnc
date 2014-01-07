@@ -89,6 +89,10 @@
 <![CDATA[
 <b>Version 1.6.x:</b>
 	<ul>
+          <li>1.6.4</li>
+     	             <ul>
+     	                <li>Fix immediate crash upon connecting on some devices.</li>
+     	      	  </ul>
            <li>1.6.3</li>
      	             <ul>
      	                <li>Fix hidden menu items on some devices.</li>
