@@ -19,7 +19,7 @@
 	    android:padding="10dip"
 	    android:paddingTop="10dp" >
 
-		<ImageView android:id="@+id/ImageView01"
+		<ImageView 
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
 			android:scaleType="fitCenter" android:src="@drawable/icon">
 		</ImageView>
