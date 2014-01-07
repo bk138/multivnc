@@ -542,6 +542,8 @@ public class VncCanvasActivity extends Activity {
 
 		super.onCreate(savedInstanceState);
 
+		// hide or show actionbar, title bar, status bar
+		setupWindowSize();
 
 		setContentView(R.layout.canvas);
 
@@ -717,8 +719,6 @@ public class VncCanvasActivity extends Activity {
 		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
 		notificationToast.setGravity(Gravity.TOP, 0, 60);
 
-		// hide or show actionbar, title bar, status bar
-		setupWindowSize();
 
 		if(! prefs.getBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, true))
 			vncCanvas.setPointerHighlight(false);
@@ -1190,6 +1190,11 @@ public class VncCanvasActivity extends Activity {
 			getActionBar().setTitle(text);
 	}
 
+
+	/**
+	 * Sets window size according to target device's platform.
+	 * Note that this MUST be called before adding content!
+	 */
 	@SuppressLint("NewApi")
 	private void setupWindowSize() {
 
