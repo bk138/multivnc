@@ -33,6 +33,7 @@ multivnc_LDADD = \
 	gui/libMultiVNCgui.a \
 	wxServDisc/libwxservdisc.a \
 	libvncclient/libvncclient.a \
+	$(GTK_LIBS) \
 	$(WX_LIBS)
 
 if MINGW
