@@ -186,6 +186,10 @@ int _host(struct message *m, unsigned char **bufp, unsigned char *name)
     return len;
 }
 
+
+/** 
+    Return 1 on success, 0 on failure. 
+ */
 int _rrparse(struct message *m, struct resource *rr, int count, unsigned char **bufp)
 {
     int i;
@@ -198,7 +202,7 @@ int _rrparse(struct message *m, struct resource *rr, int count, unsigned char **
         rr[i].rdlength = net2short(bufp);
 
         // if not going to overflow, make copy of source rdata
-        if(rr[i].rdlength + (*bufp - m->_buf) > MAX_PACKET_LEN || m->_len + rr[i].rdlength > MAX_PACKET_LEN) return 1;
+        if(rr[i].rdlength + (*bufp - m->_buf) > MAX_PACKET_LEN || m->_len + rr[i].rdlength > MAX_PACKET_LEN) return 0;
         rr[i].rdata = m->_packet + m->_len;
         m->_len += rr[i].rdlength;
         memcpy(rr[i].rdata,*bufp,rr[i].rdlength);
@@ -207,7 +211,7 @@ int _rrparse(struct message *m, struct resource *rr, int count, unsigned char **
         switch(rr[i].type)
         {
         case 1:
-            if(m->_len + 16 > MAX_PACKET_LEN) return 1;
+            if(m->_len + 16 > MAX_PACKET_LEN) return 0;
             rr[i].known.a.name = m->_packet + m->_len;
             m->_len += 16;
             sprintf(rr[i].known.a.name,"%d.%d.%d.%d",(*bufp)[0],(*bufp)[1],(*bufp)[2],(*bufp)[3]);
@@ -233,7 +237,7 @@ int _rrparse(struct message *m, struct resource *rr, int count, unsigned char **
         }
     }
 
-    return 0;
+    return 1;
 }
 
 
@@ -284,9 +288,12 @@ void message_parse(struct message *m, unsigned char *packet)
     my(m->an, sizeof(struct resource) * m->ancount);
     my(m->ns, sizeof(struct resource) * m->nscount);
     my(m->ar, sizeof(struct resource) * m->arcount);
-    if(_rrparse(m,m->an,m->ancount,&buf)) return;
-    if(_rrparse(m,m->ns,m->nscount,&buf)) return;
-    if(_rrparse(m,m->ar,m->arcount,&buf)) return;
+    if(! _rrparse(m,m->an,m->ancount,&buf))
+      m->ancount = 0; // some error in parsing, set those counts to 0
+    if(! _rrparse(m,m->ns,m->nscount,&buf)) 
+      m->nscount = 0;
+    if(! _rrparse(m,m->ar,m->arcount,&buf)) 
+      m->arcount = 0;
 }
 
 void message_qd(struct message *m, unsigned char *name, unsigned short int type, unsigned short int class)

@@ -28,21 +28,42 @@
 #include <wx/event.h>
 #include <wx/string.h>
 #include <wx/hashmap.h>
+#include <wx/stopwatch.h>
 #include <vector>
 
 #include "1035.h"
 #include "mdnsd.h"
 
-// just for convenience
-// SOCKET is a unsigned int in win32!!
-// but in unix we expect signed ints!!
-#ifndef __WIN32__
-typedef int SOCKET;
+// all the nice socket includes in one place here
+#ifdef _WIN32
+// https://stackoverflow.com/questions/5004858/stdmin-gives-error
+#define NOMINMAX
+// mingw/ visual studio socket includes
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define SHUT_RDWR SD_BOTH
+#else // proper UNIX
+typedef int SOCKET;       // under windows, SOCKET is unsigned
+#define INVALID_SOCKET -1 // so there also is no -1 return value
+#define closesocket(s) close(s) // under windows, it's called closesocket
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/un.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 #endif
 
 
+
+
 // make available custom notify event if getResults() would yield sth new
-DECLARE_EVENT_TYPE(wxServDiscNOTIFY, -1)
+#if wxVERSION_NUMBER < 2900
+DECLARE_EVENT_TYPE(wxServDiscNOTIFY, -1);
+#else
+wxDECLARE_EVENT(wxServDiscNOTIFY, wxCommandEvent);
+#endif
+
 
 
 
@@ -52,7 +73,8 @@ struct wxSDEntry
   wxString name;
   wxString ip;
   int port;
-  wxSDEntry() { port=0; }
+  long time;
+  wxSDEntry() { port=0; time=0; }
 };
 
 
@@ -64,7 +86,10 @@ public:
   // type can be one of QTYPE_A, QTYPE_NS, QTYPE_CNAME, QTYPE_PTR or QTYPE_SRV 
   wxServDisc(void* parent, const wxString& what, int type);
   ~wxServDisc();
-  
+ 
+  /// Returns true if service discovery successfully started. If not, getErr() may contain a hint.
+  bool isOK() const { return err.length() == 0; };
+ 
   // yeah well...
   std::vector<wxSDEntry> getResults() const;
   size_t getResultCount() const;
@@ -76,13 +101,14 @@ public:
 
 
 private:
-  SOCKET sock;
+  SOCKET mSock;
   wxString err;
   void *parent;
   wxString query;
   int querytype; 
 WX_DECLARE_STRING_HASH_MAP(wxSDEntry, wxSDMap);
   wxSDMap results;
+  wxStopWatch mWallClock;
   
   // this runs as a separate thread
   virtual wxThread::ExitCode Entry();

@@ -1,6 +1,10 @@
 #include "mdnsd.h"
 #include <string.h>
 #include <stdlib.h>
+#ifdef __WIN32__
+// for the inet related functions
+#include <ws2tcpip.h>
+#endif
 
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
@@ -299,10 +303,10 @@ void _cache(mdnsd d, struct resource *r)
     { // process deletes
         while(c = _c_next(d,c,r->name,r->type))
             if(_a_match(r,&c->rr))
-            {
-                c->rr.ttl = 0;
-                _c_expire(d,&d->cache[i]);
-            }
+	      c->rr.ttl = 0;
+
+	_c_expire(d,&d->cache[i]);
+
         return;
     }
 
