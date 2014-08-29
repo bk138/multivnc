@@ -66,6 +66,10 @@
 #include "ghpringbuf.h"
 #include "packet.h"
 
+#ifdef _MSC_VER
+#  define snprintf _snprintf
+#endif
+
 /*
  * rfbClientLog prints a time-stamped message to the log file (stderr).
  */
