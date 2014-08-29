@@ -108,10 +108,12 @@ int ghpringbuf_insert(ghpringbuf* b, size_t index, void* src)
   if (b->count > 0 && index < b->count) 
     {
       size_t pos = b->iget + index;
+	  char* it;
+	  
       if(pos >= b->capacity)
 	pos -= b->capacity;
 
-      char* it = b->items;
+      it = b->items;
       it += b->item_sz * pos;
       memcpy(it, src, b->item_sz);
       b->lock = 0;
@@ -128,10 +130,12 @@ int ghpringbuf_at(ghpringbuf* b, size_t index, void* dst)
   if (b->count > 0 && index < b->count) 
     {
       size_t pos = b->iget + index;
+	  char* it;
+	  
       if(pos >= b->capacity)
 	pos -= b->capacity;
 
-      char* it = b->items;
+      it = b->items;
       it += b->item_sz * pos;
       memcpy(dst, it, b->item_sz);
       b->lock = 0;
