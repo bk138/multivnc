@@ -107,6 +107,10 @@ typedef int8_t rfbBool;
 #define TRUE -1
 #endif
 
+#ifdef _MSC_VER
+#include <stdint.h>
+#endif
+
 typedef uint32_t rfbKeySym;
 typedef uint32_t rfbPixel;
 

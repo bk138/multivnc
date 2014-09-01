@@ -66,6 +66,10 @@
 #include "ghpringbuf.h"
 #include "packet.h"
 
+#ifdef _MSC_VER
+#  define snprintf _snprintf
+#endif
+
 /*
  * rfbClientLog prints a time-stamped message to the log file (stderr).
  */
@@ -2123,13 +2127,15 @@ HandleRFBServerMessage(rfbClient* client)
 	struct sockaddr_storage multicastSockAddr;
 	char host[512], serv[128];
 	int r;
+	struct sockaddr_in* ipv4sock;
+	struct sockaddr_in6* ipv6sock;
 
 	if(rect.encoding  == rfbEncodingMulticastVNC)
 	  {
 	    if (!ReadFromRFBServer(client, buffer, 4))
 	      return FALSE;
 
-	    struct sockaddr_in* ipv4sock = (struct sockaddr_in*) &multicastSockAddr;
+	    ipv4sock = (struct sockaddr_in*) &multicastSockAddr;
 	    ipv4sock->sin_family = AF_INET;
 	    ipv4sock->sin_addr.s_addr = *(in_addr_t*)buffer;
 	    /* port has to be in NBO, but was swapped before, so swap again */
@@ -2140,7 +2146,7 @@ HandleRFBServerMessage(rfbClient* client)
 	     if (!ReadFromRFBServer(client, buffer, 16))
 	       return FALSE;
 
-	     struct sockaddr_in6* ipv6sock = (struct sockaddr_in6*) &multicastSockAddr;
+	     ipv6sock = (struct sockaddr_in6*) &multicastSockAddr;
 	     ipv6sock->sin6_family = AF_INET6;
 	     ipv6sock->sin6_addr = *(struct in6_addr*)buffer;
 	     /* port has to be in NBO, but was swapped before, so swap again */
