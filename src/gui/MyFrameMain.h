@@ -79,6 +79,9 @@ class MyFrameMain: public FrameMain
 
   static char* getpasswd(rfbClient* client);
 
+  static rfbCredential* getcreds(rfbClient* client, int type);
+
+
   bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
 
   

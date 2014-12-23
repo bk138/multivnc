@@ -82,7 +82,7 @@ public:
        Init()  <-> Shutdown()
   */
 
-  bool Setup(char* (*getpasswdfunc)(rfbClient*));
+  bool Setup(char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int));
   void Cleanup();
   bool Listen(int port);
   bool Init(const wxString& host, const wxString& encodings, int compresslevel = 1, int quality = 5, 

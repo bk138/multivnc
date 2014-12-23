@@ -13,8 +13,8 @@ class DialogLogin : public wxDialog
     // Destructor
     virtual ~DialogLogin();
 
-    const wxString& getUserName() const { const wxString& ref = m_usernameEntry->GetValue(); return ref; };
-    const wxString& getPassword() const { const wxString& ref = m_passwordEntry->GetValue(); return ref; };
+    const wxString getUserName() const { return m_usernameEntry->GetValue(); };
+    const wxString getPassword() const { return m_passwordEntry->GetValue(); };
  
  private:
     wxStaticText* m_usernameLabel;

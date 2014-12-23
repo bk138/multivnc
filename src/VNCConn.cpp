@@ -902,7 +902,7 @@ void VNCConn::thread_logger(const char *format, ...)
   public members
 */
 
-bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
+bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int))
 {
   wxLogDebug(wxT("VNCConn %p: Setup()"), this);
 
@@ -923,6 +923,7 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*))
   cl->GotFrameBufferUpdate = thread_got_update;
   cl->FinishedFrameBufferUpdate = thread_update_finished;
   cl->GetPassword = getpasswdfunc;
+  cl->GetCredential = getCredentialFunc;
   cl->HandleKeyboardLedState = thread_kbd_leds;
   cl->HandleTextChat = thread_textchat;
   cl->GotXCutText = thread_got_cuttext;

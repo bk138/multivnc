@@ -11,6 +11,7 @@
 
 #include "MyFrameMain.h"
 #include "MyDialogSettings.h"
+#include "DialogLogin.h"
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
@@ -571,6 +572,27 @@ char* MyFrameMain::getpasswd(rfbClient* client)
 
 
 
+rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
+{
+    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
+
+    if(type == rfbCredentialTypeUser) {
+ 
+	DialogLogin formLogin(0, wxID_ANY, _("Credentials required..."));
+	if ( formLogin.ShowModal() == wxID_OK ) {
+	  
+	    c->userCredential.username = strdup(formLogin.getUserName().char_str());
+	    c->userCredential.password = strdup(formLogin.getPassword().char_str());
+	  
+	}
+
+    }
+
+    return c;
+}
+
+
+
 bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave)
 {
   if(stats.IsEmpty())
@@ -673,7 +695,7 @@ bool MyFrameMain::spawn_conn(wxString host, int listenPort)
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
 
   VNCConn* c = new VNCConn(this);
-  c->Setup(getpasswd);
+  c->Setup(getpasswd, getcreds);
 
   if(listenPort > 0)
     {
