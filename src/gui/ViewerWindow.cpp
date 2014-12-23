@@ -201,7 +201,7 @@ void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 
 #ifdef __WXDEBUG__
   wxLongLong t1 = wxGetLocalTimeMillis();
-  wxLogDebug(wxT("VNCCanvas %p: updating %d rects (%d bytes) took %lld ms"),
+  wxLogDebug(wxT("VNCCanvas %p: updating %zu rects (%zu bytes) took %lld ms"),
 	     this,
 	     nr_rects,
 	     nr_bytes,
