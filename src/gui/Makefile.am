@@ -18,6 +18,8 @@ libMultiVNCgui_a_SOURCES = \
 	DialogSettings.h \
 	MyDialogSettings.cpp \
 	MyDialogSettings.h \
+	DialogLogin.cpp \
+	DialogLogin.h \
 	evtids.h\
 	bitmapFromMem.h\
 	res/about.png.h \
