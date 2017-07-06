@@ -92,8 +92,8 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
   keyboard_grabbed = do_keyboard_grab = false;
  
   // this kinda cursor creation works everywhere
-  wxBitmap vnccursor_bitmap(vnccursor_bits, 16, 16);
-  wxBitmap vnccursor_mask_bitmap(vnccursor_mask, 16, 16);
+  wxBitmap vnccursor_bitmap((char*)vnccursor_bits, 16, 16);
+  wxBitmap vnccursor_mask_bitmap((char*)vnccursor_mask_bits, 16, 16);
   vnccursor_bitmap.SetMask(new wxMask(vnccursor_mask_bitmap));
   wxImage vnccursor_image = vnccursor_bitmap.ConvertToImage();
   vnccursor_image.SetOption(wxIMAGE_OPTION_CUR_HOTSPOT_X, 8);
