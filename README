@@ -1,59 +1,60 @@
 
- MultiVNC is a cross-platform Multicast-enabled VNC viewer using
- wxWidgets and libvncclient . It runs on Unix, Mac OS X and Windows.
+MultiVNC is a cross-platform Multicast-enabled VNC viewer using
+wxWidgets and libvncclient . It runs on Unix, Mac OS X and Windows.
 
- Features:
-   * MulticastVNC ;-) 
-   * Support for most encodings including Tight.
-   * Several connections with one viewer using tabs.
-   * Discovery of VNC servers advertising themselves via ZeroConf. 
-   * Listen mode (Reverse VNC). Via tabs it's possible to listen 
-     for and serve multiple incoming connections.
-   * Window sharing: You can beam one of your windows to the remote
-     side if they support receiving windows (run a listening viewer).
-   * Seamless control of the remote side by moving pointer over the
-     (default upper) screen edge. Borrows heavily from x2vnc by
-     Fredrik Hübinette <hubbe@hubbe.net>, which in turn was based on
-     ideas from x2x and code from vncviewer.
-   * Bookmarks.
-   * Simple, loggable statistics 
-   * Supports server framebuffer resize.
+Features:
 
- 
- For features that are planned, but not completed yet, look at the
- TODO file.
+* MulticastVNC ;-) 
+* Support for most encodings including Tight.
+* Several connections with one viewer using tabs.
+* Discovery of VNC servers advertising themselves via ZeroConf. 
+* Listen mode (Reverse VNC). Via tabs it's possible to listen 
+  for and serve multiple incoming connections.
+* Window sharing: You can beam one of your windows to the remote
+  side if they support receiving windows (run a listening viewer).
+* Seamless control of the remote side by moving pointer over the
+  (default upper) screen edge. Borrows heavily from x2vnc by
+  Fredrik Hübinette <hubbe@hubbe.net>, which in turn was based on
+  ideas from x2x and code from vncviewer.
+* Bookmarks.
+* Simple, loggable statistics 
+* Supports server framebuffer resize.
 
 
-
-
- MulticastVNC notes
- ''''''''''''''''''
- 
- This is still experimental and there is no server support, 
- however you can get a modified libvncserver/libvncclient
- at http://github.com/bk138/x11vnc-multiptr, branch multicastvnc.
- This is the same library that MultiVNC uses internally.
+For features that are planned, but not completed yet, look at the
+TODO file.
 
 
 
 
- How to compile from source
- ''''''''''''''''''''''''''
+MulticastVNC notes
+------------------
 
- The prerequisites:
+This is still experimental and there is no server support, 
+however you can get a modified libvncserver/libvncclient
+at http://github.com/bk138/x11vnc-multiptr, branch multicastvnc.
+This is the same library that MultiVNC uses internally.
 
-   * the usual c-compiler with headers and stuff
-   * wxWidgets dev package version >= 2.8.7
-   * zlib dev package 
-   * libjpeg dev package 
 
- To compile:
+
+
+How to compile from source
+--------------------------
+
+The prerequisites:
+
+* the usual c-compiler with headers and stuff
+* wxWidgets dev package version >= 2.8.7
+* zlib dev package 
+* libjpeg dev package 
+
+To compile:
 
    $ autoreconf -i
 
    & ./configure
 
- If crosscompiling with MinGW:
+If crosscompiling with MinGW:
 
 
    CPPFLAGS=-DWINVER=0x0501 ./configure \
@@ -63,19 +64,19 @@
    --with-jpeg=<path to where jpeglib include and lib dirs are> 
    --with-libgcrypt-prefix=<path to where zlib include and lib dirs are>
 
- Then
+Then
 
 
    make
 
 
- And cross fingers...
+And cross fingers...
 
 
- To install:
-   * 'make install' as root
-   * or copy binary wherever you like to
+To install:
+* 'make install' as root
+* or copy binary wherever you like to
 
 
 
- That's pretty much it, have fun !
+That's pretty much it, have fun !
