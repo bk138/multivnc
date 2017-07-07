@@ -9,7 +9,7 @@
 #include <wx/process.h> 
 #include "FrameMain.h"
 #include "MyFrameLog.h"
-#include "wxServDisc/wxServDisc.h"
+#include "wxServDisc.h"
 #include "VNCConn.h"
 #include "ViewerWindow.h"
 #include "VNCSeamlessConnector.h"

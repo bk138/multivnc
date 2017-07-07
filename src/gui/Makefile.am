@@ -35,7 +35,7 @@ libMultiVNCgui_a_SOURCES = \
 	res/vnccursor.xbm
 
 
-libMultiVNCgui_a_CPPFLAGS  = @WX_CPPFLAGS@ @GTK_CFLAGS@ -I..
+libMultiVNCgui_a_CPPFLAGS  = @WX_CPPFLAGS@ @GTK_CFLAGS@ -I.. -I../wxServDisc/src
 
 
 EXTRA_DIST = \

@@ -402,7 +402,7 @@ AC_CHECK_LIB(socket,socket)
 AC_OUTPUT([
 Makefile
 src/Makefile
-src/wxServDisc/Makefile
+src/wxServDisc/src/Makefile
 src/libvncclient/Makefile
 src/gui/Makefile
 ])

@@ -3,12 +3,13 @@
 
 
 SUBDIRS = \
-	wxServDisc\
+	wxServDisc/src\
 	libvncclient \
 	gui
 
 
 AM_CPPFLAGS = \
+	-IwxServDisc/src \
 	$(WX_CXXFLAGS) \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
@@ -31,7 +32,7 @@ multivnc_SOURCES = \
 
 multivnc_LDADD = \
 	gui/libMultiVNCgui.a \
-	wxServDisc/libwxservdisc.a \
+	wxServDisc/src/libwxservdisc.la \
 	libvncclient/libvncclient.a \
 	$(GTK_LIBS) \
 	$(WX_LIBS)
