@@ -1,0 +1,3 @@
+[submodule "src/wxServDisc"]
+	path = src/wxServDisc
+	url = git@github.com:bk138/wxservdisc.git
