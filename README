@@ -48,6 +48,13 @@ The prerequisites:
 * zlib dev package 
 * libjpeg dev package 
 
+After cloning the repo, do
+
+```
+   git submodule init
+   git submodule update
+```
+
 To compile:
 
 ```
