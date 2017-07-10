@@ -9,7 +9,7 @@ os:
 
 # install build dependencies
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libwxgtk3.0-dev libgtk2.0-dev libjpeg-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libwxgtk3.0-dev libgtk2.0-dev libjpeg-dev libgcrypt20-dev; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install wxmac; fi
 
 
