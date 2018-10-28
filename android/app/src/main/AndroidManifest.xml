@@ -4,7 +4,6 @@
     package="com.coboltforge.dontmind.multivnc" android:installLocation="auto"
     android:versionCode="42" android:versionName="1.6.4">
 
-    <uses-sdk android:minSdkVersion="5" android:targetSdkVersion="13"></uses-sdk>
 	<supports-screens android:anyDensity="true" />
 
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>

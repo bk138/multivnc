@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="address_caption">地址</string>
+    <string name="alt_check">Alt</string>
+    <string name="app_name">MultiVNC</string>
+<string name="color_mode">颜色模式</string>
+<string name="connect_button">连接</string>
+<string name="control_check">Ctrl</string>
+<string name="delete_connection">删除连接</string>
+<string name="disconnect">断开连接</string>
+<string name="info">信息</string>
+<string name="meta_key_title">发送特殊键</string>
+<string name="nickname_caption">名称</string>
+<string name="password_caption">密码</string>
+<string name="port_caption">端口</string>
+<string name="repeater_caption">转发器地址</string>
+<string name="repeater_clear">不使用转发器</string>
+<string name="save_as_copy">保存作为副本</string>
+<!-- Send selected metakey -->
+<string name="send_button">发送</string>
+<string name="send_key_again">再发送键</string>
+<string name="shift_check">Shift</string>
+<string name="shortcut_label">VNC 连接</string>
+<string name="special_keys">发送键</string>
+<string name="username_caption">用户名</string>
+<string name="username_hint">针对Windows授权</string>
+<string name="repeater_hint">输入转发器地址，只有当你正在使用UltraVNC时选中转发器</string>
+<string name="colormode_caption">颜色模式</string>
+</resources>

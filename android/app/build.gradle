@@ -1,0 +1,26 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "28.0.3"
+
+    defaultConfig {
+        applicationId "com.coboltforge.dontmind.multivnc"
+        minSdkVersion 5
+        targetSdkVersion 26
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile files('libs/GoogleAdMobAdsSdk-6.3.1.jar')
+    compile files('libs/com.antlersoft.android.contentxml.jar')
+    compile files('libs/com.antlersoft.android.db.jar')
+    compile files('libs/jmdns.jar')
+}

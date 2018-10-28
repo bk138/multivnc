@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="address_caption">アドレス</string>
+    <string name="alt_check">Alt</string>
+    <string name="app_name">MultiVNC</string>
+<string name="color_mode">彩色モード</string>
+<string name="connect_button">接続</string>
+<string name="control_check">Ctrl</string>
+<string name="delete_connection">コネクションを消す</string>
+<string name="disconnect">終了</string>
+<string name="info">情報</string>
+<string name="keep_password_button">保存</string>
+<string name="meta_key_title">特殊キー</string>
+<string name="nickname_caption">コネクション名</string>
+<string name="password_caption">パスワード</string>
+<string name="port_caption">ポート</string>
+<string name="save_as_copy">コピーとして保存</string>
+<!-- Send selected metakey -->
+<string name="send_button">送信</string>
+<string name="send_key_again">キーを繰り返す</string>
+<string name="shift_check">Shift</string>
+<string name="special_keys">特殊キー</string>
+</resources>
