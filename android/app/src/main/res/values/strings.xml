@@ -7,7 +7,7 @@
     <string name="server_removed">VNC Server disappeared</string>
     <string name="restartMDNS">Restart Server Discovery</string>
     <string name="scale_msg">Scale now</string>
-<string name="madeby">MultiVNC on Android is brought to you by CoboltForge (www.coboltforge.com).\n\nIt is based on android-vnc-viewer (http://code.google.com/p/android-vnc-viewer), with major cleanups and improvements done by CoboltForge.\n\nThe project home page is at https://github.com/bk138/multivnc.</string>
+<string name="madeby">MultiVNC on Android is brought to you by Christian Beier.\n\nIt is based on android-vnc-viewer (http://code.google.com/p/android-vnc-viewer), with major cleanups and improvements done by Christian Beier.\n\nThe project home page is at https://github.com/bk138/multivnc.</string>
 <string name="colormode_caption">Color Mode</string>
 <string name="color_mode">Set Color Mode</string>
 <string name="connect_button">Connect</string>
