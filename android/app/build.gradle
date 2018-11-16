@@ -19,7 +19,7 @@ android {
 }
 
 dependencies {
-    compile files('libs/com.antlersoft.android.contentxml.jar')
-    compile files('libs/com.antlersoft.android.db.jar')
-    compile files('libs/jmdns.jar')
+    implementation files('libs/com.antlersoft.android.contentxml.jar')
+    implementation files('libs/com.antlersoft.android.db.jar')
+    implementation files('libs/jmdns.jar')
 }
