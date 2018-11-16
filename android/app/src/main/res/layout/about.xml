@@ -65,16 +65,6 @@
 
  </ScrollView>
 
-       <com.google.ads.AdView
-           xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
-           android:id="@+id/ad"
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:layout_alignParentBottom="true"
-           ads:adSize="BANNER"
-           ads:adUnitId="a14f58d316c19d5"
-           android:gravity="center_horizontal"
-           ads:loadAdOnCreate="true" />
 
 </RelativeLayout>
 

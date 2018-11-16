@@ -8,7 +8,6 @@ package com.coboltforge.dontmind.multivnc;
  */
 
 
-import com.google.ads.*;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -56,10 +55,7 @@ public class AboutActivity extends Activity {
 		    	startActivity(browserIntent);
 			}
 		});
-		
-		// Look up the AdView as a resource and load a request.
-	    AdView adView = (AdView)this.findViewById(R.id.ad);
-	    adView.loadAd(new AdRequest());
+
 	}
 	
 	

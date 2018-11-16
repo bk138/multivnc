@@ -19,7 +19,6 @@ android {
 }
 
 dependencies {
-    compile files('libs/GoogleAdMobAdsSdk-6.3.1.jar')
     compile files('libs/com.antlersoft.android.contentxml.jar')
     compile files('libs/com.antlersoft.android.db.jar')
     compile files('libs/jmdns.jar')
