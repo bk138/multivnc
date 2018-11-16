@@ -6,11 +6,11 @@
 
 	<supports-screens android:anyDensity="true" />
 
-	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
 
     <application android:icon="@drawable/icon" android:label="MultiVNC" android:hardwareAccelerated="true">
@@ -19,13 +19,13 @@
 		          android:name="MainMenuActivity"
 		    	  >
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN"></action>
-				<category android:name="android.intent.category.LAUNCHER"></category>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<activity android:screenOrientation="landscape" android:configChanges="orientation|keyboardHidden" android:name="VncCanvasActivity">
 			<intent-filter>
-				<action android:name="android.intent.action.VIEW"></action>
+				<action android:name="android.intent.action.VIEW" />
 			</intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -61,9 +61,6 @@
             android:enabled="true"
             android:name=".MDNSService" >
         </service>
-
-        <activity android:name="com.google.ads.AdActivity"
-              android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
 
 	</application>
 
