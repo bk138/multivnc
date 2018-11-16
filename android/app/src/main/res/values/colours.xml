@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<color name="transparentred">#aaff0000</color>
+
+    <color name="transparentred">#aaff0000</color>
+
+    <color name="multivnc_icon_green">#4e9a06</color>
+    <color name="multivnc_icon_gray">#babdb6</color>
+
+    // specify colours here to also work on sub-21 API. those get used in layouts *and* styles
+    <color name="ui_primary">@color/multivnc_icon_gray</color>
+    <color name="ui_primary_dark">@color/multivnc_icon_green</color>
+    <color name="ui_text">@android:color/black</color>
+    <color name="ui_background">@android:color/white</color>
+
+
 </resources>
