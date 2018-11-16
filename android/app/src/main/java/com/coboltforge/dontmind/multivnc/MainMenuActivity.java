@@ -208,7 +208,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			{
 				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 				dialog.setTitle(getString(R.string.support_dialog_title));
-				dialog.setIcon(getResources().getDrawable(R.drawable.icon));
+				dialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
 				dialog.setMessage(R.string.support_dialog_text);
 
 				dialog.setPositiveButton(getString(R.string.support_dialog_yes), new OnClickListener() {
@@ -271,7 +271,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 
 				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
 				dialog.setTitle(getString(R.string.changelog_dialog_title));
-				dialog.setIcon(getResources().getDrawable(R.drawable.icon));
+				dialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
 
 				WebView wv = new WebView(getApplicationContext());
 				wv.loadData(getString(R.string.changelog_dialog_text), "text/html", "utf-8");
