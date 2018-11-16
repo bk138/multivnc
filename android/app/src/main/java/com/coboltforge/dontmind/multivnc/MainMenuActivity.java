@@ -296,62 +296,6 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		}
 
 
-		/*
-		 *  show commercial
-		 */
-		if(Utils.appstarts > 5 && Utils.appstarts % 2 != 0 && settings.getBoolean(Constants.PREFS_KEY_COMMERCIALDLG, true) && savedInstanceState == null)
-		{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-			dialog.setTitle(getString(R.string.commercial_dialog_title));
-			dialog.setIcon(getResources().getDrawable(R.drawable.icon));
-
-			WebView wv = new WebView(getApplicationContext());
-			wv.loadData(getString(R.string.commercial_dialog_text), "text/html", "utf-8");
-			dialog.setView(wv);
-
-			dialog.setPositiveButton(getString(R.string.commercial_dialog_yes), new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					Intent commercialIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://hello.shoutr.net/vnc.html"));
-					commercialIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-					startActivity(commercialIntent);
-					try{
-						dialog.dismiss();
-					}
-					catch(Exception e) {
-					}
-				}
-			});
-			dialog.setNeutralButton(getString(R.string.commercial_dialog_no), new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					try{
-						dialog.dismiss();
-					}
-					catch(Exception e) {
-					}
-				}
-			});
-			dialog.setNegativeButton(getString(R.string.commercial_dialog_neveragain), new OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
-					SharedPreferences.Editor ed = settings.edit();
-					ed.putBoolean(Constants.PREFS_KEY_COMMERCIALDLG, false);
-					ed.commit();
-
-					try{
-						dialog.dismiss();
-					}
-					catch(Exception e) {
-					}
-				}
-			});
-
-			dialog.show();
-		}
-
-
 	}
 
 	protected void onDestroy() {
