@@ -112,7 +112,7 @@ public class VncCanvasActivity extends Activity {
 		 * when user is making a small movement on touch screen.
 		 * Scale up delta when delta is big. This allows fast mouse movement when
 		 * user is flinging.
-		 * @param deltaX
+		 * @param delta
 		 * @return
 		 */
 		private float fineCtrlScale(float delta) {
@@ -401,7 +401,6 @@ public class VncCanvasActivity extends Activity {
 
 			e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
-			if(Build.VERSION.SDK_INT >= 14) {
 				//Translate the event into onTouchEvent type language
 				if (e.getButtonState() != 0) {
 					if ((e.getButtonState() & MotionEvent.BUTTON_PRIMARY) != 0) {
@@ -433,7 +432,6 @@ public class VncCanvasActivity extends Activity {
 					}
 					vncCanvas.panToMouse();
 				}
-			}
 
 			if(Utils.DEBUG())
 				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
@@ -834,7 +832,7 @@ public class VncCanvasActivity extends Activity {
 		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
 
 		try {
-			if(Build.VERSION.SDK_INT >= 11 && getActionBar().isShowing()) {
+			if(getActionBar().isShowing()) {
 				menu.findItem(R.id.itemSpecialKeys).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 				menu.findItem(R.id.itemSendKeyAgain).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 				menu.findItem(R.id.itemToggleKeyboard).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -1184,10 +1182,8 @@ public class VncCanvasActivity extends Activity {
 		notificationToast.show();
 	}
 
-	@SuppressLint("NewApi")
 	public void setTitle(String text) {
-		if(Build.VERSION.SDK_INT >= 11)
-			getActionBar().setTitle(text);
+		getActionBar().setTitle(text);
 	}
 
 
@@ -1195,33 +1191,23 @@ public class VncCanvasActivity extends Activity {
 	 * Sets window size according to target device's platform.
 	 * Note that this MUST be called before adding content!
 	 */
-	@SuppressLint("NewApi")
 	private void setupWindowSize() {
 
-		// only do complete fullscreen on 2.x devices
-		if(Build.VERSION.SDK_INT < 11)
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-		// but hide status bar everywhere
+		// hide status bar everywhere
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		if(Build.VERSION.SDK_INT >= 11) {
-			// disable home button as this sometimes takes keyboard focus
-			getActionBar().setDisplayShowHomeEnabled(false);
-		}
+		// disable home button as this sometimes takes keyboard focus
+		getActionBar().setDisplayShowHomeEnabled(false);
 
-		if(Build.VERSION.SDK_INT >= 14) {
-			// hideactionbar when there is a hardware menu button
-			if(ViewConfiguration.get(this).hasPermanentMenuKey())
-				getActionBar().hide();
-		}
+
+		// hideactionbar when there is a hardware menu button
+		if(ViewConfiguration.get(this).hasPermanentMenuKey())
+			getActionBar().hide();
 	}
 
-	@SuppressLint("NewApi")
 	private void invalidateMyOptionsMenu() {
-		if(Build.VERSION.SDK_INT >= 11) {
-			invalidateOptionsMenu();
-		}
+		invalidateOptionsMenu();
 	}
 
 }
