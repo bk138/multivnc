@@ -67,7 +67,7 @@
 <string name="firstrun_help_dialog_title">Show Help?</string>
 <string name="firstrun_help_dialog_text">Seems it\'s the first time you use MultiVNC. Do you want to read the app manual? It\'s not very long yet informative...</string>
 
-<string name="pleaserate">Show some love by clicking the heart ;-)</string>
+<string name="pleaserate">If you like MultiVNC, why not show some love by clicking the heart?</string>
 <string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
 <![CDATA[
