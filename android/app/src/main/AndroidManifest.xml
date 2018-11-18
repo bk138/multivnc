@@ -50,6 +50,11 @@
             >
        	</activity>
 
+		<activity android:name="ImportExportActivity"
+			android:label="@string/import_export_settings"
+			>
+		</activity>
+
         <activity android:name="AboutActivity"
              android:label="@string/about"
              >

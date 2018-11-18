@@ -34,7 +34,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -306,18 +305,6 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		unbindFromMDNSService();
 	}
 
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onCreateDialog(int)
-	 */
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		if (id == R.layout.importexport)
-			return new ImportExportDialog(this);
-
-		return null;
-	}
-
-
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -347,7 +334,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			}
 			break;
 		case R.id.itemImportExport :
-			showDialog(R.layout.importexport);
+			startActivity(new Intent(this, ImportExportActivity.class));
 			break;
 		case R.id.itemOpenDoc :
 			Intent intent = new Intent (this, AboutActivity.class);

@@ -4,7 +4,6 @@
 package com.coboltforge.dontmind.multivnc;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,25 +32,14 @@ import org.xml.sax.SAXException;
  * @author Michael A. MacDonald
  *
  */
-class ImportExportDialog extends Dialog {
+public class ImportExportActivity extends Activity {
 
-	private MainMenuActivity _configurationDialog;
 	private EditText _textLoadUrl;
 	private EditText _textSaveUrl;
+	private VncDatabase mDatabase;
 
 
-	/**
-	 * @param context
-	 */
-	public ImportExportDialog(MainMenuActivity context) {
-		super(context);
-		setOwnerActivity((Activity)context);
-		_configurationDialog = context;
-	}
 
-	/* (non-Javadoc)
-	 * @see android.app.Dialog#onCreate(android.os.Bundle)
-	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,7 +48,9 @@ class ImportExportDialog extends Dialog {
 		_textLoadUrl = (EditText)findViewById(R.id.textImportUrl);
 		_textSaveUrl = (EditText)findViewById(R.id.textExportPath);
 
-		File f = BCFactory.getInstance().getStorageContext().getExternalStorageDir(_configurationDialog, null);
+		mDatabase = new VncDatabase(this);
+
+		File f = BCFactory.getInstance().getStorageContext().getExternalStorageDir(this, null);
 		// Sdcard not mounted; nothing else to do
 		if (f == null)
 			return;
@@ -82,10 +72,10 @@ class ImportExportDialog extends Dialog {
 				try {
 					File f = new File(_textSaveUrl.getText().toString());
 					Writer writer = new OutputStreamWriter(new FileOutputStream(f, false));
-					SqliteElement.exportDbAsXmlToStream(_configurationDialog.getDatabaseHelper().getReadableDatabase(), writer);
+					SqliteElement.exportDbAsXmlToStream(mDatabase.getReadableDatabase(), writer);
 					writer.close();
 					try{
-						dismiss();
+						finish();
 					}
 					catch(Exception e) {
 					}
@@ -111,15 +101,14 @@ class ImportExportDialog extends Dialog {
 					connection.connect();
 					Reader reader = new InputStreamReader(connection.getInputStream());
 					SqliteElement.importXmlStreamToDb(
-							_configurationDialog.getDatabaseHelper().getWritableDatabase(),
+							mDatabase.getWritableDatabase(),
 							reader,
 							ReplaceStrategy.REPLACE_EXISTING);
 					try{
-						dismiss();
+						finish();
 					}
 					catch(Exception e) {
 					}
-					_configurationDialog.updateBookmarkView();
 				}
 				catch (MalformedURLException mfe)
 				{
@@ -140,8 +129,8 @@ class ImportExportDialog extends Dialog {
 
 	private void errorNotify(String msg, Throwable t)
 	{
-		Log.i("com.coboltforge.dontmind.multivnc.ImportExportDialog", msg, t);
-		Utils.showErrorMessage(this.getContext(), msg + ":" + t.getMessage());
+		Log.e("ImportExportActivity", msg, t);
+		Utils.showErrorMessage(this, msg + ":" + t.getMessage());
 	}
 
 }
