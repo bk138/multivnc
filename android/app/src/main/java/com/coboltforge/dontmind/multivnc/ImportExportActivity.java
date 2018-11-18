@@ -3,14 +3,19 @@
  */
 package com.coboltforge.dontmind.multivnc;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.antlersoft.android.bc.BCFactory;
 import com.antlersoft.android.contentxml.SqliteElement;
 import com.antlersoft.android.contentxml.SqliteElement.ReplaceStrategy;
 
@@ -34,8 +39,12 @@ import org.xml.sax.SAXException;
  */
 public class ImportExportActivity extends Activity {
 
+	private final static String TAG = "ImportExportActivity";
+
 	private EditText _textLoadUrl;
 	private EditText _textSaveUrl;
+	private Button mButtonExport;
+	private Button mButtonImport;
 	private VncDatabase mDatabase;
 
 
@@ -50,11 +59,7 @@ public class ImportExportActivity extends Activity {
 
 		mDatabase = new VncDatabase(this);
 
-		File f = BCFactory.getInstance().getStorageContext().getExternalStorageDir(this, null);
-		// Sdcard not mounted; nothing else to do
-		if (f == null)
-			return;
-
+		File f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 		f = new File(f, "MultiVNC-Export.xml");
 
 		_textSaveUrl.setText(f.getAbsolutePath());
@@ -64,21 +69,22 @@ public class ImportExportActivity extends Activity {
 			// Do nothing; default value not set
 		}
 
-		Button export = (Button)findViewById(R.id.buttonExport);
-		export.setOnClickListener(new View.OnClickListener() {
+		mButtonExport = findViewById(R.id.buttonExport);
+		mButtonExport.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+
+				if(!checkPerm(R.id.buttonExport))
+					return;
+
 				try {
 					File f = new File(_textSaveUrl.getText().toString());
 					Writer writer = new OutputStreamWriter(new FileOutputStream(f, false));
 					SqliteElement.exportDbAsXmlToStream(mDatabase.getReadableDatabase(), writer);
 					writer.close();
-					try{
-						finish();
-					}
-					catch(Exception e) {
-					}
+					finish();
+					Log.d(TAG, "export successful!");
 				}
 				catch (IOException ioe)
 				{
@@ -90,10 +96,15 @@ public class ImportExportActivity extends Activity {
 
 		});
 
-		((Button)findViewById(R.id.buttonImport)).setOnClickListener(new View.OnClickListener() {
+		mButtonImport = findViewById(R.id.buttonImport);
+		mButtonImport.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
+
+				if(!checkPerm(R.id.buttonImport))
+					return;
+
 				try
 				{
 					URL url = new URL(_textLoadUrl.getText().toString());
@@ -104,11 +115,9 @@ public class ImportExportActivity extends Activity {
 							mDatabase.getWritableDatabase(),
 							reader,
 							ReplaceStrategy.REPLACE_EXISTING);
-					try{
-						finish();
-					}
-					catch(Exception e) {
-					}
+					finish();
+					Log.d(TAG, "import successful!");
+
 				}
 				catch (MalformedURLException mfe)
 				{
@@ -127,10 +136,44 @@ public class ImportExportActivity extends Activity {
 		});
 	}
 
+	@SuppressLint("NewApi")
+	@Override
+	public void onRequestPermissionsResult(int requestCode,  String[] permissions, int[] grantResults) {
+
+		if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			Log.d(TAG, "Permission result: given!");
+			if(requestCode == R.id.buttonExport)
+				mButtonExport.callOnClick();
+			if(requestCode == R.id.buttonImport)
+				mButtonImport.callOnClick();
+		}
+		else {
+			Log.d(TAG, "Permission result: denied!");
+			Utils.showErrorMessage(this, "Permission to access external storage was denied.");
+		}
+
+	}
+
+	private boolean checkPerm(int requestId) {
+
+		if (android.os.Build.VERSION.SDK_INT >= 23) {
+
+			if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+				Log.d(TAG, "Has no permission! Ask!");
+				requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestId);
+				return false;
+			} else {
+				Log.d(TAG, "Permission already given!");
+			}
+		}
+
+		return true;
+	}
+
 	private void errorNotify(String msg, Throwable t)
 	{
-		Log.e("ImportExportActivity", msg, t);
-		Utils.showErrorMessage(this, msg + ":" + t.getMessage());
+		Log.e(TAG, msg, t);
+		Utils.showErrorMessage(this, msg + ": " + t.getMessage());
 	}
 
 }
