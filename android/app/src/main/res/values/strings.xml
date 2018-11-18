@@ -71,6 +71,16 @@
 <string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
 <![CDATA[
+<b>Version 1.7.x:</b>
+    <ul>
+          <li>1.7.0</li>
+     	      <ul>
+     	                 <li>Updated the UI theming to use the default look on the respective Android version.</li>
+       	                 <li>Made the import/export UI more usable.</li>
+     	                 <li>Updated the launcher icon to be more hi-res.</li>
+     	                 <li>Removed the ad system.</li>
+     	      </ul>
+    </ul>
 <b>Version 1.6.x:</b>
 	<ul>
           <li>1.6.4</li>
@@ -106,8 +116,14 @@
      </ul>
 <b>Version 1.5.x:</b>
 	<ul>
-	        <li>1.5.2: Hopefully fix crash on dialog dismissal.</li>
-		    <li>1.5.1: Prevent ActionBar from stealing keyboard focus.</li>
+	        <li>1.5.2</li>
+                      <ul>
+	                      <li>Hopefully fix crash on dialog dismissal.</li>
+	                  </ul>
+		    <li>1.5.1</li>
+                     <ul>
+		                  <li>Prevent ActionBar from stealing keyboard focus.</li>
+		             </ul>
      		 <li>1.5.0</li>
      	             <ul>
 			     		 <li>Full IPv6 support on Honeycomb and newer!</li>
@@ -124,17 +140,57 @@
 
 <b>Version 1.4.x:</b>
      		<ul>
-     		 <li>1.4.10: Added button to be able to rate the app.</li>
-     		 <li>1.4.9: Fix crash introduced by the 1.4.8 fix.</li>
-     	     <li>1.4.8: Fix an ANR error when pausing the app.</li>
-     		 <li>1.4.7: Fix hang after password entry. Should also work with bookmarks now.</li>
-     		 <li>1.4.6: Add menu item to toggle pointer highlighting.</li>
-     	     <li>1.4.5: Fix the 1.4.4 fix.</li>
-     	      <li>1.4.4: Fix crash on startup on Honeycomb or newer devices.</li>
-     	       <li>1.4.3: Hopefully fixed keyboard disappearing bug.</li>
-     	            <li>1.4.2: Fixed crash on mouse button press.</li>
-     	             <li>1.4.1: Fixed app not starting on Honeycomb devices.</li>
-     	             <li>1.4.0</li>
+     		 <li>1.4.10</li>
+     		 <ul>
+     		    <li>Added button to be able to rate the app.</li>
+     		 </ul>
+
+     		 <li>1.4.9</li>
+             <ul>
+     		    <li>Fix crash introduced by the 1.4.8 fix.</li>
+     	     </ul>
+
+     	     <li>1.4.8</li>
+     	     <ul>
+     	        <li>Fix an ANR error when pausing the app.</li>
+     		 </ul>
+
+     		 <li>1.4.7</li>
+     		 <ul>
+     		    <li>Fix hang after password entry. Should also work with bookmarks now.</li>
+     		 </ul>
+
+     		 <li>1.4.6</li>
+     		 <ul>
+     		    <li>Add menu item to toggle pointer highlighting.</li>
+     	     </ul>
+
+     		 <li>1.4.5</li>
+     	     <ul>
+     	         <li>Fix the 1.4.4 fix.</li>
+     	     </ul>
+
+     	     <li>1.4.4</li>
+     	     <ul>
+     	        <li>Fix crash on startup on Honeycomb or newer devices.</li>
+     	     </ul>
+
+     	     <li>1.4.3</li>
+     	     <ul>
+     	         <li> Hopefully fixed keyboard disappearing bug.</li>
+     	     </ul>
+
+     	     <li>1.4.2</li>
+     	      <ul>
+     	         <li>Fixed crash on mouse button press.</li>
+     	      </ul>
+
+     	     <li>1.4.1</li>
+     	      <ul>
+     	          <li>Fixed app not starting on Honeycomb devices.</li>
+     	      </ul>
+
+     	     <li>1.4.0</li>
      	             <ul>
 			     		 <li>ICS and Tablet Support!</li>
 			     		 <li>Added password prompt. Shown when no password was given but one is required.</li>
