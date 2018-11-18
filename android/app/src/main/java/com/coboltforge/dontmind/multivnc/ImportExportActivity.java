@@ -55,7 +55,7 @@ public class ImportExportActivity extends Activity {
 		if (f == null)
 			return;
 
-		f = new File(f, "vnc_settings.xml");
+		f = new File(f, "MultiVNC-Export.xml");
 
 		_textSaveUrl.setText(f.getAbsolutePath());
 		try {
