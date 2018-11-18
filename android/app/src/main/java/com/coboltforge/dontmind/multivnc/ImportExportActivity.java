@@ -59,7 +59,16 @@ public class ImportExportActivity extends Activity {
 
 		mDatabase = new VncDatabase(this);
 
-		File f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+		File f;
+		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			Log.d(TAG, "external storage not mounted, using internal");
+			f = getFilesDir();
+		}
+		else {
+			Log.d(TAG, "external storage mounted, using it");
+			f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+		}
+
 		f = new File(f, "MultiVNC-Export.xml");
 
 		_textSaveUrl.setText(f.getAbsolutePath());
