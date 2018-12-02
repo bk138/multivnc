@@ -73,6 +73,11 @@
 <![CDATA[
 <b>Version 1.7.x:</b>
     <ul>
+          <li>1.7.1</li>
+     	      <ul>
+     	                 <li>Fix crash on connection initialisation.</li>
+     	      </ul>
+
           <li>1.7.0</li>
      	      <ul>
      	                 <li>Updated the UI theming to use the default look on the respective Android version.</li>
