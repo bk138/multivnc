@@ -2,8 +2,7 @@
 <resources>
     <string name="address_caption">Adresse</string>
     <string name="alt_check">Alt</string>
-    <string name="app_name">MultiVNC</string>
-<string name="color_mode">Mode de couleur</string>
+    <string name="color_mode">Mode de couleur</string>
 <string name="connect_button">Connecter</string>
 <string name="control_check">Ctrl</string>
 <string name="delete_connection">Connexion supprimée</string>
