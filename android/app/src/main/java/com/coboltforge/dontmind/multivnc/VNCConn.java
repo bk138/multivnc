@@ -433,8 +433,12 @@ public class VNCConn {
 							// Hide progress dialog
 							canvas.handler.post(new Runnable() {
 								public void run() {
-									if(pd.isShowing())
-										pd.dismiss();
+									try {
+										if (pd.isShowing())
+											pd.dismiss();
+									} catch (Exception e){
+										//unused
+									}
 								}
 							});
 						}
