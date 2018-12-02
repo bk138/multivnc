@@ -1,0 +1,193 @@
+<resources>
+    <string name="address_caption">"Adresse"</string>
+    <string name="alt_check">"Alt"</string>
+    <string name="app_name" translatable="false">"MultiVNC"</string>
+    <string name="server_found">"VNC-Server gefunden: "</string>
+    <string name="server_removed">"VNC-Server ist verschwunden"</string>
+    <string name="restartMDNS">"Server-Erkennung neu starten"</string>
+    <string name="scale_msg">"Jetzt skalieren"</string>
+<string name="madeby">"MultiVNC für Android wird von Christian Beier für Sie bereitgestellt.\n\nEs basiert auf android-vnc-viewer (http://code.google.com/p/android-vnc-viewer) mit wichtigen Fehlerbehebungen und Verbesserungen. \n\nDie Projekt-Homepage befindet sich unter https://github.com/bk138/multivnc."</string>
+<string name="colormode_caption">"Farbmodus"</string>
+<string name="color_mode">"Farbmodus einstellen"</string>
+<string name="connect_button">"Verbinden"</string>
+<string name="control_check">"Ctrl"</string>
+<string name="delete_connection">"Löschen"</string>
+<string name="disconnect">"Trennen"</string>
+<string name="toggle_framebuffer_update">"Ansicht umschalten"</string>
+<string name="toggle_mouse_buttons">"Maustasten umschalten"</string>
+<string name="toggle_pointer_highlight">"Cursor-Highlight umschalten"</string>
+<string name="toggle_keyboard">"Tastatur umschalten"</string>
+<string name="export_settings">"Export"</string>
+<string name="export_settings_path">"In Datei exportieren"</string>
+<string name="database_error_open">"Fehler beim Öffnen der Datenbank!"</string>
+<string name="import_export_settings">"Importieren/Exportieren"</string>
+<string name="import_settings">"Importieren"</string>
+<string name="import_settings_file_url">"Importieren aus Datei oder URL"</string>
+<string name="info">"Info zur Verbindung"</string>
+<string name="meta_key_title">"Tastenkombination senden"</string>
+<string name="new_connection">"Neue Verbindung"</string>
+<string name="nickname_caption">"Lesezeichen"</string>
+<string name="discovered_servers">"Erkannte Server"</string>
+<string name="bookmarks">"Lesezeichen"</string>
+<string name="savebookmark_button">"Lesezeichen speichern"</string>
+<string name="bookmark_saved">"Lesezeichen gespeichert!"</string>
+<string name="bookmark_invalid">"Dies ist kein gültiges Lesezeichen mehr!"</string>
+<string name="password_caption">"Passwort"</string>
+<string name="keep_password_button">"Behalten"</string>
+<string name="port_caption">"Port"</string>
+<string name="repeater_caption">"Repeater"</string>
+<string name="repeater_hint">"UltraVNC-Repeater-Adresse"</string>
+<string name="repeater_clear">"Keinen Repeater verwenden"</string>
+<string name="save_as_copy">"Als Kopie speichern"</string>
+    <string name="repeater_save">"Speichern"</string>
+<!-- Send selected metakey -->
+<string name="send_button">"Senden"</string>
+<string name="send_key_again">"Tastenkombination erneut senden"</string>
+<string name="shift_check">"Shift"</string>
+<string name="shortcut_label">"VNC-Verbindungsverknüpfung"</string>
+<string name="special_keys">"Tastenkombination"</string>
+<string name="username_caption">"Nutzername"</string>
+<string name="username_hint">"Für die Windows-Authentifizierung"</string>
+<string name="editbookmark_title">"Lesezeichen bearbeiten"</string>
+<string name="enterbookmarkname">"Bitte geben Sie einen Lesezeichennamen ein…"</string>
+<string name="bookmark_save_question">"Möchten Sie diesen Server mit einem Lesezeichen versehen?"</string>
+<string name="bookmark_delete_question">"Möchten Sie dieses Lesezeichen wirklich löschen?"</string>
+<string name="disconnect_question">"Möchten Sie die Verbindung wirklich trennen?"</string>
+<string name="about">"Über"</string>
+<string name="help">"Hilfe"</string>
+<string name="edit">"Bearbeiten"</string>
+
+<string name="support_dialog_title">"Bitte unterstützen Sie MultiVNC"</string>
+<string name="support_dialog_text">"Wenn Ihnen MultiVNC gefällt, können Sie die Entwicklung unterstützen, indem Sie die App bewerten oder PayPal verwenden. Vielen Dank!"</string>
+<string name="support_dialog_yes">"Ja, gute Idee!"</string>
+<string name="support_dialog_no">"Nein, nicht jetzt."</string>
+<string name="support_dialog_neveragain">"Nicht noch einmal nachfragen."</string>
+
+<string name="firstrun_help_dialog_title">"Hilfe anzeigen?"</string>
+<string name="firstrun_help_dialog_text">"Es scheint, dass Sie MultiVNC zum ersten Mal verwenden. Möchten Sie das App-Handbuch lesen? Es ist noch nicht sehr umfangreich, aber trotzdem informativ…"</string>
+
+<string name="pleaserate">"Wenn Ihnen MultiVNC gefällt, klicken Sie einfach auf das Herz."</string>
+<string name="changelog_dialog_title">"Was gibt\'s Neues…"</string>
+<string name="changelog_dialog_text">
+<![CDATA[
+   <b> Version 1.7.x: </b>
+   <ul>
+      <li> 1.7.1 </li>
+      <ul>
+         <li> Absturz bei Verbindungsinitialisierung behoben.</li>
+      </ul>
+      <li> 1.7.0 </li>
+      <ul>
+         <li> Das UI-Theming wurde aktualisiert, um das Standard-Aussehen der jeweiligen Android-Version zu verwenden. </li>
+         <li> Die Import / Export-Benutzeroberfl&auml;che wurde benutzerfreundlicher. </li>
+         <li> Das Startsymbol wurde aktualisiert, um eine h&ouml;here Aufl&ouml;sung zu erreichen. </li>
+         <li> Das Anzeigensystem wurde entfernt. </li>
+      </ul>
+   </ul>
+   <b> Version 1.6.x: </b >
+   <ul>
+      <li> 1.6.4 </li>
+      <ul>
+         <li> Absturz beim Verbindsaufbau mit einigen Ger&auml;te behoben. </li>
+      </ul>
+      <li> 1.6.3 </li>
+      <ul>
+         <li> Verdeckte Men&uuml;elemente auf einigen Ger&auml;ten werden nun korrekt angezeigt. </li>
+         <li> Korrigieren der Erkennung von Zeroconf/Bonjour/mDNS-VNC-Servern auf Android 4.2-Ger&auml;ten. </li>
+      </ul>
+      <li> 1.6.2 </li>
+      <ul>
+         <li> Der ActionBar wird nun ausgeblendet, wenn Hardware-Men&uuml;-Buttons vorhanden sind. </li>
+         <li> Besch&auml;digte ungarische &Uuml;bersetzung entfernt. </li>
+      </ul>
+      <li> 1.6.1 </li>
+      <ul>
+         <li> ANR behoben, der manchmal auftreten konnte, wenn die Verbindung unterbrochen wurde. </li>
+         <li> Absturz in der Liste erkannter Server behoben. </li>
+      </ul>
+      <li> 1.6.0 </li>
+      <ul>
+         <li> Unterst&uuml;tzung f&uuml;r Hardwaretastaturen und M&auml;use wurde hinzugef&uuml;gt. Ein dickes Lob daf&uuml;r an Kevin Pansky. </li>
+         <li> Funktion zum Kopieren und Einf&uuml;gen in und aus der Android-Zwischenablage hinzugef&uuml;gt. </li>
+         <li> Das Klicken und Ziehen per virtueller Maustaste funktioniert jetzt auch auf Honeycomb-Ger&auml;ten und neueren Ger&auml;ten. </li>
+         <li> Etwas mehr Bildschirmfl&auml;che auf ICS und neueren Ger&auml;ten durch Ausblenden der Statusleiste. </li>
+      </ul>
+   </ul>
+   <b> Version 1.5.x: </b>
+   <ul>
+      <li> 1.5.2 </li>
+      <ul>
+         <li> Behebt hoffentlich Absturz beim Schlie&szlig;en des Dialogs. </li>
+      </ul>
+      <li> 1.5.1 </li>
+      <ul>
+         <li> Verhindert, dass der ActionBar den Tastaturfokus stiehlt. </li>
+      </ul>
+      <li> 1.5.0 </li>
+      <ul>
+         <li> Vollst&auml;ndige IPv6-Unterst&uuml;tzung in Honeycomb und neuer! </li>
+         <li> Hilfebildschirm hinzugef&uuml;gt. </li>
+         <li> Der Touchpad-Modus wurde verbessert. </li>
+         <li> Problem behoben, bei dem die \'Key Combo\'-Taste bei aktivierter Software-Tastatur fokussiert wurde. </li>
+         <li> Fehler beim Umschalten der virtuellen Maustaste behoben. </li>
+         <li> Fehler in Lesezeichen behoben. </li>
+         <li> Fokus-Problem mit ActionBar behoben. </li>
+         <li> Viele m&ouml;gliche Absturzsituationen ausgeschlossen. </li>
+         <li> Defekter Flattr-Button wurde entfernt. </li>
+      </ul >
+   </ul>
+   <b> Version 1.4.x: </b>
+   <ul>
+      <li> 1.4.10 </li>
+      <ul>
+         <li> Schaltfl&auml;che hinzugef&uuml;gt, um die App bewerten zu k&ouml;nnen. </li>
+      </ul>
+      <li> 1.4.9 </li>
+      <ul>
+         <li> Behebung eines Absturzes, der durch den 1.4.8-Fix eingef&uuml;hrt wurde. </li>
+      </ul>
+      <li> 1.4.8 </li>
+      <ul>
+         <li> Behebung eines ANR-Fehlers bei App-Beendigung. </li>
+      </ul>
+      <li> 1.4.7 </li>
+      <ul>
+         <li> ANR nach Passworteingabe behoben. Sollte jetzt auch mit Lesezeichen funktionieren. </li>
+      </ul>
+      <li> 1.4.6 </li>
+      <ul>
+         <li> Men&uuml;punkt hinzugef&uuml;gt, um das Highlighting des Cursors umzuschalten. </li>
+      </ul>
+      <li> 1.4.5 </li>
+      <ul>
+         <li> Fix f&uuml;r 1.4.4 gefixt. </li>
+      </ul>
+      <li> 1.4.4 </li>
+      <ul>
+         <li> Absturz beim Start behoben. </li>
+      </ul>
+      <li> 1.4.3 </li>
+      <ul>
+         <li> Fehler bei Benutzung der Tastatur behoben. </li>
+      </ul>
+      <li> 1.4.2 </li>
+      <ul>
+         <li> Absturz beim Dr&uuml;cken der Maustaste behoben. </li>
+      </ul>
+      <li> 1.4.1 </li>
+      <ul>
+         <li> Absturz beim Start behoben. </li >
+      </ul>
+      <li> 1.4.0 </li>
+      <ul>
+         <li> Unterst&uuml;tzung f&uuml;r Android 4.0 und Tablets! </li>
+         <li> Aufforderung zur Passworteingabe hinzugef&uuml;gt. Wird angezeigt, wenn kein Passwort angegeben wurde, aber eines erforderlich ist. </li>
+         <li> Die Tastatureingabe wurde erheblich verbessert. Die meisten Spezialsymbole funktionieren jetzt. </li>
+         <li> Fehler beim Neustart der App behoben. </li>
+         <li> Einige m&ouml;gliche Abst&uuml;rze behoben. </li>
+      </ul>
+   </ul>
+
+]]>
+</string>
+</resources>
