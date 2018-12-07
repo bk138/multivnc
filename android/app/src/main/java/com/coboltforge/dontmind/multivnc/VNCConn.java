@@ -193,8 +193,12 @@ public class VNCConn {
 					// before we fatal error finish
 					canvas.handler.post(new Runnable() {
 						public void run() {
-							if(pd.isShowing())
-								pd.dismiss();
+							try {
+								if (pd.isShowing())
+									pd.dismiss();
+							} catch (Exception e) {
+								//unused
+							}
 						}
 					});
 					if (e instanceof OutOfMemoryError) {
