@@ -72,6 +72,13 @@
 <![CDATA[
    <b> Version 1.7.x: </b>
    <ul>
+
+      <li>1.7.2</li>
+     	      <ul>
+     	                 <li>M&ouml;glichen Absturz behoben.</li>
+     	                 <li>Deutsche &Uuml;bersetzung hinzugef&uuml;gt.</li>
+     	      </ul>
+
       <li> 1.7.1 </li>
       <ul>
          <li> Absturz bei Verbindungsinitialisierung behoben.</li>

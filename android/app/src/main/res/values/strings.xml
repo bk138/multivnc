@@ -73,6 +73,12 @@
 <![CDATA[
 <b>Version 1.7.x:</b>
     <ul>
+           <li>1.7.2</li>
+     	      <ul>
+     	                 <li>Fixed another possible crash.</li>
+     	                 <li>Added german translation.</li>
+     	      </ul>
+
           <li>1.7.1</li>
      	      <ul>
      	                 <li>Fix crash on connection initialisation.</li>
