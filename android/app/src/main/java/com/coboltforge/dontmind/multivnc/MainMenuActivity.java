@@ -311,6 +311,11 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		unbindFromMDNSService();
 	}
 
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		stopService(new Intent(Intent.ACTION_VIEW, null, this, MDNSService.class));
+	}
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
