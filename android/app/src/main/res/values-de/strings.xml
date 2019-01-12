@@ -73,6 +73,13 @@
    <b> Version 1.7.x: </b>
    <ul>
 
+      <li>1.7.3</li>
+     	      <ul>
+     	                 <li>Einige Aktualisierungen der automatischen Servererkennung.</li>
+     	                 <li>Kleinere Probleme in deutscher Übersetzung behoben.</li>
+     	      </ul>
+
+
       <li>1.7.2</li>
      	      <ul>
      	                 <li>M&ouml;glichen Absturz behoben.</li>
