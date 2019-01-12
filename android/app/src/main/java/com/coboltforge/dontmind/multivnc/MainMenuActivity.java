@@ -96,10 +96,13 @@ public class MainMenuActivity extends Activity implements IMDNS {
 			// and force a dump of discovered connections
 			boundMDNSService.dump();
 
-			Log.d(TAG, "bound to MDNSService " + boundMDNSService);
+			Log.d(TAG, "connected to MDNSService " + boundMDNSService);
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
+
+			Log.d(TAG, "disconnected from MDNSService " + boundMDNSService);
+
 			// This is called when the connection with the service has been
 			// unexpectedly disconnected -- that is, its process crashed.
 			// Because it is running in our same process, we should never
@@ -298,6 +301,9 @@ public class MainMenuActivity extends Activity implements IMDNS {
 	}
 
 	protected void onDestroy() {
+
+		Log.d(TAG, "onDestroy()");
+
 		super.onDestroy();
 
 		database.close();
@@ -607,6 +613,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		{
 			this.unbindService(connection_MDNSService);
 			connection_MDNSService = null;
+			boundMDNSService.registerCallback(null);
 			boundMDNSService = null;
 		}
 	}
