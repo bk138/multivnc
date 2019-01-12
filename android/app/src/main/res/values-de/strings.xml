@@ -2,8 +2,8 @@
     <string name="address_caption">"Adresse"</string>
     <string name="alt_check">"Alt"</string>
     <string name="app_name" translatable="false">"MultiVNC"</string>
-    <string name="server_found">"VNC-Server gefunden: "</string>
-    <string name="server_removed">"VNC-Server ist verschwunden"</string>
+    <string name="server_found">"VNC-Server gefunden"</string>
+    <string name="server_removed">"VNC-Server verschwunden"</string>
     <string name="restartMDNS">"Server-Erkennung neu starten"</string>
     <string name="scale_msg">"Jetzt skalieren"</string>
 <string name="madeby">"MultiVNC für Android wird von Christian Beier für Sie bereitgestellt.\n\nEs basiert auf android-vnc-viewer (http://code.google.com/p/android-vnc-viewer) mit wichtigen Fehlerbehebungen und Verbesserungen. \n\nDie Projekt-Homepage befindet sich unter https://github.com/bk138/multivnc."</string>
@@ -17,7 +17,7 @@
 <string name="toggle_mouse_buttons">"Maustasten umschalten"</string>
 <string name="toggle_pointer_highlight">"Cursor-Highlight umschalten"</string>
 <string name="toggle_keyboard">"Tastatur umschalten"</string>
-<string name="export_settings">"Export"</string>
+<string name="export_settings">"Exportien"</string>
 <string name="export_settings_path">"In Datei exportieren"</string>
 <string name="database_error_open">"Fehler beim Öffnen der Datenbank!"</string>
 <string name="import_export_settings">"Importieren/Exportieren"</string>
@@ -50,7 +50,7 @@
 <string name="username_hint">"Für die Windows-Authentifizierung"</string>
 <string name="editbookmark_title">"Lesezeichen bearbeiten"</string>
 <string name="enterbookmarkname">"Bitte geben Sie einen Lesezeichennamen ein…"</string>
-<string name="bookmark_save_question">"Möchten Sie diesen Server mit einem Lesezeichen versehen?"</string>
+<string name="bookmark_save_question">"Möchten Sie diesen Server als Lesezeichen speichern?"</string>
 <string name="bookmark_delete_question">"Möchten Sie dieses Lesezeichen wirklich löschen?"</string>
 <string name="disconnect_question">"Möchten Sie die Verbindung wirklich trennen?"</string>
 <string name="about">"Über"</string>
