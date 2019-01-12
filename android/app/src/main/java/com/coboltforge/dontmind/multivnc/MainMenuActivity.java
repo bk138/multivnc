@@ -294,7 +294,7 @@ public class MainMenuActivity extends Activity implements IMDNS {
 
 			}
 		} catch (NameNotFoundException e) {
-			Log.w("Unable to get version code. Will not show changelog", e);
+			Log.w(TAG, "Unable to get version code. Will not show changelog", e);
 		}
 
 
