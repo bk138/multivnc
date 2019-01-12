@@ -1,6 +1,6 @@
 package com.coboltforge.dontmind.multivnc;
 
-/**
+/*
  * @author Christian Beier
  * mDNS Service Discovery Service.
  * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
@@ -14,6 +14,7 @@ import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceListener;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,7 +22,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -45,7 +45,7 @@ public class MDNSService extends Service {
 	 * Class for clients to access. Because we know this service always runs in
 	 * the same process as its clients, we don't need to deal with IPC.
 	 */
-	public class LocalBinder extends Binder {
+	class LocalBinder extends Binder {
 		MDNSService getService() {
 			return MDNSService.this;
 		}
@@ -83,6 +83,7 @@ public class MDNSService extends Service {
 					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_STOP).sendToTarget();
 				}
 				catch(NullPointerException e) {
+					//unused
 				}
 
 				//  (re)start
@@ -90,6 +91,7 @@ public class MDNSService extends Service {
 					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_START).sendToTarget();
 				}
 				catch(NullPointerException e) {
+					//unused
 				}
 
 			}
@@ -133,6 +135,7 @@ public class MDNSService extends Service {
 			Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_DUMP).sendToTarget();
 		}
 		catch(NullPointerException e) {
+			//unused
 		}
 	}
 
@@ -148,15 +151,16 @@ public class MDNSService extends Service {
 		private String mdnstype = "_rfb._tcp.local.";
 		private JmDNS jmdns = null;
 		private ServiceListener listener = null;
-		private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<String,ConnectionBean> ();
+		private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<>();
 		private Handler handler;
 
-		public final static int MESSAGE_START = 0;
-		public final static int MESSAGE_STOP = 1;
-		public final static int MESSAGE_DUMP = 2;
+		final static int MESSAGE_START = 0;
+		final static int MESSAGE_STOP = 1;
+		final static int MESSAGE_DUMP = 2;
 
 
 		// this just runs a message loop and acts according to messages
+		@SuppressLint("HandlerLeak") // no handler leak as looper runs on worker thread
 		public void run() {
 			Looper.prepare();
 
@@ -205,16 +209,16 @@ public class MDNSService extends Service {
 				success = false;
 			}
 			else {
-
-				android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
-				multicastLock = wifi.createMulticastLock("mylockthereturn");
-				multicastLock.setReferenceCounted(true);
-				multicastLock.acquire();
 				try {
 
+					android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
+					assert wifi != null;
+					multicastLock = wifi.createMulticastLock("mylockthereturn");
+					multicastLock.setReferenceCounted(true);
+					multicastLock.acquire();
 					InetAddress addr = Utils.intToInetAddress(wifi.getConnectionInfo().getIpAddress());
 
-					Log.d(TAG, "Creating MDNS with address " + addr.toString());
+					Log.d(TAG, "Creating MDNS with address " + addr);
 
 					jmdns = JmDNS.create(addr);
 					jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
@@ -224,11 +228,7 @@ public class MDNSService extends Service {
 							ConnectionBean c = new ConnectionBean();
 							c.set_Id(0); // new!
 							c.setNickname(ev.getName());
-							// use IPv4-only on gingerbread and lower
-							if(Build.VERSION.SDK_INT < 11)
-								c.setAddress(ev.getInfo().getInet4Addresses()[0].toString().replace('/', ' ').trim());
-							else
-								c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
+							c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
 							c.setPort(ev.getInfo().getPort());
 							c.setUseLocalCursor(true); // always enable
 
