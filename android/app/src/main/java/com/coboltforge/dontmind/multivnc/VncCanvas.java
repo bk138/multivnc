@@ -437,8 +437,12 @@ public class VncCanvas extends GLSurfaceView {
 	 */
 	void panToMouse()
 	{
-		if (! vncConn.getConnSettings().getFollowMouse())
+		try {
+			if (!vncConn.getConnSettings().getFollowMouse())
+				return;
+		} catch (NullPointerException e) {
 			return;
+		}
 
 		if (scaling != null && ! scaling.isAbleToPan())
 			return;
