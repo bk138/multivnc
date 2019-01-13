@@ -73,6 +73,12 @@
 <![CDATA[
 <b>Version 1.7.x:</b>
     <ul>
+
+           <li>1.7.4</li>
+     	      <ul>
+     	                 <li>Fixed possible crash in cursor handling.</li>
+     	      </ul>
+
            <li>1.7.3</li>
      	      <ul>
      	                 <li>Some updates to the server discovery module.</li>

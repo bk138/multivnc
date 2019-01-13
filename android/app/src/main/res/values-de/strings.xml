@@ -73,6 +73,11 @@
    <b> Version 1.7.x: </b>
    <ul>
 
+       <li>1.7.4</li>
+     	      <ul>
+     	                 <li>Möglichen Absturz beim Verfolgen des Cursors behoben.</li>
+     	      </ul>
+
       <li>1.7.3</li>
      	      <ul>
      	                 <li>Einige Aktualisierungen der automatischen Servererkennung.</li>
