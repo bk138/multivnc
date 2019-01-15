@@ -618,8 +618,12 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		{
 			this.unbindService(connection_MDNSService);
 			connection_MDNSService = null;
-			boundMDNSService.registerCallback(null);
-			boundMDNSService = null;
+			try {
+				boundMDNSService.registerCallback(null);
+				boundMDNSService = null;
+			} catch (NullPointerException e) {
+				// was already null
+			}
 		}
 	}
 
