@@ -73,6 +73,12 @@
    <b> Version 1.7.x: </b>
    <ul>
 
+
+         <li>1.7.5</li>
+     	      <ul>
+     	                 <li>Möglichen Absturz beim Schließen der App behoben.</li>
+     	      </ul>
+
        <li>1.7.4</li>
      	      <ul>
      	                 <li>Möglichen Absturz beim Verfolgen des Cursors behoben.</li>

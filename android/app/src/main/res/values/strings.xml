@@ -74,6 +74,11 @@
 <b>Version 1.7.x:</b>
     <ul>
 
+         <li>1.7.5</li>
+     	      <ul>
+     	                 <li>Fixed possible crash when closing the app.</li>
+     	      </ul>
+
            <li>1.7.4</li>
      	      <ul>
      	                 <li>Fixed possible crash in cursor handling.</li>
