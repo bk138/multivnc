@@ -1,6 +1,7 @@
 
 MultiVNC is a cross-platform Multicast-enabled VNC viewer using
 wxWidgets and libvncclient . It runs on Unix, Mac OS X and Windows.
+There also is an [Android version](/android/).
 
 Features:
 
