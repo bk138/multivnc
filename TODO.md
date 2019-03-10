@@ -1,5 +1,5 @@
 
-wxWidgets version:
+# wxWidgets version:
  - wxSecretStore for bookmarks
  - wxTaskBarIcon
  - CMake instead of Autotools
@@ -30,7 +30,7 @@ cl->framebuffer
    SendXvpMessage(), but why? testrect case is ok...
    
    
-Android version:
+# Android version:
   - unified mode of operation
   - multicast
   
