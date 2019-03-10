@@ -38,19 +38,16 @@ For features that are planned, but not completed yet, look at the
 
 
 
-MulticastVNC notes
-------------------
+# MulticastVNC notes
 
-This is still experimental and there is no server support, 
-however you can get a modified libvncserver/libvncclient
-at http://github.com/bk138/x11vnc-multiptr, branch multicastvnc.
-This is the same library that MultiVNC uses internally.
+You can get a modified libvncserver/libvncclient at
+https://github.com/LibVNC/libvncserver/tree/multicastvnc -
+this is the same library that MultiVNC uses internally.
 
 
 
 
-How to compile from source
---------------------------
+# How to compile the desktop wxWidgets version from source
 
 The prerequisites:
 
