@@ -15,11 +15,11 @@
  - translations
  - new drawing model:
 
-                  wxBitmap(per viewerwindow) -> (wxImage-> scaled wxImage -> wxBitmap) -> screen
-                /
-cl->framebuffer
-                \
-                  gl texture(per viewerwindow) -> screen (via wxGLCanvas -> FAST scaling)
+                          wxBitmap(per viewerwindow) -> (wxImage-> scaled wxImage -> wxBitmap) -> screen
+                        /
+        cl->framebuffer
+                        \
+                          gl texture(per viewerwindow) -> screen (via wxGLCanvas -> FAST scaling)
                   
  read directly cl->framebuffer into wxBitmap/texture WITHOUT an intermediate wxBitmap object
 
