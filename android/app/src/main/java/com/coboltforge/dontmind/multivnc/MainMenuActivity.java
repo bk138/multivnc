@@ -21,9 +21,7 @@
 
 package com.coboltforge.dontmind.multivnc;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,6 +34,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.IBinder;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -59,7 +58,7 @@ import java.util.Hashtable;
 
 
 
-public class MainMenuActivity extends Activity implements IMDNS {
+public class MainMenuActivity extends AppCompatActivity implements IMDNS {
 
 	private static final String TAG = "MainMenuActivity";
 

@@ -27,9 +27,9 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -38,7 +38,6 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnDismissListener;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -53,14 +52,13 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
 @SuppressWarnings("deprecation")
-public class VncCanvasActivity extends Activity {
+public class VncCanvasActivity extends AppCompatActivity {
 
 
 	public class MightyInputHandler extends AbstractGestureInputHandler {
@@ -832,7 +830,7 @@ public class VncCanvasActivity extends Activity {
 		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
 
 		try {
-			if(getActionBar().isShowing()) {
+			if(getSupportActionBar().isShowing()) {
 				menu.findItem(R.id.itemSpecialKeys).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 				menu.findItem(R.id.itemSendKeyAgain).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 				menu.findItem(R.id.itemToggleKeyboard).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -1183,7 +1181,7 @@ public class VncCanvasActivity extends Activity {
 	}
 
 	public void setTitle(String text) {
-		getActionBar().setTitle(text);
+		getSupportActionBar().setTitle(text);
 	}
 
 
@@ -1198,12 +1196,12 @@ public class VncCanvasActivity extends Activity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		// disable home button as this sometimes takes keyboard focus
-		getActionBar().setDisplayShowHomeEnabled(false);
+		getSupportActionBar().setDisplayShowHomeEnabled(false);
 
 
 		// hideactionbar when there is a hardware menu button
 		if(ViewConfiguration.get(this).hasPermanentMenuKey())
-			getActionBar().hide();
+			getSupportActionBar().hide();
 	}
 
 	private void invalidateMyOptionsMenu() {
