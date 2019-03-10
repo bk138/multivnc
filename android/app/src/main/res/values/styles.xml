@@ -3,6 +3,8 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <item name="android:textColorPrimary">@color/ui_text</item>
         <item name="android:windowBackground">@color/ui_background</item>
+        <!-- https://stackoverflow.com/questions/31777167/android-options-menu-is-transparent -->
+        <item name="android:panelBackground">@color/ui_background</item>
     </style>
 
 </resources>
