@@ -1,4 +1,0 @@
-
-* make rotatable
-
-* port to libvncclient

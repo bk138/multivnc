@@ -31,6 +31,9 @@ cl->framebuffer
    
    
 # Android version:
-  - unified mode of operation
-  - multicast
+
+* make rotatable
+* port to libvncclient
+- unified mode of operation (?)
+
   
