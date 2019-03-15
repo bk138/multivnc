@@ -24,13 +24,15 @@ The desktop version stands out with additional features such as:
 * Simple, loggable statistics 
 * Supports server framebuffer resize.
 
-The mobile Android versions sports:
+The mobile Android version sports:
 
 * Virtual mouse button controls with haptic feedback.
 * Two-finger swipe gesture recognition.
 * A super fast touchpad mode for local use.
 * Hardware-accelerated OpenGL drawing and zooming.
 * Copy&paste to and from Android.
+* Availability from both [Google Play](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
+  and [F-Droid](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/).
 
 For features that are planned, but not completed yet, look at the
 [TODO](TODO.md) file.
