@@ -1,0 +1,86 @@
+MultiVNC 0.5 - "Bag o' stuff"
+	* MulticastVNC now supports the Ultra encoding and features
+	  a freely sizeable receive buffer in addition to the 
+	  OS-dependent socket receive buffer.
+	* The new MulticastVNC flow control adapts the server's
+	  transmission rate to the capabilities of the network
+	  and clients.
+	* MultiVNC is now able to connect to Apple Remote Desktop
+	  servers.
+	* It is now possible to select the desired VNC encoding.
+	* Encrypted connections now work on Windows as well.
+	* Added a keyboard grab button that allows to enter arbitrary
+	  key combinations like Ctrl-Alt-Del into MultiVNC without
+	  being interpreted by the local OS. Works on UNIX by now.
+	* This time really fixed the bug with the viewer becoming
+          unresponsive under high multicast loads.
+	* Fixed not being able to enter IPv6 addresses.
+
+MultiVNC 0.4.1 - "Fix me up"
+        * Changed default MulticastVNC receive buffer size to 5120 KB
+          to play it safe.
+        * Shared windows are now view-only on Linux clients. Having 
+          the local cursor warped here and there is quite distracting.
+	* Window sharing on Windows has no more trayicon and 
+	  distracting setup dialog.
+        * Window sharing should be more stable now.
+        * Link latency measuring is way more exact now.
+        * Fixed crash on startup when toolbar was disabled.
+        * Fixed Windows build. MultiVNC 0.4 was unusable.
+
+MultiVNC 0.4 - "One for the road"
+        * MultiVNC can now connect to IPv6 servers!
+        * MulticastVNC now incorporates a NACK mechanism which makes
+          multicasting a lot more reliable: Lost packets are 
+          retransmitted if the server supports it.
+        * MultiVNC now supports QoS: data sent to a VNC server can be
+          marked for expedited forwarding!
+        * Fixed bug where changing edge connector settings would
+          crash MultiVNC.
+
+MultiVNC 0.3 - "Collab me!"
+	* Implemented window sharing: You can now beam one of your 
+          windows to the remote side. Works on UNIX and Windows.
+        * Implemented Edge Connector: You can now tell MultiVNC that
+          one of your screen edges should be the border to the remote
+          display. When you move the pointer over this edge, MultiVNC
+          will take over your mouse and keyboard and send your input 
+          to the remote side. When the pointer is moved back towards 
+          the opposite edge on the remote screen, you're back on your
+          local desktop.
+ 	* Implemented FastRequest feature: You can now set an interval
+ 	  at which MultiVNC continously asks the server for updates
+	  instead of just asking after each received server message.
+	  This should improve framerate on high latency links.
+	* Fixed a bug where a fast VNC server would make MultiVNC
+	  GUI unresponsive on a slow client.
+	* Fixed bug where saving log or screenshot would terminate
+	  the connection or even crash on some machines.
+        * Fixed bug where setting up connection would take very long
+          due to unnecessary DNS lookups.
+
+
+MultiVNC 0.2 - "The real thing"
+	* MulticastVNC incorporated! You can now connect to a
+ 	  MulticastVNC enabled server, e.g. based on libvncserver.
+	* Listen mode (Reverse VNC) implemented. Via tabs it is
+	  possible to listen for and serve multiple incoming
+	  connections.
+        * Bookmarks are working now.
+	* Clipboard data is now properly encoded.
+	* Fix bug with canvas centering.
+	* Fix bug where disconnecting from a fast server would 
+ 	  terminate MultiVNC.
+        * Fix really nasty bug where listening on windows would
+          take 100% CPU.
+
+
+MultiVNC 0.1 - "In the beginning"
+	* a usable tight-enabled vncviewer with the following special
+	  features:
+	* supports server framebuffer resize
+	* several connections with one viewer using tabs
+	* simple, loggable statistics
+        * discovery of VNC servers advertising themselves via ZeroConf
+        * runs under UNIX and Windows
+
