@@ -80,7 +80,11 @@
 <![CDATA[
    <b> Version 1.7.x: </b>
    <ul>
-
+         <li>1.7.6</li>
+     	      <ul>
+      	                 <li>Wenn keine Lesezeichen vorhanden sind, wird dies nun beim Erstellen einer Homescreen-Verknüpfung angezeigt.</li>
+     	                 <li>Möglichen Absturz beim Importieren von Einstellungen behoben.</li>
+     	      </ul>
 
          <li>1.7.5</li>
      	      <ul>
