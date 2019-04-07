@@ -5,10 +5,9 @@ package com.coboltforge.dontmind.multivnc;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -47,6 +46,42 @@ public class ImportExportActivity extends Activity {
 	private Button mButtonImport;
 	private VncDatabase mDatabase;
 
+	@SuppressLint("StaticFieldLeak") // this is not long-running
+	private class ImportFromURLAsyncTask extends AsyncTask<String, Void, Exception> {
+
+		@Override
+		protected Exception doInBackground(String... urls) {
+			try {
+				URLConnection connection = new URL(urls[0]).openConnection();
+				connection.connect();
+				Reader reader = new InputStreamReader(connection.getInputStream());
+				SqliteElement.importXmlStreamToDb(
+						mDatabase.getWritableDatabase(),
+						reader,
+						ReplaceStrategy.REPLACE_EXISTING);
+				return null;
+			} catch (Exception e) {
+				return e;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Exception e) {
+			if(e == null) {
+				finish();
+				Log.d(TAG, "import successful!");
+			} else {
+				if(e instanceof MalformedURLException)
+					errorNotify("Improper URL given: " + _textLoadUrl.getText(), e);
+
+				if(e instanceof IOException)
+					errorNotify("I/O error reading configuration", e);
+
+				if(e instanceof SAXException)
+					errorNotify("XML or format error reading configuration", e);
+			}
+		}
+	}
 
 
 	@Override
@@ -114,32 +149,7 @@ public class ImportExportActivity extends Activity {
 				if(!checkPerm(R.id.buttonImport))
 					return;
 
-				try
-				{
-					URL url = new URL(_textLoadUrl.getText().toString());
-					URLConnection connection = url.openConnection();
-					connection.connect();
-					Reader reader = new InputStreamReader(connection.getInputStream());
-					SqliteElement.importXmlStreamToDb(
-							mDatabase.getWritableDatabase(),
-							reader,
-							ReplaceStrategy.REPLACE_EXISTING);
-					finish();
-					Log.d(TAG, "import successful!");
-
-				}
-				catch (MalformedURLException mfe)
-				{
-					errorNotify("Improper URL given: " + _textLoadUrl.getText(), mfe);
-				}
-				catch (IOException ioe)
-				{
-					errorNotify("I/O error reading configuration", ioe);
-				}
-				catch (SAXException e)
-				{
-					errorNotify("XML or format error reading configuration", e);
-				}
+				new ImportFromURLAsyncTask().execute(_textLoadUrl.getText().toString());
 			}
 
 		});
