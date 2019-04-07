@@ -1,5 +1,6 @@
-/**
+/*
  * Copyright (c) 2010 Michael A. MacDonald
+ * Copyright (c) 2011-2019 Christian Beier
  */
 package com.coboltforge.dontmind.multivnc;
 
@@ -89,8 +90,8 @@ public class ImportExportActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.importexport);
 		setTitle(R.string.import_export_settings);
-		_textLoadUrl = (EditText)findViewById(R.id.textImportUrl);
-		_textSaveUrl = (EditText)findViewById(R.id.textExportPath);
+		_textLoadUrl = findViewById(R.id.textImportUrl);
+		_textSaveUrl = findViewById(R.id.textExportPath);
 
 		mDatabase = new VncDatabase(this);
 
@@ -173,6 +174,7 @@ public class ImportExportActivity extends Activity {
 
 	}
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted") // holy shit
 	private boolean checkPerm(int requestId) {
 
 		if (android.os.Build.VERSION.SDK_INT >= 23) {
