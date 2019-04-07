@@ -73,13 +73,13 @@ public class ImportExportActivity extends Activity {
 				Log.d(TAG, "import successful!");
 			} else {
 				if(e instanceof MalformedURLException)
-					errorNotify("Improper URL given: " + _textLoadUrl.getText(), e);
+					errorNotify(getString(R.string.import_error_url) + " " + _textLoadUrl.getText(), e);
 
 				if(e instanceof IOException)
-					errorNotify("I/O error reading configuration", e);
+					errorNotify(getString(R.string.import_error_io), e);
 
 				if(e instanceof SAXException)
-					errorNotify("XML or format error reading configuration", e);
+					errorNotify(getString(R.string.import_error_xml), e);
 			}
 		}
 	}
@@ -194,7 +194,7 @@ public class ImportExportActivity extends Activity {
 	private void errorNotify(String msg, Throwable t)
 	{
 		Log.e(TAG, msg, t);
-		Utils.showErrorMessage(this, msg + ": " + t.getMessage());
+		Utils.showErrorMessage(this, msg + ": <br/><br/>" + t.getMessage());
 	}
 
 }
