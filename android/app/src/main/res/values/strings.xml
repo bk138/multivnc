@@ -51,6 +51,7 @@
 <string name="send_key_again">Send Key Combo Again</string>
 <string name="shift_check">Shift</string>
 <string name="shortcut_label">VNC Connection Shortcut</string>
+    <string name="shortcut_no_entries">No bookmarks yet</string>
 <string name="special_keys">Key Combo</string>
 <string name="username_caption">Username</string>
 <string name="username_hint">For Windows authentication</string>

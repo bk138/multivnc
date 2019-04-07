@@ -39,7 +39,9 @@ public class ConnectionListActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        
+
+        setContentView(R.layout.connection_list);
+
         database = new VncDatabase(this);
 
         // Query for all people contacts using the Contacts.People convenience class.

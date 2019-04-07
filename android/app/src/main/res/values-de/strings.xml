@@ -50,6 +50,7 @@
 <string name="send_key_again">"Tastenkombination erneut senden"</string>
 <string name="shift_check">"Shift"</string>
 <string name="shortcut_label">"VNC-Verbindungsverknüpfung"</string>
+    <string name="shortcut_no_entries">Keine Lesezeichen vorhanden</string>
 <string name="special_keys">"Tastenkombination"</string>
 <string name="username_caption">"Nutzername"</string>
 <string name="username_hint">"Für die Windows-Authentifizierung"</string>
