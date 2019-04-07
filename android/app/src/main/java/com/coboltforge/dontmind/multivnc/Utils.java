@@ -61,11 +61,11 @@ public class Utils {
 	}
 
 	public static void showErrorMessage(Context _context, String message) {
-		showMessage(_context, "Error!", message, 0, android.R.attr.alertDialogIcon, null);
+		showMessage(_context, _context.getString(R.string.utils_title_error), message, 0, android.R.attr.alertDialogIcon, null);
 	}
 
 	public static void showFatalErrorMessage(final Context _context, String message) {
-		showMessage(_context, "Error!", message, 0, android.R.attr.alertDialogIcon, new DialogInterface.OnClickListener() {
+		showMessage(_context, _context.getString(R.string.utils_title_error), message, 0, android.R.attr.alertDialogIcon, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				((Activity) _context).finish();
@@ -79,7 +79,7 @@ public class Utils {
 			builder.setTitle(title);
 			builder.setMessage(Html.fromHtml(message));
 			builder.setCancelable(false);
-			builder.setPositiveButton("Acknowledged", ackHandler);
+			builder.setPositiveButton(android.R.string.ok, ackHandler);
 			if(icon != 0)
 				builder.setIcon(icon);
 			if(iconAttribute != 0)
