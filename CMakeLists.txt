@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.0)
 set(version 0.6)
 configure_file(config.h.cmake_in config.h)
 
+add_subdirectory(libwxservdisc/src)
+
 add_subdirectory(src)
 
 

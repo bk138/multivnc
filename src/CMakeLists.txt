@@ -7,14 +7,13 @@ include_directories(
     ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/
-    ${CMAKE_SOURCE_DIR}/src/wxServDisc/src
+    ${CMAKE_SOURCE_DIR}/libwxservdisc/src
 )
 
 
 #
 # source and targets
 #
-add_subdirectory(wxServDisc/src)
 add_subdirectory(libvncclient)
 add_subdirectory(gui)
 
