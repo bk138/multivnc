@@ -68,26 +68,10 @@ After cloning the repo, do
 To compile:
 
 ```
-   $ autoreconf -i
-
-   & ./configure
-```
-
-If crosscompiling with MinGW:
-
-```
-   CPPFLAGS=-DWINVER=0x0501 ./configure \
-   --build=<your build system type> --host=i586-mingw32msvc \
-   --with-wx-config=<your win32 wx-config> \
-   --with-zlib=<path to where zlib include and lib dirs are> \
-   --with-jpeg=<path to where jpeglib include and lib dirs are> 
-   --with-libgcrypt-prefix=<path to where zlib include and lib dirs are>
-```
-
-Then
-
-```
-   make
+   mkdir build
+   cd build
+   cmake ..
+   cmake --build .
 ```
 
 And cross fingers...
