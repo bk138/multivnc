@@ -1,3 +1,6 @@
 [submodule "src/wxServDisc"]
 	path = libwxservdisc
 	url = https://github.com/bk138/wxservdisc.git
+[submodule "libvncserver"]
+	path = libvncserver
+	url = https://github.com/LibVNC/libvncserver.git

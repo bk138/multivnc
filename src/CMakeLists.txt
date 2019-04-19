@@ -8,13 +8,13 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/
     ${CMAKE_SOURCE_DIR}/libwxservdisc/src
+    ${CMAKE_SOURCE_DIR}/libvncserver
 )
 
 
 #
 # source and targets
 #
-add_subdirectory(libvncclient)
 add_subdirectory(gui)
 
 
