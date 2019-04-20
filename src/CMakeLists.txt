@@ -30,7 +30,7 @@ SET(multivnc_SRCS
 
 add_executable(multivnc ${multivnc_SRCS})
 
-target_link_libraries(multivnc ${wxWidgets_LIBRARIES} MultiVNCgui wxservdisc vncclient)
+target_link_libraries(multivnc MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vncclient)
 
 
 
