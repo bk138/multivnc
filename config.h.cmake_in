@@ -1,4 +1,4 @@
-#ifndef CONFIG_h
+#ifndef CONFIG_H
 #define CONFIG_H
 
 /* Name of package */
