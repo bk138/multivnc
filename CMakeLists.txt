@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 
+# all the build configuration switches
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
 set(version 0.6)
 configure_file(config.h.cmake_in config.h)
 
