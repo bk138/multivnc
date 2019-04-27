@@ -821,8 +821,14 @@ public class VncCanvasActivity extends Activity {
 		vncCanvas.onResume();
 
 		// get Android clipboard contents
-		if (mClipboardManager.hasText())
-			vncCanvas.vncConn.sendCutText(mClipboardManager.getText().toString());
+		if (mClipboardManager.hasText()) {
+			try {
+				vncCanvas.vncConn.sendCutText(mClipboardManager.getText().toString());
+			}
+			catch(NullPointerException e) {
+				//unused
+			}
+		}
 
 	}
 
