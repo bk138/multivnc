@@ -19,10 +19,7 @@
 /* Define to the home page for this package. */
 #define PACKAGE_URL "https://github.com/bk138/multivnc"
 
-/* Define to the version of this package. */
-#define PACKAGE_VERSION "${version}"
-
 /* Version number of package */
-#define VERSION "${version}"
+#define VERSION "${PROJECT_VERSION}"
 
 #endif /* CONFIG_H */

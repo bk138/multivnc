@@ -1,23 +1,62 @@
 cmake_minimum_required(VERSION 3.0)
 
+project(multivnc
+    VERSION 0.6.0)
+
 # all the build configuration switches
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-set(version 0.6)
 configure_file(config.h.cmake_in config.h)
 
+set(WXSERVDISC_INSTALL OFF CACHE BOOL "Set to OFF to not include wxservdisc artifacts in install")
 add_subdirectory(libwxservdisc/src)
+set(LIBVNCSERVER_INSTALL OFF CACHE BOOL "Set to OFF to not include libvncserver artifacts in install")
 add_subdirectory(libvncserver)
 
 add_subdirectory(src)
 
 
+#
+# install directives
+#
 
-########### install files ###############
+if(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+    install(TARGETS multivnc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(FILES src/multivnc.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(FILES README.md TODO.md AUTHORS ChangeLog NEWS DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(FILES src/gui/res/multivnc.xpm DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps)
+endif(UNIX AND NOT APPLE)
 
-#install(FILES  README 	AUTHORS 	ChangeLog 	NEWS DESTINATION )
-#install(FILES  src/multivnc.desktop DESTINATION share/applications/)
-#install(FILES  src/gui/res/multivnc.xpm DESTINATION share/pixmaps)
+
+#
+# packaging directives
+#
+
+set(CPACK_STRIP_FILES true)
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/COPYING)
+set(CPACK_PACKAGE_EXECUTABLES "${target_name};MultiVNC")
+
+
+if(UNIX AND NOT APPLE)
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Christian Beier <dontmind@freeshell.org>")
+    set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+    set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Multicast-enabled VNC viewer
+ MultiVNC is a cross-platform Multicast-enabled VNC client using wxWidgets
+ and libvncclient . It runs on Unix, Mac OS X and Windows.")
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+endif(UNIX AND NOT APPLE)
+
+
+
+include(CPack)
+
+
 
 
 

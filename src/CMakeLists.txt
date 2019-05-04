@@ -35,12 +35,6 @@ target_link_libraries(multivnc MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vnc
 
 
 
-#
-# install
-#
-
-install(TARGETS multivnc DESTINATION bin)
-
 
 
 #original Makefile.am contents follow:
