@@ -9,7 +9,13 @@ os:
 
 # install build dependencies
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libwxgtk3.0-dev libgtk2.0-dev libjpeg-dev libgcrypt20-dev liblzo2-dev; fi
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+    sudo apt-get install libwxgtk3.0-dev libgtk2.0-dev libjpeg-dev libgcrypt20-dev liblzo2-dev
+    CMAKE_URL="http://www.cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.tar.gz"
+    mkdir -p ${TRAVIS_BUILD_DIR}/deps/cmake && travis_retry wget --quiet -O - $travis{CMAKE_URL} | tar --strip-components=1 -xz -C ${TRAVIS_BUILD_DIR}/deps/cmake
+    export PATH=${TRAVIS_BUILD_DIR}/deps/cmake/bin:${PATH}
+    fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install wxmac; fi
 
 
