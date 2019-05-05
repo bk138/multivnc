@@ -1,8 +1,9 @@
 
 # wxWidgets version:
+ - make credentials dialog log in on pressing Enter
+ - make fullscreen behave really like fullscreen
  - wxSecretStore for bookmarks
  - wxTaskBarIcon
- - CMake instead of Autotools
  - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
  - fix the seamless connector for win32.
