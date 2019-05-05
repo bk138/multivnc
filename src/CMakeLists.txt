@@ -18,6 +18,7 @@ include_directories(
 #
 add_subdirectory(gui)
 
+set(executable_name multivnc)
 
 SET(multivnc_SRCS
    MultiVNCApp.cpp
@@ -28,9 +29,18 @@ SET(multivnc_SRCS
    msgqueue.h
 )
 
-add_executable(multivnc ${multivnc_SRCS})
+if(APPLE)
+    set(executable_name MultiVNC)
+    set(MACOSX_BUNDLE_COPYRIGHT "© Christian Beier (dontmind@freeshell.org), 2008-2019")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
+    set(MACOSX_BUNDLE_ICON_FILE icon.icns)
+    set(multivnc_SRCS ${multivnc_SRCS} icon.icns)
+    set_source_files_properties(icon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+endif(APPLE)
 
-target_link_libraries(multivnc MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vncclient)
+add_executable(${executable_name} MACOSX_BUNDLE ${multivnc_SRCS})
+
+target_link_libraries(${executable_name} MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vncclient)
 
 
 
