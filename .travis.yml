@@ -25,3 +25,4 @@ script:
   - cd build
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake .. -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl; else cmake ..; fi
   - cmake --build .
+  - cpack -V
