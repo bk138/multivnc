@@ -574,21 +574,18 @@ char* MyFrameMain::getpasswd(rfbClient* client)
 
 rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
 {
-    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
-
     if(type == rfbCredentialTypeUser) {
  
 	DialogLogin formLogin(0, wxID_ANY, _("Credentials required..."));
 	if ( formLogin.ShowModal() == wxID_OK ) {
-	  
+	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
 	    c->userCredential.username = strdup(formLogin.getUserName().char_str());
 	    c->userCredential.password = strdup(formLogin.getPassword().char_str());
-	  
+	    return c;
 	}
-
     }
 
-    return c;
+    return NULL;
 }
 
 
