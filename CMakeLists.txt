@@ -29,6 +29,18 @@ if(UNIX AND NOT APPLE)
     install(FILES src/gui/res/multivnc.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 endif(UNIX AND NOT APPLE)
 
+if(APPLE)
+    set(APPS ${CMAKE_CURRENT_BINARY_DIR}/src/MultiVNC.app)  # paths to executables
+    set(DIRS "")   # directories to search for prerequisites
+    INSTALL(CODE "
+set(BU_CHMOD_BUNDLE_ITEMS ON) # as per https://cmake.org/Bug/view.php?id=13833
+include(BundleUtilities)
+fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
+   " COMPONENT Runtime)
+    INSTALL(TARGETS MultiVNC BUNDLE DESTINATION . COMPONENT Runtime)
+    INSTALL(FILES README.md DESTINATION . RENAME Readme.txt)
+endif(APPLE)
+
 
 #
 # packaging directives
@@ -39,8 +51,6 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/COPYING)
-set(CPACK_PACKAGE_EXECUTABLES "${target_name};MultiVNC")
-
 
 if(UNIX AND NOT APPLE)
     set(CPACK_GENERATOR "DEB")
@@ -53,6 +63,11 @@ if(UNIX AND NOT APPLE)
     set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 endif(UNIX AND NOT APPLE)
 
+if(APPLE)
+    set(CPACK_GENERATOR "DragNDrop")
+    set(CPACK_PACKAGE_FILE_NAME "MultiVNC-${PROJECT_VERSION}")
+    set(CPACK_INSTALL_PREFIX .) # for some reason defaults to /usr/local/
+endif(APPLE)
 
 
 include(CPack)
