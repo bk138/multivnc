@@ -16,7 +16,7 @@ before_install:
     mkdir -p ${TRAVIS_BUILD_DIR}/deps/cmake && travis_retry wget --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${TRAVIS_BUILD_DIR}/deps/cmake
     export PATH=${TRAVIS_BUILD_DIR}/deps/cmake/bin:${PATH}
     fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install wxmac cmake; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install wxmac; brew upgrade cmake; fi
 
 
 # Build steps
