@@ -48,7 +48,7 @@ if(UNIX AND NOT APPLE)
     set(CPACK_DEBIAN_PACKAGE_SECTION "net")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Multicast-enabled VNC viewer
  MultiVNC is a cross-platform Multicast-enabled VNC client using wxWidgets
- and libvncclient . It runs on Unix, Mac OS X and Windows.")
+ and libvncclient. It runs on Unix, Mac OS X and Windows.")
     set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
     set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 endif(UNIX AND NOT APPLE)
