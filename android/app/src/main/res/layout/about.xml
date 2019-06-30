@@ -19,7 +19,7 @@
 	    android:paddingTop="10dp" >
 
 		<ImageView 
-			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:layout_height="80dip"
 			android:scaleType="fitCenter" android:src="@drawable/ic_launcher">
 		</ImageView>
 		<TextView android:id="@+id/TextViewVersion"
