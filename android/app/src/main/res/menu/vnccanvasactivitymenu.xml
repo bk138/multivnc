@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/itemToggleKeyboard"
-        android:icon="@drawable/keyboard"
+        android:icon="@drawable/ic_keyboard_grey_48dp"
         android:title="@string/toggle_keyboard">
     </item>
 

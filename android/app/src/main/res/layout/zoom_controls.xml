@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         />
     <ImageButton android:id="@+id/zoomKeys"
-    	android:background="@drawable/keyboard"
+    	android:background="@drawable/ic_keyboard_grey_48dp"
     	android:layout_width="wrap_content"
     	android:layout_height="wrap_content"
     	/>
