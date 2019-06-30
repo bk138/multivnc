@@ -80,6 +80,12 @@
 <![CDATA[
    <b> Version 1.7.x: </b>
    <ul>
+
+         <li>1.7.7</li>
+     	      <ul>
+     	                 <li>Möglichen Absturz auf ChromeBox-Geräten behoben.</li>
+     	      </ul>
+
          <li>1.7.6</li>
      	      <ul>
       	                 <li>Wenn keine Lesezeichen vorhanden sind, wird dies nun beim Erstellen einer Homescreen-Verknüpfung angezeigt.</li>
