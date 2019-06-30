@@ -67,7 +67,7 @@
     <string name="utils_title_error">Error!</string>
 
 <string name="support_dialog_title">Please Support MultiVNC</string>
-<string name="support_dialog_text">If you like MultiVNC, why not consider supporting its development? For the time being, you can do so easily by rating the app or by using PayPal. Thanks!</string>
+<string name="support_dialog_text">If you like MultiVNC, why not consider supporting its development? For the time being, you can do so easily by rating the app or by donating. Thanks!</string>
 <string name="support_dialog_yes">Yes, good idea!</string>
 <string name="support_dialog_no">No, not now.</string>
 <string name="support_dialog_neveragain">Never ask again!</string>
