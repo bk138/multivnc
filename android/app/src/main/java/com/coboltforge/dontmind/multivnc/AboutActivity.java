@@ -47,12 +47,30 @@ public class AboutActivity extends Activity {
 			}
 		});
 		
-		ImageButton donateButton = (ImageButton) findViewById(R.id.paypal_button);
-		donateButton.setOnClickListener(new View.OnClickListener() {
+		ImageButton paypalButton = (ImageButton) findViewById(R.id.paypal_button);
+		paypalButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HKRTWKNKBKPKN"));
 		    	startActivity(browserIntent);
+			}
+		});
+
+		ImageButton liberapayButton = (ImageButton) findViewById(R.id.liberapay_button);
+		liberapayButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://liberapay.com/bk138"));
+				startActivity(browserIntent);
+			}
+		});
+
+		ImageButton patreonButton = (ImageButton) findViewById(R.id.patreon_button);
+		patreonButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.patreon.com/bk138"));
+				startActivity(browserIntent);
 			}
 		});
 
