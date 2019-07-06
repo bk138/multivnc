@@ -1,4 +1,4 @@
-**Version 1.7.x:**
+# Version 1.7.x:
 
 1.7.7
 
@@ -39,7 +39,7 @@
 -   Updated the launcher icon to be more hi-res.
 -   Removed the ad system.
 
-**Version 1.6.x:**
+# Version 1.6.x:
 
 1.6.4
 
@@ -71,7 +71,7 @@
 -   A bit more screen real estate on ICS and newer devices by hiding the
     status bar.
 
-**Version 1.5.x:**
+# Version 1.5.x:
 
 1.5.2
 
@@ -94,7 +94,7 @@
 -   Fixed a lot of maybe-crash situations.
 -   Removed broken flattr button.
 
-**Version 1.4.x:**
+# Version 1.4.x:
 
 1.4.10
 
