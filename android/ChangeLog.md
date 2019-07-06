@@ -1,5 +1,9 @@
 # Version 1.7.x:
 
+1.7.8
+
+-   Added Italian translation.
+
 1.7.7
 
 -   Fixed possible crash on ChromeBox.
