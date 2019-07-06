@@ -1,23 +1,83 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="address_caption">Indirizzo</string>
-    <string name="alt_check">Alt</string>
+    <string name="address_caption">"Indirizzo"</string>
+    <string name="alt_check">"Alt"</string>
+    <string name="server_found">"Trovato server VNC"</string>
+    <string name="server_removed">"VNC Server è scomparso"</string>
+    <string name="restartMDNS">"Riavvia Server Discovery"</string>
+    <string name="scale_msg">"Scala ora"</string>
+<string name="madeby">"MultiVNC su Android è offerto da Christian Beier. \n\nSi basa su android-vnc-viewer (http://code.google.com/p/android-vnc-viewer), con importanti ripuliture e miglioramenti apportati da Christian Beier. \n\nLa home page del progetto è https://github.com/bk138/multivnc ."</string>
+<string name="colormode_caption">"Modalità colore"</string>
+<string name="color_mode">"Imposta la modalità colore"</string>
+<string name="connect_button">"Collegare"</string>
+<string name="control_check">"Ctrl"</string>
+<string name="delete_connection">"Elimina"</string>
+<string name="disconnect">"Disconnect"</string>
+<string name="toggle_framebuffer_update">"Attiva / disattiva vista"</string>
+<string name="toggle_mouse_buttons">"Attiva o disattiva i pulsanti del mouse"</string>
+<string name="toggle_pointer_highlight">"Attiva / disattiva l'evidenziazione del puntatore"</string>
+<string name="toggle_keyboard">"Attiva / disattiva la tastiera"</string>
 
-    <string name="color_mode">Modalità Colore</string>
-<string name="connect_button">Connetti</string>
-<string name="control_check">Ctrl</string>
-<string name="delete_connection">Elimina connessione</string>
-<string name="disconnect">Disconnetti</string>
-<string name="info">Info</string>
-<string name="keep_password_button">Mantieni</string>
-<string name="meta_key_title">Invia tasti speciali</string>
-<string name="nickname_caption">Alias</string>
-<string name="password_caption">Password</string>
-<string name="port_caption">Porta</string>
-<string name="save_as_copy">Salva copia</string>
+<string name="export_settings">"Esportare"</string>
+<string name="export_settings_path">"Esporta nel file"</string>
+<string name="database_error_open">"Errore durante l'apertura del database!"</string>
+<string name="import_export_settings">"Import / Export"</string>
+<string name="import_settings">"Importare"</string>
+<string name="import_settings_file_url">"Importa da file o URL"</string>
+    <string name="import_error_url">"URL improprio dato:"</string>
+    <string name="import_error_io">"Errore di I / O durante la lettura della configurazione"</string>
+    <string name="import_error_xml">"Configurazione della lettura dell'errore XML o di formato"</string>
+
+<string name="info">"Informazioni di connessione"</string>
+<string name="meta_key_title">"Invia chiave combinata"</string>
+<string name="new_connection">"Nuova connessione"</string>
+<string name="nickname_caption">"Segnalibro"</string>
+<string name="discovered_servers">"Server scoperti"</string>
+<string name="bookmarks">"Segnalibri"</string>
+<string name="savebookmark_button">"Salva segnalibro"</string>
+<string name="bookmark_saved">"Segnalibro salvato!"</string>
+<string name="bookmark_invalid">"Questo non è più un segnalibro valido!"</string>
+<string name="password_caption">"Parola d'ordine"</string>
+<string name="keep_password_button">"Conservare"</string>
+<string name="port_caption">"Port"</string>
+<string name="repeater_caption">"Ripetitore"</string>
+<string name="repeater_hint">"Per l'indirizzo del ripetitore in stile UltraVNC"</string>
+<string name="repeater_clear">"Non usare il ripetitore"</string>
+<string name="save_as_copy">"Salva come copia"</string>
+    <string name="repeater_save">"Salvare"</string>
 <!-- Send selected metakey -->
-<string name="send_button">Invia</string>
-<string name="send_key_again">Ripeti invio tasto</string>
-<string name="shift_check">Shift</string>
-<string name="special_keys">Invia tasti</string>
+<string name="send_button">"Inviare"</string>
+<string name="send_key_again">"Invia nuovamente Combo chiave"</string>
+<string name="shift_check">"Cambio"</string>
+<string name="shortcut_label">"Collegamento alla connessione VNC"</string>
+    <string name="shortcut_no_entries">"Nessun segnalibro ancora"</string>
+<string name="special_keys">"Chiave combinata"</string>
+<string name="username_caption">"Nome utente"</string>
+<string name="username_hint">"Per l'autenticazione di Windows"</string>
+<string name="editbookmark_title">"Modifica segnalibro"</string>
+<string name="enterbookmarkname">"Si prega di inserire il nome di un segnalibro …"</string>
+<string name="bookmark_save_question">"Vuoi aggiungere questo server ai segnalibri?"</string>
+<string name="bookmark_delete_question">"Sei sicuro di voler eliminare questo segnalibro?"</string>
+<string name="disconnect_question">"Sei sicuro di voler disconnettere?"</string>
+<string name="about">"Di"</string>
+<string name="help">"Aiuto"</string>
+<string name="edit">"Modificare"</string>
+
+    <string name="utils_title_error">"Errore!"</string>
+
+<string name="support_dialog_title">"Si prega di supportare MultiVNC"</string>
+<string name="support_dialog_text">"Se ti piace il MultiVNC, perché non prendere in considerazione il supporto del suo sviluppo? Per ora, puoi farlo facilmente valutando l'app o donando. Grazie!"</string>
+<string name="support_dialog_yes">"Sì buona idea!"</string>
+<string name="support_dialog_no">"No non ora."</string>
+<string name="support_dialog_neveragain">"Non chiedere mai più!"</string>
+
+<string name="firstrun_help_dialog_title">"Mostra aiuto?"</string>
+<string name="firstrun_help_dialog_text">"Sembra che sia la prima volta che usi MultiVNC. Vuoi leggere il manuale dell'app? Non è molto lungo ma informativo …"</string>
+
+<string name="pleaserate">"Se ti piace il MultiVNC, perché non mostrare un po 'di amore facendo clic sul cuore?"</string>
+<string name="changelog_dialog_title">"Cosa c'è di nuovo…"</string>
+<string name="changelog_dialog_text">
+<![CDATA[
+       Se vuoi sapere quali modifiche sono state apportate con questa versione, puoi dare un\'occhiata online lanciare il <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">registro delle modifiche disponibili (in inglese)</a>.
+    ]]>
+</string>
 </resources>
