@@ -5,7 +5,7 @@
     <string name="server_removed">"VNC-Server verschwunden"</string>
     <string name="restartMDNS">"Server-Erkennung neu starten"</string>
     <string name="scale_msg">"Jetzt skalieren"</string>
-<string name="madeby">"MultiVNC für Android wird von Christian Beier für Sie bereitgestellt.\n\nEs basiert auf android-vnc-viewer (http://code.google.com/p/android-vnc-viewer) mit wichtigen Fehlerbehebungen und Verbesserungen. \n\nDie Projekt-Homepage befindet sich unter https://github.com/bk138/multivnc."</string>
+<string name="madeby">"MultiVNC für Android wird von Christian Beier für Sie bereitgestellt.\n\nEs basiert auf android-vnc-viewer (http://code.google.com/p/android-vnc-viewer) mit wichtigen Fehlerbehebungen und Verbesserungen. \n\nDie Projekt-Homepage befindet sich unter https://github.com/bk138/multivnc ."</string>
 <string name="colormode_caption">"Farbmodus"</string>
 <string name="color_mode">"Farbmodus einstellen"</string>
 <string name="connect_button">"Verbinden"</string>
