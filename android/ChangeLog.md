@@ -1,5 +1,10 @@
 # Version 1.7.x:
 
+1.7.9
+
+-   Fixed a possible crash.
+-   Added Russian translation.
+
 1.7.8
 
 -   Added Italian translation.
