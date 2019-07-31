@@ -805,13 +805,14 @@ public class VNCConn {
 
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 
-		// trim coodinates
-		if (x<0) x=0;
-		else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
-		if (y<0) y=0;
-		else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
-
 		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+
+			// trim coodinates
+			if (x<0) x=0;
+			else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
+			if (y<0) y=0;
+			else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
+
 			OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
 			outputEventQueue.add(e);
 			synchronized (outputEventQueue) {
