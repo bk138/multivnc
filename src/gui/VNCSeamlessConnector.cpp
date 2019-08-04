@@ -532,7 +532,7 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
       canvas->CaptureMouse();
       canvas->SetFocus();
 #ifdef __WXGTK__     
-      gdk_keyboard_grab(canvas->GetHandle()->window, False, GDK_CURRENT_TIME);
+      gdk_keyboard_grab(gtk_widget_get_window(canvas->GetHandle()), False, GDK_CURRENT_TIME);
 #endif
     }
     /*

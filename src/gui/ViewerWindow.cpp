@@ -122,7 +122,7 @@ void VNCCanvas::grab_keyboard()
     {
 #ifdef __WXGTK__
       // grab
-      gdk_keyboard_grab(GetHandle()->window, True, GDK_CURRENT_TIME);
+      gdk_keyboard_grab(gtk_widget_get_window(GetHandle()), True, GDK_CURRENT_TIME);
 
       // save previous settings
       GtkSettings *settings = gtk_settings_get_for_screen(gdk_screen_get_default());
