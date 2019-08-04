@@ -208,7 +208,11 @@ MyFrameMain::~MyFrameMain()
   // the library would segfault while trying to delete the m_callbackUserData 
   // member of m_dynamicEvents
   if (m_dynamicEvents)
+#if wxCHECK_VERSION(3, 1, 0)
+    for ( wxVector<wxDynamicEventTableEntry*>::iterator it = m_dynamicEvents->begin(),
+#else
     for ( wxList::iterator it = m_dynamicEvents->begin(),
+#endif
 	    end = m_dynamicEvents->end();
 	  it != end;
 	  ++it )

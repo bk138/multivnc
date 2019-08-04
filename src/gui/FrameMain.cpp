@@ -65,7 +65,7 @@ FrameMain::FrameMain(wxWindow* parent, int id, const wxString& title, const wxPo
     frame_main_menubar->Append(wxglade_tmp_menu_5, _("&Help"));
     SetMenuBar(frame_main_menubar);
     frame_main_statusbar = CreateStatusBar(2, 0);
-    frame_main_toolbar = new wxToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxTB_3DBUTTONS|wxTB_TEXT|wxTB_NODIVIDER);
+    frame_main_toolbar = new wxToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL|wxTB_TEXT|wxTB_NODIVIDER);
     SetToolBar(frame_main_toolbar);
     frame_main_toolbar->SetToolBitmapSize(wxSize(24, 24));
     frame_main_toolbar->AddTool(wxID_YES, _("Connect"), (bitmapFromMem(connect_png)), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString);
