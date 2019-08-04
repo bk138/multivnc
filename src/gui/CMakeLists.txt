@@ -44,10 +44,18 @@ add_library(MultiVNCgui STATIC ${MultiVNCgui_SRCS})
 #
 # dependencies
 #
-find_package(GTK2)
-include_directories(${GTK2_INCLUDE_DIRS})
-target_link_libraries(MultiVNCgui ${GTK2_LIBRARIES})
-
+if(wxWidgets_LIBRARIES MATCHES "gtk2")
+  message(STATUS "Detected wxWidgets using GTK2, building internals with that")
+  find_package(GTK2)
+  include_directories(${GTK2_INCLUDE_DIRS})
+  target_link_libraries(MultiVNCgui ${GTK2_LIBRARIES})
+else()
+  message(STATUS "Detected wxWidgets using GTK3, building internals with that")
+  FIND_PACKAGE(PkgConfig)
+  PKG_CHECK_MODULES(GTK3 gtk+-3.0)
+  include_directories(${GTK3_INCLUDE_DIRS})
+  target_link_libraries(MultiVNCgui ${GTK3_LIBRARIES})
+endif()
 
 
 
