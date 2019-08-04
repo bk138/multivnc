@@ -958,7 +958,7 @@ bool VNCConn::Listen(int port)
 
   thread_listenmode = true;
 
-  if( Create() != wxTHREAD_NO_ERROR )
+  if( CreateThread() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not create VNC listener thread!"));
       Shutdown();
@@ -1043,7 +1043,7 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
   
   // this is like our main loop
   thread_listenmode = false;
-  if( Create() != wxTHREAD_NO_ERROR )
+  if( CreateThread() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not create VNC thread!"));
       Shutdown();
