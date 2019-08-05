@@ -1,6 +1,5 @@
 
 # wxWidgets version:
- - make credentials dialog log in on pressing Enter
  - make fullscreen behave really like fullscreen
  - wxSecretStore for bookmarks
  - wxTaskBarIcon

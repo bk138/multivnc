@@ -22,8 +22,8 @@ DialogLogin::DialogLogin(wxFrame *parent, wxWindowID id, const wxString &title )
     m_passwordLabel = new wxStaticText(this, wxID_ANY, _("Password: "), wxDefaultPosition, wxSize(80, -1));
     hbox2->Add(m_passwordLabel, 0);
  
-    m_passwordEntry = new wxTextCtrl(this, wxID_ANY, wxString(""),
-        wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD);
+    m_passwordEntry = new wxTextCtrl(this, BUTTON_Login, wxString(""),
+        wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD|wxTE_PROCESS_ENTER);
     hbox2->Add(m_passwordEntry, 1);
     vbox->Add(hbox2, 0, wxEXPAND | wxLEFT | wxTOP | wxRIGHT, 10);
  
@@ -62,4 +62,5 @@ DialogLogin::~DialogLogin() {}
 BEGIN_EVENT_TABLE(DialogLogin, wxDialog)
 EVT_BUTTON(wxID_CANCEL, DialogLogin::OnCancel)
 EVT_BUTTON(BUTTON_Login, DialogLogin::OnLogin)
+EVT_TEXT_ENTER(BUTTON_Login, DialogLogin::OnLogin)
 END_EVENT_TABLE()
