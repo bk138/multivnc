@@ -1014,7 +1014,7 @@ bool MyFrameMain::loadbookmarks()
   
   cfg->SetPath(wxT("/"));
 
-  list_box_bookmarks->Set(bookmarknames, (void**)0);
+  list_box_bookmarks->Set(bookmarknames);
 
   return true;
 }
