@@ -3,6 +3,7 @@
 #ifndef VIEWERWINDOW_H
 #define VIEWERWINDOW_H
 
+#include <wx/wx.h>
 #include <wx/scrolwin.h>
 #include <wx/log.h>
 #include "VNCConn.h"
