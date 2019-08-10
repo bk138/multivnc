@@ -392,15 +392,15 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
  
   // create statitistics widgets
   label_updrawbytes = new wxStaticText(stats_container, wxID_ANY, _("Eff. KB/s:"));
-  text_ctrl_updrawbytes = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  text_ctrl_updrawbytes = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,20), wxTE_READONLY);
   label_updcount = new wxStaticText(stats_container, wxID_ANY, _("Updates/s:"));
-  text_ctrl_updcount = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  text_ctrl_updcount = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,20), wxTE_READONLY);
   label_latency = new wxStaticText(stats_container, wxID_ANY, _("Latency ms:"));
-  text_ctrl_latency = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  text_ctrl_latency = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,20), wxTE_READONLY);
   label_lossratio = new wxStaticText(stats_container, wxID_ANY, _("Loss Ratio:"));
-  text_ctrl_lossratio = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,18), wxTE_READONLY);
+  text_ctrl_lossratio = new wxTextCtrl(stats_container, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(80,20), wxTE_READONLY);
   label_recvbuf = new wxStaticText(stats_container, wxID_ANY, _("Rcv Buffer:"));
-  gauge_recvbuf = new wxGauge(stats_container, wxID_ANY, 10, wxDefaultPosition, wxSize(80,18), wxGA_HORIZONTAL|wxGA_SMOOTH);
+  gauge_recvbuf = new wxGauge(stats_container, wxID_ANY, 10, wxDefaultPosition, wxSize(80,20), wxGA_HORIZONTAL|wxGA_SMOOTH);
 
   dflt_fg = gauge_recvbuf->GetForegroundColour();
 
