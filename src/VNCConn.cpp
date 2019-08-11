@@ -1516,6 +1516,16 @@ wxString VNCConn::getDesktopName() const
 }
 
 
+const wxString& VNCConn::getUserName() const {
+    return username;
+}
+
+void VNCConn::setUserName(const wxString& username) {
+    this->username = username;
+}
+
+
+
 wxString VNCConn::getServerHost() const
 {
   if(cl)

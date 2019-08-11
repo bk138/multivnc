@@ -145,6 +145,9 @@ public:
   wxString getServerHost() const;
   wxString getServerPort() const;
 
+  const wxString& getUserName() const;
+  void setUserName(const wxString& username);
+
   // get current multicast receive buf state
   int getMCBufSize() const { if(cl) return cl->multicastRcvBufSize; else return 0; };
   int getMCBufFill() const { if(cl) return cl->multicastRcvBufLen; else return 0; };
@@ -202,6 +205,9 @@ private:
   // this contains cuttext we received or should send
   wxString cuttext;
   wxCriticalSection mutex_cuttext;
+
+  // credentials
+  wxString username;
 
   // statistics
   bool do_stats;
