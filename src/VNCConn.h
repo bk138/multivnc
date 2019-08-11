@@ -85,7 +85,7 @@ public:
   bool Setup(char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int));
   void Cleanup();
   bool Listen(int port);
-  bool Init(const wxString& host, const wxString& encodings, int compresslevel = 1, int quality = 5, 
+  bool Init(const wxString& host, const wxString& username, const wxString& encodings, int compresslevel = 1, int quality = 5, 
 	    bool multicast = true, int multicastSocketRecvBuf = 5120, int multicastRecvBuf = 5120);
   void Shutdown();
 

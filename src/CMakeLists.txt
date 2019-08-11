@@ -1,7 +1,7 @@
 #
 # dependencies
 #
-find_package(wxWidgets REQUIRED core base net adv qa)
+find_package(wxWidgets 3.0 REQUIRED core base net adv qa)
 include(${wxWidgets_USE_FILE})
 include_directories(
     ${CMAKE_BINARY_DIR}

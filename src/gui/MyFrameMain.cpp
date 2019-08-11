@@ -458,7 +458,7 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   encodings = encodings.AfterFirst(' '); 
 
   
-  if(!c->Init(wxEmptyString, encodings, compresslevel, quality))
+  if(!c->Init(wxEmptyString, wxEmptyString, encodings, compresslevel, quality))
     {
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
@@ -578,10 +578,23 @@ char* MyFrameMain::getpasswd(rfbClient* client)
 
 rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
 {
+    VNCConn *conn = VNCConn::getVNCConnFromRfbClient(client);
+
     if(type == rfbCredentialTypeUser) {
- 
+
+	if(conn->getUserName() != wxEmptyString) {
+	    // already got a username from a bookmark, get password
+	    wxString pass = wxGetPasswordFromUser(_("Please enter password for user ") + conn->getUserName(),
+						  _("Credentials required..."));
+	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
+	    c->userCredential.username = strdup(conn->getUserName().char_str());
+	    c->userCredential.password = strdup(pass.char_str());
+	    return c;
+	}
+
 	DialogLogin formLogin(0, wxID_ANY, _("Credentials required..."));
 	if ( formLogin.ShowModal() == wxID_OK ) {
+	    conn->setUserName(formLogin.getUserName());
 	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
 	    c->userCredential.username = strdup(formLogin.getUserName().char_str());
 	    c->userCredential.password = strdup(formLogin.getPassword().char_str());
@@ -643,7 +656,7 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-bool MyFrameMain::spawn_conn(wxString host, int listenPort)
+bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 {
   wxBusyCursor busy;
 
@@ -710,8 +723,12 @@ bool MyFrameMain::spawn_conn(wxString host, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxLogStatus(_("Connecting to ") + host + wxT(" ..."));
-      if(!c->Init(host, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
+      wxLogStatus(_("Connecting to ") + service + wxT(" ..."));
+
+      wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
+      wxString host = service.Contains("@") ? service.AfterFirst('@') : service;
+
+      if(!c->Init(host, user, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -977,7 +994,7 @@ bool MyFrameMain::loadbookmarks()
   // then read in each bookmark value pair
   for(size_t i=0; i < bookmarknames.GetCount(); ++i)
     {
-      wxString host, port;
+      wxString host, port, user;
 
       cfg->SetPath(G_BOOKMARKS + bookmarknames[i]);
 
@@ -995,12 +1012,15 @@ bool MyFrameMain::loadbookmarks()
 	  return false;
 	}
 
+      // user is optional
+      cfg->Read(K_BOOKMARKS_USER, &user);
+
       // add brackets if host is an IPv6 address
       if(host.Freq(':') > 0)
 	 host = wxT("[") + host + wxT("]");
 
       // all fine, add it
-      bookmarks.Add(host + wxT(":") + port);
+      bookmarks.Add((user != wxEmptyString ? user + "@" : "") + host + wxT(":") + port);
 
       // and add to bookmarks menu
       int id = NewControlId();
@@ -1502,7 +1522,8 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 	}
 
   wxString name = wxGetTextFromUser(_("Enter bookmark name:"),
-				    _("Saving bookmark"));
+				    _("Saving bookmark"),
+				    (! c->getUserName().IsEmpty() ? c->getUserName() + "@" : "") + c->getDesktopName());
 				
   if(name != wxEmptyString)
     {
@@ -1516,6 +1537,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 
       cfg->Write(K_BOOKMARKS_HOST, c->getServerHost());
       cfg->Write(K_BOOKMARKS_PORT, c->getServerPort());
+      cfg->Write(K_BOOKMARKS_USER, c->getUserName());
 
       //reset path
       cfg->SetPath(wxT("/"));

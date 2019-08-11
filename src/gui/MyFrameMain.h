@@ -57,7 +57,7 @@ class MyFrameMain: public FrameMain
   wxArrayString bookmarks;
   bool loadbookmarks();
 
-  bool spawn_conn(wxString host, int listenPort = -1);
+  bool spawn_conn(wxString service, int listenPort = -1);
   void terminate_conn(int which);
 
   // collab features

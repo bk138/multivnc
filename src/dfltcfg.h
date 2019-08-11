@@ -96,6 +96,7 @@
 #define G_BOOKMARKS wxT("/Bookmarks/")
 #define K_BOOKMARKS_HOST wxT("Host")
 #define K_BOOKMARKS_PORT wxT("Port")
+#define K_BOOKMARKS_USER "User"
 
 // collab features
 #define K_WINDOWSHARE _T("WindowShareCmd")

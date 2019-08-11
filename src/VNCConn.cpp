@@ -976,7 +976,7 @@ bool VNCConn::Listen(int port)
 }
 
 
-bool VNCConn::Init(const wxString& host, const wxString& encodings, int compresslevel, int quality, 
+bool VNCConn::Init(const wxString& host, const wxString& username, const wxString& encodings, int compresslevel, int quality, 
 		   bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
@@ -992,6 +992,7 @@ bool VNCConn::Init(const wxString& host, const wxString& encodings, int compress
 
   cl->programName = "VNCConn";
   parseHostString(host.mb_str(), 5900, &cl->serverHost, &cl->serverPort);
+  this->username = username;
   // Support short-form (:0, :1) 
   if(cl->serverPort < 100)
     cl->serverPort += 5900;
