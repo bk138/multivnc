@@ -57,7 +57,7 @@ this is the same library that MultiVNC uses internally.
 The prerequisites:
 
 * the usual c-compiler with headers and stuff
-* wxWidgets dev package version >= 2.8.7
+* wxWidgets dev package version >= 3.0
 * zlib dev package 
 * libjpeg dev package 
 
