@@ -1682,3 +1682,10 @@ void VNCConn::parseHostString(const char *server, int defaultport, char **host, 
 	if (port)
 		*port = defaultport;
 }
+
+
+VNCConn* VNCConn::getVNCConnFromRfbClient(rfbClient *cl) {
+
+    return (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
+
+}

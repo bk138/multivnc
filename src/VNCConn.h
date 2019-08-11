@@ -162,6 +162,11 @@ public:
 
   static int getMaxSocketRecvBufSize();
 
+    /**
+       Returns the VNCConn handling the given rfbClient.
+     */
+    static VNCConn* getVNCConnFromRfbClient(rfbClient *cl);
+
 protected:
   // thread execution starts here
   virtual wxThread::ExitCode Entry();
