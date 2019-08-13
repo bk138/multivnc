@@ -1526,6 +1526,15 @@ void VNCConn::setUserName(const wxString& username) {
 }
 
 
+const wxString& VNCConn::getPassword() const {
+    return password;
+}
+
+void VNCConn::setPassword(const wxString& password) {
+    this->password = password;
+}
+
+
 
 wxString VNCConn::getServerHost() const
 {

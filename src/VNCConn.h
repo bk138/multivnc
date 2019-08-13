@@ -147,6 +147,8 @@ public:
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);
+  const wxString& getPassword() const;
+  void setPassword(const wxString& username);
 
   // get current multicast receive buf state
   int getMCBufSize() const { if(cl) return cl->multicastRcvBufSize; else return 0; };
@@ -208,6 +210,7 @@ private:
 
   // credentials
   wxString username;
+  wxString password;
 
   // statistics
   bool do_stats;
