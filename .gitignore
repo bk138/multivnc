@@ -1,19 +1,30 @@
-Makefile
-*.in
-*.log
-*.o
-*.lo
-*.a
+# Backup files
 *~
-compile
-configure
-configure.lineno
-config.guess
-config.sub
-config.status
-_configs.sed
-.deps
-.libs
-aclocal.m4
-autom4te.cache
-stamp-*
+
+# Generated header files
+config.h
+
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.a
+*.lib
+
+# Executables
+*.exe
+*.app
+
+# CMake files
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Makefile
+*.cmake
+compile_commands.json
