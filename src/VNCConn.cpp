@@ -976,8 +976,11 @@ bool VNCConn::Listen(int port)
 }
 
 
-bool VNCConn::Init(const wxString& host, const wxString& username, const wxString& encodings, int compresslevel, int quality, 
-		   bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
+bool VNCConn::Init(const wxString& host, const wxString& username,
+#if wxUSE_SECRETSTORE
+		   const wxSecretValue& password,
+#endif
+		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
 
@@ -993,6 +996,9 @@ bool VNCConn::Init(const wxString& host, const wxString& username, const wxStrin
   cl->programName = "VNCConn";
   parseHostString(host.mb_str(), 5900, &cl->serverHost, &cl->serverPort);
   this->username = username;
+#if wxUSE_SECRETSTORE
+  this->password = password;
+#endif
   // Support short-form (:0, :1) 
   if(cl->serverPort < 100)
     cl->serverPort += 5900;
@@ -1525,15 +1531,15 @@ void VNCConn::setUserName(const wxString& username) {
     this->username = username;
 }
 
-
-const wxString& VNCConn::getPassword() const {
+#if wxUSE_SECRETSTORE
+const wxSecretValue& VNCConn::getPassword() const {
     return password;
 }
 
-void VNCConn::setPassword(const wxString& password) {
+void VNCConn::setPassword(const wxSecretValue& password) {
     this->password = password;
 }
-
+#endif
 
 
 wxString VNCConn::getServerHost() const

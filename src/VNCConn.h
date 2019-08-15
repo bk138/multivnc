@@ -33,6 +33,9 @@
 #include <wx/rawbmp.h>
 #include <wx/timer.h>
 #include <wx/thread.h>
+#if wxCHECK_VERSION(3, 1, 1)
+#include <wx/secretstore.h>
+#endif
 #include "msgqueue.h"
 #include "rfb/rfbclient.h"
 
@@ -85,8 +88,11 @@ public:
   bool Setup(char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int));
   void Cleanup();
   bool Listen(int port);
-  bool Init(const wxString& host, const wxString& username, const wxString& encodings, int compresslevel = 1, int quality = 5, 
-	    bool multicast = true, int multicastSocketRecvBuf = 5120, int multicastRecvBuf = 5120);
+  bool Init(const wxString& host, const wxString& username,
+#if wxUSE_SECRETSTORE
+	    const wxSecretValue& password,
+#endif
+	    const wxString& encodings, int compresslevel = 1, int quality = 5, bool multicast = true, int multicastSocketRecvBuf = 5120, int multicastRecvBuf = 5120);
   void Shutdown();
 
 
@@ -147,8 +153,11 @@ public:
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);
-  const wxString& getPassword() const;
-  void setPassword(const wxString& username);
+#if wxUSE_SECRETSTORE
+  const wxSecretValue& getPassword() const;
+  void setPassword(const wxSecretValue& password);
+#endif
+
 
   // get current multicast receive buf state
   int getMCBufSize() const { if(cl) return cl->multicastRcvBufSize; else return 0; };
@@ -210,7 +219,9 @@ private:
 
   // credentials
   wxString username;
-  wxString password;
+#if wxUSE_SECRETSTORE
+  wxSecretValue password;
+#endif
 
   // statistics
   bool do_stats;
