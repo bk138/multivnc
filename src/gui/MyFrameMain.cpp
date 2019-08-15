@@ -4,7 +4,9 @@
 #include <wx/socket.h>
 #include <wx/clipbrd.h>
 #include <wx/imaglist.h>
-
+#if wxCHECK_VERSION(3, 1, 1)
+#include <wx/secretstore.h>
+#endif
 #include "res/about.png.h"
 #include "res/unicast.png.h"
 #include "res/multicast.png.h"
@@ -458,7 +460,11 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   encodings = encodings.AfterFirst(' '); 
 
   
-  if(!c->Init(wxEmptyString, wxEmptyString, encodings, compresslevel, quality))
+  if(!c->Init(wxEmptyString, wxEmptyString,
+#if wxUSE_SECRETSTORE
+	      wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
+#endif
+	      encodings, compresslevel, quality))
     {
       wxLogStatus( _("Connection failed."));
       wxArrayString log = VNCConn::getLog();
@@ -584,7 +590,13 @@ rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
 
 	if(conn->getUserName() != wxEmptyString) {
 	    // already got a username from a bookmark, get password
-	    wxString pass = wxGetPasswordFromUser(_("Please enter password for user ") + conn->getUserName(),
+	    wxString pass;
+#if wxUSE_SECRETSTORE
+	    if(conn->getPassword().IsOk())
+		pass = conn->getPassword().GetAsString();
+	    else
+#endif
+		pass = wxGetPasswordFromUser(_("Please enter password for user ") + conn->getUserName(),
 						  _("Credentials required..."));
 	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
 	    c->userCredential.username = strdup(conn->getUserName().char_str());
@@ -595,6 +607,9 @@ rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
 	DialogLogin formLogin(0, wxID_ANY, _("Credentials required..."));
 	if ( formLogin.ShowModal() == wxID_OK ) {
 	    conn->setUserName(formLogin.getUserName());
+#if wxUSE_SECRETSTORE
+	    conn->setPassword(wxSecretValue(formLogin.getPassword()));
+#endif
 	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
 	    c->userCredential.username = strdup(formLogin.getUserName().char_str());
 	    c->userCredential.password = strdup(formLogin.getPassword().char_str());
@@ -727,8 +742,19 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 
       wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
       wxString host = service.Contains("@") ? service.AfterFirst('@') : service;
-
-      if(!c->Init(host, user, encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
+#if wxUSE_SECRETSTORE
+      wxSecretValue password;
+      wxSecretStore store = wxSecretStore::GetDefault();
+      if(store.IsOk()) {
+	  wxString username; // this will not be used
+	  store.Load("MultiVNC/Bookmarks/" + service, username, password); // if Load() fails, password will still be empty
+      }
+#endif
+      if(!c->Init(host, user,
+#if wxUSE_SECRETSTORE
+		  password,
+#endif
+		  encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
 	{
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
@@ -1539,6 +1565,14 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
       cfg->Write(K_BOOKMARKS_PORT, c->getServerPort());
       cfg->Write(K_BOOKMARKS_USER, c->getUserName());
 
+#if wxUSE_SECRETSTORE
+      wxSecretStore store = wxSecretStore::GetDefault();
+      if(store.IsOk() && c->getPassword().IsOk()) { //check if destination and source are ok
+	  if(!store.Save("MultiVNC/Bookmarks/" +  c->getUserName() + "@" + c->getServerHost() + ":" + c->getServerPort(), c->getUserName(), c->getPassword())) //FIXME the service should use the user-given bookmark name, but that requires a rework of our internal bookmarking
+	      wxLogWarning(_("Failed to save credentials to the system secret store."));
+      }
+#endif
+
       //reset path
       cfg->SetPath(wxT("/"));
 
@@ -1580,17 +1614,27 @@ void MyFrameMain::bookmarks_edit(wxCommandEvent &event)
 
 void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
 {
-  wxString sel = list_box_bookmarks->GetStringSelection();
+  wxString name = list_box_bookmarks->GetStringSelection();
   
-  if(sel.IsEmpty())
+  if(name.IsEmpty())
     {
       wxLogError(_("No bookmark selected!"));
       return;
     }
 
   wxConfigBase *cfg = wxConfigBase::Get();
-  if(!cfg->DeleteGroup(G_BOOKMARKS + sel))
+  if(!cfg->DeleteGroup(G_BOOKMARKS + name))
     wxLogError(_("No bookmark with this name!"));
+
+#if wxUSE_SECRETSTORE
+  int sel = list_box_bookmarks->GetSelection();
+  if(sel != wxNOT_FOUND) {
+      wxString service = bookmarks[sel];
+      wxSecretStore store = wxSecretStore::GetDefault();
+      if(store.IsOk())
+	  store.Delete("MultiVNC/Bookmarks/" + service);
+  }
+#endif
 
   // and re-read
   loadbookmarks();
