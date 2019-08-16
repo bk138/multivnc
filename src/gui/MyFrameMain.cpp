@@ -108,7 +108,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // window sharing
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
-
+  // edge connector
+  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(4)->Enable(VNCSeamlessConnector::isSupportedByCurrentPlatform());
 
   // toolbar setup
 #ifdef MULTIVNC_GRABKEYBOARD
@@ -784,7 +785,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 #endif
 
   VNCSeamlessConnector* sc = 0;
-  if(show_seamless != EDGE_NONE)
+  if(VNCSeamlessConnector::isSupportedByCurrentPlatform() && show_seamless != EDGE_NONE)
     sc = new VNCSeamlessConnector(this, c, show_seamless);
 
   ConnBlob cb;

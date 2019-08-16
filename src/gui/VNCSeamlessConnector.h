@@ -39,6 +39,8 @@ public:
   void adjustSize(); 
   int getEdge() { return edge; };
 
+  static bool isSupportedByCurrentPlatform();
+
 
 protected:
   DECLARE_EVENT_TABLE();

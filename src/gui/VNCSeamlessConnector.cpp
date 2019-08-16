@@ -116,6 +116,15 @@ VNCSeamlessConnector::~VNCSeamlessConnector()
 }
 
 
+bool VNCSeamlessConnector::isSupportedByCurrentPlatform() {
+#ifdef __WXGTK__
+    wxString sessionType;
+    wxGetEnv("XDG_SESSION_TYPE", &sessionType);
+    return sessionType.IsSameAs("x11");
+#endif
+    return false;
+}
+
 
 
 void VNCSeamlessConnector::adjustSize()
