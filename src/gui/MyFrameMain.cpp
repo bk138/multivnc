@@ -108,6 +108,16 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // window sharing
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+#ifdef __WXGTK__
+  wxString sessionType;
+  wxGetEnv("XDG_SESSION_TYPE", &sessionType);
+  frame_main_menubar->EnableTop(frame_main_menubar->FindMenu(wxT("Window Sharing")), sessionType.IsSameAs("x11"));
+#elif defined __WXMSW__
+  // always on
+#else
+  // always off so far
+  frame_main_menubar->EnableTop(frame_main_menubar->FindMenu(wxT("Window Sharing")), false);
+#endif
   // edge connector
   frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(4)->Enable(VNCSeamlessConnector::isSupportedByCurrentPlatform());
 
