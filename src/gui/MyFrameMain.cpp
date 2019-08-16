@@ -1716,7 +1716,7 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
   {
     wxServDisc namescan(0, servscan->getResults().at(sel).name, QTYPE_SRV);
   
-    timeout = 3000;
+    timeout = 5000;
     while(!namescan.getResultCount() && timeout > 0)
       {
 	wxMilliSleep(25);
@@ -1738,7 +1738,7 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
   {
     wxServDisc addrscan(0, services_hostname, QTYPE_A);
   
-    timeout = 3000;
+    timeout = 5000;
     while(!addrscan.getResultCount() && timeout > 0)
       {
 	wxMilliSleep(25);
