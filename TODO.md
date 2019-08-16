@@ -1,7 +1,6 @@
 
 # wxWidgets version:
  - make fullscreen behave really like fullscreen
- - wxSecretStore for bookmarks
  - wxTaskBarIcon
  - fix hang when connection is disrupted
  - make VNC server on win32 exit when window is closed
