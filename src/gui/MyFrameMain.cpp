@@ -7,6 +7,8 @@
 #if wxCHECK_VERSION(3, 1, 1)
 #include <wx/secretstore.h>
 #endif
+#include <wx/wfstream.h>
+#include <wx/txtstrm.h>
 #include "res/about.png.h"
 #include "res/unicast.png.h"
 #include "res/multicast.png.h"
@@ -1740,7 +1742,24 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
     services_port = wxString() << namescan.getResults().at(0).port;
   }
 
-  
+  // check if we actually have to resolve the IP address ourselves
+  bool is_system_resolving_mdns = false;
+#ifdef __WXMAC__
+  is_system_resolving_mdns = true;
+#else
+  wxLog::EnableLogging(false);
+  wxFileInputStream input("/etc/nsswitch.conf");
+  wxLog::EnableLogging(true);
+  wxTextInputStream text(input);
+  while(input.IsOk() && !input.Eof())
+      if(text.ReadLine().Contains("mdns")) {
+	  is_system_resolving_mdns = true;
+	  wxLogDebug("System resolver does mDNS, skipping IP address lookup");
+	  break;
+      }
+#endif
+
+  if(!is_system_resolving_mdns)
   // lookup ip address
   {
     wxServDisc addrscan(0, services_hostname, QTYPE_A);
@@ -1760,6 +1779,8 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
       }
     services_addr = addrscan.getResults().at(0).ip;
   }
+  else
+      services_addr = services_hostname; // system resolves mDNS
 
   wxLogStatus(services_hostname + wxT(" (") + services_addr + wxT(":") + services_port + wxT(")"));
 
