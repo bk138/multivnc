@@ -730,7 +730,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 
   if(listenPort > 0)
     {
-      wxLogStatus(_("Listening on port ") + wxString() << listenPort + wxT(" ..."));
+      wxLogStatus(_("Listening on port ") + (wxString() << listenPort) + wxT(" ..."));
       if(!c->Listen(listenPort))
 	{
 	  wxLogError(c->getErr());
