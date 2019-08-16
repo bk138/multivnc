@@ -1702,6 +1702,13 @@ or multicast mode."));
 
 void MyFrameMain::listbox_services_select(wxCommandEvent &event)
 {
+    // intentionally empty
+    wxLogStatus(_("VNC Server ") + list_box_services->GetStringSelection());
+}
+
+
+void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
+{
   int timeout;
   wxBusyCursor busy;
   int sel = event.GetInt();
@@ -1755,12 +1762,8 @@ void MyFrameMain::listbox_services_select(wxCommandEvent &event)
   }
 
   wxLogStatus(services_hostname + wxT(" (") + services_addr + wxT(":") + services_port + wxT(")"));
-}
 
 
-void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
-{
-  listbox_services_select(event); // get the actual values
   spawn_conn(services_addr + wxT(":") + services_port);
 } 
  
