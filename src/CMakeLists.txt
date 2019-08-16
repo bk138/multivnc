@@ -26,7 +26,6 @@ SET(multivnc_SRCS
    VNCConn.cpp
    VNCConn.h
    dfltcfg.h
-   msgqueue.h
 )
 
 if(APPLE)
