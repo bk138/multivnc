@@ -586,6 +586,8 @@ rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
 {
     VNCConn *conn = VNCConn::getVNCConnFromRfbClient(client);
 
+    conn->setRequireAuth(true);
+    
     if(type == rfbCredentialTypeUser) {
 
 	if(conn->getUserName() != wxEmptyString) {
@@ -756,6 +758,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 #endif
 		  encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
 	{
+	  if(! (c->getRequireAuth() && c->getUserName() == wxEmptyString)) {
 	  wxLogStatus( _("Connection failed."));
 	  wxArrayString log = VNCConn::getLog();
 	  // show last 3 log strings
@@ -763,6 +766,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 	    wxLogMessage(log[i]);
 	  
 	  wxLogError(c->getErr());
+	  }
 	  delete c;
 	  return false;
 	}

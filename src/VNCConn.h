@@ -157,6 +157,8 @@ public:
   const wxSecretValue& getPassword() const;
   void setPassword(const wxSecretValue& password);
 #endif
+  const bool getRequireAuth() const;
+  void setRequireAuth(bool yesno);
 
 
   // get current multicast receive buf state
@@ -222,6 +224,7 @@ private:
 #if wxUSE_SECRETSTORE
   wxSecretValue password;
 #endif
+  bool require_auth;
 
   // statistics
   bool do_stats;

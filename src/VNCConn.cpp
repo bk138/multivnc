@@ -1541,6 +1541,13 @@ void VNCConn::setPassword(const wxSecretValue& password) {
 }
 #endif
 
+const bool VNCConn::getRequireAuth() const {
+    return require_auth;
+}
+
+void VNCConn::setRequireAuth(bool yesno) {
+    require_auth = yesno;
+}
 
 wxString VNCConn::getServerHost() const
 {
