@@ -1826,13 +1826,14 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 {
   int sel = event.GetInt();
 
-  if(sel < 0) // nothing selected
-    return;
+  if(sel < 0) { // nothing selected
+      // this gets set by Connect() in loadbookmarks(), in this case sel is always -1
+      if(event.m_callbackUserData)
+	  sel = wxAtoi(*(wxString*)event.m_callbackUserData);
+      else
+	  return;
+  }
 
-  // this gets set by Connect() in loadbookmarks(), in this case sel is always 0
-  if(event.m_callbackUserData)
-    sel = wxAtoi(*(wxString*)event.m_callbackUserData);
-      
   spawn_conn(bookmarks[sel]);
 }
 

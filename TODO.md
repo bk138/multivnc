@@ -1,6 +1,5 @@
 
 # wxWidgets version:
- - fix bookmarks not being callable from menu
  - make fullscreen behave really like fullscreen
  - wxTaskBarIcon
  - fix hang when connection is disrupted
