@@ -17,18 +17,15 @@ class VNCCanvas;
 */
 class ViewerWindow: public wxPanel
 {
-  wxScrolledWindow* canvas_container;
-  wxScrolledWindow* stats_container;
-  VNCCanvas* canvas;
+public:
+  ViewerWindow(wxWindow* parent, VNCConn* connection);
+  ~ViewerWindow();
 
-  // timer to update stats win
-  wxTimer stats_timer;
-  void onStatsTimer(wxTimerEvent& event);
+  void adjustCanvasSize(); 
 
-  void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
+  void showStats(bool yesno);
+  void grabKeyboard(bool yesno);
 
-  // save default foreground colour to be able to flash when buffer full
-  wxColour dflt_fg;
 
 protected:
   wxStaticText* label_updrawbytes;
@@ -44,14 +41,22 @@ protected:
 
   DECLARE_EVENT_TABLE();
 
-public:
-  ViewerWindow(wxWindow* parent, VNCConn* connection);
-  ~ViewerWindow();
+private:
 
-  void adjustCanvasSize(); 
+  wxScrolledWindow* canvas_container;
+  wxScrolledWindow* stats_container;
+  VNCCanvas* canvas;
 
-  void showStats(bool yesno);
-  void grabKeyboard(bool yesno);
+  // timer to update stats win
+  wxTimer stats_timer;
+  void onStatsTimer(wxTimerEvent& event);
+
+  void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
+
+  // save default foreground colour to be able to flash when buffer full
+  wxColour dflt_fg;
+
+
 };
 	
 
