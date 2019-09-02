@@ -35,6 +35,8 @@
 package com.coboltforge.dontmind.multivnc;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -118,10 +120,18 @@ public class ZoomControls extends LinearLayout {
     
     public void setIsZoomInEnabled(boolean isEnabled) {
         mZoomIn.setEnabled(isEnabled);
+        if(!isEnabled)
+            mZoomIn.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+        else
+            mZoomIn.getBackground().setColorFilter(null);
     }
     
     public void setIsZoomOutEnabled(boolean isEnabled) {
         mZoomOut.setEnabled(isEnabled);
+        if(!isEnabled)
+            mZoomOut.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+        else
+            mZoomOut.getBackground().setColorFilter(null);
     }
     
     @Override
