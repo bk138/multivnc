@@ -67,6 +67,7 @@
 
         <service
             android:enabled="true"
+			android:exported="false"
             android:name=".MDNSService" >
         </service>
 
