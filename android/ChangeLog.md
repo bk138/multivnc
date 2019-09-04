@@ -1,5 +1,9 @@
 # Version 1.7.x:
 
+1.7.10
+
+-   Fixed a possible race condition and subsequent crash on app start.
+
 1.7.9
 
 -   Fixed a possible crash.
