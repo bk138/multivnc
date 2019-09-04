@@ -17,7 +17,7 @@
 <string name="toggle_mouse_buttons">"Maustasten umschalten"</string>
 <string name="toggle_pointer_highlight">"Cursor-Highlight umschalten"</string>
 <string name="toggle_keyboard">"Tastatur umschalten"</string>
-<string name="export_settings">"Exportien"</string>
+<string name="export_settings">"Exportieren"</string>
 <string name="export_settings_path">"In Datei exportieren"</string>
 <string name="database_error_open">"Fehler beim Öffnen der Datenbank!"</string>
 <string name="import_export_settings">"Importieren/Exportieren"</string>
