@@ -1,8 +1,17 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
-        <item name="android:textColorPrimary">@color/ui_text</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+        <!-- app branding color for the app bar -->
+        <item name="colorPrimary">@color/ui_primary</item>
+        <!-- darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">@color/ui_primary_dark</item>
+        <!-- theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">@color/ui_primary</item>
+
         <item name="android:windowBackground">@color/ui_background</item>
+        <item name="android:textColorPrimary">@color/ui_text</item>
+
         <!-- https://stackoverflow.com/questions/31777167/android-options-menu-is-transparent -->
         <item name="android:panelBackground">@color/ui_background</item>
     </style>
