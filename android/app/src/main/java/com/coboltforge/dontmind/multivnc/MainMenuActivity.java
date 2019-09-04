@@ -124,11 +124,6 @@ public class MainMenuActivity extends Activity implements IMDNS {
 		// update appstart cound
 		Utils.updateAppStartCount(this);
 
-		// start the MDNS service
-		startMDNSService();
-		// and (re-)bind to MDNS service
-		bindToMDNSService(new Intent(this, MDNSService.class));
-
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
@@ -308,7 +303,6 @@ public class MainMenuActivity extends Activity implements IMDNS {
 
 		database.close();
 
-		unbindFromMDNSService();
 	}
 
 	@Override
@@ -369,6 +363,20 @@ public class MainMenuActivity extends Activity implements IMDNS {
 	}
 
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// start the MDNS service
+		startMDNSService();
+		// and (re-)bind to MDNS service
+		bindToMDNSService(new Intent(this, MDNSService.class));
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		unbindFromMDNSService();
+	}
 
 	/**
 	 * Return the object representing the app global state in the database, or null
