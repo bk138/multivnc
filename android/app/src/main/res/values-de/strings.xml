@@ -56,8 +56,10 @@
 <string name="about">"Über"</string>
 <string name="help">"Hilfe"</string>
 <string name="edit">"Bearbeiten"</string>
+    <string name="save">Speichern</string>
 
-<string name="support_dialog_title">"Bitte unterstützen Sie MultiVNC"</string>
+
+    <string name="support_dialog_title">"Bitte unterstützen Sie MultiVNC"</string>
 <string name="support_dialog_text">"Wenn Ihnen MultiVNC gefällt, können Sie die Entwicklung unterstützen, indem Sie die App bewerten oder PayPal verwenden. Vielen Dank!"</string>
 <string name="support_dialog_yes">"Ja, gute Idee!"</string>
 <string name="support_dialog_no">"Nein, nicht jetzt."</string>

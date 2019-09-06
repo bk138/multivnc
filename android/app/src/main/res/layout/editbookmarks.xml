@@ -217,7 +217,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dip"
                 android:layout_weight="1"
-                android:text="@string/savebookmark_button" />
+                android:text="@string/save" />
 
             <Button
                 android:id="@+id/buttonCancelBookmark"
