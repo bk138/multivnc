@@ -11,7 +11,8 @@
         	android:layout_weight="1"
         android:layout_gravity="center_vertical"/>
         <ImageButton android:id="@+id/discovered_server_save_button"
-        	android:src="@android:drawable/ic_menu_save"
+			style="@style/Widget.AppCompat.Button.Borderless"
+			android:src="@drawable/ic_bookmark_border_green_24dp"
         	android:layout_gravity="center_vertical"
 	        android:layout_height="50dp"
 	        android:layout_width="50dp"
