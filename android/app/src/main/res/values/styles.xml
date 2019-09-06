@@ -14,6 +14,9 @@
 
         <!-- https://stackoverflow.com/questions/31777167/android-options-menu-is-transparent -->
         <item name="android:panelBackground">@color/ui_background</item>
+
+        <!-- make all buttons coloured -->
+        <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
     </style>
 
 </resources>
