@@ -38,7 +38,6 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnDismissListener;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -51,13 +50,13 @@ import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 @SuppressWarnings("deprecation")
 public class VncCanvasActivity extends Activity {
@@ -540,7 +539,7 @@ public class VncCanvasActivity extends Activity {
 
 		super.onCreate(savedInstanceState);
 
-		// hide or show actionbar, title bar, status bar
+		// hide title bar, status bar
 		setupWindowSize();
 
 		setContentView(R.layout.canvas);
@@ -558,7 +557,17 @@ public class VncCanvasActivity extends Activity {
 		inputHandler = new MightyInputHandler();
 		inputHandler.init();
 
-
+		/*
+		 * setup floating action button
+		 */
+		FloatingActionButton fab = findViewById(R.id.fab);
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+			    Log.d(TAG, "FAB onClick");
+				openOptionsMenu();
+			}
+		});
 
 
 		/*
@@ -836,19 +845,6 @@ public class VncCanvasActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
-
-		try {
-			if(getActionBar().isShowing()) {
-				menu.findItem(R.id.itemSpecialKeys).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-				menu.findItem(R.id.itemSendKeyAgain).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-				menu.findItem(R.id.itemToggleKeyboard).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-				menu.findItem(R.id.itemSaveBookmark).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-				menu.findItem(R.id.itemDisconnect).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			}
-		}
-		catch(NullPointerException e) {
-		}
-
 
 		return true;
 	}
@@ -1188,10 +1184,6 @@ public class VncCanvasActivity extends Activity {
 		notificationToast.show();
 	}
 
-	public void setTitle(String text) {
-		getActionBar().setTitle(text);
-	}
-
 
 	/**
 	 * Sets window size according to target device's platform.
@@ -1203,13 +1195,6 @@ public class VncCanvasActivity extends Activity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		// disable home button as this sometimes takes keyboard focus
-		getActionBar().setDisplayShowHomeEnabled(false);
-
-
-		// hideactionbar when there is a hardware menu button
-		if(ViewConfiguration.get(this).hasPermanentMenuKey())
-			getActionBar().hide();
 	}
 
 	private void invalidateMyOptionsMenu() {

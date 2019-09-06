@@ -199,6 +199,6 @@
         android:layout_height="100dp"
         android:layout_gravity="center"
         android:text="@string/connect_button"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse" />
 
 </merge>

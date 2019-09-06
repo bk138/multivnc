@@ -22,18 +22,30 @@
     	android:visibility="gone"
     />
 
+	<com.coboltforge.dontmind.multivnc.ZoomControls
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/zoomer"
+		android:layout_gravity="center|top"
+		/>
+
+	<com.google.android.material.floatingactionbutton.FloatingActionButton
+		android:id="@+id/fab"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="end|top"
+		android:src="@drawable/ic_menu_black_24dp"
+		android:alpha="0.6"
+		android:layout_margin="16dp" />
+
+
 	<LinearLayout
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center|bottom">
 
-		<com.coboltforge.dontmind.multivnc.ZoomControls
-	    	android:layout_width="wrap_content"
-    		android:layout_height="wrap_content"
-	   		android:id="@+id/zoomer"
-    		android:layout_gravity="center|bottom"
-		/>
+
 
 	  <LinearLayout
 	      android:id="@+id/virtualmousebuttons"

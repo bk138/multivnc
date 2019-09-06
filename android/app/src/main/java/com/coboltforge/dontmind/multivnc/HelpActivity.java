@@ -10,10 +10,9 @@ public class HelpActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.help);
-		WebView wv = (WebView) findViewById(R.id.helpwebView);
+		WebView wv = findViewById(R.id.helpwebView);
 		wv.loadUrl("file:///android_asset/help.html");
-		wv.getSettings().setBuiltInZoomControls(true);
-	
+
 	}
 	
 }

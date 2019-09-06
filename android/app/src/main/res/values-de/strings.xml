@@ -4,7 +4,7 @@
     <string name="server_found">"VNC-Server gefunden"</string>
     <string name="server_removed">"VNC-Server verschwunden"</string>
     <string name="restartMDNS">"Server-Erkennung neu starten"</string>
-    <string name="scale_msg">"Jetzt skalieren"</string>
+    <string name="scale_msg">"Skaliert auf "</string>
 <string name="madeby">"MultiVNC für Android wird von Christian Beier für Sie bereitgestellt.\n\nEs basiert auf android-vnc-viewer (http://code.google.com/p/android-vnc-viewer) mit wichtigen Fehlerbehebungen und Verbesserungen. \n\nDie Projekt-Homepage befindet sich unter https://github.com/bk138/multivnc ."</string>
 <string name="colormode_caption">"Farbmodus"</string>
 <string name="color_mode">"Farbmodus einstellen"</string>
@@ -17,7 +17,7 @@
 <string name="toggle_pointer_highlight">"Cursor-Highlight umschalten"</string>
 <string name="toggle_keyboard">"Tastatur umschalten"</string>
 
-<string name="export_settings">"Exportien"</string>
+<string name="export_settings">"Exportieren"</string>
 <string name="export_settings_path">"In Datei exportieren"</string>
 <string name="database_error_open">"Fehler beim Öffnen der Datenbank!"</string>
 <string name="import_export_settings">"Importieren/Exportieren"</string>
@@ -61,11 +61,13 @@
 <string name="about">"Über"</string>
 <string name="help">"Hilfe"</string>
 <string name="edit">"Bearbeiten"</string>
+    <string name="save">Speichern</string>
 
     <string name="utils_title_error">Fehler!</string>
 
 <string name="support_dialog_title">"Bitte unterstützen Sie MultiVNC"</string>
 <string name="support_dialog_text">"Wenn Ihnen MultiVNC gefällt, können Sie die Entwicklung unterstützen, indem Sie die App bewerten oder eine Kleinigkeit spenden. Vielen Dank!"</string>
+
 <string name="support_dialog_yes">"Ja, gute Idee!"</string>
 <string name="support_dialog_no">"Nein, nicht jetzt."</string>
 <string name="support_dialog_neveragain">"Nicht noch einmal nachfragen."</string>
