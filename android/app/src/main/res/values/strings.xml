@@ -30,7 +30,7 @@
 <string name="nickname_caption">Bookmark</string>
 <string name="discovered_servers">Discovered Servers</string>
 <string name="bookmarks">Bookmarks</string>
-<string name="savebookmark_button">Save</string>
+<string name="savebookmark_button">Save Bookmark</string>
 <string name="bookmark_saved">Bookmark saved!</string>
 <string name="bookmark_invalid">This is not a valid bookmark anymore!</string>
 <string name="password_caption">Password</string>

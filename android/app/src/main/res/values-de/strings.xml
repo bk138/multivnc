@@ -29,7 +29,7 @@
 <string name="nickname_caption">"Lesezeichen"</string>
 <string name="discovered_servers">"Erkannte Server"</string>
 <string name="bookmarks">"Lesezeichen"</string>
-<string name="savebookmark_button">"Speichern"</string>
+<string name="savebookmark_button">"Lesezeichen speichern"</string>
 <string name="bookmark_saved">"Lesezeichen gespeichert!"</string>
 <string name="bookmark_invalid">"Dies ist kein gültiges Lesezeichen mehr!"</string>
 <string name="password_caption">"Passwort"</string>
