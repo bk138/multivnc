@@ -7,7 +7,7 @@
 
     <item
         android:id="@+id/itemSendKeyAgain"
-        android:icon="@drawable/refresh"
+        android:icon="@drawable/ic_refresh_white_48dp"
         android:title="@string/send_key_again"/>
 
     <item
