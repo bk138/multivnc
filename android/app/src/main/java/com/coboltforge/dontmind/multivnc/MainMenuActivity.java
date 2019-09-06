@@ -32,6 +32,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import androidx.appcompat.app.AppCompatActivity;
@@ -51,6 +52,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -58,7 +64,7 @@ import java.util.Hashtable;
 
 
 
-public class MainMenuActivity extends AppCompatActivity implements IMDNS {
+public class MainMenuActivity extends AppCompatActivity implements IMDNS, LifecycleObserver {
 
 	private static final String TAG = "MainMenuActivity";
 
@@ -600,8 +606,24 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS {
 
 
 	void startMDNSService() {
-		Intent serviceIntent = new Intent(Intent.ACTION_VIEW, null, this, MDNSService.class);
-		this.startService(serviceIntent);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+				Intent serviceIntent = new Intent(Intent.ACTION_VIEW, null, this, MDNSService.class);
+				this.startService(serviceIntent);
+			} else {
+				ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+			}
+		} else {
+			Intent serviceIntent = new Intent(Intent.ACTION_VIEW, null, this, MDNSService.class);
+			this.startService(serviceIntent);
+		}
+	}
+
+	@OnLifecycleEvent(Lifecycle.Event.ON_START)
+	void onEnterForeground() {
+		startMDNSService();
+		ProcessLifecycleOwner.get().getLifecycle().removeObserver(this);
 	}
 
 	void bindToMDNSService(Intent serviceIntent) {
