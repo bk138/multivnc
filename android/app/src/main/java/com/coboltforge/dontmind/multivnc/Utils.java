@@ -79,7 +79,7 @@ public class Utils {
 			builder.setTitle(title);
 			builder.setMessage(Html.fromHtml(message));
 			builder.setCancelable(false);
-			builder.setPositiveButton("Acknowledged", ackHandler);
+			builder.setPositiveButton(android.R.string.ok, ackHandler);
 			if(icon != 0)
 				builder.setIcon(icon);
 			if(iconAttribute != 0)
