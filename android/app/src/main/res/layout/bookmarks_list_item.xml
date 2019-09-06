@@ -3,7 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="10dip">
+    android:padding="5dip">
         <TextView android:id="@+id/bookmark_name"
         	android:text="bookmark name"
         	android:textAppearance="?android:attr/textAppearanceMedium"
