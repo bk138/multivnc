@@ -61,6 +61,7 @@
 <string name="about">"Di"</string>
 <string name="help">"Aiuto"</string>
 <string name="edit">"Modificare"</string>
+    <string name="save">Salvare</string>
 
     <string name="utils_title_error">"Errore!"</string>
 

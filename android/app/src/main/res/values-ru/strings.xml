@@ -61,6 +61,7 @@
 <string name="about">"Около"</string>
 <string name="help">"Помогите"</string>
 <string name="edit">"редактировать"</string>
+    <string name="save">спасти</string>
 
     <string name="utils_title_error">"Ошибка!"</string>
 
