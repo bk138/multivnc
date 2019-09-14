@@ -1,0 +1,4 @@
+-keep class com.antlersoft.** { *; }
+
+
+
