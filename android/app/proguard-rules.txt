@@ -1,3 +1,4 @@
+-dontobfuscate
 -keep class com.antlersoft.** { *; }
 
 
