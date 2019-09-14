@@ -1,3 +1,12 @@
+# Version 1.8.x:
+
+1.8.0
+
+-   Updated UI to use Material Design.
+-   Made remote desktop view use more screen real estate.
+-   Changed default color mode to TrueColor.
+-   Fixed possible crash on app start.
+
 # Version 1.7.x:
 
 1.7.10
