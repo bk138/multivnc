@@ -6,6 +6,7 @@ package com.coboltforge.dontmind.multivnc;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.util.Log;
 
 /**
@@ -38,7 +39,14 @@ class VncDatabase extends SQLiteOpenHelper {
 		
 		db.execSQL("INSERT INTO "+MetaList.GEN_TABLE_NAME+" VALUES ( 1, 'DEFAULT')");
 	}
-	
+
+	@Override
+	public void onOpen(SQLiteDatabase db) {
+		super.onOpen(db);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+			db.disableWriteAheadLogging();
+	}
+
 	private void defaultUpgrade(SQLiteDatabase db)
 	{
 		Log.i(TAG, "Doing default database upgrade (drop and create tables)");
