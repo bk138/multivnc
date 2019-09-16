@@ -4,7 +4,7 @@
     package="com.coboltforge.dontmind.multivnc" android:installLocation="auto"
     android:versionCode="55" android:versionName="1.8.1">
 
-	<supports-screens android:anyDensity="true"
+	<supports-screens
 		android:largeScreens="true"
 		android:xlargeScreens="true"/>
 
