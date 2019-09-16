@@ -1,5 +1,10 @@
 # Version 1.8.x:
 
+1.8.1
+
+-   More adaptations for tablets.
+-   Fixed two possible crashes.
+
 1.8.0
 
 -   Updated UI to use Material Design.
