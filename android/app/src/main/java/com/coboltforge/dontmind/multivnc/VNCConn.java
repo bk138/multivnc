@@ -121,6 +121,15 @@ public class VNCConn {
     		ffur.incremental = incremental;
     	}
 
+		public OutputEvent(int x, int y, int w, int h, boolean incremental) {
+			fur = new FramebufferUpdateRequest();
+			fur.x = x;
+			fur.y = y;
+			fur.w = w;
+			fur.h = h;
+			fur.incremental = incremental;
+		}
+
     	public OutputEvent(String text) {
     		cuttext = new ClientCutText();
     		cuttext.text = text;
@@ -143,12 +152,18 @@ public class VNCConn {
     		boolean incremental;
     	}
 
+		private class FramebufferUpdateRequest {
+    		int x,y,w,h;
+			boolean incremental;
+		}
+
     	private class ClientCutText {
     		String text;
     	}
 
     	public FullFramebufferUpdateRequest ffur;
-    	public PointerEvent pointer;
+		public FramebufferUpdateRequest fur;
+		public PointerEvent pointer;
     	public KeyboardEvent key;
     	public ClientCutText cuttext;
     }
@@ -340,7 +355,7 @@ public class VNCConn {
 			else
 				useFull = (connSettings.getForceFull() == BitmapImplHint.FULL);
 			if (! useFull)
-				bitmapData=new LargeBitmapData(rfb, canvas, capacity);
+				bitmapData=new LargeBitmapData(rfb, canvas, VNCConn.this, capacity);
 			else
 				bitmapData=new FullBufferBitmapData(rfb, canvas, capacity);
 
@@ -599,6 +614,12 @@ public class VNCConn {
 						try {
 							bitmapData.writeFullUpdateRequest(ev.ffur.incremental);
 						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					if(ev.fur != null)
+						try {
+							rfb.writeFramebufferUpdateRequest(ev.fur.x, ev.fur.y, ev.fur.w, ev.fur.h, ev.fur.incremental);
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
     				if(ev.cuttext != null)
@@ -968,6 +989,21 @@ public class VNCConn {
 		return framebufferUpdatesEnabled;
 	}
 
+
+	void sendFramebufferUpdateRequest(int x, int y, int w, int h, boolean incremental) {
+		if(framebufferUpdatesEnabled)
+		{
+			try {
+				OutputEvent e = new OutputEvent(x, y, w, h, incremental);
+				outputEventQueue.add(e);
+				synchronized (outputEventQueue) {
+					outputEventQueue.notify();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 
 	public void setColorModel(COLORMODEL cm) {

@@ -35,6 +35,7 @@ class LargeBitmapData extends AbstractBitmapData {
 	private Paint defaultPaint;
 	private RectList invalidList;
 	private RectList pendingList;
+	private VNCConn mConn;
 	
 	/**
 	 * Pool of temporary rectangle objects.  Need to synchronize externally access from
@@ -61,7 +62,7 @@ class LargeBitmapData extends AbstractBitmapData {
 	 * @param displayHeight
 	 * @param capacity Max process heap size in bytes
 	 */
-	LargeBitmapData(RfbProto p, VncCanvas c, int capacity)
+	LargeBitmapData(RfbProto p, VncCanvas c, VNCConn conn, int capacity)
 	{
 		super(p,c);
 		double scaleMultiplier = Math.sqrt((double)(capacity * 1024 * 1024) / (double)(CAPACITY_MULTIPLIER * framebufferwidth * framebufferheight));
@@ -77,6 +78,7 @@ class LargeBitmapData extends AbstractBitmapData {
 		pendingList = new RectList(rectPool);
 		bitmapRect=new Rect(0,0,bitmapwidth,bitmapheight);
 		defaultPaint = new Paint();
+		mConn = conn;
 	}
 	
 	
@@ -254,16 +256,11 @@ class LargeBitmapData extends AbstractBitmapData {
 			}
 			if (! didOverlapping)
 			{
-				try
-				{
+
 					//android.util.Log.i("LBM","update req "+xoffset+" "+yoffset);
 					mbitmap.eraseColor(Color.GREEN);
-					writeFullUpdateRequest(false);
-				}
-				catch ( IOException ioe)
-				{
-					// TODO log this
-				}
+					mConn.sendFramebufferUpdateRequest(0,0,rfb.framebufferWidth, rfb.framebufferHeight, false);
+
 			}
 		}
 		int size = pendingList.getSize();
@@ -273,15 +270,9 @@ class LargeBitmapData extends AbstractBitmapData {
 		size = invalidList.getSize();
 		for (int i=0; i<size; i++) {
 			Rect invalidRect = invalidList.get(i);
-			try
-			{
-				rfb.writeFramebufferUpdateRequest(invalidRect.left, invalidRect.top, invalidRect.right-invalidRect.left, invalidRect.bottom-invalidRect.top, false);
+
+				mConn.sendFramebufferUpdateRequest(invalidRect.left, invalidRect.top, invalidRect.right-invalidRect.left, invalidRect.bottom-invalidRect.top, false);
 				pendingList.add(invalidRect);
-			}
-			catch (IOException ioe)
-			{
-				//TODO Log this
-			}
 		}
 		waitingForInput=true;
 		//android.util.Log.i("LBM", "pending "+pendingList.toString() + "invalid "+invalidList.toString());
