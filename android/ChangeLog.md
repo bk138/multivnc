@@ -1,5 +1,9 @@
 # Version 1.8.x:
 
+1.8.2
+
+-   Some UI fixes for Android Kitkat.
+
 1.8.1
 
 -   More adaptations for tablets.
