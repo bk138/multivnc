@@ -79,8 +79,8 @@
 <string name="changelog_dialog_title">"Was gibt\'s Neues…"</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-        Wenn Sie wissen möchten, welche Änderungen mit dieser Version neu hinzugekommen sind, können Sie einen Blick in das online
-        verfügbare <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">Änderungsprotokoll (in Englisch)</a> werfen.
+        Wenn Sie wissen m&ouml;chten, welche &Auml;nderungen mit dieser Version neu hinzugekommen sind, k&ouml;nnen Sie einen Blick in das online
+        verf&uuml;gbare <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">&Auml;nderungsprotokoll (in Englisch)</a> werfen.
     ]]>
 </string>
 </resources>
