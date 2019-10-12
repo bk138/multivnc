@@ -229,7 +229,11 @@ public class VNCConn {
 						final String error_ = error + "<br>" + e.getLocalizedMessage();
 						canvas.handler.post(new Runnable() {
 							public void run() {
-								Utils.showFatalErrorMessage(canvas.getContext(), error_);
+								try {
+									Utils.showFatalErrorMessage(canvas.getContext(), error_);
+								}
+								catch(NullPointerException e) {
+								}
 							}
 						});
 					}
