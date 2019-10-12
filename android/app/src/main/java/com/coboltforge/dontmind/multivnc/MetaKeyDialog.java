@@ -261,17 +261,20 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 				if (list.get_Id()==listId)
 				{
 					_keysInList = new ArrayList<MetaKeyBean>();
-					Cursor c = _database.getReadableDatabase().rawQuery(
-							MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2} ORDER BY KEYDESC",
-									MetaKeyBean.GEN_TABLE_NAME,
-									MetaKeyBean.GEN_FIELD_METALISTID,
-									listId),
-							EMPTY_ARGS);
-					MetaKeyBean.Gen_populateFromCursor(
-							c,
-							_keysInList,
-							MetaKeyBean.NEW);
-					c.close();
+					try {
+						Cursor c = _database.getReadableDatabase().rawQuery(
+								MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2} ORDER BY KEYDESC",
+										MetaKeyBean.GEN_TABLE_NAME,
+										MetaKeyBean.GEN_FIELD_METALISTID,
+										listId),
+								EMPTY_ARGS);
+						MetaKeyBean.Gen_populateFromCursor(
+								c,
+								_keysInList,
+								MetaKeyBean.NEW);
+						c.close();
+					} catch (Exception e) {
+					}
 					ArrayList<String> keys = new ArrayList<String>(_keysInList.size());
 					int selectedOffset = 0;
 					long lastSelectedKeyId = _canvasActivity.getConnection().getLastMetaKeyId();
