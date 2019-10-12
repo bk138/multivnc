@@ -1,14 +1,17 @@
+# AndroidMultiVNC
 
-# I/O Architecture of the Java Version
+## Technical Notes
+
+### I/O Architecture of the Java Version
 
 * MainMenuActivity
   * launches VncCanvasActivity
 
 * VncCanvasActivity
-  * contains VNCCanvas, which is a GLSurfaceView
+  * contains VncCanvas, which is a GLSurfaceView
   * contains UI buttons, ZoomControls
-  * manages touch input via MightyInputHandler
-  * creates a new VNCConn, connects it with the VNCCanvas and sets it up from a ConnectionBean
+  * contains MightyInputHandler
+  * creates a new VNCConn, connects it with the VncCanvas and sets it up from a ConnectionBean
 
 * VNCConn
   * encapsulates RfbProto
@@ -17,11 +20,11 @@
     framebuffer updates using its provided method
   
 * InputHandler
-  * gets and sets scaling from/on VNCCanvas
-  * sets render modes on VNCCanvas 
-  * sends touch events to VNCCanvas
+  * gets and sets scaling from/on VncCanvas
+  * sets render modes on VncCanvas 
+  * sends touch events to VncCanvas
   
-* VNCCanvas
+* VncCanvas
   * receives touch events from system, pipes them to InputHandler
   * receives pointer events from InputHandler, pipes them to VNCConn
   * receives key events from VncCanvasActivity, pipes them to VNCConn
