@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-If you'd like to put out an incentive for fixing this bug, you can do so at https://issuehunt.io/r/bk138/multivnc
+If you'd like to put out an incentive for fixing this bug, you can do so at https://issuehunt.io/r/bk138/multivnc?tab=idle
 
 **Describe the bug**
 <!-- A clear and concise description of what the bug is. -->

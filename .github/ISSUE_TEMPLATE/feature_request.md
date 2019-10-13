@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-If you'd like to put out an incentive for implementing this feature, you can do so at https://issuehunt.io/r/bk138/multivnc
+If you'd like to put out an incentive for implementing this feature, you can do so at https://issuehunt.io/r/bk138/multivnc?tab=idle
 
 **Is your feature request about the Desktop Multivnc or the Mobile MultiVNC?**
 
