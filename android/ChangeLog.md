@@ -1,5 +1,10 @@
 # Version 1.8.x:
 
+1.8.3
+
+-   Main menu layout improved on small tablet devices.
+-   Fixed two possible crashes.
+
 1.8.2
 
 -   Some UI fixes for Android Kitkat.
