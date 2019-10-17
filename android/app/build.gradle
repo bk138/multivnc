@@ -11,7 +11,7 @@ android {
         externalNativeBuild {
             cmake {
                 // exclude the other LibVNCServer targets
-                targets "vncclient", "vncconn"
+                targets "vncclient", "vncconn" , "vnccanvas"
             }
         }
     }

@@ -17,3 +17,9 @@ add_library(vncconn SHARED vncconn.c)
 target_link_libraries(vncconn
     log
     vncclient)
+
+# build VNCCanvas
+add_library(vnccanvas SHARED vnccanvas.c)
+target_link_libraries(vnccanvas
+    log
+    GLESv1_CM)

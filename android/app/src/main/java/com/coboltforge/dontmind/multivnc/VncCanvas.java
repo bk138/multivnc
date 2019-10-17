@@ -55,14 +55,21 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 public class VncCanvas extends GLSurfaceView {
+	static {
+		System.loadLibrary("vnccanvas");
+    }
+
 	private final static String TAG = "VncCanvas";
 
 	AbstractScaling scaling;
 
 
 	// Runtime control flags
+	private boolean mIsDoingNativeDrawing = false;
 	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
 
@@ -109,6 +116,13 @@ public class VncCanvas extends GLSurfaceView {
 	int absoluteXPosition = 0, absoluteYPosition = 0;
 
 
+	/*
+		native drawing functions
+	*/
+    private static native void on_surface_created();
+    private static native void on_surface_changed(int width, int height);
+    private static native void on_draw_frame();
+
 
 
 	private class VNCGLRenderer implements GLSurfaceView.Renderer {
@@ -120,6 +134,11 @@ public class VncCanvas extends GLSurfaceView {
 
 		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
+			if(mIsDoingNativeDrawing) {
+				on_surface_created();
+				return;
+			}
 
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
 
@@ -161,6 +180,11 @@ public class VncCanvas extends GLSurfaceView {
 		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
 
+			if(mIsDoingNativeDrawing) {
+				on_surface_changed(width, height);
+				return;
+			}
+
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
 
 			// Set the viewport (display area) to cover the entire window
@@ -178,6 +202,11 @@ public class VncCanvas extends GLSurfaceView {
 
 		@Override
 		public void onDrawFrame(GL10 gl) {
+
+			if(mIsDoingNativeDrawing) {
+				on_draw_frame();
+				return;
+			}
 
 			// TODO optimize: texSUBimage ?
 			// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
@@ -311,6 +340,8 @@ public class VncCanvas extends GLSurfaceView {
 		activity = a;
 		this.inputHandler = inputHandler;
 		vncConn = conn;
+
+		mIsDoingNativeDrawing = a.getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false);
 	}
 
 	/**
