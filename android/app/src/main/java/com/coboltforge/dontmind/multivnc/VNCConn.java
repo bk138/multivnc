@@ -31,6 +31,11 @@ import android.widget.Toast;
 
 
 public class VNCConn {
+	static {
+		// order is important here
+		System.loadLibrary("vncclient");
+		System.loadLibrary("vncconn");
+	}
 
 	private final static String TAG = "VNCConn";
 
