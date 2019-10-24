@@ -578,6 +578,8 @@ public class VncCanvasActivity extends Activity {
 		Uri data = i.getData();
 		if ((data != null) && (data.getScheme().equals("vnc"))) { // started from outer world
 
+			Log.d(TAG, "Starting via vnc://");
+
 			// This should not happen according to Uri contract, but bug introduced in Froyo (2.2)
 			// has made this parsing of host necessary, i.e. getPort() returns -1 and the stuff after the colon is
 			// still in the host part...
@@ -618,7 +620,6 @@ public class VncCanvasActivity extends Activity {
 			    if (path.size() >= 2) {
 			        connection.setPassword(path.get(1));
 			    }
-			    connection.save(database.getWritableDatabase());
 			}
 		}
 		// Uri == null
