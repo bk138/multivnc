@@ -11,6 +11,7 @@
     	android:layout_width="fill_parent"
     	android:layout_height="fill_parent"
     	android:layout_gravity="bottom|center"
+		android:focusableInTouchMode="true"
     	>
 	</com.coboltforge.dontmind.multivnc.VncCanvas>
 
