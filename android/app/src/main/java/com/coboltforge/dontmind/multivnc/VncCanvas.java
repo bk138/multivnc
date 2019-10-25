@@ -51,6 +51,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
@@ -884,5 +886,12 @@ public class VncCanvas extends GLSurfaceView {
 	public void setScaleType(ScaleType scaleType) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+		Log.d(TAG, "onCreateInputConnection"); // only called when focusableInTouchMode==true
+		outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN; // need to set this for some keyboards in landscape mode
+		return super.onCreateInputConnection(outAttrs);
 	}
 }
