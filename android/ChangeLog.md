@@ -1,5 +1,11 @@
 # Version 1.8.x:
 
+1.8.4
+
+-   Fix erronous auto-bookmarking of connections started via vnc:// scheme.
+-   Fix some keyboards not accepting input.
+-   Fix resending of sent special key combo.
+
 1.8.3
 
 -   Main menu layout improved on small tablet devices.
