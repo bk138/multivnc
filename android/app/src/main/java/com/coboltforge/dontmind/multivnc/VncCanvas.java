@@ -796,6 +796,11 @@ public class VncCanvas extends GLSurfaceView {
 
 	void sendMetaKey(MetaKeyBean meta)
 	{
+		Log.d(TAG, "sendMetaKey " + (meta != null ? meta.getKeyDesc() : "none"));
+
+		if(meta == null)
+			return;
+
 		if (meta.isMouseClick())
 		{
 			vncConn.sendPointerEvent(mouseX, mouseY, meta.getMetaFlags(), meta.getMouseButtons());
