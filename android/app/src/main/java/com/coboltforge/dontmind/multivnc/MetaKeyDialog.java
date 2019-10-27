@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +37,8 @@ import android.widget.TextView;
  *
  */
 class MetaKeyDialog extends Dialog implements ConnectionSettable {
+
+	private final static String TAG = "MetaKeyDialog";
 
 	CheckBox _checkShift;
 	CheckBox _checkCtrl;
@@ -248,7 +251,9 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			_connection.setLastMetaKeyId(bean.get_Id());
 		}
 		_connection.Gen_update(db);
+		_canvasActivity.lastSentKey = _currentKeyBean;
 		_canvasActivity.vncCanvas.sendMetaKey(_currentKeyBean);
+		Log.d(TAG, "sendCurrentKey: sent " + _currentKeyBean.getKeyDesc());
 	}
 
 	void setMetaKeyList()

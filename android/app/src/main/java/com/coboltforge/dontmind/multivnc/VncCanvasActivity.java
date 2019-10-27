@@ -959,11 +959,10 @@ public class VncCanvasActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	private MetaKeyBean lastSentKey;
+	MetaKeyBean lastSentKey;
 
 	private void sendSpecialKeyAgain() {
-		if (lastSentKey == null
-				|| lastSentKey.get_Id() != connection.getLastMetaKeyId()) {
+		if (lastSentKey == null) {
 			ArrayList<MetaKeyBean> keys = new ArrayList<MetaKeyBean>();
 			Cursor c = database.getReadableDatabase().rawQuery(
 					MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2}",
@@ -976,12 +975,10 @@ public class VncCanvasActivity extends Activity {
 			if (keys.size() > 0) {
 				lastSentKey = keys.get(0);
 			} else {
-				lastSentKey = new MetaKeyBean();
-				lastSentKey.setKeySym(0xFFC6); // set F9 as default
+				lastSentKey = null;
 			}
 		}
-		if (lastSentKey != null)
-			vncCanvas.sendMetaKey(lastSentKey);
+		vncCanvas.sendMetaKey(lastSentKey);
 	}
 
 	private void toggleKeyboard() {
