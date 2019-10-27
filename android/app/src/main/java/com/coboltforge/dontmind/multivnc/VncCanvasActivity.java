@@ -30,6 +30,8 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.text.ClipboardManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -802,12 +804,14 @@ public class VncCanvasActivity extends Activity {
 
 	@Override
 	protected void onStop() {
+		Log.d(TAG, "onStop");
 		vncCanvas.disableRepaints();
 		super.onStop();
 	}
 
 	@Override
 	protected void onRestart() {
+		Log.d(TAG, "onRestart");
 		vncCanvas.enableRepaints();
 		super.onRestart();
 	}
@@ -815,9 +819,18 @@ public class VncCanvasActivity extends Activity {
 
 	@Override
 	protected void onPause() {
+		Log.d(TAG, "onPause");
+
 		super.onPause();
-		// needed for the GLSurfaceView
-		vncCanvas.onPause();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			if(!isInPictureInPictureMode()) {
+				Log.d(TAG, "onPause: not PIP");
+				vncCanvas.onPause(); // needed for the GLSurfaceView
+			}
+			Log.d(TAG, "onPause: PIP");
+		}
+		else
+			vncCanvas.onPause(); // needed for the GLSurfaceView
 
 		// get VNC cuttext and post to Android
 		if(vncCanvas.vncConn.getCutText() != null)
@@ -826,6 +839,8 @@ public class VncCanvasActivity extends Activity {
 
 	@Override
 	protected void onResume() {
+		Log.d(TAG, "onResume");
+
 		super.onResume();
 		// needed for the GLSurfaceView
 		vncCanvas.onResume();
@@ -841,6 +856,27 @@ public class VncCanvasActivity extends Activity {
 		}
 
 	}
+
+	@Override
+	public void onUserLeaveHint () {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			enterPictureInPictureMode();
+		}
+	}
+
+	@Override
+	public void onPictureInPictureModeChanged (boolean isInPictureInPictureMode, Configuration newConfig) {
+		if (isInPictureInPictureMode) {
+			// Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
+			findViewById(R.id.fab).setVisibility(View.INVISIBLE);
+			findViewById(R.id.virtualmousebuttons).setVisibility(View.INVISIBLE);
+		} else {
+			// Restore the full-screen UI.
+			findViewById(R.id.fab).setVisibility(View.VISIBLE);
+			findViewById(R.id.virtualmousebuttons).setVisibility(View.VISIBLE);
+		}
+	}
+
 
 	@SuppressLint("NewApi")
 	@Override
@@ -988,6 +1024,7 @@ public class VncCanvasActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
+		Log.d(TAG, "onDestroy");
 		super.onDestroy();
 		if (isFinishing()) {
 			try {
