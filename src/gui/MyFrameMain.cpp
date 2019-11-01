@@ -739,7 +739,6 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
 
   VNCConn* c = new VNCConn(this, getpasswd, getcreds);
-  c->Setup();
 
   if(listenPort > 0)
     {
