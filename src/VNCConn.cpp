@@ -122,7 +122,7 @@ extern "C"
 */
 
 
-VNCConn::VNCConn(void* p)
+VNCConn::VNCConn(void* p, char* (*getpassworddfunc)(rfbClient*), rfbCredential* (*getcredentialfunc)(rfbClient*, int))
 {
   // save our caller
   parent = p;
@@ -160,6 +160,9 @@ VNCConn::VNCConn(void* p)
   // record/replay stuff
   recording = replaying = false;
 
+  // save the credential and password getters
+  this->getpasswordfunc = getpassworddfunc;
+  this->getcredentialfunc = getcredentialfunc;
 }
 
 
@@ -902,7 +905,7 @@ void VNCConn::thread_logger(const char *format, ...)
   public members
 */
 
-bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int))
+bool VNCConn::Setup()
 {
   wxLogDebug(wxT("VNCConn %p: Setup()"), this);
 
@@ -922,8 +925,8 @@ bool VNCConn::Setup(char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCred
   cl->MallocFrameBuffer = alloc_framebuffer;
   cl->GotFrameBufferUpdate = thread_got_update;
   cl->FinishedFrameBufferUpdate = thread_update_finished;
-  cl->GetPassword = getpasswdfunc;
-  cl->GetCredential = getCredentialFunc;
+  cl->GetPassword = getpasswordfunc;
+  cl->GetCredential = getcredentialfunc;
   cl->HandleKeyboardLedState = thread_kbd_leds;
   cl->HandleTextChat = thread_textchat;
   cl->GotXCutText = thread_got_cuttext;
