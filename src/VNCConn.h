@@ -67,7 +67,7 @@ DECLARE_EVENT_TYPE(VNCConnReplayFinishedNOTIFY, -1)
 class VNCConn: public wxEvtHandler, public wxThreadHelper
 {
 public:
-  VNCConn(void *parent);
+  VNCConn(void *parent, char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int));
   ~VNCConn(); 
 
   /*
@@ -85,7 +85,7 @@ public:
        Init()  <-> Shutdown()
   */
 
-  bool Setup(char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int));
+  bool Setup();
   void Cleanup();
   bool Listen(int port);
   bool Init(const wxString& host, const wxString& username,
@@ -225,6 +225,9 @@ private:
   wxSecretValue password;
 #endif
   bool require_auth;
+  // these are set saved by the constructor and later attached to the client
+  GetPasswordProc getpasswordfunc;
+  GetCredentialProc getcredentialfunc;
 
   // statistics
   bool do_stats;
