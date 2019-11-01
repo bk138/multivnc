@@ -171,7 +171,6 @@ VNCConn::VNCConn(void* p, char* (*getpassworddfunc)(rfbClient*), rfbCredential* 
 VNCConn::~VNCConn()
 {
   Shutdown();
-  Cleanup();
   wxLogDebug(wxT("VNCConn %p: I'm dead!"), this);
 }
 
@@ -905,13 +904,13 @@ void VNCConn::thread_logger(const char *format, ...)
   public members
 */
 
-bool VNCConn::Setup()
+bool VNCConn::setupClient()
 {
-  wxLogDebug(wxT("VNCConn %p: Setup()"), this);
+  wxLogDebug(wxT("VNCConn %p: setupClient()"), this);
 
   if(cl) // already set up
     {
-      wxLogDebug(wxT("VNCConn %p: Setup already done. Call Cleanup() first!"), this);
+      wxLogDebug(wxT("VNCConn %p: setupClient() already done"), this);
       return false;
     }
 
@@ -939,23 +938,13 @@ bool VNCConn::Setup()
 }
 
 
-void VNCConn::Cleanup()
-{
-  wxLogDebug(wxT( "VNCConn %p: Cleanup()"), this);
-
-  if(cl)
-    {
-      wxLogDebug(wxT( "VNCConn %p: Cleanup() before client cleanup"), this);
-      rfbClientCleanup(cl);
-      cl = 0;
-      wxLogDebug(wxT( "VNCConn %p: Cleanup() after client cleanup"), this);
-    }
-}
-
 
 bool VNCConn::Listen(int port)
 {
   wxLogDebug(wxT("VNCConn %p: Listen() port %d"), this, port);
+
+  if(!cl)
+      setupClient();
 
   cl->listenPort = cl->listen6Port = port;
 
@@ -986,6 +975,9 @@ bool VNCConn::Init(const wxString& host, const wxString& username,
 		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug(wxT("VNCConn %p: Init()"), this);
+
+  if(!cl)
+      setupClient();
 
   if(cl->frameBuffer || (GetThread() && GetThread()->IsRunning()))
     {
@@ -1111,6 +1103,8 @@ void VNCConn::Shutdown()
 	  cl->frameBuffer = 0;
 	}
 
+      rfbClientCleanup(cl);
+      cl = 0;
     }
 }
 

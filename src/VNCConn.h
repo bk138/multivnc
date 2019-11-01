@@ -71,22 +71,11 @@ public:
   ~VNCConn(); 
 
   /*
-    to make a connection, call
-    Setup(), then
-    Listen() (optional), then
-    Init(), then
-    Shutdown, then
-    Cleanup()
-    
-    NB: If Init() fails, you have to call Setup() again!
-
-    The semantic counterparts are:
-       Setup() <-> Cleanup()
-       Init()  <-> Shutdown()
+    To make an outgoing connection, call Init().
+    To make a listening connection, call Listen().
+    To shut down a connection, call Shutdown().
   */
 
-  bool Setup();
-  void Cleanup();
   bool Listen(int port);
   bool Init(const wxString& host, const wxString& username,
 #if wxUSE_SECRETSTORE
@@ -193,6 +182,7 @@ private:
   void *parent;
 
   rfbClient* cl;
+  bool setupClient();
 
   wxRect updated_rect;
 
