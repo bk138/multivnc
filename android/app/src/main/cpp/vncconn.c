@@ -18,9 +18,23 @@
 
 #include <jni.h>
 #include <android/log.h>
+#include <errno.h>
 #include "rfb/rfbclient.h"
 
 #define TAG "VNCConn-native"
+
+/* id for the managed VNCConn */
+#define VNCCONN_OBJ_ID (void*)1
+#define VNCCONN_ENV_ID (void*)2
+
+
+/*
+ * PixelFormat defaults.
+ * Seems 8,3,4 and 5,3,2 are possible with rfbGetClient().
+ */
+#define BITSPERSAMPLE 8
+#define SAMPLESPERPIXEL 3
+#define BYTESPERPIXEL 4
 
 
 /*
@@ -43,6 +57,26 @@ static void logcat_logger(const char *format, ...)
 }
 
 
+static void log_obj_tostring(JNIEnv *env, jobject obj, const char *format, ...) {
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "toString", "()Ljava/lang/String;");
+    jstring jStr = (*env)->CallObjectMethod(env, obj, mid);
+    const char *cStr = (*env)->GetStringUTFChars(env, jStr, NULL);
+    va_list args;
+
+    /* prefix format string with result of toString() */
+    const size_t format_buf_len = 1024;
+    char *format_buf[format_buf_len];
+    snprintf((char*)format_buf, format_buf_len, "%s: %s", cStr, format);
+
+    va_start(args, format);
+    __android_log_vprint(ANDROID_LOG_INFO, TAG, (char*)format_buf, args);
+    va_end(args);
+
+    (*env)->ReleaseStringUTFChars(env, jStr, cStr);
+}
+
+
 /*
  * The VM calls JNI_OnLoad when the native library is loaded (for example, through System.loadLibrary).
  * JNI_OnLoad must return the JNI version needed by the native library.
@@ -58,3 +92,161 @@ JNIEXPORT jint JNI_OnLoad(JavaVM __unused * vm, void __unused * reserved) {
 }
 
 
+/**
+ * Get the managed VNCConn's rfbClient.
+ */
+static rfbClient* getRfbClient(JNIEnv *env, jobject conn) {
+    rfbClient* cl = NULL;
+    jclass cls = (*env)->GetObjectClass(env, conn);
+    jfieldID fid = (*env)->GetFieldID(env, cls, "rfbClient", "J");
+    if (fid == 0)
+        return NULL;
+
+    cl = (rfbClient*)(long)(*env)->GetLongField(env, conn, fid);
+
+    return cl;
+}
+
+/**
+ * Set the managed VNCConn's rfbClient.
+ */
+static jboolean setRfbClient(JNIEnv *env, jobject conn, rfbClient* cl) {
+    jclass cls = (*env)->GetObjectClass(env, conn);
+    jfieldID fid = (*env)->GetFieldID(env, cls, "rfbClient", "J");
+    if (fid == 0)
+        return JNI_FALSE;
+
+    (*env)->SetLongField(env, conn, fid, (long)cl);
+
+    return JNI_TRUE;
+}
+
+
+static void onFramebufferUpdateFinished(rfbClient* client)
+{
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onFramebufferUpdateFinished", "()V");
+    (*env)->CallVoidMethod(env, obj, mid);
+}
+
+
+/**
+ * Allocates and sets up the VNCConn's rfbClient.
+ * @param env
+ * @param obj
+ * @return
+ */
+static jboolean setupClient(JNIEnv *env, jobject obj) {
+
+    log_obj_tostring(env, obj, "setupClient()");
+
+    if(getRfbClient(env, obj)) { /* already set up */
+        log_obj_tostring(env, obj, "setupClient() already done");
+        return JNI_FALSE;
+    }
+
+    rfbClient *cl = rfbGetClient(BITSPERSAMPLE, SAMPLESPERPIXEL, BYTESPERPIXEL);
+
+    // set callbacks
+    cl->FinishedFrameBufferUpdate = onFramebufferUpdateFinished;
+
+    setRfbClient(env, obj, cl);
+
+    return JNI_TRUE;
+}
+
+JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdown(JNIEnv *env, jobject obj) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl) {
+        log_obj_tostring(env, obj,  "rfbShutdown() closing connection");
+        close(cl->sock);
+
+        if(cl->frameBuffer) {
+            free(cl->frameBuffer);
+            cl->frameBuffer = 0;
+        }
+
+        rfbClientCleanup(cl);
+        // rfbClientCleanup does not zero the pointer
+        setRfbClient(env, obj, 0);
+    }
+}
+
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port) {
+    log_obj_tostring(env, obj, "rfbInit()");
+
+    if(!getRfbClient(env, obj))
+        setupClient(env, obj);
+
+    rfbClient *cl = getRfbClient(env, obj);
+
+    cl->programName = "VNCConn";
+
+    const char *cHost = (*env)->GetStringUTFChars(env, host, NULL);
+    cl->serverHost = strdup(cHost);
+    (*env)->ReleaseStringUTFChars(env, host, cHost);
+
+    cl->serverPort = port;
+    // Support short-form (:0, :1)
+    if(cl->serverPort < 100)
+        cl->serverPort += 5900;
+
+    log_obj_tostring(env, obj, "rfbInit() about to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
+
+    if(!rfbInitClient(cl, 0, NULL)) {
+        setRfbClient(env, obj, 0); //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
+        log_obj_tostring(env, obj, "rfbInit() failed. Cleanup by library.");
+        return JNI_FALSE;
+    }
+
+    // if there was an error in alloc_framebuffer(), catch that here
+    if(!cl->frameBuffer) {
+        Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdown(env, obj);
+        return JNI_FALSE;
+    }
+
+    return JNI_TRUE;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbProcessServerMessage(JNIEnv *env, jobject obj) {
+    rfbClient *cl = getRfbClient(env, obj);
+
+    /*
+     * Save pointers to the managed VNCConn and env in the rfbClient for use in the onXYZ callbacks.
+     * We do this each time here and not in setupClient() because the managed objects get moved
+     * around by the VM.
+     */
+    rfbClientSetClientData(cl, VNCCONN_OBJ_ID, obj);
+    rfbClientSetClientData(cl, VNCCONN_ENV_ID, env);
+
+    /* request update and handle response */
+    if(!rfbProcessServerMessage(cl, 500)) {
+        if(errno == EINTR)
+            return JNI_TRUE;
+
+        log_obj_tostring(env, obj,"rfbProcessServerMessage() failed");
+        return JNI_FALSE;
+    }
+    return JNI_TRUE;
+}
+
+
+JNIEXPORT jstring JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbGetDesktopName(JNIEnv *env, jobject obj) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return (*env)->NewStringUTF(env, cl->desktopName);
+    else
+        return NULL;
+}
+
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendKeyEvent(JNIEnv *env, jobject obj, jlong keysym, jboolean down) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return (jboolean) SendKeyEvent(cl, (uint32_t) keysym, down);
+    else
+        return JNI_FALSE;
+}

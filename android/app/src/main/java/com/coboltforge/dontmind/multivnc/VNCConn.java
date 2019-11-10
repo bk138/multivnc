@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class VNCConn {
@@ -46,6 +47,10 @@ public class VNCConn {
 
 	// VNC protocol connection
 	private RfbProto rfb;
+	// the native rfbClient
+	@SuppressWarnings("unused")
+	private long rfbClient;
+	private boolean isDoingNativeConn = false;
 	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 
@@ -191,8 +196,13 @@ public class VNCConn {
 			if(Utils.DEBUG()) Log.d(TAG, "InputThread started!");
 
 			try {
-				connectAndAuthenticate();
-				doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
+				if(isDoingNativeConn) {
+					rfbInit(connSettings.getAddress(), connSettings.getPort());
+				}
+				else {
+					connectAndAuthenticate();
+					doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
+				}
 				canvas.handler.post(new Runnable() {
 					public void run() {
 						canvas.activity.setTitle(getDesktopName());
@@ -204,7 +214,16 @@ public class VNCConn {
 				outputThread = new VNCOutputThread();
 				outputThread.start();
 
-				processNormalProtocol(canvas.getContext(), pd, setModes);
+				if(isDoingNativeConn) {
+					// main loop
+					while(maintainConnection) {
+						if(!rfbProcessServerMessage())
+							shutdown();
+					}
+				}
+				else {
+					processNormalProtocol(canvas.getContext(), pd, setModes);
+				}
 			} catch (Throwable e) {
 				if (maintainConnection) {
 					Log.e(TAG, e.toString());
@@ -673,11 +692,14 @@ public class VNCConn {
 
 
 		private boolean sendKeyEvent(OutputEvent.KeyboardEvent evt) {
-			if (rfb != null && rfb.inNormalProtocol) {
+			if ((rfb != null && rfb.inNormalProtocol) || rfbClient != 0) {
 
 			   try {
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
-				   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
+				   if(isDoingNativeConn)
+				   	 	rfbSendKeyEvent(evt.keyCode, evt.down);
+				   else
+					   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
 				   return true;
 				} catch (Exception e) {
 					return false;
@@ -705,6 +727,11 @@ public class VNCConn {
     }
 
 
+	private native boolean rfbInit(String host, int port);
+	private native void rfbShutdown();
+	private native boolean rfbProcessServerMessage();
+	private native String rfbGetDesktopName();
+	private native boolean rfbSendKeyEvent(long keysym, boolean down);
 
 
 	public VNCConn() {
@@ -717,33 +744,6 @@ public class VNCConn {
 	protected void finalize() {
 		if(Utils.DEBUG()) Log.d(TAG, this + " finalized!");
 	}
-
-
-	/*
-		    to make a connection, call
-		    Setup(), then
-		    Listen() (optional), then
-		    Init(), then
-		    Shutdown, then
-		    Cleanup()
-
-		    NB: If Init() fails, you have to call Setup() again!
-
-		    The semantic counterparts are:
-		       Setup() <-> Cleanup()
-		       Init()  <-> Shutdown()
-	 */
-
-	boolean Setup() {
-
-		return true;
-	}
-
-
-	void Cleanup() {
-
-	}
-
 
 
 	/**
@@ -776,12 +776,11 @@ public class VNCConn {
 	        }
 	    });
 	    pd.show();
-
+		canvas.activity.firstFrameWaitDialog = pd;
 
 		inputThread = new VncInputThread(pd, setModes);
 		inputThread.start();
 	}
-
 
 
 	public void shutdown() {
@@ -791,8 +790,13 @@ public class VNCConn {
 		maintainConnection = false;
 
 		try {
-			bitmapData.dispose();
-			rfb.close(); // close immediatly
+			if(isDoingNativeConn) {
+				rfbShutdown();
+			}
+			else {
+				bitmapData.dispose();
+				rfb.close(); // close immediatly
+			}
 
 			// the input thread stops by itself, but the putput thread not
 			outputThread.interrupt();
@@ -814,6 +818,7 @@ public class VNCConn {
 	 */
 	public void setCanvas(VncCanvas c) {
 		canvas = c;
+		isDoingNativeConn = canvas.activity.getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false);
 	}
 
 
@@ -868,7 +873,7 @@ public class VNCConn {
 	 */
 	public boolean sendKeyEvent(int keyCode, KeyEvent evt, boolean sendDirectly) {
 
-		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+		if((rfb != null && rfb.inNormalProtocol) || rfbClient != 0) { // only queue if already connected
 
 			if(Utils.DEBUG()) Log.d(TAG, "queueing key evt " + evt.toString() + " code 0x" + Integer.toHexString(keyCode));
 
@@ -1050,7 +1055,10 @@ public class VNCConn {
 
 
 	public final String getDesktopName() {
-		return rfb.desktopName;
+		if(isDoingNativeConn)
+			return rfbGetDesktopName();
+		else
+			return rfb.desktopName;
 	}
 
 	public final int getFramebufferWidth() {
@@ -1804,6 +1812,21 @@ public class VNCConn {
 			canvas.reDraw();
 	}
 
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private void onFramebufferUpdateFinished() {
+		// Hide progress dialog
+		if (canvas.activity.firstFrameWaitDialog.isShowing())
+			canvas.handler.post(new Runnable() {
+				public void run() {
+					try {
+						canvas.activity.firstFrameWaitDialog.dismiss();
+					} catch (Exception e){
+						//unused
+					}
+				}
+			});
+	}
 
 
 }
