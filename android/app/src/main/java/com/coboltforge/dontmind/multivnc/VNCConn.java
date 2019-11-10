@@ -36,8 +36,8 @@ public class VNCConn {
 
 	private VncCanvas canvas;
 
-	private VncInputThread inputThread;
-	private VNCOutputThread outputThread;
+	private ServerToClientThread inputThread;
+	private ClientToServerThread outputThread;
 
 	// VNC protocol connection
 	private RfbProto rfb;
@@ -169,13 +169,13 @@ public class VNCConn {
     }
 
 
-    private class VncInputThread extends Thread {
+    private class ServerToClientThread extends Thread {
 
     	private ProgressDialog pd;
     	private Runnable setModes;
 
 
-    	public VncInputThread(ProgressDialog pd, Runnable setModes) {
+    	public ServerToClientThread(ProgressDialog pd, Runnable setModes) {
     		this.pd = pd;
     		this.setModes = setModes;
     	}
@@ -183,7 +183,7 @@ public class VNCConn {
 
 		public void run() {
 
-			if(Utils.DEBUG()) Log.d(TAG, "InputThread started!");
+			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread started!");
 
 			try {
 				connectAndAuthenticate();
@@ -196,7 +196,7 @@ public class VNCConn {
 				});
 
 				// start output thread here
-				outputThread = new VNCOutputThread();
+				outputThread = new ClientToServerThread();
 				outputThread.start();
 
 				processNormalProtocol(canvas.getContext(), pd, setModes);
@@ -240,7 +240,7 @@ public class VNCConn {
 				}
 			}
 
-			if(Utils.DEBUG()) Log.d(TAG, "InputThread done!");
+			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread done!");
 		}
 
 
@@ -596,11 +596,11 @@ public class VNCConn {
 
 
 
-    private class VNCOutputThread extends Thread {
+    private class ClientToServerThread extends Thread {
 
     	public void run() {
 
-			if(Utils.DEBUG()) Log.d(TAG, "OutputThread started!");
+			if(Utils.DEBUG()) Log.d(TAG, "ClientToServerThread started!");
 
     		//
     		// main output loop
@@ -641,7 +641,7 @@ public class VNCConn {
 
     		}
 
-    		if(Utils.DEBUG()) Log.d(TAG, "OutputThread done!");
+    		if(Utils.DEBUG()) Log.d(TAG, "ClientToServerThread done!");
 
     	}
 
@@ -773,7 +773,7 @@ public class VNCConn {
 	    pd.show();
 
 
-		inputThread = new VncInputThread(pd, setModes);
+		inputThread = new ServerToClientThread(pd, setModes);
 		inputThread.start();
 	}
 
