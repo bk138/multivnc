@@ -1,6 +1,20 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+# build libJPEG
+set(libjpeg_src_DIR ../../../../../libjpeg-turbo)
+set(libjpeg_build_DIR ${CMAKE_BINARY_DIR}/libjpeg)
+# adds a source subdir with specifying a build output dir
+add_subdirectory(${libjpeg_src_DIR} ${libjpeg_build_DIR})
+# set these variables so FindJPEG can find the library
+set(JPEG_LIBRARY ${libjpeg_build_DIR}/libturbojpeg.a)
+set(JPEG_INCLUDE_DIR ${libjpeg_src_DIR})
+# set include directories so dependent code can find the headers
+include_directories(
+        ${libjpeg_src_DIR}
+        ${libjpeg_build_DIR}
+)
+
 # build LibVNCClient
 set(libvnc_src_DIR ../../../../../libvncserver)
 set(libvnc_build_DIR ${CMAKE_BINARY_DIR}/libvnc)
