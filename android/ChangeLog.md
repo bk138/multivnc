@@ -1,5 +1,9 @@
 # Version 1.8.x:
 
+1.8.5
+
+-   Handle right-mouse-button-clicks from USB-OTG mice the right way.
+
 1.8.4
 
 -   Fix erronous auto-bookmarking of connections started via vnc:// scheme.
