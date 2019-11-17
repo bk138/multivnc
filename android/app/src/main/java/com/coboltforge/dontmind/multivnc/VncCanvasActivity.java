@@ -44,6 +44,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
+import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -1014,6 +1015,20 @@ public class VncCanvasActivity extends Activity {
 
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 
+			// handle right mouse button of USB-OTG devices
+			if(evt.getSource() == InputDevice.SOURCE_MOUSE) {
+				MotionEvent e = MotionEvent.obtain(
+						SystemClock.uptimeMillis(),
+						SystemClock.uptimeMillis(),
+						MotionEvent.ACTION_DOWN,
+						vncCanvas.mouseX,
+						vncCanvas.mouseY,
+						0
+						);
+				vncCanvas.processPointerEvent(e, true, true);
+				return true;
+			}
+
 			if(evt.getFlags() == KeyEvent.FLAG_FROM_SYSTEM) // from hardware keyboard
 				keyCode = KeyEvent.KEYCODE_ESCAPE;
 			else {
@@ -1045,6 +1060,22 @@ public class VncCanvasActivity extends Activity {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent evt) {
 		if(Utils.DEBUG()) Log.d(TAG, "Input: key up: " + evt.toString());
+
+		if(keyCode == KeyEvent.KEYCODE_BACK) {
+			// handle right mouse button of USB-OTG devices
+			if (evt.getSource() == InputDevice.SOURCE_MOUSE) {
+				MotionEvent e = MotionEvent.obtain(
+						SystemClock.uptimeMillis(),
+						SystemClock.uptimeMillis(),
+						MotionEvent.ACTION_UP,
+						vncCanvas.mouseX,
+						vncCanvas.mouseY,
+						0
+				);
+				vncCanvas.processPointerEvent(e, false, true);
+				return true;
+			}
+		}
 
 		if (keyCode == KeyEvent.KEYCODE_MENU)
 			return super.onKeyUp(keyCode, evt);
