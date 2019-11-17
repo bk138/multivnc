@@ -10,9 +10,8 @@ assignees: ''
 If you'd like to put out an incentive for implementing this feature, you can do so at https://issuehunt.io/r/bk138/multivnc?tab=idle
 
 **Is your feature request about the Desktop Multivnc or the Mobile MultiVNC?**
-
-* [ ] Desktop (wxWidgets)
-* [ ] Mobile (Android)
+ - Desktop (wxWidgets) or Mobile (Android):
+ - If Mobile, installed from Play Store or F-Droid:
 
 **Is your feature request related to a problem? Please describe.**
 <!-- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
