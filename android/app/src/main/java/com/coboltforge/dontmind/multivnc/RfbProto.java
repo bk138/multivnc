@@ -64,7 +64,8 @@ class RfbProto {
     SecTypeNone    = 1,
     SecTypeVncAuth = 2,
     SecTypeTight   = 16,
-    SecTypeUltra34 = 0xfffffffa;
+    SecTypeUltra34 = 0xfffffffa,
+    SecTypeARD = 30;
 
   // Supported tunneling types
   final static int
@@ -77,7 +78,9 @@ class RfbProto {
     AuthNone      = 1,
     AuthVNC       = 2,
     AuthUnixLogin = 129,
-    AuthUltra	  = 17;
+    AuthUltra	  = 17,
+    AuthARD       = 30;
+
   final static String
     SigAuthNone      = "NOAUTH__",
     SigAuthVNC       = "VNCAUTH_",
@@ -395,7 +398,7 @@ class RfbProto {
 
     // Find first supported security type.
     for (int i = 0; i < nSecTypes; i++) {
-      if (secTypes[i] == SecTypeNone || secTypes[i] == SecTypeVncAuth) {
+      if (secTypes[i] == SecTypeNone || secTypes[i] == SecTypeVncAuth || secTypes[i] == SecTypeARD) {
 	secType = secTypes[i];
 	break;
       }
@@ -446,6 +449,13 @@ class RfbProto {
     os.write(challenge);
 
     readSecurityResult("VNC authentication");
+  }
+
+  void authenticateARD(String username, String pw) throws Exception {
+    Log.d(TAG, "authenticateARD");
+    RFBSecurityARD ard = new RFBSecurityARD(username, pw);
+    ard.perform(this);
+    readSecurityResult("ARD authentication");
   }
 
   //
