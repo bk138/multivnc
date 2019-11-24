@@ -55,7 +55,7 @@
     <string name="shortcut_no_entries">No bookmarks yet</string>
 <string name="special_keys">Key Combo</string>
 <string name="username_caption">Username</string>
-<string name="username_hint">For Windows authentication</string>
+<string name="username_hint">For Windows/Mac authentication</string>
 <string name="editbookmark_title">Edit Bookmark</string>
 <string name="enterbookmarkname">Please enter a bookmark name…</string>
 <string name="bookmark_save_question">Do you want to bookmark this server?</string>

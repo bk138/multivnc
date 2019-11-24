@@ -53,7 +53,7 @@
     <string name="shortcut_no_entries">"Nessun segnalibro ancora"</string>
 <string name="special_keys">"Chiave combinata"</string>
 <string name="username_caption">"Nome utente"</string>
-<string name="username_hint">"Per l'autenticazione di Windows"</string>
+<string name="username_hint">"Per l'autenticazione di Windows/Mac"</string>
 <string name="editbookmark_title">"Modifica segnalibro"</string>
 <string name="enterbookmarkname">"Si prega di inserire il nome di un segnalibro …"</string>
 <string name="bookmark_save_question">"Vuoi aggiungere questo server ai segnalibri?"</string>

@@ -53,7 +53,7 @@
     <string name="shortcut_no_entries">"Еще нет закладок"</string>
 <string name="special_keys">"ключевая комбинация"</string>
 <string name="username_caption">"имя пользователя"</string>
-<string name="username_hint">"Для проверки подлинности Windows"</string>
+<string name="username_hint">"Для проверки подлинности Windows/Mac"</string>
 <string name="editbookmark_title">"Изменить закладку"</string>
 <string name="enterbookmarkname">"Пожалуйста, введите название закладки…"</string>
 <string name="bookmark_save_question">"Вы хотите добавить в закладки этот сервер?"</string>

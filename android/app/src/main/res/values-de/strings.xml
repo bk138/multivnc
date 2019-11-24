@@ -53,7 +53,7 @@
     <string name="shortcut_no_entries">Keine Lesezeichen vorhanden</string>
 <string name="special_keys">"Tastenkombination"</string>
 <string name="username_caption">"Nutzername"</string>
-<string name="username_hint">"Für die Windows-Authentifizierung"</string>
+<string name="username_hint">"Für die Windows/Mac-Authentifizierung"</string>
 <string name="editbookmark_title">"Lesezeichen bearbeiten"</string>
 <string name="enterbookmarkname">"Bitte geben Sie einen Lesezeichennamen ein…"</string>
 <string name="bookmark_save_question">"Möchten Sie diesen Server als Lesezeichen speichern?"</string>
