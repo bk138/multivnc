@@ -50,7 +50,9 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
@@ -830,7 +832,7 @@ public class VncCanvas extends GLSurfaceView {
 				input.setTransformationMethod(new PasswordTransformationMethod());
 
 				new AlertDialog.Builder(getContext())
-			    .setTitle(getContext().getString(R.string.password_caption))
+			    .setTitle(getContext().getString(R.string.credentials_needed_title))
 			    .setView(input)
 			    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			        public void onClick(DialogInterface dialog, int whichButton) {
@@ -845,7 +847,32 @@ public class VncCanvas extends GLSurfaceView {
 
 	}
 
+	public void getCredsFromUser(final ConnectionBean c) {
+		// this method is probably called from the vnc thread
+		post(new Runnable() {
+			@Override
+			public void run() {
 
+				LayoutInflater layoutinflater = LayoutInflater.from(activity);
+				View credentialsDialog = layoutinflater.inflate(R.layout.credentials_dialog, null);
+
+				new AlertDialog.Builder(getContext())
+						.setTitle(getContext().getString(R.string.credentials_needed_title))
+						.setView(credentialsDialog)
+						.setCancelable(false)
+						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								c.setUserName(((EditText)credentialsDialog.findViewById(R.id.userName)).getText().toString());
+								c.setPassword(((EditText)credentialsDialog.findViewById(R.id.password)).getText().toString());
+								synchronized (vncConn) {
+									vncConn.notify();
+								}
+							}
+						}).show();
+			}
+		});
+
+	}
 
 	public ScaleType getScaleType() {
 		// TODO Auto-generated method stub
