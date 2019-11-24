@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
     package="com.coboltforge.dontmind.multivnc" android:installLocation="auto"
-    android:versionCode="59" android:versionName="1.8.5">
+    android:versionCode="60" android:versionName="1.8.6">
 
 	<supports-screens
 		android:largeScreens="true"
