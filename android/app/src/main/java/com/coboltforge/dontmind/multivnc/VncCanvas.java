@@ -865,6 +865,7 @@ public class VncCanvas extends GLSurfaceView {
 				new AlertDialog.Builder(getContext())
 			    .setTitle(getContext().getString(R.string.credentials_needed_title))
 			    .setView(input)
+				.setCancelable(false)
 			    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			        public void onClick(DialogInterface dialog, int whichButton) {
 			            c.setPassword(input.getText().toString());
