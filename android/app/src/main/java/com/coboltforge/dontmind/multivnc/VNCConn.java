@@ -340,7 +340,7 @@ public class VNCConn {
 			case RfbProto.AuthVNC:
 				Log.i(TAG, "VNC authentication needed");
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-					canvas.getCredFromUser(connSettings);
+					canvas.getPasswordFromUser(connSettings);
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
@@ -349,7 +349,7 @@ public class VNCConn {
 				break;
 			case RfbProto.AuthUltra:
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-					canvas.getCredFromUser(connSettings);
+					canvas.getPasswordFromUser(connSettings);
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
