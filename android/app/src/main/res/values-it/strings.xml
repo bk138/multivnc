@@ -44,6 +44,7 @@
 <string name="repeater_clear">"Non usare il ripetitore"</string>
 <string name="save_as_copy">"Salva come copia"</string>
     <string name="repeater_save">"Salvare"</string>
+    <string name="credentials_needed_title">Credenziali necessarie…</string>
 <!-- Send selected metakey -->
 <string name="send_button">"Inviare"</string>
 <string name="send_key_again">"Invia nuovamente Combo chiave"</string>

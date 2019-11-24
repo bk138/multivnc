@@ -44,7 +44,8 @@
 <string name="repeater_clear">"Не используйте репитер"</string>
 <string name="save_as_copy">"Сохранить как копию"</string>
     <string name="repeater_save">"Сохранить"</string>
-<!-- Send selected metakey -->
+    <string name="credentials_needed_title">необходимы учетные данные…</string>
+    <!-- Send selected metakey -->
 <string name="send_button">"послать"</string>
 <string name="send_key_again">"Отправить комбинацию клавиш еще раз"</string>
 <string name="shift_check">"Shift"</string>

@@ -44,7 +44,8 @@
 <string name="repeater_clear">"Keinen Repeater verwenden"</string>
 <string name="save_as_copy">"Als Kopie speichern"</string>
     <string name="repeater_save">"Speichern"</string>
-<!-- Send selected metakey -->
+    <string name="credentials_needed_title">Anmeldeinformationen erforderlich…</string>
+    <!-- Send selected metakey -->
 <string name="send_button">"Senden"</string>
 <string name="send_key_again">"Tastenkombination erneut senden"</string>
 <string name="shift_check">"Shift"</string>
