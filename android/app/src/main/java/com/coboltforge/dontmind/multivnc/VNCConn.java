@@ -316,7 +316,7 @@ public class VNCConn {
 			case RfbProto.AuthVNC:
 				Log.i(TAG, "VNC authentication needed");
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-					canvas.getPasswordFromUser(connSettings);
+					canvas.getCredsFromUser(connSettings, false);
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
@@ -325,12 +325,21 @@ public class VNCConn {
 				break;
 			case RfbProto.AuthUltra:
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-					canvas.getPasswordFromUser(connSettings);
+					canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
 				}
 				rfb.authenticateDH(connSettings.getUserName(),connSettings.getPassword());
+				break;
+			case RfbProto.AuthARD:
+				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
+					canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
+					synchronized (VNCConn.this) {
+						VNCConn.this.wait();  // wait for user input to finish
+					}
+				}
+				rfb.authenticateARD(connSettings.getUserName(),connSettings.getPassword());
 				break;
 			default:
 				throw new Exception("Unknown authentication scheme " + authType);
