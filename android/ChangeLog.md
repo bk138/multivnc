@@ -1,5 +1,10 @@
 # Version 1.8.x:
 
+1.8.6
+
+-   Added ability to connect to MacOS servers.
+-   Fixed bookmarks sometimes not having a name.
+
 1.8.5
 
 -   Handle right-mouse-button-clicks from USB-OTG mice the right way.
