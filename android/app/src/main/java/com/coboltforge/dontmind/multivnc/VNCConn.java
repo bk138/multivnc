@@ -388,7 +388,11 @@ public class VNCConn {
 				bitmapData=new FullBufferBitmapData(rfb, canvas, capacity);
 
 			setPixelFormat();
-		}
+
+            // set nickname if unset
+            if(connSettings.getNickname().isEmpty())
+                connSettings.setNickname((getDesktopName()));
+        }
 
 
 		private void processNormalProtocol(final Context context, final ProgressDialog pd, final Runnable setModes) throws Exception {
