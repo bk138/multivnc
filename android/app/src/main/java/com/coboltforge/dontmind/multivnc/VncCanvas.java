@@ -822,33 +822,7 @@ public class VncCanvas extends GLSurfaceView {
 	}
 
 
-	public void getPasswordFromUser(final ConnectionBean c) {
-		// this method is probably called from the vnc thread
-		post(new Runnable() {
-			@Override
-			public void run() {
-				final EditText input = new EditText(getContext());
-				input.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-				input.setTransformationMethod(new PasswordTransformationMethod());
-
-				new AlertDialog.Builder(getContext())
-			    .setTitle(getContext().getString(R.string.credentials_needed_title))
-			    .setView(input)
-				.setCancelable(false)
-			    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int whichButton) {
-			            c.setPassword(input.getText().toString());
-			            synchronized (vncConn) {
-				            vncConn.notify();
-						}
-			        }
-			    }).show();
-			}
-		});
-
-	}
-
-	public void getCredsFromUser(final ConnectionBean c) {
+	public void getCredsFromUser(final ConnectionBean c, boolean isUserNameNeeded) {
 		// this method is probably called from the vnc thread
 		post(new Runnable() {
 			@Override
@@ -856,6 +830,8 @@ public class VncCanvas extends GLSurfaceView {
 
 				LayoutInflater layoutinflater = LayoutInflater.from(activity);
 				View credentialsDialog = layoutinflater.inflate(R.layout.credentials_dialog, null);
+				if(!isUserNameNeeded)
+					credentialsDialog.findViewById(R.id.username_row).setVisibility(GONE);
 
 				new AlertDialog.Builder(getContext())
 						.setTitle(getContext().getString(R.string.credentials_needed_title))
@@ -863,7 +839,8 @@ public class VncCanvas extends GLSurfaceView {
 						.setCancelable(false)
 						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
-								c.setUserName(((EditText)credentialsDialog.findViewById(R.id.userName)).getText().toString());
+								if(isUserNameNeeded)
+									c.setUserName(((EditText)credentialsDialog.findViewById(R.id.userName)).getText().toString());
 								c.setPassword(((EditText)credentialsDialog.findViewById(R.id.password)).getText().toString());
 								synchronized (vncConn) {
 									vncConn.notify();
