@@ -820,7 +820,7 @@ public class VncCanvas extends GLSurfaceView {
 	}
 
 
-	public void getCredFromUser(final ConnectionBean c) {
+	public void getPasswordFromUser(final ConnectionBean c) {
 		// this method is probably called from the vnc thread
 		post(new Runnable() {
 			@Override
