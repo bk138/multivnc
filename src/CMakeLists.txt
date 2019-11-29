@@ -41,6 +41,9 @@ add_executable(${executable_name} MACOSX_BUNDLE ${multivnc_SRCS})
 
 target_link_libraries(${executable_name} MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vncclient)
 
+if(APPLE AND wxWidgets_VERSION_STRING LESS 3.1)
+    set_target_properties(${executable_name} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
+endif(APPLE)
 
 
 
