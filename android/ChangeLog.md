@@ -1,5 +1,9 @@
 # Version 1.8.x:
 
+1.8.7
+
+-   Fixed possible crash in import/export activity.
+
 1.8.6
 
 -   Added ability to connect to MacOS servers.
