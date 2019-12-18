@@ -160,7 +160,7 @@ public class ImportExportActivity extends Activity {
 	@Override
 	public void onRequestPermissionsResult(int requestCode,  String[] permissions, int[] grantResults) {
 
-		if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+		if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 			Log.d(TAG, "Permission result: given!");
 			if(requestCode == R.id.buttonExport)
 				mButtonExport.callOnClick();
