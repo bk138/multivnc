@@ -4,10 +4,6 @@
     package="com.coboltforge.dontmind.multivnc" android:installLocation="auto"
     android:versionCode="61" android:versionName="1.8.7">
 
-	<supports-screens
-		android:largeScreens="true"
-		android:xlargeScreens="true"/>
-
 	<uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
