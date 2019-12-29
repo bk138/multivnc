@@ -541,7 +541,17 @@ public class VncCanvasActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		// hide title bar, status bar
-		setupWindowSize();
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		// hide system ui after softkeyboard close as per https://stackoverflow.com/a/21278040/361413
+		final View decorView = getWindow().getDecorView();
+		decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
+			@Override
+			public void onSystemUiVisibilityChange(int visibility) {
+				hideSystemUI();
+			}
+		});
 
 		setContentView(R.layout.canvas);
 
@@ -1214,16 +1224,28 @@ public class VncCanvasActivity extends Activity {
 	}
 
 
-	/**
-	 * Sets window size according to target device's platform.
-	 * Note that this MUST be called before adding content!
-	 */
-	private void setupWindowSize() {
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			hideSystemUI();
+		}
+	}
 
-		// hide status bar everywhere
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+	private void hideSystemUI() {
+		// For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+		// Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+		View decorView = getWindow().getDecorView();
+		decorView.setSystemUiVisibility(
+						View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+						// Set the content to appear under the system bars so that the
+						// content doesn't resize when the system bars hide and show.
+						| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+						| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+						| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+						// Hide the nav bar and status bar
+						| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+						| View.SYSTEM_UI_FLAG_FULLSCREEN);
 	}
 
 	private void invalidateMyOptionsMenu() {
