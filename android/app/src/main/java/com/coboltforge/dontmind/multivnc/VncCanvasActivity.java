@@ -30,6 +30,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.res.Configuration;
 import android.text.ClipboardManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -1250,6 +1251,28 @@ public class VncCanvasActivity extends Activity {
 
 	private void invalidateMyOptionsMenu() {
 		invalidateOptionsMenu();
+	}
+
+	/*
+	 * Overwrite buggy implementation on Samsung devices where menu would not open when triggered
+	 * from FAB. Stolen from https://github.com/EasyRPG/Player/pull/567 :-)
+	 */
+	@Override
+	public void openOptionsMenu() {
+
+		Configuration config = getResources().getConfiguration();
+
+		if((config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+				> Configuration.SCREENLAYOUT_SIZE_LARGE) {
+
+			int originalScreenLayout = config.screenLayout;
+			config.screenLayout = Configuration.SCREENLAYOUT_SIZE_LARGE;
+			super.openOptionsMenu();
+			config.screenLayout = originalScreenLayout;
+
+		} else {
+			super.openOptionsMenu();
+		}
 	}
 
 }
