@@ -1,5 +1,10 @@
 # Version 1.8.x:
 
+1.8.8
+
+-   Now hides navigation bar per default, resulting in more usable screen space.
+-   Fixed hamburger menu not opening on some Samsung devices.
+
 1.8.7
 
 -   Fixed possible crash in import/export activity.
