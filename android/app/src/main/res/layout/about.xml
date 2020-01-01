@@ -59,14 +59,14 @@
 			android:layout_marginBottom="20dip"	 />
 
 		<ImageButton android:id="@+id/patreon_button"
-			android:clickable="true" android:src="@drawable/patreon_button"
+			android:clickable="true" android:src="@drawable/ic_patreon_logo"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:layout_gravity="center"
 			android:padding="0dip"
 			android:layout_marginBottom="20dip"	 />
 
 				<ImageButton android:id="@+id/paypal_button"
-					android:clickable="true" android:src="@drawable/paypal_button"
+					android:clickable="true" android:src="@drawable/ic_paypal_logo"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content" android:layout_gravity="center"
 					android:padding="0dip"
