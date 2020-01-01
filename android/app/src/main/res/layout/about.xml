@@ -52,7 +52,7 @@
                 />
 
 		<ImageButton android:id="@+id/liberapay_button"
-			android:clickable="true" android:src="@drawable/liberapay_button"
+			android:clickable="true" android:src="@drawable/ic_liberapay_logo"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:layout_gravity="center"
 			android:padding="0dip"
