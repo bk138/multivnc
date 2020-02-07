@@ -174,6 +174,12 @@ class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean>
 							sb.append('-');
 						sb.append("Alt");
 					}
+					if (0 != (meta & VNCConn.SUPER_MASK))
+					{
+						if (sb.length()>0)
+							sb.append('-');
+						sb.append("Super");
+					}
 					if (sb.length()>0)
 						sb.append(' ');
 					MetaKeyBase base;

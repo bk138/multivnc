@@ -31,10 +31,18 @@
 			android:layout_weight="0"
 			android:layout_margin="3dip"
 		/>
+		<CheckBox android:id="@+id/checkboxSuper"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/super_check"
+			android:layout_weight="0"
+			android:layout_margin="3dip"
+			/>
 		<Spinner android:id="@+id/spinnerKeySelect"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:layout_margin="3dip"
+            android:layout_weight="1"
+            android:layout_margin="3dip"
 		/>
 	</LinearLayout>
 	<LinearLayout

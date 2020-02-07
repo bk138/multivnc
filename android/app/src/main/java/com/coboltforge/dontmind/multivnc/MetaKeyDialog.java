@@ -43,6 +43,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 	CheckBox _checkShift;
 	CheckBox _checkCtrl;
 	CheckBox _checkAlt;
+	CheckBox _checkSuper;
 	TextView _textKeyDesc;
 	Spinner _spinnerKeySelect;
 
@@ -78,6 +79,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		_checkShift = (CheckBox)findViewById(R.id.checkboxShift);
 		_checkCtrl = (CheckBox)findViewById(R.id.checkboxCtrl);
 		_checkAlt = (CheckBox)findViewById(R.id.checkboxAlt);
+		_checkSuper = (CheckBox)findViewById(R.id.checkboxSuper);
 		_textKeyDesc = (TextView)findViewById(R.id.textKeyDesc);
 		_spinnerKeySelect = (Spinner)findViewById(R.id.spinnerKeySelect);
 
@@ -93,6 +95,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 
 		_checkShift.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.SHIFT_MASK));
 		_checkAlt.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.ALT_MASK));
+		_checkSuper.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.SUPER_MASK));
 		_checkCtrl.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.CTRL_MASK));
 
 
@@ -314,6 +317,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		_checkAlt.setChecked(0 != (flags & VNCConn.ALT_MASK));
 		_checkShift.setChecked(0 != (flags & VNCConn.SHIFT_MASK));
 		_checkCtrl.setChecked(0 != (flags & VNCConn.CTRL_MASK));
+		_checkSuper.setChecked(0 != (flags & VNCConn.SUPER_MASK));
 		MetaKeyBase base = null;
 		if (_currentKeyBean.isMouseClick())
 		{

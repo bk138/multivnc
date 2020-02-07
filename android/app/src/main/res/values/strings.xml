@@ -2,6 +2,7 @@
 <resources>
     <string name="address_caption">Address</string>
     <string name="alt_check">Alt</string>
+    <string name="super_check">Super</string>
     <string name="app_name" translatable="false">MultiVNC</string>
     <string name="server_found">Found VNC Server</string>
     <string name="server_removed">VNC Server disappeared</string>

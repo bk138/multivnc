@@ -90,8 +90,9 @@ public class VNCConn {
     public final static int SHIFT_MASK = KeyEvent.META_SHIFT_ON;
     public final static int META_MASK  = 0;
     public final static int ALT_MASK   = KeyEvent.META_ALT_ON;
+	public final static int SUPER_MASK = KeyEvent.META_FUNCTION_ON; // mhm rather sym_on?
 
-    public static final int MOUSE_BUTTON_NONE = 0;
+	public static final int MOUSE_BUTTON_NONE = 0;
     public static final int MOUSE_BUTTON_LEFT = 1;
     public static final int MOUSE_BUTTON_MIDDLE = 2;
     public static final int MOUSE_BUTTON_RIGHT = 4;

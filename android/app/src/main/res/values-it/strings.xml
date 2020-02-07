@@ -1,6 +1,7 @@
 <resources>
     <string name="address_caption">"Indirizzo"</string>
     <string name="alt_check">"Alt"</string>
+    <string name="super_check">Super</string>
     <string name="server_found">"Trovato server VNC"</string>
     <string name="server_removed">"VNC Server è scomparso"</string>
     <string name="restartMDNS">"Riavvia Server Discovery"</string>

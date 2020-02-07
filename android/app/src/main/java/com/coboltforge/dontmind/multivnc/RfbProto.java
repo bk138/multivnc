@@ -1188,6 +1188,9 @@ class RfbProto {
     if ((newModifiers & VNCConn.ALT_MASK) != (oldModifiers & VNCConn.ALT_MASK))
       writeKeyEvent(0xffe9, (newModifiers & VNCConn.ALT_MASK) != 0);
 
+    if ((newModifiers & VNCConn.SUPER_MASK) != (oldModifiers & VNCConn.SUPER_MASK))
+      writeKeyEvent(0xffeb, (newModifiers & VNCConn.SUPER_MASK) != 0);
+
     oldModifiers = newModifiers;
   }
   //
