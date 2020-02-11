@@ -20,27 +20,23 @@
 //
 package com.coboltforge.dontmind.multivnc;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.res.Configuration;
-import android.text.ClipboardManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnDismissListener;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
@@ -54,1225 +50,1160 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
-import android.content.Context;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("deprecation")
 public class VncCanvasActivity extends Activity {
 
+    public class MightyInputHandler extends AbstractGestureInputHandler {
 
-	public class MightyInputHandler extends AbstractGestureInputHandler {
+        private static final String TAG = "TouchPadInputHandler";
 
-		private static final String TAG = "TouchPadInputHandler";
+        /**
+         * In drag mode (entered with long press) you process mouse events
+         * without sending them through the gesture detector
+         */
+        private boolean dragMode;
+        float dragX, dragY;
+        private boolean dragModeButtonDown = false;
+        private boolean dragModeButton2insteadof1 = false;
 
-		/**
-		 * In drag mode (entered with long press) you process mouse events
-		 * without sending them through the gesture detector
-		 */
-		private boolean dragMode;
-		float dragX, dragY;
-		private boolean dragModeButtonDown = false;
-		private boolean dragModeButton2insteadof1 = false;
+        /*
+         * two-finger fling gesture stuff
+         */
+        private long twoFingerFlingStart = -1;
+        private VelocityTracker twoFingerFlingVelocityTracker;
+        private boolean twoFingerFlingDetected = false;
+        private final int TWO_FINGER_FLING_UNITS = 1000;
+        private final float TWO_FINGER_FLING_THRESHOLD = 1000;
 
-		/*
-		 * two-finger fling gesture stuff
-		 */
-		private long twoFingerFlingStart = -1;
-		private VelocityTracker twoFingerFlingVelocityTracker;
-		private boolean twoFingerFlingDetected = false;
-		private final int TWO_FINGER_FLING_UNITS = 1000;
-		private final float TWO_FINGER_FLING_THRESHOLD = 1000;
+        MightyInputHandler() {
+            super(VncCanvasActivity.this);
+            Log.d(TAG, "MightyInputHandler " + this + " created!");
+        }
 
-		MightyInputHandler() {
-			super(VncCanvasActivity.this);
-			Log.d(TAG, "MightyInputHandler " + this +  " created!");
-		}
+        public void init() {
+            twoFingerFlingVelocityTracker = VelocityTracker.obtain();
+            Log.d(TAG, "MightyInputHandler " + this + " init!");
+        }
 
+        public void shutdown() {
+            try {
+                twoFingerFlingVelocityTracker.recycle();
+                twoFingerFlingVelocityTracker = null;
+            } catch (NullPointerException e) {
+            }
+            Log.d(TAG, "MightyInputHandler " + this + " shutdown!");
+        }
 
-		public void init() {
-			twoFingerFlingVelocityTracker = VelocityTracker.obtain();
-			Log.d(TAG, "MightyInputHandler " + this +  " init!");
-		}
+        /**
+         * scale down delta when it is small. This will allow finer control
+         * when user is making a small movement on touch screen.
+         * Scale up delta when delta is big. This allows fast mouse movement when
+         * user is flinging.
+         *
+         * @param delta
+         * @return
+         */
+        private float fineCtrlScale(float delta) {
+            float sign = (delta > 0) ? 1 : -1;
+            delta = Math.abs(delta);
+            if (delta >= 1 && delta <= 3) {
+                delta = 1;
+            } else if (delta <= 10) {
+                delta *= 0.34;
+            } else if (delta <= 30) {
+                delta *= delta / 30;
+            } else if (delta <= 90) {
+                delta *= (delta / 30);
+            } else {
+                delta *= 3.0;
+            }
+            return sign * delta;
+        }
 
-		public void shutdown() {
-			try {
-				twoFingerFlingVelocityTracker.recycle();
-				twoFingerFlingVelocityTracker = null;
-			}
-			catch (NullPointerException e) {
-			}
-			Log.d(TAG, "MightyInputHandler " + this +  " shutdown!");
-		}
+        private void twoFingerFlingNotification(String str) {
+            // bzzt!
+            vncCanvas.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING | HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
 
+            // beep!
+            vncCanvas.playSoundEffect(SoundEffectConstants.CLICK);
 
-		/**
-		 * scale down delta when it is small. This will allow finer control
-		 * when user is making a small movement on touch screen.
-		 * Scale up delta when delta is big. This allows fast mouse movement when
-		 * user is flinging.
-		 * @param delta
-		 * @return
-		 */
-		private float fineCtrlScale(float delta) {
-			float sign = (delta>0) ? 1 : -1;
-			delta = Math.abs(delta);
-			if (delta>=1 && delta <=3) {
-				delta = 1;
-			}else if (delta <= 10) {
-				delta *= 0.34;
-			} else if (delta <= 30 ) {
-				delta *= delta/30;
-			} else if (delta <= 90) {
-				delta *=  (delta/30);
-			} else {
-				delta *= 3.0;
-			}
-			return sign * delta;
-		}
+            VncCanvasActivity.this.notificationToast.setText(str);
+            VncCanvasActivity.this.notificationToast.show();
+        }
 
-		private void twoFingerFlingNotification(String str)
-		{
-			// bzzt!
-			vncCanvas.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
-					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+        private void twoFingerFlingAction(Character d) {
+            switch (d) {
+                case '←':
+                    vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
+                    break;
+                case '→':
+                    vncCanvas.sendMetaKey(MetaKeyBean.keyArrowRight);
+                    break;
+                case '↑':
+                    vncCanvas.sendMetaKey(MetaKeyBean.keyArrowUp);
+                    break;
+                case '↓':
+                    vncCanvas.sendMetaKey(MetaKeyBean.keyArrowDown);
+                    break;
+            }
+        }
 
-			// beep!
-			vncCanvas.playSoundEffect(SoundEffectConstants.CLICK);
+        /*
+         * (non-Javadoc)
+         *
+         * @see android.view.GestureDetector.SimpleOnGestureListener#onLongPress(android.view.MotionEvent)
+         */
+        @Override
+        public void onLongPress(MotionEvent e) {
 
-			VncCanvasActivity.this.notificationToast.setText(str);
-			VncCanvasActivity.this.notificationToast.show();
-		}
+            if (isTouchEvent(e) == false)
+                return;
 
-		private void twoFingerFlingAction(Character d)
-		{
-			switch(d) {
-			case '←':
-				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
-				break;
-			case '→':
-				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowRight);
-				break;
-			case '↑':
-				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowUp);
-				break;
-			case '↓':
-				vncCanvas.sendMetaKey(MetaKeyBean.keyArrowDown);
-				break;
-			}
-		}
+            if (Utils.DEBUG()) Log.d(TAG, "Input: long press");
 
+            showZoomer(true);
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onLongPress(android.view.MotionEvent)
-		 */
-		@Override
-		public void onLongPress(MotionEvent e) {
+            vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING | HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+            dragMode = true;
+            dragX = e.getX();
+            dragY = e.getY();
 
-			if (isTouchEvent(e) == false)
-				return;
+            // only interpret as button down if virtual mouse buttons are disabled
+            if (mousebuttons.getVisibility() != View.VISIBLE)
+                dragModeButtonDown = true;
+        }
 
-			if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
+        /*
+         * (non-Javadoc)
+         *
+         * @see android.view.GestureDetector.SimpleOnGestureListener#onScroll(android.view.MotionEvent,
+         *      android.view.MotionEvent, float, float)
+         */
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                float distanceX, float distanceY) {
 
-			showZoomer(true);
+            if (isTouchEvent(e1) == false)
+                return false;
 
-			vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
-			dragMode = true;
-			dragX = e.getX();
-			dragY = e.getY();
+            if (isTouchEvent(e2) == false)
+                return false;
 
-			// only interpret as button down if virtual mouse buttons are disabled
-			if(mousebuttons.getVisibility() != View.VISIBLE)
-				dragModeButtonDown = true;
-		}
+            if (e2.getPointerCount() > 1) {
+                if (Utils.DEBUG()) Log.d(TAG, "Input: scroll multitouch");
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onScroll(android.view.MotionEvent,
-		 *      android.view.MotionEvent, float, float)
-		 */
-		@Override
-		public boolean onScroll(MotionEvent e1, MotionEvent e2,
-				float distanceX, float distanceY) {
+                if (inScaling)
+                    return false;
 
-			if (isTouchEvent(e1) == false)
-				return false;
+                // pan on 3 fingers and more
+                if (e2.getPointerCount() > 2) {
+                    showZoomer(false);
+                    return vncCanvas.pan((int) distanceX, (int) distanceY);
+                }
 
-			if (isTouchEvent(e2) == false)
-				return false;
+                /*
+                 * here comes the stuff that acts for two fingers
+                 */
 
-			if (e2.getPointerCount() > 1)
-			{
-				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll multitouch");
+                // gesture start
+                if (twoFingerFlingStart != e1.getEventTime()) // it's a new scroll sequence
+                {
+                    twoFingerFlingStart = e1.getEventTime();
+                    twoFingerFlingDetected = false;
+                    twoFingerFlingVelocityTracker.clear();
+                    if (Utils.DEBUG()) Log.d(TAG, "new twoFingerFling detection started");
+                }
 
-				if (inScaling)
-					return false;
+                // gesture end
+                if (twoFingerFlingDetected == false) // not yet detected in this sequence (we only want ONE event per sequence!)
+                {
+                    // update our velocity tracker
+                    twoFingerFlingVelocityTracker.addMovement(e2);
+                    twoFingerFlingVelocityTracker.computeCurrentVelocity(TWO_FINGER_FLING_UNITS);
 
-				// pan on 3 fingers and more
-				if(e2.getPointerCount() > 2) {
-					showZoomer(false);
-					return vncCanvas.pan((int) distanceX, (int) distanceY);
-				}
+                    float velocityX = twoFingerFlingVelocityTracker.getXVelocity();
+                    float velocityY = twoFingerFlingVelocityTracker.getYVelocity();
 
-				/*
-				 * here comes the stuff that acts for two fingers
-				 */
+                    // check for left/right flings
+                    if (Math.abs(velocityX) > TWO_FINGER_FLING_THRESHOLD
+                            && Math.abs(velocityX) > Math.abs(2 * velocityY)) {
+                        if (velocityX < 0) {
+                            if (Utils.DEBUG()) Log.d(TAG, "twoFingerFling LEFT detected");
+                            twoFingerFlingNotification("←");
+                            twoFingerFlingAction('←');
+                        } else {
+                            if (Utils.DEBUG()) Log.d(TAG, "twoFingerFling RIGHT detected");
+                            twoFingerFlingNotification("→");
+                            twoFingerFlingAction('→');
+                        }
 
-				// gesture start
-				if(twoFingerFlingStart != e1.getEventTime()) // it's a new scroll sequence
-				{
-					twoFingerFlingStart = e1.getEventTime();
-					twoFingerFlingDetected = false;
-					twoFingerFlingVelocityTracker.clear();
-					if(Utils.DEBUG()) Log.d(TAG, "new twoFingerFling detection started");
-				}
+                        twoFingerFlingDetected = true;
+                    }
 
-				// gesture end
-				if(twoFingerFlingDetected == false) // not yet detected in this sequence (we only want ONE event per sequence!)
-				{
-					// update our velocity tracker
-					twoFingerFlingVelocityTracker.addMovement(e2);
-					twoFingerFlingVelocityTracker.computeCurrentVelocity(TWO_FINGER_FLING_UNITS);
+                    // check for left/right flings
+                    if (Math.abs(velocityY) > TWO_FINGER_FLING_THRESHOLD
+                            && Math.abs(velocityY) > Math.abs(2 * velocityX)) {
+                        if (velocityY < 0) {
+                            if (Utils.DEBUG()) Log.d(TAG, "twoFingerFling UP detected");
+                            twoFingerFlingNotification("↑");
+                            twoFingerFlingAction('↑');
+                        } else {
+                            if (Utils.DEBUG()) Log.d(TAG, "twoFingerFling DOWN detected");
+                            twoFingerFlingNotification("↓");
+                            twoFingerFlingAction('↓');
+                        }
 
-					float velocityX = twoFingerFlingVelocityTracker.getXVelocity();
-					float velocityY = twoFingerFlingVelocityTracker.getYVelocity();
+                        twoFingerFlingDetected = true;
+                    }
+                }
 
-					// check for left/right flings
-					if(Math.abs(velocityX) > TWO_FINGER_FLING_THRESHOLD
-							&& Math.abs(velocityX) > Math.abs(2*velocityY)) {
-						if(velocityX < 0) {
-							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling LEFT detected");
-							twoFingerFlingNotification("←");
-							twoFingerFlingAction('←');
-						}
-						else {
-							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling RIGHT detected");
-							twoFingerFlingNotification("→");
-							twoFingerFlingAction('→');
-						}
+                return twoFingerFlingDetected;
+            } else {
+                // compute the relative movement offset on the remote screen.
+                float deltaX = -distanceX * vncCanvas.getScale();
+                float deltaY = -distanceY * vncCanvas.getScale();
+                deltaX = fineCtrlScale(deltaX);
+                deltaY = fineCtrlScale(deltaY);
 
-						twoFingerFlingDetected = true;
-					}
+                // compute the absolution new mouse pos on the remote site.
+                float newRemoteX = vncCanvas.mouseX + deltaX;
+                float newRemoteY = vncCanvas.mouseY + deltaY;
 
-					// check for left/right flings
-					if(Math.abs(velocityY) > TWO_FINGER_FLING_THRESHOLD
-							&& Math.abs(velocityY) > Math.abs(2*velocityX)) {
-						if(velocityY < 0) {
-							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling UP detected");
-							twoFingerFlingNotification("↑");
-							twoFingerFlingAction('↑');
-						}
-						else {
-							if(Utils.DEBUG()) Log.d(TAG, "twoFingerFling DOWN detected");
-							twoFingerFlingNotification("↓");
-							twoFingerFlingAction('↓');
-						}
+                if (Utils.DEBUG()) Log.d(TAG, "Input: scroll single touch from "
+                        + vncCanvas.mouseX + "," + vncCanvas.mouseY
+                        + " to " + (int) newRemoteX + "," + (int) newRemoteY);
 
-						twoFingerFlingDetected = true;
-					}
-
-				}
-
-				return twoFingerFlingDetected;
-			}
-			else
-			{
-				// compute the relative movement offset on the remote screen.
-				float deltaX = -distanceX *vncCanvas.getScale();
-				float deltaY = -distanceY *vncCanvas.getScale();
-				deltaX = fineCtrlScale(deltaX);
-				deltaY = fineCtrlScale(deltaY);
-
-				// compute the absolution new mouse pos on the remote site.
-				float newRemoteX = vncCanvas.mouseX + deltaX;
-				float newRemoteY = vncCanvas.mouseY + deltaY;
-
-				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll single touch from "
-						+ vncCanvas.mouseX + "," + vncCanvas.mouseY
-						+ " to " + (int)newRemoteX + "," + (int)newRemoteY);
-
-//				if (dragMode) {
+//                if (dragMode) {
 //
-//					Log.d(TAG, "dragmode in scroll!!!!");
+//                    Log.d(TAG, "dragmode in scroll!!!!");
 //
-//					if (e2.getAction() == MotionEvent.ACTION_UP)
-//						dragMode = false;
-//					dragX = e2.getX();
-//					dragY = e2.getY();
-//					e2.setLocation(newRemoteX, newRemoteY);
-//					return vncCanvas.processPointerEvent(e2, true);
-//				}
-
-				e2.setLocation(newRemoteX, newRemoteY);
-				vncCanvas.processPointerEvent(e2, false);
-			}
-			return false;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see com.coboltforge.dontmind.multivnc.AbstractGestureInputHandler#onTouchEvent(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onTouchEvent(MotionEvent e) {
-			if (isTouchEvent(e) == false) { // physical input device
-
-				e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
-
-				vncCanvas.processPointerEvent(e, true, false);
-				vncCanvas.panToMouse();
-
-				return true;
-			}
-
-			if (dragMode) {
-
-				if(Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode");
-
-				// compute the relative movement offset on the remote screen.
-				float deltaX = (e.getX() - dragX) *vncCanvas.getScale();
-				float deltaY = (e.getY() - dragY) *vncCanvas.getScale();
-				dragX = e.getX();
-				dragY = e.getY();
-				deltaX = fineCtrlScale(deltaX);
-				deltaY = fineCtrlScale(deltaY);
-
-				// compute the absolution new mouse pos on the remote site.
-				float newRemoteX = vncCanvas.mouseX + deltaX;
-				float newRemoteY = vncCanvas.mouseY + deltaY;
-
-
-				if (e.getAction() == MotionEvent.ACTION_UP)
-				{
-					if(Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode, finger up");
-
-					dragMode = false;
-
-					dragModeButtonDown = false;
-					dragModeButton2insteadof1 = false;
-
-					remoteMouseStayPut(e);
-					vncCanvas.processPointerEvent(e, false);
-					return super.onTouchEvent(e); // important! otherwise the gesture detector gets confused!
-				}
-				e.setLocation(newRemoteX, newRemoteY);
-
-				boolean status = false;
-				if(dragModeButtonDown) {
-					if(!dragModeButton2insteadof1) // button 1 down
-						status = vncCanvas.processPointerEvent(e, true, false);
-					else // button2 down
-						status = vncCanvas.processPointerEvent(e, true, true);
-				}
-				else { // dragging without any button down
-					status = vncCanvas.processPointerEvent(e, false);
-				}
-
-				return status;
-
-			}
-
-
-			if(Utils.DEBUG())
-				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
-
-			return super.onTouchEvent(e);
-		}
-
-
-
-
-		@TargetApi(14)
-		@Override
-		public boolean onGenericMotionEvent(MotionEvent e) {
-			int action = MotionEvent.ACTION_MASK;
-			boolean button = false;
-			boolean secondary = false;
-
-			if (isTouchEvent(e)) {
-				return false;
-			}
-
-			e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
-
-				//Translate the event into onTouchEvent type language
-				if (e.getButtonState() != 0) {
-					if ((e.getButtonState() & MotionEvent.BUTTON_PRIMARY) != 0) {
-						button = true;
-						secondary = false;
-						action = MotionEvent.ACTION_DOWN;
-					} else if ((e.getButtonState() & MotionEvent.BUTTON_SECONDARY) != 0) {
-						button = true;
-						secondary = true;
-						action = MotionEvent.ACTION_DOWN;
-					}
-					if (e.getAction() == MotionEvent.ACTION_MOVE) {
-						action = MotionEvent.ACTION_MOVE;
-					}
-				} else if ((e.getActionMasked() == MotionEvent.ACTION_HOVER_MOVE) ||
-						(e.getActionMasked() == MotionEvent.ACTION_UP)){
-					action = MotionEvent.ACTION_UP;
-					button = false;
-					secondary = false;
-				}
-
-				if (action != MotionEvent.ACTION_MASK) {
-					e.setAction(action);
-					if (button == false) {
-						vncCanvas.processPointerEvent(e, false);
-					}
-					else {
-						vncCanvas.processPointerEvent(e, true, secondary);
-					}
-					vncCanvas.panToMouse();
-				}
-
-			if(Utils.DEBUG())
-				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
-
-			return true;
-		}
-
-
-
-		/**
-		 * Modify the event so that it does not move the mouse on the
-		 * remote server.
-		 * @param e
-		 */
-		private void remoteMouseStayPut(MotionEvent e) {
-			e.setLocation(vncCanvas.mouseX, vncCanvas.mouseY);
-
-		}
-		/*
-		 * (non-Javadoc)
-		 * confirmed single tap: do a left mouse down and up click on remote without moving the mouse.
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onSingleTapConfirmed(MotionEvent e) {
-
-			if (isTouchEvent(e) == false)
-				return false;
-
-			// disable if virtual mouse buttons are in use
-			if(mousebuttons.getVisibility()== View.VISIBLE)
-				return false;
-
-			if(Utils.DEBUG()) Log.d(TAG, "Input: single tap");
-
-			boolean multiTouch = e.getPointerCount() > 1;
-			remoteMouseStayPut(e);
-
-			vncCanvas.processPointerEvent(e, true, multiTouch||vncCanvas.cameraButtonDown);
-			e.setAction(MotionEvent.ACTION_UP);
-			return vncCanvas.processPointerEvent(e, false, multiTouch||vncCanvas.cameraButtonDown);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * double tap: do right mouse down and up click on remote without moving the mouse.
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onDoubleTap(MotionEvent e) {
-
-			if (isTouchEvent(e) == false)
-				return false;
-
-			// disable if virtual mouse buttons are in use
-			if(mousebuttons.getVisibility()== View.VISIBLE)
-				return false;
-
-			if(Utils.DEBUG()) Log.d(TAG, "Input: double tap");
-
-			dragModeButtonDown = true;
-			dragModeButton2insteadof1 = true;
-
-			remoteMouseStayPut(e);
-			vncCanvas.processPointerEvent(e, true, true);
-			e.setAction(MotionEvent.ACTION_UP);
-			return vncCanvas.processPointerEvent(e, false, true);
-		}
-
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
-		 */
-		@Override
-		public boolean onDown(MotionEvent e) {
-			if (isTouchEvent(e) == false)
-				return false;
-
-			return true;
-		}
-	}
-
-	private final static String TAG = "VncCanvasActivity";
-
-
-	VncCanvas vncCanvas;
-	VncDatabase database;
-	private ConnectionBean connection;
-
-	ZoomControls zoomer;
-	MightyInputHandler inputHandler;
-
-	ViewGroup mousebuttons;
-	TouchPointView touchpoints;
-	Toast notificationToast;
-
-	private SharedPreferences prefs;
-
-	private ClipboardManager mClipboardManager;
-
-	@SuppressLint("ShowToast")
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-
-		super.onCreate(savedInstanceState);
-
-		// hide title bar, status bar
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		// hide system ui after softkeyboard close as per https://stackoverflow.com/a/21278040/361413
-		final View decorView = getWindow().getDecorView();
-		decorView.setOnSystemUiVisibilityChangeListener (new View.OnSystemUiVisibilityChangeListener() {
-			@Override
-			public void onSystemUiVisibilityChange(int visibility) {
-				hideSystemUI();
-			}
-		});
-
-		setContentView(R.layout.canvas);
-
-		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
-		zoomer = (ZoomControls) findViewById(R.id.zoomer);
-
-		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
-
-		database = new VncDatabase(this);
-
-		mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-
-
-		inputHandler = new MightyInputHandler();
-		inputHandler.init();
-
-		/*
-		 * setup floating action button
-		 */
-		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-			    Log.d(TAG, "FAB onClick");
-				openOptionsMenu();
-			}
-		});
-
-
-		/*
-		 * Setup connection bean.
-		 */
-		connection = new ConnectionBean();
-		Intent i = getIntent();
-		Uri data = i.getData();
-		if ((data != null) && (data.getScheme().equals("vnc"))) { // started from outer world
-
-			Log.d(TAG, "Starting via vnc://");
-
-			// This should not happen according to Uri contract, but bug introduced in Froyo (2.2)
-			// has made this parsing of host necessary, i.e. getPort() returns -1 and the stuff after the colon is
-			// still in the host part...
-			// http://code.google.com/p/android/issues/detail?id=9952
-			if(! connection.parseHostPort(data.getHost())) {
-				// no colons in getHost()
-				connection.setPort(data.getPort());
-				connection.setAddress(data.getHost());
-			}
-
-			if (connection.getAddress().equals(Constants.CONNECTION)) // this is a bookmarked connection
-			{
-				Log.d(TAG, "Starting bookmarked connection " + connection.getPort());
-				// read in this bookmarked connection
-				if (connection.Gen_read(database.getReadableDatabase(), connection.getPort()))
-				{
-					// and set to most recently used
-					MostRecentBean bean = MainMenuActivity.getMostRecent(database.getReadableDatabase());
-					if (bean != null)
-					{
-						bean.setConnectionId(connection.get_Id());
-						bean.Gen_update(database.getWritableDatabase());
-					}
-				}
-				else {
-					Log.e(TAG, "Bookmarked connection " + connection.getPort() + " does not exist!");
-					Utils.showFatalErrorMessage(this, getString(R.string.bookmark_invalid));
-					return;
-				}
-			}
-			else // well, not a boomarked connection
-			{
-			    connection.setNickname(connection.getAddress());
-			    List<String> path = data.getPathSegments();
-			    if (path.size() >= 1) {
-			        connection.setColorModel(path.get(0));
-			    }
-			    if (path.size() >= 2) {
-			        connection.setPassword(path.get(1));
-			    }
-			}
-		}
-		// Uri == null
-		else { // i.e. started from main menu
-
-		    Bundle extras = i.getExtras();
-
-		    if (extras != null) {
-		  	    connection.Gen_populate((ContentValues) extras
-				  	.getParcelable(Constants.CONNECTION));
-		    }
-		    if (connection.getPort() == 0)
-			    connection.setPort(5900);
-
-			Log.d(TAG, "Got raw intent " + connection.toString());
-
-			// Parse a HOST:PORT entry
-			connection.parseHostPort(connection.getAddress());
-		}
-
-
-		/*
-		 * Setup canvas and conn.
-		 */
-		VNCConn conn = new VNCConn();
-		vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
-		conn.setCanvas(vncCanvas); // add canvas to conn. be sure to call this before init!
-		// the actual connection init
-		conn.init(connection, new Runnable() {
-			public void run() {
-				setModes();
-			}
-		});
-
-
-
-
-
-		zoomer.hide();
-		zoomer.setOnZoomInClickListener(new View.OnClickListener() {
-
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
-			@Override
-			public void onClick(View v) {
-				try {
-					showZoomer(true);
-					vncCanvas.scaling.zoomIn(VncCanvasActivity.this);
-				}
-				catch(NullPointerException e) {
-				}
-			}
-
-		});
-		zoomer.setOnZoomOutClickListener(new View.OnClickListener() {
-
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
-			@Override
-			public void onClick(View v) {
-				try {
-					showZoomer(true);
-					vncCanvas.scaling.zoomOut(VncCanvasActivity.this);
-				}
-				catch(NullPointerException e) {
-				}
-			}
-
-		});
-		zoomer.setOnZoomKeyboardClickListener(new View.OnClickListener() {
-
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see android.view.View.OnClickListener#onClick(android.view.View)
-			 */
-			@Override
-			public void onClick(View v) {
-				toggleKeyboard();
-			}
-
-		});
-
-		mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
-		MouseButtonView mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
-		MouseButtonView mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
-		MouseButtonView mousebutton3 = (MouseButtonView) findViewById(R.id.mousebutton3);
-
-		mousebutton1.init(1, vncCanvas);
-		mousebutton2.init(2, vncCanvas);
-		mousebutton3.init(3, vncCanvas);
-		if(! prefs.getBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, true))
-			mousebuttons.setVisibility(View.GONE);
-
-		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
-		touchpoints.setInputHandler(inputHandler);
-
-		// create an empty toast. we do this do be able to cancel
-		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
-		notificationToast.setGravity(Gravity.TOP, 0, 60);
-
-
-		if(! prefs.getBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, true))
-			vncCanvas.setPointerHighlight(false);
-
-
-		/*
-		 * ask whether to show help on first run
-		 */
-		if(Utils.appstarts == 1) {
-			new AlertDialog.Builder(this)
-			.setMessage(R.string.firstrun_help_dialog_text)
-			.setTitle(R.string.firstrun_help_dialog_title)
-			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					Intent helpIntent = new Intent (VncCanvasActivity.this, HelpActivity.class);
-					VncCanvasActivity.this.startActivity(helpIntent);
-				}
-			})
-			.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					try {
-						dialog.dismiss();
-					}
-					catch(Exception e) {
-					}
-				}
-			})
-			.show();
-		}
-
-	}
-
-	/**
-	 * Set modes on start to match what is specified in the ConnectionBean;
-	 * color mode (already done), scaling
-	 */
-	void setModes() {
-
-		AbstractScaling.getByScaleType(connection.getScaleMode())
-				.setScaleTypeForActivity(this);
-
-	}
-
-	ConnectionBean getConnection() {
-		return connection;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see android.app.Activity#onCreateDialog(int)
-	 */
-	@Override
-	protected Dialog onCreateDialog(int id) {
-
-
-		// Default to meta key dialog
-		return new MetaKeyDialog(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
-	 */
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog) {
-		super.onPrepareDialog(id, dialog);
-		if (dialog instanceof ConnectionSettable)
-			((ConnectionSettable) dialog).setConnection(connection);
-	}
-
-
-	@Override
-	protected void onStop() {
-		vncCanvas.disableRepaints();
-		super.onStop();
-	}
-
-	@Override
-	protected void onRestart() {
-		vncCanvas.enableRepaints();
-		super.onRestart();
-	}
-
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		// needed for the GLSurfaceView
-		vncCanvas.onPause();
-
-		// get VNC cuttext and post to Android
-		if(vncCanvas.vncConn.getCutText() != null)
-			mClipboardManager.setText(vncCanvas.vncConn.getCutText());
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		// needed for the GLSurfaceView
-		vncCanvas.onResume();
-
-		// get Android clipboard contents
-		if (mClipboardManager.hasText()) {
-			try {
-				vncCanvas.vncConn.sendCutText(mClipboardManager.getText().toString());
-			}
-			catch(NullPointerException e) {
-				//unused
-			}
-		}
-
-	}
-
-	@SuppressLint("NewApi")
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
-
-		return true;
-	}
-
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		try {
-			if(touchpoints.getVisibility() == View.VISIBLE) {
-				menu.findItem(R.id.itemColorMode).setVisible(false);
-				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
-			}
-			else {
-				menu.findItem(R.id.itemColorMode).setVisible(true);
-				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
-			}}
-		catch(NullPointerException e) { // when menu is initially created
-		}
-
-		return super.onPrepareOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		SharedPreferences.Editor ed = prefs.edit();
-
-		switch (item.getItemId()) {
-		case R.id.itemInfo:
-			vncCanvas.showConnectionInfo();
-			return true;
-		case R.id.itemSpecialKeys:
-			showDialog(R.layout.metakey);
-			return true;
-		case R.id.itemColorMode:
-			selectColorModel();
-			return true;
-		case R.id.itemToggleFramebufferUpdate:
-			if(vncCanvas.vncConn.toggleFramebufferUpdates()) // view enabled
-			{
-				vncCanvas.setVisibility(View.VISIBLE);
-				touchpoints.setVisibility(View.GONE);
-			}
-			else
-			{
-				vncCanvas.setVisibility(View.GONE);
-				touchpoints.setVisibility(View.VISIBLE);
-			}
-			// trigger onCreateOptions
-			invalidateMyOptionsMenu();
-			return true;
-
-		case R.id.itemToggleMouseButtons:
-			if(mousebuttons.getVisibility()== View.VISIBLE) {
-				mousebuttons.setVisibility(View.GONE);
-				ed.putBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, false);
-			}
-			else {
-				mousebuttons.setVisibility(View.VISIBLE);
-				ed.putBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, true);
-			}
-			ed.commit();
-			return true;
-
-		case R.id.itemTogglePointerHighlight:
-			if(vncCanvas.getPointerHighlight())
-				vncCanvas.setPointerHighlight(false);
-			else
-				vncCanvas.setPointerHighlight(true);
-
-			ed.putBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, vncCanvas.getPointerHighlight());
-			ed.commit();
-			return true;
-
-		case R.id.itemToggleKeyboard:
-			toggleKeyboard();
-			return true;
-
-		case R.id.itemSendKeyAgain:
-			sendSpecialKeyAgain();
-			return true;
-		case R.id.itemSaveBookmark:
-			connection.save(database.getWritableDatabase());
-			Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
-			return true;
-		case R.id.itemAbout:
-			Intent intent = new Intent (this, AboutActivity.class);
-			this.startActivity(intent);
-			return true;
-		case R.id.itemHelp:
-			Intent helpIntent = new Intent (this, HelpActivity.class);
-			this.startActivity(helpIntent);
-			return true;
-		case R.id.itemDisconnect:
-			new AlertDialog.Builder(this)
-			.setMessage(getString(R.string.disconnect_question))
-			.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					vncCanvas.vncConn.shutdown();
-					finish();
-				}
-			}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					// Do nothing.
-				}
-			}).show();
-			return true;
-		default:
-			break;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	MetaKeyBean lastSentKey;
-
-	private void sendSpecialKeyAgain() {
-		if (lastSentKey == null) {
-			ArrayList<MetaKeyBean> keys = new ArrayList<MetaKeyBean>();
-			Cursor c = database.getReadableDatabase().rawQuery(
-					MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2}",
-							MetaKeyBean.GEN_TABLE_NAME,
-							MetaKeyBean.GEN_FIELD__ID, connection
-									.getLastMetaKeyId()),
-					MetaKeyDialog.EMPTY_ARGS);
-			MetaKeyBean.Gen_populateFromCursor(c, keys, MetaKeyBean.NEW);
-			c.close();
-			if (keys.size() > 0) {
-				lastSentKey = keys.get(0);
-			} else {
-				lastSentKey = null;
-			}
-		}
-		vncCanvas.sendMetaKey(lastSentKey);
-	}
-
-	private void toggleKeyboard() {
-		InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		if (isFinishing()) {
-			try {
-				inputHandler.shutdown();
-				vncCanvas.vncConn.shutdown();
-				vncCanvas.onDestroy();
-				database.close();
-			}
-			catch(NullPointerException e) {
-			}
-		}
-	}
-
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent evt) {
-		if(Utils.DEBUG()) Log.d(TAG, "Input: key down: " + evt.toString());
-
-		if (keyCode == KeyEvent.KEYCODE_MENU)
-			return super.onKeyDown(keyCode, evt);
-
-		if(keyCode == KeyEvent.KEYCODE_BACK) {
-
-			// handle right mouse button of USB-OTG devices
-			if(evt.getSource() == InputDevice.SOURCE_MOUSE) {
-				MotionEvent e = MotionEvent.obtain(
-						SystemClock.uptimeMillis(),
-						SystemClock.uptimeMillis(),
-						MotionEvent.ACTION_DOWN,
-						vncCanvas.mouseX,
-						vncCanvas.mouseY,
-						0
-						);
-				vncCanvas.processPointerEvent(e, true, true);
-				return true;
-			}
-
-			if(evt.getFlags() == KeyEvent.FLAG_FROM_SYSTEM) // from hardware keyboard
-				keyCode = KeyEvent.KEYCODE_ESCAPE;
-			else {
-				new AlertDialog.Builder(this)
-				.setMessage(getString(R.string.disconnect_question))
-				.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						vncCanvas.vncConn.shutdown();
-						finish();
-					}
-				}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						// Do nothing.
-					}
-				}).show();
-				return true;
-			}
-		}
-
-		// use search key to toggle soft keyboard
-		if (keyCode == KeyEvent.KEYCODE_SEARCH)
-			toggleKeyboard();
-
-		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
-			return true;
-		return super.onKeyDown(keyCode, evt);
-	}
-
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent evt) {
-		if(Utils.DEBUG()) Log.d(TAG, "Input: key up: " + evt.toString());
-
-		if(keyCode == KeyEvent.KEYCODE_BACK) {
-			// handle right mouse button of USB-OTG devices
-			if (evt.getSource() == InputDevice.SOURCE_MOUSE) {
-				MotionEvent e = MotionEvent.obtain(
-						SystemClock.uptimeMillis(),
-						SystemClock.uptimeMillis(),
-						MotionEvent.ACTION_UP,
-						vncCanvas.mouseX,
-						vncCanvas.mouseY,
-						0
-				);
-				vncCanvas.processPointerEvent(e, false, true);
-				return true;
-			}
-		}
-
-		if (keyCode == KeyEvent.KEYCODE_MENU)
-			return super.onKeyUp(keyCode, evt);
-
-		if (vncCanvas.processLocalKeyEvent(keyCode, evt))
-			return true;
-		return super.onKeyUp(keyCode, evt);
-	}
-
-
-	// this is called for unicode symbols like €
-	// multiple duplicate key events have occurred in a row, or a complex string is being delivered.
-	// If the key code is not KEYCODE_UNKNOWN then the getRepeatCount() method returns the number of
-	// times the given key code should be executed.
-	// Otherwise, if the key code is KEYCODE_UNKNOWN, then this is a sequence of characters as returned by getCharacters().
-	@Override
-	public boolean onKeyMultiple (int keyCode, int count, KeyEvent evt) {
-		if(Utils.DEBUG()) Log.d(TAG, "Input: key mult: " + evt.toString());
-
-		// we only deal with the special char case for now
-		if(evt.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN) {
-			if (vncCanvas.processLocalKeyEvent(keyCode, evt))
-				return true;
-		}
-
-		return super.onKeyMultiple(keyCode, count, evt);
-	}
-
-
-
-
-
-	private void selectColorModel() {
-		// Stop repainting the desktop
-		// because the display is composited!
-		vncCanvas.disableRepaints();
-
-		final String[] choices = new String[COLORMODEL.values().length];
-		int currentSelection = -1;
-		for (int i = 0; i < choices.length; i++) {
-			COLORMODEL cm = COLORMODEL.values()[i];
-			choices[i] = cm.toString();
-			if(cm.equals(vncCanvas.vncConn.getColorModel()))
-				currentSelection = i;
-		}
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setSingleChoiceItems(choices, currentSelection, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
-		    	try{
-					dialog.dismiss();
-				}
-				catch(Exception e) {
-				}
-				COLORMODEL cm = COLORMODEL.values()[item];
-				vncCanvas.vncConn.setColorModel(cm);
-				connection.setColorModel(cm.nameString());
-				Toast.makeText(VncCanvasActivity.this,
-						"Updating Color Model to " + cm.toString(),
-						Toast.LENGTH_SHORT).show();
-		    }
-		});
-		AlertDialog dialog = builder.create();
-		dialog.setOnDismissListener(new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface arg0) {
-				Log.i(TAG, "Color Model Selector dismissed");
-				// Restore desktop repaints
-				vncCanvas.enableRepaints();
-			}
-		});
-		dialog.show();
-	}
-
-	float panTouchX, panTouchY;
-
-	/**
-	 * Pan based on touch motions
-	 *
-	 * @param event
-	 */
-	private boolean pan(MotionEvent event) {
-		float curX = event.getX();
-		float curY = event.getY();
-		int dX = (int) (panTouchX - curX);
-		int dY = (int) (panTouchY - curY);
-
-		return vncCanvas.pan(dX, dY);
-	}
-
-
-
-	boolean touchPan(MotionEvent event) {
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			panTouchX = event.getX();
-			panTouchY = event.getY();
-			break;
-		case MotionEvent.ACTION_MOVE:
-			pan(event);
-			panTouchX = event.getX();
-			panTouchY = event.getY();
-			break;
-		case MotionEvent.ACTION_UP:
-			pan(event);
-			break;
-		}
-		return true;
-	}
-
-
-	long hideZoomAfterMs;
-	static final long ZOOM_HIDE_DELAY_MS = 2500;
-	HideZoomRunnable hideZoomInstance = new HideZoomRunnable();
-
-	private void showZoomer(boolean force) {
-		if (force || zoomer.getVisibility() != View.VISIBLE) {
-			zoomer.show();
-			hideZoomAfterMs = SystemClock.uptimeMillis() + ZOOM_HIDE_DELAY_MS;
-			vncCanvas.handler
-					.postAtTime(hideZoomInstance, hideZoomAfterMs + 10);
-		}
-	}
-
-	private class HideZoomRunnable implements Runnable {
-		public void run() {
-			if (SystemClock.uptimeMillis() >= hideZoomAfterMs) {
-				zoomer.hide();
-			}
-		}
-
-	}
-
-	public void showScaleToast()
-	{
-		// show scale
-		notificationToast.setText(getString(R.string.scale_msg) + " " + (int)(100*vncCanvas.getScale()) + "%");
-		notificationToast.show();
-	}
-
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		if (hasFocus) {
-			hideSystemUI();
-		}
-	}
-
-	private void hideSystemUI() {
-		// For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
-		// Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-		View decorView = getWindow().getDecorView();
-		decorView.setSystemUiVisibility(
-						View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-						// Set the content to appear under the system bars so that the
-						// content doesn't resize when the system bars hide and show.
-						| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-						| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-						| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-						// Hide the nav bar and status bar
-						| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-						| View.SYSTEM_UI_FLAG_FULLSCREEN);
-	}
-
-	private void invalidateMyOptionsMenu() {
-		invalidateOptionsMenu();
-	}
-
-	/*
-	 * Overwrite buggy implementation on Samsung devices where menu would not open when triggered
-	 * from FAB. Stolen from https://github.com/EasyRPG/Player/pull/567 :-)
-	 */
-	@Override
-	public void openOptionsMenu() {
-
-		Configuration config = getResources().getConfiguration();
-
-		if((config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-				> Configuration.SCREENLAYOUT_SIZE_LARGE) {
-
-			int originalScreenLayout = config.screenLayout;
-			config.screenLayout = Configuration.SCREENLAYOUT_SIZE_LARGE;
-			super.openOptionsMenu();
-			config.screenLayout = originalScreenLayout;
-
-		} else {
-			super.openOptionsMenu();
-		}
-	}
-
+//                    if (e2.getAction() == MotionEvent.ACTION_UP)
+//                        dragMode = false;
+//                    dragX = e2.getX();
+//                    dragY = e2.getY();
+//                    e2.setLocation(newRemoteX, newRemoteY);
+//                    return vncCanvas.processPointerEvent(e2, true);
+//                }
+
+                e2.setLocation(newRemoteX, newRemoteY);
+                vncCanvas.processPointerEvent(e2, false);
+            }
+            return false;
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see com.coboltforge.dontmind.multivnc.AbstractGestureInputHandler#onTouchEvent(android.view.MotionEvent)
+         */
+        @Override
+        public boolean onTouchEvent(MotionEvent e) {
+            if (isTouchEvent(e) == false) { // physical input device
+
+                e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
+
+                vncCanvas.processPointerEvent(e, true, false);
+                vncCanvas.panToMouse();
+
+                return true;
+            }
+
+            if (dragMode) {
+
+                if (Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode");
+
+                // compute the relative movement offset on the remote screen.
+                float deltaX = (e.getX() - dragX) * vncCanvas.getScale();
+                float deltaY = (e.getY() - dragY) * vncCanvas.getScale();
+                dragX = e.getX();
+                dragY = e.getY();
+                deltaX = fineCtrlScale(deltaX);
+                deltaY = fineCtrlScale(deltaY);
+
+                // compute the absolution new mouse pos on the remote site.
+                float newRemoteX = vncCanvas.mouseX + deltaX;
+                float newRemoteY = vncCanvas.mouseY + deltaY;
+
+                if (e.getAction() == MotionEvent.ACTION_UP) {
+                    if (Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode, finger up");
+
+                    dragMode = false;
+
+                    dragModeButtonDown = false;
+                    dragModeButton2insteadof1 = false;
+
+                    remoteMouseStayPut(e);
+                    vncCanvas.processPointerEvent(e, false);
+                    return super.onTouchEvent(e); // important! otherwise the gesture detector gets confused!
+                }
+                e.setLocation(newRemoteX, newRemoteY);
+
+                boolean status = false;
+                if (dragModeButtonDown) {
+                    if (!dragModeButton2insteadof1) // button 1 down
+                        status = vncCanvas.processPointerEvent(e, true, false);
+                    else // button2 down
+                        status = vncCanvas.processPointerEvent(e, true, true);
+                } else { // dragging without any button down
+                    status = vncCanvas.processPointerEvent(e, false);
+                }
+
+                return status;
+            }
+
+            if (Utils.DEBUG())
+                Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+
+            return super.onTouchEvent(e);
+        }
+
+        @TargetApi(14)
+        @Override
+        public boolean onGenericMotionEvent(MotionEvent e) {
+            int action = MotionEvent.ACTION_MASK;
+            boolean button = false;
+            boolean secondary = false;
+
+            if (isTouchEvent(e)) {
+                return false;
+            }
+
+            e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
+
+            //Translate the event into onTouchEvent type language
+            if (e.getButtonState() != 0) {
+                if ((e.getButtonState() & MotionEvent.BUTTON_PRIMARY) != 0) {
+                    button = true;
+                    secondary = false;
+                    action = MotionEvent.ACTION_DOWN;
+                } else if ((e.getButtonState() & MotionEvent.BUTTON_SECONDARY) != 0) {
+                    button = true;
+                    secondary = true;
+                    action = MotionEvent.ACTION_DOWN;
+                }
+                if (e.getAction() == MotionEvent.ACTION_MOVE) {
+                    action = MotionEvent.ACTION_MOVE;
+                }
+            } else if ((e.getActionMasked() == MotionEvent.ACTION_HOVER_MOVE) ||
+                    (e.getActionMasked() == MotionEvent.ACTION_UP)) {
+                action = MotionEvent.ACTION_UP;
+                button = false;
+                secondary = false;
+            }
+
+            if (action != MotionEvent.ACTION_MASK) {
+                e.setAction(action);
+                if (button == false) {
+                    vncCanvas.processPointerEvent(e, false);
+                } else {
+                    vncCanvas.processPointerEvent(e, true, secondary);
+                }
+                vncCanvas.panToMouse();
+            }
+
+            if (Utils.DEBUG())
+                Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+
+            return true;
+        }
+
+        /**
+         * Modify the event so that it does not move the mouse on the
+         * remote server.
+         *
+         * @param e
+         */
+        private void remoteMouseStayPut(MotionEvent e) {
+            e.setLocation(vncCanvas.mouseX, vncCanvas.mouseY);
+        }
+
+        /*
+         * (non-Javadoc)
+         * confirmed single tap: do a left mouse down and up click on remote without moving the mouse.
+         * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
+         */
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+
+            if (isTouchEvent(e) == false)
+                return false;
+
+            // disable if virtual mouse buttons are in use
+            if (mousebuttons.getVisibility() == View.VISIBLE)
+                return false;
+
+            if (Utils.DEBUG()) Log.d(TAG, "Input: single tap");
+
+            boolean multiTouch = e.getPointerCount() > 1;
+            remoteMouseStayPut(e);
+
+            vncCanvas.processPointerEvent(e, true, multiTouch || vncCanvas.cameraButtonDown);
+            e.setAction(MotionEvent.ACTION_UP);
+            return vncCanvas.processPointerEvent(e, false, multiTouch || vncCanvas.cameraButtonDown);
+        }
+
+        /*
+         * (non-Javadoc)
+         * double tap: do right mouse down and up click on remote without moving the mouse.
+         * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
+         */
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+
+            if (isTouchEvent(e) == false)
+                return false;
+
+            // disable if virtual mouse buttons are in use
+            if (mousebuttons.getVisibility() == View.VISIBLE)
+                return false;
+
+            if (Utils.DEBUG()) Log.d(TAG, "Input: double tap");
+
+            dragModeButtonDown = true;
+            dragModeButton2insteadof1 = true;
+
+            remoteMouseStayPut(e);
+            vncCanvas.processPointerEvent(e, true, true);
+            e.setAction(MotionEvent.ACTION_UP);
+            return vncCanvas.processPointerEvent(e, false, true);
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
+         */
+        @Override
+        public boolean onDown(MotionEvent e) {
+            if (isTouchEvent(e) == false)
+                return false;
+
+            return true;
+        }
+    }
+
+    private final static String TAG = "VncCanvasActivity";
+
+    VncCanvas vncCanvas;
+    VncDatabase database;
+    private ConnectionBean connection;
+
+    ZoomControls zoomer;
+    MightyInputHandler inputHandler;
+
+    ViewGroup mousebuttons;
+    TouchPointView touchpoints;
+    Toast notificationToast;
+
+    private SharedPreferences prefs;
+
+    private ClipboardManager mClipboardManager;
+
+    @SuppressLint("ShowToast")
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        // hide title bar, status bar
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        // hide system ui after softkeyboard close as per https://stackoverflow.com/a/21278040/361413
+        final View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                hideSystemUI();
+            }
+        });
+
+        setContentView(R.layout.canvas);
+
+        vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
+        zoomer = (ZoomControls) findViewById(R.id.zoomer);
+
+        prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
+
+        database = new VncDatabase(this);
+
+        mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+
+        inputHandler = new MightyInputHandler();
+        inputHandler.init();
+
+        /*
+         * setup floating action button
+         */
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "FAB onClick");
+                openOptionsMenu();
+            }
+        });
+
+
+        /*
+         * Setup connection bean.
+         */
+        connection = new ConnectionBean();
+        Intent i = getIntent();
+        Uri data = i.getData();
+        if ((data != null) && (data.getScheme().equals("vnc"))) { // started from outer world
+
+            Log.d(TAG, "Starting via vnc://");
+
+            // This should not happen according to Uri contract, but bug introduced in Froyo (2.2)
+            // has made this parsing of host necessary, i.e. getPort() returns -1 and the stuff after the colon is
+            // still in the host part...
+            // http://code.google.com/p/android/issues/detail?id=9952
+            if (!connection.parseHostPort(data.getHost())) {
+                // no colons in getHost()
+                connection.setPort(data.getPort());
+                connection.setAddress(data.getHost());
+            }
+
+            if (connection.getAddress().equals(Constants.CONNECTION)) // this is a bookmarked connection
+            {
+                Log.d(TAG, "Starting bookmarked connection " + connection.getPort());
+                // read in this bookmarked connection
+                if (connection.Gen_read(database.getReadableDatabase(), connection.getPort())) {
+                    // and set to most recently used
+                    MostRecentBean bean = MainMenuActivity.getMostRecent(database.getReadableDatabase());
+                    if (bean != null) {
+                        bean.setConnectionId(connection.get_Id());
+                        bean.Gen_update(database.getWritableDatabase());
+                    }
+                } else {
+                    Log.e(TAG, "Bookmarked connection " + connection.getPort() + " does not exist!");
+                    Utils.showFatalErrorMessage(this, getString(R.string.bookmark_invalid));
+                    return;
+                }
+            } else // well, not a boomarked connection
+            {
+                connection.setNickname(connection.getAddress());
+                List<String> path = data.getPathSegments();
+                if (path.size() >= 1) {
+                    connection.setColorModel(path.get(0));
+                }
+                if (path.size() >= 2) {
+                    connection.setPassword(path.get(1));
+                }
+            }
+        }
+        // Uri == null
+        else { // i.e. started from main menu
+
+            Bundle extras = i.getExtras();
+
+            if (extras != null) {
+                connection.Gen_populate((ContentValues) extras
+                        .getParcelable(Constants.CONNECTION));
+            }
+            if (connection.getPort() == 0)
+                connection.setPort(5900);
+
+            Log.d(TAG, "Got raw intent " + connection.toString());
+
+            // Parse a HOST:PORT entry
+            connection.parseHostPort(connection.getAddress());
+        }
+
+
+        /*
+         * Setup canvas and conn.
+         */
+        VNCConn conn = new VNCConn();
+        vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
+        conn.setCanvas(vncCanvas); // add canvas to conn. be sure to call this before init!
+        // the actual connection init
+        conn.init(connection, new Runnable() {
+            public void run() {
+                setModes();
+            }
+        });
+
+        zoomer.hide();
+        zoomer.setOnZoomInClickListener(new View.OnClickListener() {
+
+            /*
+             * (non-Javadoc)
+             *
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
+            @Override
+            public void onClick(View v) {
+                try {
+                    showZoomer(true);
+                    vncCanvas.scaling.zoomIn(VncCanvasActivity.this);
+                } catch (NullPointerException e) {
+                }
+            }
+        });
+        zoomer.setOnZoomOutClickListener(new View.OnClickListener() {
+
+            /*
+             * (non-Javadoc)
+             *
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
+            @Override
+            public void onClick(View v) {
+                try {
+                    showZoomer(true);
+                    vncCanvas.scaling.zoomOut(VncCanvasActivity.this);
+                } catch (NullPointerException e) {
+                }
+            }
+        });
+        zoomer.setOnZoomKeyboardClickListener(new View.OnClickListener() {
+
+            /*
+             * (non-Javadoc)
+             *
+             * @see android.view.View.OnClickListener#onClick(android.view.View)
+             */
+            @Override
+            public void onClick(View v) {
+                toggleKeyboard();
+            }
+        });
+
+        mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
+        MouseButtonView mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
+        MouseButtonView mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
+        MouseButtonView mousebutton3 = (MouseButtonView) findViewById(R.id.mousebutton3);
+
+        mousebutton1.init(1, vncCanvas);
+        mousebutton2.init(2, vncCanvas);
+        mousebutton3.init(3, vncCanvas);
+        if (!prefs.getBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, true))
+            mousebuttons.setVisibility(View.GONE);
+
+        touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
+        touchpoints.setInputHandler(inputHandler);
+
+        // create an empty toast. we do this do be able to cancel
+        notificationToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+        notificationToast.setGravity(Gravity.TOP, 0, 60);
+
+        if (!prefs.getBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, true))
+            vncCanvas.setPointerHighlight(false);
+
+
+        /*
+         * ask whether to show help on first run
+         */
+        if (Utils.appstarts == 1) {
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.firstrun_help_dialog_text)
+                    .setTitle(R.string.firstrun_help_dialog_title)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent helpIntent = new Intent(VncCanvasActivity.this, HelpActivity.class);
+                            VncCanvasActivity.this.startActivity(helpIntent);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            try {
+                                dialog.dismiss();
+                            } catch (Exception e) {
+                            }
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    /**
+     * Set modes on start to match what is specified in the ConnectionBean;
+     * color mode (already done), scaling
+     */
+    void setModes() {
+
+        AbstractScaling.getByScaleType(connection.getScaleMode())
+                .setScaleTypeForActivity(this);
+    }
+
+    ConnectionBean getConnection() {
+        return connection;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.app.Activity#onCreateDialog(int)
+     */
+    @Override
+    protected Dialog onCreateDialog(int id) {
+
+        // Default to meta key dialog
+        return new MetaKeyDialog(this);
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
+     */
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog) {
+        super.onPrepareDialog(id, dialog);
+        if (dialog instanceof ConnectionSettable)
+            ((ConnectionSettable) dialog).setConnection(connection);
+    }
+
+    @Override
+    protected void onStop() {
+        vncCanvas.disableRepaints();
+        super.onStop();
+    }
+
+    @Override
+    protected void onRestart() {
+        vncCanvas.enableRepaints();
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // needed for the GLSurfaceView
+        vncCanvas.onPause();
+
+        // get VNC cuttext and post to Android
+        if (vncCanvas.vncConn.getCutText() != null)
+            mClipboardManager.setText(vncCanvas.vncConn.getCutText());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // needed for the GLSurfaceView
+        vncCanvas.onResume();
+
+        // get Android clipboard contents
+        if (mClipboardManager.hasText()) {
+            try {
+                vncCanvas.vncConn.sendCutText(mClipboardManager.getText().toString());
+            } catch (NullPointerException e) {
+                //unused
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        try {
+            if (touchpoints.getVisibility() == View.VISIBLE) {
+                menu.findItem(R.id.itemColorMode).setVisible(false);
+                menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
+            } else {
+                menu.findItem(R.id.itemColorMode).setVisible(true);
+                menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
+            }
+        } catch (NullPointerException e) { // when menu is initially created
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        SharedPreferences.Editor ed = prefs.edit();
+
+        switch (item.getItemId()) {
+            case R.id.itemInfo:
+                vncCanvas.showConnectionInfo();
+                return true;
+            case R.id.itemSpecialKeys:
+                showDialog(R.layout.metakey);
+                return true;
+            case R.id.itemColorMode:
+                selectColorModel();
+                return true;
+            case R.id.itemToggleFramebufferUpdate:
+                if (vncCanvas.vncConn.toggleFramebufferUpdates()) // view enabled
+                {
+                    vncCanvas.setVisibility(View.VISIBLE);
+                    touchpoints.setVisibility(View.GONE);
+                } else {
+                    vncCanvas.setVisibility(View.GONE);
+                    touchpoints.setVisibility(View.VISIBLE);
+                }
+                // trigger onCreateOptions
+                invalidateMyOptionsMenu();
+                return true;
+
+            case R.id.itemToggleMouseButtons:
+                if (mousebuttons.getVisibility() == View.VISIBLE) {
+                    mousebuttons.setVisibility(View.GONE);
+                    ed.putBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, false);
+                } else {
+                    mousebuttons.setVisibility(View.VISIBLE);
+                    ed.putBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, true);
+                }
+                ed.commit();
+                return true;
+
+            case R.id.itemTogglePointerHighlight:
+                if (vncCanvas.getPointerHighlight())
+                    vncCanvas.setPointerHighlight(false);
+                else
+                    vncCanvas.setPointerHighlight(true);
+
+                ed.putBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, vncCanvas.getPointerHighlight());
+                ed.commit();
+                return true;
+
+            case R.id.itemToggleKeyboard:
+                toggleKeyboard();
+                return true;
+
+            case R.id.itemSendKeyAgain:
+                sendSpecialKeyAgain();
+                return true;
+            case R.id.itemSaveBookmark:
+                connection.save(database.getWritableDatabase());
+                Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.itemAbout:
+                Intent intent = new Intent(this, AboutActivity.class);
+                this.startActivity(intent);
+                return true;
+            case R.id.itemHelp:
+                Intent helpIntent = new Intent(this, HelpActivity.class);
+                this.startActivity(helpIntent);
+                return true;
+            case R.id.itemDisconnect:
+                new AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.disconnect_question))
+                        .setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                vncCanvas.vncConn.shutdown();
+                                finish();
+                            }
+                        }).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Do nothing.
+                    }
+                }).show();
+                return true;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    MetaKeyBean lastSentKey;
+
+    private void sendSpecialKeyAgain() {
+        if (lastSentKey == null) {
+            ArrayList<MetaKeyBean> keys = new ArrayList<MetaKeyBean>();
+            Cursor c = database.getReadableDatabase().rawQuery(
+                    MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2}",
+                            MetaKeyBean.GEN_TABLE_NAME,
+                            MetaKeyBean.GEN_FIELD__ID, connection
+                                    .getLastMetaKeyId()),
+                    MetaKeyDialog.EMPTY_ARGS);
+            MetaKeyBean.Gen_populateFromCursor(c, keys, MetaKeyBean.NEW);
+            c.close();
+            if (keys.size() > 0) {
+                lastSentKey = keys.get(0);
+            } else {
+                lastSentKey = null;
+            }
+        }
+        vncCanvas.sendMetaKey(lastSentKey);
+    }
+
+    private void toggleKeyboard() {
+        InputMethodManager inputMgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing()) {
+            try {
+                inputHandler.shutdown();
+                vncCanvas.vncConn.shutdown();
+                vncCanvas.onDestroy();
+                database.close();
+            } catch (NullPointerException e) {
+            }
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent evt) {
+        if (Utils.DEBUG()) Log.d(TAG, "Input: key down: " + evt.toString());
+
+        if (keyCode == KeyEvent.KEYCODE_MENU)
+            return super.onKeyDown(keyCode, evt);
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            // handle right mouse button of USB-OTG devices
+            if (evt.getSource() == InputDevice.SOURCE_MOUSE) {
+                MotionEvent e = MotionEvent.obtain(
+                        SystemClock.uptimeMillis(),
+                        SystemClock.uptimeMillis(),
+                        MotionEvent.ACTION_DOWN,
+                        vncCanvas.mouseX,
+                        vncCanvas.mouseY,
+                        0
+                );
+                vncCanvas.processPointerEvent(e, true, true);
+                return true;
+            }
+
+            if (evt.getFlags() == KeyEvent.FLAG_FROM_SYSTEM) // from hardware keyboard
+                keyCode = KeyEvent.KEYCODE_ESCAPE;
+            else {
+                new AlertDialog.Builder(this)
+                        .setMessage(getString(R.string.disconnect_question))
+                        .setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                vncCanvas.vncConn.shutdown();
+                                finish();
+                            }
+                        }).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Do nothing.
+                    }
+                }).show();
+                return true;
+            }
+        }
+
+        // use search key to toggle soft keyboard
+        if (keyCode == KeyEvent.KEYCODE_SEARCH)
+            toggleKeyboard();
+
+        if (vncCanvas.processLocalKeyEvent(keyCode, evt))
+            return true;
+        return super.onKeyDown(keyCode, evt);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent evt) {
+        if (Utils.DEBUG()) Log.d(TAG, "Input: key up: " + evt.toString());
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // handle right mouse button of USB-OTG devices
+            if (evt.getSource() == InputDevice.SOURCE_MOUSE) {
+                MotionEvent e = MotionEvent.obtain(
+                        SystemClock.uptimeMillis(),
+                        SystemClock.uptimeMillis(),
+                        MotionEvent.ACTION_UP,
+                        vncCanvas.mouseX,
+                        vncCanvas.mouseY,
+                        0
+                );
+                vncCanvas.processPointerEvent(e, false, true);
+                return true;
+            }
+        }
+
+        if (keyCode == KeyEvent.KEYCODE_MENU)
+            return super.onKeyUp(keyCode, evt);
+
+        if (vncCanvas.processLocalKeyEvent(keyCode, evt))
+            return true;
+        return super.onKeyUp(keyCode, evt);
+    }
+
+    // this is called for unicode symbols like €
+    // multiple duplicate key events have occurred in a row, or a complex string is being delivered.
+    // If the key code is not KEYCODE_UNKNOWN then the getRepeatCount() method returns the number of
+    // times the given key code should be executed.
+    // Otherwise, if the key code is KEYCODE_UNKNOWN, then this is a sequence of characters as returned by getCharacters().
+    @Override
+    public boolean onKeyMultiple(int keyCode, int count, KeyEvent evt) {
+        if (Utils.DEBUG()) Log.d(TAG, "Input: key mult: " + evt.toString());
+
+        // we only deal with the special char case for now
+        if (evt.getKeyCode() == KeyEvent.KEYCODE_UNKNOWN) {
+            if (vncCanvas.processLocalKeyEvent(keyCode, evt))
+                return true;
+        }
+
+        return super.onKeyMultiple(keyCode, count, evt);
+    }
+
+    private void selectColorModel() {
+        // Stop repainting the desktop
+        // because the display is composited!
+        vncCanvas.disableRepaints();
+
+        final String[] choices = new String[COLORMODEL.values().length];
+        int currentSelection = -1;
+        for (int i = 0; i < choices.length; i++) {
+            COLORMODEL cm = COLORMODEL.values()[i];
+            choices[i] = cm.toString();
+            if (cm.equals(vncCanvas.vncConn.getColorModel()))
+                currentSelection = i;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setSingleChoiceItems(choices, currentSelection, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                try {
+                    dialog.dismiss();
+                } catch (Exception e) {
+                }
+                COLORMODEL cm = COLORMODEL.values()[item];
+                vncCanvas.vncConn.setColorModel(cm);
+                connection.setColorModel(cm.nameString());
+                Toast.makeText(VncCanvasActivity.this,
+                        "Updating Color Model to " + cm.toString(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.setOnDismissListener(new OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface arg0) {
+                Log.i(TAG, "Color Model Selector dismissed");
+                // Restore desktop repaints
+                vncCanvas.enableRepaints();
+            }
+        });
+        dialog.show();
+    }
+
+    float panTouchX, panTouchY;
+
+    /**
+     * Pan based on touch motions
+     *
+     * @param event
+     */
+    private boolean pan(MotionEvent event) {
+        float curX = event.getX();
+        float curY = event.getY();
+        int dX = (int) (panTouchX - curX);
+        int dY = (int) (panTouchY - curY);
+
+        return vncCanvas.pan(dX, dY);
+    }
+
+    boolean touchPan(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                panTouchX = event.getX();
+                panTouchY = event.getY();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                pan(event);
+                panTouchX = event.getX();
+                panTouchY = event.getY();
+                break;
+            case MotionEvent.ACTION_UP:
+                pan(event);
+                break;
+        }
+        return true;
+    }
+
+    long hideZoomAfterMs;
+    static final long ZOOM_HIDE_DELAY_MS = 2500;
+    HideZoomRunnable hideZoomInstance = new HideZoomRunnable();
+
+    private void showZoomer(boolean force) {
+        if (force || zoomer.getVisibility() != View.VISIBLE) {
+            zoomer.show();
+            hideZoomAfterMs = SystemClock.uptimeMillis() + ZOOM_HIDE_DELAY_MS;
+            vncCanvas.handler
+                    .postAtTime(hideZoomInstance, hideZoomAfterMs + 10);
+        }
+    }
+
+    private class HideZoomRunnable implements Runnable {
+        public void run() {
+            if (SystemClock.uptimeMillis() >= hideZoomAfterMs) {
+                zoomer.hide();
+            }
+        }
+    }
+
+    public void showScaleToast() {
+        // show scale
+        notificationToast.setText(getString(R.string.scale_msg) + " " + (int) (100 * vncCanvas.getScale()) + "%");
+        notificationToast.show();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
+    }
+
+    private void hideSystemUI() {
+        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
+        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        // Set the content to appear under the system bars so that the
+                        // content doesn't resize when the system bars hide and show.
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        // Hide the nav bar and status bar
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    private void invalidateMyOptionsMenu() {
+        invalidateOptionsMenu();
+    }
+
+    /*
+     * Overwrite buggy implementation on Samsung devices where menu would not open when triggered
+     * from FAB. Stolen from https://github.com/EasyRPG/Player/pull/567 :-)
+     */
+    @Override
+    public void openOptionsMenu() {
+
+        Configuration config = getResources().getConfiguration();
+
+        if ((config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+                > Configuration.SCREENLAYOUT_SIZE_LARGE) {
+
+            int originalScreenLayout = config.screenLayout;
+            config.screenLayout = Configuration.SCREENLAYOUT_SIZE_LARGE;
+            super.openOptionsMenu();
+            config.screenLayout = originalScreenLayout;
+        } else {
+            super.openOptionsMenu();
+        }
+    }
 }

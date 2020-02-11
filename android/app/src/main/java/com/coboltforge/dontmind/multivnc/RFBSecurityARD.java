@@ -41,21 +41,21 @@ import javax.crypto.spec.SecretKeySpec;
  * This class implements "Mac Authentication", which uses Diffie-Hellman
  * key agreement (along with MD5 and AES128) to authenticate users to
  * Apple Remote Desktop, the VNC server which is built-in to Mac OS X.
- * 
+ * <p>
  * This authentication technique is based on the following steps:
- * 
+ * <p>
  * 1. Perform Diffie-Hellman key agreement, so both sides have
- *    a shared secret key which can be used for further encryption.
+ * a shared secret key which can be used for further encryption.
  * 2. Take the MD5 hash of this DH secret key to produce a 128-bit
- *    value which we will use as the actual encryption key.
+ * value which we will use as the actual encryption key.
  * 3. Encrypt the username and password with this key using the AES
- *    128-bit symmetric cipher in electronic codebook (ECB) mode.  The
- *    username/password credentials are stored in a 128-byte structure,
- *    with 64 bytes for each, null-terminated.  Ideally, write random
- *    values into the portion of this 128-byte structure which is not
- *    occupied by the username or password, but no further padding for
- *    this block cipher.
- *  
+ * 128-bit symmetric cipher in electronic codebook (ECB) mode.  The
+ * username/password credentials are stored in a 128-byte structure,
+ * with 64 bytes for each, null-terminated.  Ideally, write random
+ * values into the portion of this 128-byte structure which is not
+ * occupied by the username or password, but no further padding for
+ * this block cipher.
+ * <p>
  * The ciphertext from step 3 and the DH public key from step 2
  * are sent to the server.
  */
@@ -63,16 +63,17 @@ public class RFBSecurityARD {
 
     // The type and name identifies this authentication scheme to
     // the rest of the RFB code.
-    
+
     private static final String NAME = "Mac Authentication";
 
     public byte getType() {
         return RfbProto.SecTypeARD;
     }
+
     public String getTypeName() {
         return NAME;
     }
-    
+
     // credentials
     private String username;
     private String password;
@@ -84,27 +85,27 @@ public class RFBSecurityARD {
     private static class DHResult {
         private byte[] publicKey;
         private byte[] privateKey;
-        private byte[] secretKey;        
-    };
+        private byte[] secretKey;
+    }
 
     public RFBSecurityARD(String username, String password) {
         this.username = username;
         this.password = password;
     }
-    
+
     /**
      * Perform Mac (ARD) Authentication on the provided RFBStream using
      * the username and password provided in the constructor.
      */
     public boolean perform(RfbProto rfb) throws IOException {
-        
+
         // 1. read the Diffie-Hellman parameters from the server
         // DH base generator value
         byte[] generator = new byte[2];
         rfb.is.readFully(generator);
 
         // key length in bytes
-        int keyLength =  rfb.is.readShort();
+        int keyLength = rfb.is.readShort();
 
         // predetermined prime modulus
         byte[] prime = new byte[keyLength];
@@ -113,23 +114,23 @@ public class RFBSecurityARD {
         // other party's public key
         byte[] peerKey = new byte[keyLength];
         rfb.is.readFully(peerKey);
-        
+
         // 2. perform Diffie-Hellman key agreement to calculate
         //    the publicKey and privateKey
-        
+
         DHResult dh = performDHKeyAgreement(
-            new BigInteger(+1, prime),
-            new BigInteger(+1, generator),
-            new BigInteger(+1, peerKey),
-            keyLength
+                new BigInteger(+1, prime),
+                new BigInteger(+1, generator),
+                new BigInteger(+1, peerKey),
+                keyLength
         );
-                
+
         // 3. calculate the MD5 hash of the DH shared secret
-        
+
         byte[] secret = performMD5(dh.secretKey);
-        
+
         // 4. ciphertext = AES128(shared, username[64]:password[64]);
-        
+
         byte[] credentials = new byte[128];
         // randomize the padding for security.
         Random random = new SecureRandom();
@@ -140,31 +141,31 @@ public class RFBSecurityARD {
         int passLength = (passBytes.length < 63) ? passBytes.length : 63;
         System.arraycopy(userBytes, 0, credentials, 0, userLength);
         System.arraycopy(passBytes, 0, credentials, 64, passLength);
-        credentials[userLength] = '\0'; 
-        credentials[64+passLength] = '\0'; 
+        credentials[userLength] = '\0';
+        credentials[64 + passLength] = '\0';
         byte[] ciphertext = performAES128(secret, credentials);
 
         // 5. send the ciphertext + DH public key
         rfb.os.write(ciphertext);
         rfb.os.write(dh.publicKey);
-        
+
         return true;
     }
-    
+
     private final static String MSG_NO_SUPPORT =
-        "Your device does not support the required cryptography to perform Mac Authentication.";
+            "Your device does not support the required cryptography to perform Mac Authentication.";
     private final static String MSG_ERROR =
-        "A cryptography error occurred while trying to perform Mac Authentication.";
-    
+            "A cryptography error occurred while trying to perform Mac Authentication.";
+
     private DHResult performDHKeyAgreement(
-        BigInteger prime,
-        BigInteger generator,
-        BigInteger peerKey,
-        int keyLength
+            BigInteger prime,
+            BigInteger generator,
+            BigInteger peerKey,
+            int keyLength
     ) throws IOException {
-        
+
         // fetch instances of all needed Diffie-Hellman support classes
-        
+
         KeyPairGenerator keyPairGenerator;
         KeyAgreement keyAgreement;
         KeyFactory keyFactory;
@@ -178,22 +179,22 @@ public class RFBSecurityARD {
         }
 
         try {
-            
+
             // parse the peerKey
             DHPublicKeySpec peerKeySpec = new DHPublicKeySpec(
-                peerKey,
-                prime,
-                generator
+                    peerKey,
+                    prime,
+                    generator
             );
             DHPublicKey peerPublicKey =
-                (DHPublicKey) keyFactory.generatePublic(peerKeySpec);
-            
+                    (DHPublicKey) keyFactory.generatePublic(peerKeySpec);
+
             // generate my public/private key pair
             keyPairGenerator.initialize(
-                new DHParameterSpec(prime, generator)
+                    new DHParameterSpec(prime, generator)
             );
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            
+
             // perform key agreement
             keyAgreement.init(keyPair.getPrivate());
             keyAgreement.doPhase(peerPublicKey, true);
@@ -203,15 +204,14 @@ public class RFBSecurityARD {
             result.publicKey = keyToBytes(keyPair.getPublic(), keyLength);
             result.privateKey = keyToBytes(keyPair.getPrivate(), keyLength);
             result.secretKey = keyAgreement.generateSecret();
-            
+
             return result;
-            
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
             throw new IOException(MSG_ERROR + " (Key agreement)");
         }
     }
-    
+
     private byte[] performMD5(byte[] input) throws IOException {
         byte[] output;
         try {
@@ -225,10 +225,10 @@ public class RFBSecurityARD {
         }
         return output;
     }
-    
+
     private byte[] performAES128(byte[] key, byte[] plaintext) throws IOException {
         byte[] ciphertext;
-        
+
         try {
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
@@ -238,10 +238,10 @@ public class RFBSecurityARD {
             e.printStackTrace();
             throw new IOException(MSG_ERROR + " (AES128)");
         }
-        
+
         return ciphertext;
     }
-    
+
     /**
      * BigInteger.toByteArray() always includes a sign bit, which adds an
      * extra byte to the front.  This is meaningless and annoying when we
@@ -251,17 +251,17 @@ public class RFBSecurityARD {
         byte[] bytes = bigInteger.toByteArray();
         if (bytes.length > length) {
             byte[] array = new byte[length];
-            System.arraycopy(bytes, bytes.length-length, array, 0, length);
+            System.arraycopy(bytes, bytes.length - length, array, 0, length);
             return array;
         } else if (bytes.length < length) {
             byte[] array = new byte[length];
-            System.arraycopy(bytes, 0, array, length-bytes.length, bytes.length);
+            System.arraycopy(bytes, 0, array, length - bytes.length, bytes.length);
             return array;
         } else {
             return bytes;
         }
     }
-    
+
     /**
      * Extract raw key bytes from a Key object.  This is less than
      * straightforward, since Java loves dealing with DER-encoded
@@ -272,11 +272,11 @@ public class RFBSecurityARD {
             throw new IOException(MSG_ERROR + " (null key to bytes)");
         }
         if (key instanceof DHPublicKey) {
-            return convertBigIntegerToByteArray(((DHPublicKey)key).getY(), length);
+            return convertBigIntegerToByteArray(((DHPublicKey) key).getY(), length);
         } else if (key instanceof DHPrivateKey) {
-            return convertBigIntegerToByteArray(((DHPrivateKey)key).getX(), length);
+            return convertBigIntegerToByteArray(((DHPrivateKey) key).getX(), length);
         } else {
-            throw new IOException(MSG_ERROR + " (key "+key.getClass().getSimpleName()+" to bytes)");
+            throw new IOException(MSG_ERROR + " (key " + key.getClass().getSimpleName() + " to bytes)");
         }
     }
 }

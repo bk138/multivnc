@@ -53,28 +53,28 @@ public abstract class AbstractConnectionBean extends com.antlersoft.android.dbim
 
     // SQL Command for creating the table
     public static String GEN_CREATE = "CREATE TABLE CONNECTION_BEAN (" +
-    "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-    "NICKNAME TEXT," +
-    "ADDRESS TEXT," +
-    "PORT INTEGER," +
-    "PASSWORD TEXT," +
-    "COLORMODEL TEXT," +
-    "FORCEFULL INTEGER," +
-    "REPEATERID TEXT," +
-    "INPUTMODE TEXT," +
-    "SCALEMODE TEXT," +
-    "USELOCALCURSOR INTEGER," +
-    "KEEPPASSWORD INTEGER," +
-    "FOLLOWMOUSE INTEGER," +
-    "USEREPEATER INTEGER," +
-    "METALISTID INTEGER," +
-    "LAST_META_KEY_ID INTEGER," +
-    "FOLLOWPAN INTEGER DEFAULT 0," +
-    "USERNAME TEXT," +
-    "SECURECONNECTIONTYPE TEXT," +
-    "SHOWZOOMBUTTONS INTEGER DEFAULT 1," +
-    "DOUBLE_TAP_ACTION TEXT" +
-    ")";
+            "_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "NICKNAME TEXT," +
+            "ADDRESS TEXT," +
+            "PORT INTEGER," +
+            "PASSWORD TEXT," +
+            "COLORMODEL TEXT," +
+            "FORCEFULL INTEGER," +
+            "REPEATERID TEXT," +
+            "INPUTMODE TEXT," +
+            "SCALEMODE TEXT," +
+            "USELOCALCURSOR INTEGER," +
+            "KEEPPASSWORD INTEGER," +
+            "FOLLOWMOUSE INTEGER," +
+            "USEREPEATER INTEGER," +
+            "METALISTID INTEGER," +
+            "LAST_META_KEY_ID INTEGER," +
+            "FOLLOWPAN INTEGER DEFAULT 0," +
+            "USERNAME TEXT," +
+            "SECURECONNECTIONTYPE TEXT," +
+            "SHOWZOOMBUTTONS INTEGER DEFAULT 1," +
+            "DOUBLE_TAP_ACTION TEXT" +
+            ")";
 
     // Members corresponding to defined fields
     private long gen__Id;
@@ -99,84 +99,205 @@ public abstract class AbstractConnectionBean extends com.antlersoft.android.dbim
     private boolean gen_showZoomButtons;
     private java.lang.String gen_DOUBLE_TAP_ACTION;
 
-
-    public String Gen_tableName() { return GEN_TABLE_NAME; }
+    public String Gen_tableName() {
+        return GEN_TABLE_NAME;
+    }
 
     // Field accessors
-    public long get_Id() { return gen__Id; }
-    public void set_Id(long arg__Id) { gen__Id = arg__Id; }
-    public java.lang.String getNickname() { return gen_nickname; }
-    public void setNickname(java.lang.String arg_nickname) { gen_nickname = arg_nickname; }
-    public java.lang.String getAddress() { return gen_address; }
-    public void setAddress(java.lang.String arg_address) { gen_address = arg_address; }
-    public int getPort() { return gen_port; }
-    public void setPort(int arg_port) { gen_port = arg_port; }
-    public java.lang.String getPassword() { return gen_password; }
-    public void setPassword(java.lang.String arg_password) { gen_password = arg_password; }
-    public java.lang.String getColorModel() { return gen_colorModel; }
-    public void setColorModel(java.lang.String arg_colorModel) { gen_colorModel = arg_colorModel; }
-    public long getForceFull() { return gen_forceFull; }
-    public void setForceFull(long arg_forceFull) { gen_forceFull = arg_forceFull; }
-    public java.lang.String getRepeaterId() { return gen_repeaterId; }
-    public void setRepeaterId(java.lang.String arg_repeaterId) { gen_repeaterId = arg_repeaterId; }
-    public java.lang.String getScaleModeAsString() { return gen_SCALEMODE; }
-    public void setScaleModeAsString(java.lang.String arg_SCALEMODE) { gen_SCALEMODE = arg_SCALEMODE; }
-    public boolean getUseLocalCursor() { return gen_useLocalCursor; }
-    public void setUseLocalCursor(boolean arg_useLocalCursor) { gen_useLocalCursor = arg_useLocalCursor; }
-    public boolean getKeepPassword() { return gen_keepPassword; }
-    public void setKeepPassword(boolean arg_keepPassword) { gen_keepPassword = arg_keepPassword; }
-    public boolean getFollowMouse() { return gen_followMouse; }
-    public void setFollowMouse(boolean arg_followMouse) { gen_followMouse = arg_followMouse; }
-    public boolean getUseRepeater() { return gen_useRepeater; }
-    public void setUseRepeater(boolean arg_useRepeater) { gen_useRepeater = arg_useRepeater; }
-    public long getMetaListId() { return gen_metaListId; }
-    public void setMetaListId(long arg_metaListId) { gen_metaListId = arg_metaListId; }
-    public long getLastMetaKeyId() { return gen_LAST_META_KEY_ID; }
-    public void setLastMetaKeyId(long arg_LAST_META_KEY_ID) { gen_LAST_META_KEY_ID = arg_LAST_META_KEY_ID; }
-    public boolean getFollowPan() { return gen_followPan; }
-    public void setFollowPan(boolean arg_followPan) { gen_followPan = arg_followPan; }
-    public java.lang.String getUserName() { return gen_userName; }
-    public void setUserName(java.lang.String arg_userName) { gen_userName = arg_userName; }
-    public java.lang.String getSecureConnectionType() { return gen_secureConnectionType; }
-    public void setSecureConnectionType(java.lang.String arg_secureConnectionType) { gen_secureConnectionType = arg_secureConnectionType; }
-    public boolean getShowZoomButtons() { return gen_showZoomButtons; }
-    public void setShowZoomButtons(boolean arg_showZoomButtons) { gen_showZoomButtons = arg_showZoomButtons; }
-    public java.lang.String getDoubleTapActionAsString() { return gen_DOUBLE_TAP_ACTION; }
-    public void setDoubleTapActionAsString(java.lang.String arg_DOUBLE_TAP_ACTION) { gen_DOUBLE_TAP_ACTION = arg_DOUBLE_TAP_ACTION; }
+    public long get_Id() {
+        return gen__Id;
+    }
+
+    public void set_Id(long arg__Id) {
+        gen__Id = arg__Id;
+    }
+
+    public java.lang.String getNickname() {
+        return gen_nickname;
+    }
+
+    public void setNickname(java.lang.String arg_nickname) {
+        gen_nickname = arg_nickname;
+    }
+
+    public java.lang.String getAddress() {
+        return gen_address;
+    }
+
+    public void setAddress(java.lang.String arg_address) {
+        gen_address = arg_address;
+    }
+
+    public int getPort() {
+        return gen_port;
+    }
+
+    public void setPort(int arg_port) {
+        gen_port = arg_port;
+    }
+
+    public java.lang.String getPassword() {
+        return gen_password;
+    }
+
+    public void setPassword(java.lang.String arg_password) {
+        gen_password = arg_password;
+    }
+
+    public java.lang.String getColorModel() {
+        return gen_colorModel;
+    }
+
+    public void setColorModel(java.lang.String arg_colorModel) {
+        gen_colorModel = arg_colorModel;
+    }
+
+    public long getForceFull() {
+        return gen_forceFull;
+    }
+
+    public void setForceFull(long arg_forceFull) {
+        gen_forceFull = arg_forceFull;
+    }
+
+    public java.lang.String getRepeaterId() {
+        return gen_repeaterId;
+    }
+
+    public void setRepeaterId(java.lang.String arg_repeaterId) {
+        gen_repeaterId = arg_repeaterId;
+    }
+
+    public java.lang.String getScaleModeAsString() {
+        return gen_SCALEMODE;
+    }
+
+    public void setScaleModeAsString(java.lang.String arg_SCALEMODE) {
+        gen_SCALEMODE = arg_SCALEMODE;
+    }
+
+    public boolean getUseLocalCursor() {
+        return gen_useLocalCursor;
+    }
+
+    public void setUseLocalCursor(boolean arg_useLocalCursor) {
+        gen_useLocalCursor = arg_useLocalCursor;
+    }
+
+    public boolean getKeepPassword() {
+        return gen_keepPassword;
+    }
+
+    public void setKeepPassword(boolean arg_keepPassword) {
+        gen_keepPassword = arg_keepPassword;
+    }
+
+    public boolean getFollowMouse() {
+        return gen_followMouse;
+    }
+
+    public void setFollowMouse(boolean arg_followMouse) {
+        gen_followMouse = arg_followMouse;
+    }
+
+    public boolean getUseRepeater() {
+        return gen_useRepeater;
+    }
+
+    public void setUseRepeater(boolean arg_useRepeater) {
+        gen_useRepeater = arg_useRepeater;
+    }
+
+    public long getMetaListId() {
+        return gen_metaListId;
+    }
+
+    public void setMetaListId(long arg_metaListId) {
+        gen_metaListId = arg_metaListId;
+    }
+
+    public long getLastMetaKeyId() {
+        return gen_LAST_META_KEY_ID;
+    }
+
+    public void setLastMetaKeyId(long arg_LAST_META_KEY_ID) {
+        gen_LAST_META_KEY_ID = arg_LAST_META_KEY_ID;
+    }
+
+    public boolean getFollowPan() {
+        return gen_followPan;
+    }
+
+    public void setFollowPan(boolean arg_followPan) {
+        gen_followPan = arg_followPan;
+    }
+
+    public java.lang.String getUserName() {
+        return gen_userName;
+    }
+
+    public void setUserName(java.lang.String arg_userName) {
+        gen_userName = arg_userName;
+    }
+
+    public java.lang.String getSecureConnectionType() {
+        return gen_secureConnectionType;
+    }
+
+    public void setSecureConnectionType(java.lang.String arg_secureConnectionType) {
+        gen_secureConnectionType = arg_secureConnectionType;
+    }
+
+    public boolean getShowZoomButtons() {
+        return gen_showZoomButtons;
+    }
+
+    public void setShowZoomButtons(boolean arg_showZoomButtons) {
+        gen_showZoomButtons = arg_showZoomButtons;
+    }
+
+    public java.lang.String getDoubleTapActionAsString() {
+        return gen_DOUBLE_TAP_ACTION;
+    }
+
+    public void setDoubleTapActionAsString(java.lang.String arg_DOUBLE_TAP_ACTION) {
+        gen_DOUBLE_TAP_ACTION = arg_DOUBLE_TAP_ACTION;
+    }
 
     public android.content.ContentValues Gen_getValues() {
-        android.content.ContentValues values=new android.content.ContentValues();
-        values.put(GEN_FIELD__ID,Long.toString(this.gen__Id));
-        values.put(GEN_FIELD_NICKNAME,this.gen_nickname);
-        values.put(GEN_FIELD_ADDRESS,this.gen_address);
-        values.put(GEN_FIELD_PORT,Integer.toString(this.gen_port));
-        values.put(GEN_FIELD_PASSWORD,this.gen_password);
-        values.put(GEN_FIELD_COLORMODEL,this.gen_colorModel);
-        values.put(GEN_FIELD_FORCEFULL,Long.toString(this.gen_forceFull));
-        values.put(GEN_FIELD_REPEATERID,this.gen_repeaterId);
-        values.put(GEN_FIELD_INPUTMODE,this.gen_inputMode);
-        values.put(GEN_FIELD_SCALEMODE,this.gen_SCALEMODE);
-        values.put(GEN_FIELD_USELOCALCURSOR,(this.gen_useLocalCursor ? "1" : "0"));
-        values.put(GEN_FIELD_KEEPPASSWORD,(this.gen_keepPassword ? "1" : "0"));
-        values.put(GEN_FIELD_FOLLOWMOUSE,(this.gen_followMouse ? "1" : "0"));
-        values.put(GEN_FIELD_USEREPEATER,(this.gen_useRepeater ? "1" : "0"));
-        values.put(GEN_FIELD_METALISTID,Long.toString(this.gen_metaListId));
-        values.put(GEN_FIELD_LAST_META_KEY_ID,Long.toString(this.gen_LAST_META_KEY_ID));
-        values.put(GEN_FIELD_FOLLOWPAN,(this.gen_followPan ? "1" : "0"));
-        values.put(GEN_FIELD_USERNAME,this.gen_userName);
-        values.put(GEN_FIELD_SECURECONNECTIONTYPE,this.gen_secureConnectionType);
-        values.put(GEN_FIELD_SHOWZOOMBUTTONS,(this.gen_showZoomButtons ? "1" : "0"));
-        values.put(GEN_FIELD_DOUBLE_TAP_ACTION,this.gen_DOUBLE_TAP_ACTION);
+        android.content.ContentValues values = new android.content.ContentValues();
+        values.put(GEN_FIELD__ID, Long.toString(this.gen__Id));
+        values.put(GEN_FIELD_NICKNAME, this.gen_nickname);
+        values.put(GEN_FIELD_ADDRESS, this.gen_address);
+        values.put(GEN_FIELD_PORT, Integer.toString(this.gen_port));
+        values.put(GEN_FIELD_PASSWORD, this.gen_password);
+        values.put(GEN_FIELD_COLORMODEL, this.gen_colorModel);
+        values.put(GEN_FIELD_FORCEFULL, Long.toString(this.gen_forceFull));
+        values.put(GEN_FIELD_REPEATERID, this.gen_repeaterId);
+        values.put(GEN_FIELD_INPUTMODE, this.gen_inputMode);
+        values.put(GEN_FIELD_SCALEMODE, this.gen_SCALEMODE);
+        values.put(GEN_FIELD_USELOCALCURSOR, (this.gen_useLocalCursor ? "1" : "0"));
+        values.put(GEN_FIELD_KEEPPASSWORD, (this.gen_keepPassword ? "1" : "0"));
+        values.put(GEN_FIELD_FOLLOWMOUSE, (this.gen_followMouse ? "1" : "0"));
+        values.put(GEN_FIELD_USEREPEATER, (this.gen_useRepeater ? "1" : "0"));
+        values.put(GEN_FIELD_METALISTID, Long.toString(this.gen_metaListId));
+        values.put(GEN_FIELD_LAST_META_KEY_ID, Long.toString(this.gen_LAST_META_KEY_ID));
+        values.put(GEN_FIELD_FOLLOWPAN, (this.gen_followPan ? "1" : "0"));
+        values.put(GEN_FIELD_USERNAME, this.gen_userName);
+        values.put(GEN_FIELD_SECURECONNECTIONTYPE, this.gen_secureConnectionType);
+        values.put(GEN_FIELD_SHOWZOOMBUTTONS, (this.gen_showZoomButtons ? "1" : "0"));
+        values.put(GEN_FIELD_DOUBLE_TAP_ACTION, this.gen_DOUBLE_TAP_ACTION);
         return values;
     }
 
     /**
      * Return an array that gives the column index in the cursor for each field defined
+     *
      * @param cursor Database cursor over some columns, possibly including this table
      * @return array of column indices; -1 if the column with that id is not in cursor
      */
     public int[] Gen_columnIndices(android.database.Cursor cursor) {
-        int[] result=new int[GEN_COUNT];
+        int[] result = new int[GEN_COUNT];
         result[0] = cursor.getColumnIndex(GEN_FIELD__ID);
         // Make compatible with database generated by older version of plugin with uppercase column name
         if (result[0] == -1) {
@@ -206,82 +327,82 @@ public abstract class AbstractConnectionBean extends com.antlersoft.android.dbim
     }
 
     /**
-     * Populate one instance from a cursor 
+     * Populate one instance from a cursor
      */
-    public void Gen_populate(android.database.Cursor cursor,int[] columnIndices) {
-        if ( columnIndices[GEN_ID__ID] >= 0 && ! cursor.isNull(columnIndices[GEN_ID__ID])) {
+    public void Gen_populate(android.database.Cursor cursor, int[] columnIndices) {
+        if (columnIndices[GEN_ID__ID] >= 0 && !cursor.isNull(columnIndices[GEN_ID__ID])) {
             gen__Id = cursor.getLong(columnIndices[GEN_ID__ID]);
         }
-        if ( columnIndices[GEN_ID_NICKNAME] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_NICKNAME])) {
+        if (columnIndices[GEN_ID_NICKNAME] >= 0 && !cursor.isNull(columnIndices[GEN_ID_NICKNAME])) {
             gen_nickname = cursor.getString(columnIndices[GEN_ID_NICKNAME]);
         }
-        if ( columnIndices[GEN_ID_ADDRESS] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_ADDRESS])) {
+        if (columnIndices[GEN_ID_ADDRESS] >= 0 && !cursor.isNull(columnIndices[GEN_ID_ADDRESS])) {
             gen_address = cursor.getString(columnIndices[GEN_ID_ADDRESS]);
         }
-        if ( columnIndices[GEN_ID_PORT] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_PORT])) {
-            gen_port = (int)cursor.getInt(columnIndices[GEN_ID_PORT]);
+        if (columnIndices[GEN_ID_PORT] >= 0 && !cursor.isNull(columnIndices[GEN_ID_PORT])) {
+            gen_port = (int) cursor.getInt(columnIndices[GEN_ID_PORT]);
         }
-        if ( columnIndices[GEN_ID_PASSWORD] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_PASSWORD])) {
+        if (columnIndices[GEN_ID_PASSWORD] >= 0 && !cursor.isNull(columnIndices[GEN_ID_PASSWORD])) {
             gen_password = cursor.getString(columnIndices[GEN_ID_PASSWORD]);
         }
-        if ( columnIndices[GEN_ID_COLORMODEL] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_COLORMODEL])) {
+        if (columnIndices[GEN_ID_COLORMODEL] >= 0 && !cursor.isNull(columnIndices[GEN_ID_COLORMODEL])) {
             gen_colorModel = cursor.getString(columnIndices[GEN_ID_COLORMODEL]);
         }
-        if ( columnIndices[GEN_ID_FORCEFULL] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_FORCEFULL])) {
+        if (columnIndices[GEN_ID_FORCEFULL] >= 0 && !cursor.isNull(columnIndices[GEN_ID_FORCEFULL])) {
             gen_forceFull = cursor.getLong(columnIndices[GEN_ID_FORCEFULL]);
         }
-        if ( columnIndices[GEN_ID_REPEATERID] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_REPEATERID])) {
+        if (columnIndices[GEN_ID_REPEATERID] >= 0 && !cursor.isNull(columnIndices[GEN_ID_REPEATERID])) {
             gen_repeaterId = cursor.getString(columnIndices[GEN_ID_REPEATERID]);
         }
-        if ( columnIndices[GEN_ID_INPUTMODE] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_INPUTMODE])) {
+        if (columnIndices[GEN_ID_INPUTMODE] >= 0 && !cursor.isNull(columnIndices[GEN_ID_INPUTMODE])) {
             gen_inputMode = cursor.getString(columnIndices[GEN_ID_INPUTMODE]);
         }
-        if ( columnIndices[GEN_ID_SCALEMODE] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_SCALEMODE])) {
+        if (columnIndices[GEN_ID_SCALEMODE] >= 0 && !cursor.isNull(columnIndices[GEN_ID_SCALEMODE])) {
             gen_SCALEMODE = cursor.getString(columnIndices[GEN_ID_SCALEMODE]);
         }
-        if ( columnIndices[GEN_ID_USELOCALCURSOR] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_USELOCALCURSOR])) {
+        if (columnIndices[GEN_ID_USELOCALCURSOR] >= 0 && !cursor.isNull(columnIndices[GEN_ID_USELOCALCURSOR])) {
             gen_useLocalCursor = (cursor.getInt(columnIndices[GEN_ID_USELOCALCURSOR]) != 0);
         }
-        if ( columnIndices[GEN_ID_KEEPPASSWORD] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_KEEPPASSWORD])) {
+        if (columnIndices[GEN_ID_KEEPPASSWORD] >= 0 && !cursor.isNull(columnIndices[GEN_ID_KEEPPASSWORD])) {
             gen_keepPassword = (cursor.getInt(columnIndices[GEN_ID_KEEPPASSWORD]) != 0);
         }
-        if ( columnIndices[GEN_ID_FOLLOWMOUSE] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_FOLLOWMOUSE])) {
+        if (columnIndices[GEN_ID_FOLLOWMOUSE] >= 0 && !cursor.isNull(columnIndices[GEN_ID_FOLLOWMOUSE])) {
             gen_followMouse = (cursor.getInt(columnIndices[GEN_ID_FOLLOWMOUSE]) != 0);
         }
-        if ( columnIndices[GEN_ID_USEREPEATER] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_USEREPEATER])) {
+        if (columnIndices[GEN_ID_USEREPEATER] >= 0 && !cursor.isNull(columnIndices[GEN_ID_USEREPEATER])) {
             gen_useRepeater = (cursor.getInt(columnIndices[GEN_ID_USEREPEATER]) != 0);
         }
-        if ( columnIndices[GEN_ID_METALISTID] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_METALISTID])) {
+        if (columnIndices[GEN_ID_METALISTID] >= 0 && !cursor.isNull(columnIndices[GEN_ID_METALISTID])) {
             gen_metaListId = cursor.getLong(columnIndices[GEN_ID_METALISTID]);
         }
-        if ( columnIndices[GEN_ID_LAST_META_KEY_ID] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_LAST_META_KEY_ID])) {
+        if (columnIndices[GEN_ID_LAST_META_KEY_ID] >= 0 && !cursor.isNull(columnIndices[GEN_ID_LAST_META_KEY_ID])) {
             gen_LAST_META_KEY_ID = cursor.getLong(columnIndices[GEN_ID_LAST_META_KEY_ID]);
         }
-        if ( columnIndices[GEN_ID_FOLLOWPAN] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_FOLLOWPAN])) {
+        if (columnIndices[GEN_ID_FOLLOWPAN] >= 0 && !cursor.isNull(columnIndices[GEN_ID_FOLLOWPAN])) {
             gen_followPan = (cursor.getInt(columnIndices[GEN_ID_FOLLOWPAN]) != 0);
         }
-        if ( columnIndices[GEN_ID_USERNAME] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_USERNAME])) {
+        if (columnIndices[GEN_ID_USERNAME] >= 0 && !cursor.isNull(columnIndices[GEN_ID_USERNAME])) {
             gen_userName = cursor.getString(columnIndices[GEN_ID_USERNAME]);
         }
-        if ( columnIndices[GEN_ID_SECURECONNECTIONTYPE] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_SECURECONNECTIONTYPE])) {
+        if (columnIndices[GEN_ID_SECURECONNECTIONTYPE] >= 0 && !cursor.isNull(columnIndices[GEN_ID_SECURECONNECTIONTYPE])) {
             gen_secureConnectionType = cursor.getString(columnIndices[GEN_ID_SECURECONNECTIONTYPE]);
         }
-        if ( columnIndices[GEN_ID_SHOWZOOMBUTTONS] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_SHOWZOOMBUTTONS])) {
+        if (columnIndices[GEN_ID_SHOWZOOMBUTTONS] >= 0 && !cursor.isNull(columnIndices[GEN_ID_SHOWZOOMBUTTONS])) {
             gen_showZoomButtons = (cursor.getInt(columnIndices[GEN_ID_SHOWZOOMBUTTONS]) != 0);
         }
-        if ( columnIndices[GEN_ID_DOUBLE_TAP_ACTION] >= 0 && ! cursor.isNull(columnIndices[GEN_ID_DOUBLE_TAP_ACTION])) {
+        if (columnIndices[GEN_ID_DOUBLE_TAP_ACTION] >= 0 && !cursor.isNull(columnIndices[GEN_ID_DOUBLE_TAP_ACTION])) {
             gen_DOUBLE_TAP_ACTION = cursor.getString(columnIndices[GEN_ID_DOUBLE_TAP_ACTION]);
         }
     }
 
     /**
-     * Populate one instance from a ContentValues 
+     * Populate one instance from a ContentValues
      */
     public void Gen_populate(android.content.ContentValues values) {
         gen__Id = values.getAsLong(GEN_FIELD__ID);
         gen_nickname = values.getAsString(GEN_FIELD_NICKNAME);
         gen_address = values.getAsString(GEN_FIELD_ADDRESS);
-        gen_port = (int)values.getAsInteger(GEN_FIELD_PORT);
+        gen_port = (int) values.getAsInteger(GEN_FIELD_PORT);
         gen_password = values.getAsString(GEN_FIELD_PASSWORD);
         gen_colorModel = values.getAsString(GEN_FIELD_COLORMODEL);
         gen_forceFull = values.getAsLong(GEN_FIELD_FORCEFULL);

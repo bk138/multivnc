@@ -8,24 +8,31 @@ import com.antlersoft.android.db.TableInterface;
 
 /**
  * @author Michael A. MacDonald
- *
  */
-@TableInterface(TableName="META_KEY",ImplementingClassName="AbstractMetaKeyBean")
+@TableInterface(TableName = "META_KEY", ImplementingClassName = "AbstractMetaKeyBean")
 public interface IMetaKey {
-	@FieldAccessor
-	long get_Id();
-	@FieldAccessor
-	long getMetaListId();
-	@FieldAccessor
-	String getKeyDesc();
-	@FieldAccessor
-	int getMetaFlags();
-	@FieldAccessor
-	boolean isMouseClick();
-	@FieldAccessor
-	int getMouseButtons();
-	@FieldAccessor
-	int getKeySym();
-	@FieldAccessor
-	String getShortcut();
+
+    @FieldAccessor
+    long get_Id();
+
+    @FieldAccessor
+    long getMetaListId();
+
+    @FieldAccessor
+    String getKeyDesc();
+
+    @FieldAccessor
+    int getMetaFlags();
+
+    @FieldAccessor
+    boolean isMouseClick();
+
+    @FieldAccessor
+    int getMouseButtons();
+
+    @FieldAccessor
+    int getKeySym();
+
+    @FieldAccessor
+    String getShortcut();
 }
