@@ -1,66 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:padding="10dip"
-	android:orientation="vertical"
-		>
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		>
-		<CheckBox android:id="@+id/checkboxShift"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/shift_check"
-			android:layout_weight="0"
-			android:layout_margin="3dip"
-		/>
-		<CheckBox android:id="@+id/checkboxCtrl"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/control_check"
-			android:layout_weight="0"
-			android:layout_margin="3dip"
-		/>
-		<CheckBox android:id="@+id/checkboxAlt"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/alt_check"
-			android:layout_weight="0"
-			android:layout_margin="3dip"
-		/>
-		<CheckBox android:id="@+id/checkboxSuper"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/super_check"
-			android:layout_weight="0"
-			android:layout_margin="3dip"
-			/>
-		<Spinner android:id="@+id/spinnerKeySelect"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-            android:layout_weight="1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="10dip">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkboxShift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="3dip"
-		/>
-	</LinearLayout>
-	<LinearLayout
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		>
-		<Button android:id="@+id/buttonSend"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/send_button"
-		/>
-		<TextView android:id="@+id/textKeyDesc"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:textAppearance="?android:attr/textAppearanceLarge"
-			android:layout_marginLeft="10dip"
-		/>
-	</LinearLayout>
-	<ImageView android:layout_width="fill_parent" android:layout_height="wrap_content" android:src="@android:drawable/divider_horizontal_bright"/>
+            android:layout_weight="0"
+            android:text="@string/shift_check" />
+
+        <CheckBox
+            android:id="@+id/checkboxCtrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dip"
+            android:layout_weight="0"
+            android:text="@string/control_check" />
+
+        <CheckBox
+            android:id="@+id/checkboxAlt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dip"
+            android:layout_weight="0"
+            android:text="@string/alt_check" />
+
+        <CheckBox
+            android:id="@+id/checkboxSuper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dip"
+            android:layout_weight="0"
+            android:text="@string/super_check" />
+
+        <Spinner
+            android:id="@+id/spinnerKeySelect"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dip"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send_button" />
+
+        <TextView
+            android:id="@+id/textKeyDesc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/divider_horizontal_bright" />
+
 </LinearLayout>

@@ -1,82 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:flattr_sdk="http://schemas.flattr4android.com/sdk"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_vertical">
 
-	  <ScrollView
-		android:layout_gravity="center_vertical"
-		 android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="10dip"
+            android:paddingTop="10dp">
 
-	<LinearLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:gravity="center_horizontal"
-	    android:orientation="vertical"
-	    android:padding="10dip"
-	    android:paddingTop="10dp" >
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="80dip"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_launcher" />
 
-		<ImageView 
-			android:layout_width="fill_parent" android:layout_height="80dip"
-			android:scaleType="fitCenter" android:src="@drawable/ic_launcher">
-		</ImageView>
-		<TextView android:id="@+id/TextViewVersion"
-			android:textSize="7pt"
-			android:gravity="center_vertical|center_horizontal"
-			android:layout_width="fill_parent" android:layout_height="wrap_content"
-			android:paddingBottom="10dp"
-		/>
+            <TextView
+                android:id="@+id/TextViewVersion"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingBottom="10dp"
+                android:textSize="7pt" />
 
-		        <TextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginBottom="10dip"
                 android:layout_marginTop="10dip"
+                android:layout_marginBottom="10dip"
                 android:autoLink="web"
+                android:gravity="center"
                 android:padding="10dip"
-                android:text="@string/madeby"
-                />
+                android:text="@string/madeby" />
 
-
-		        <Button
-		            android:id="@+id/love_button"
+            <Button
+                android:id="@+id/love_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dip"
-                android:text="@string/pleaserate"
-                android:drawableTop="@drawable/ic_heart"
                 android:background="@android:color/transparent"
-                />
+                android:drawableTop="@drawable/ic_heart"
+                android:text="@string/pleaserate" />
 
-		<ImageButton android:id="@+id/liberapay_button"
-			android:clickable="true" android:src="@drawable/ic_liberapay_logo"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_gravity="center"
-			android:padding="0dip"
-			android:layout_marginBottom="20dip"	 />
+            <ImageButton
+                android:id="@+id/liberapay_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dip"
+                android:clickable="true"
+                android:padding="0dip"
+                android:src="@drawable/ic_liberapay_logo" />
 
-		<ImageButton android:id="@+id/patreon_button"
-			android:clickable="true" android:src="@drawable/ic_patreon_logo"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_gravity="center"
-			android:padding="0dip"
-			android:layout_marginBottom="20dip"	 />
+            <ImageButton
+                android:id="@+id/patreon_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dip"
+                android:clickable="true"
+                android:padding="0dip"
+                android:src="@drawable/ic_patreon_logo" />
 
-				<ImageButton android:id="@+id/paypal_button"
-					android:clickable="true" android:src="@drawable/ic_paypal_logo"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content" android:layout_gravity="center"
-					android:padding="0dip"
-					android:layout_marginBottom="20dip"	 />
+            <ImageButton
+                android:id="@+id/paypal_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dip"
+                android:clickable="true"
+                android:padding="0dip"
+                android:src="@drawable/ic_paypal_logo" />
 
-
-      </LinearLayout>
-
- </ScrollView>
-
-
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
-

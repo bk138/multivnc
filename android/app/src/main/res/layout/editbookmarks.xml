@@ -2,22 +2,21 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:scrollbars="vertical" >
+    android:scrollbars="vertical">
 
     <!-- this is focusable to start with view focus here! -->
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical"
-        android:padding="10dip" >
+        android:padding="10dip">
 
         <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="10dip" >
+            android:padding="10dip">
 
             <TableRow>
 
@@ -114,7 +113,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="horizontal" >
+                    android:orientation="horizontal">
 
                     <EditText
                         android:id="@+id/textPASSWORDBookmark"
@@ -151,65 +150,65 @@
             </TableRow>
         </TableLayout>
         <!--
-			<TextView
-			    android:layout_height="wrap_content"
-			    android:layout_width="wrap_content"
-			    android:layout_gravity="left|center_vertical"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:text="@string/color_format_caption"
-			/>
-			<Spinner 
-			    android:id="@+id/colorformat" 
-			    android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-			/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/color_format_caption"
+            />
+            <Spinner
+                android:id="@+id/colorformat"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+            />
         -->
 
 
         <!--
-			<LinearLayout
-				android:orientation="horizontal"
-				android:padding="10dp"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				>
-				<TextView
-					android:text="@string/force_full_check"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					/> 
-				<RadioGroup
-					android:id="@+id/groupForceFullScreen"
-					android:orientation="horizontal"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					>
-					<RadioButton
-						android:id="@+id/radioForceFullScreenAuto"
-					    android:text="@string/auto"
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content"
-					/>
-					<RadioButton
-						android:id="@+id/radioForceFullScreenOn"
-					    android:text="@string/on"
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content"
-					/>
-					<RadioButton
-						android:id="@+id/radioForceFullScreenOff"
-					    android:text="@string/off"
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content"
-					/>
-				</RadioGroup>
-			</LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                >
+                <TextView
+                    android:text="@string/force_full_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                <RadioGroup
+                    android:id="@+id/groupForceFullScreen"
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <RadioButton
+                        android:id="@+id/radioForceFullScreenAuto"
+                        android:text="@string/auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                    />
+                    <RadioButton
+                        android:id="@+id/radioForceFullScreenOn"
+                        android:text="@string/on"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                    />
+                    <RadioButton
+                        android:id="@+id/radioForceFullScreenOff"
+                        android:text="@string/off"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                    />
+                </RadioGroup>
+            </LinearLayout>
         -->
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/buttonSaveBookmark"
@@ -226,7 +225,7 @@
                 android:layout_margin="10dip"
                 android:layout_weight="1"
                 android:text="@android:string/cancel" />
+
         </LinearLayout>
     </LinearLayout>
-
 </ScrollView>

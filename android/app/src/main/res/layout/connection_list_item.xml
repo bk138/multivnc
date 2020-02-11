@@ -1,46 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:orientation="vertical"
-	android:padding="5dp"
-  >
-  <TextView
-  	android:layout_width="fill_parent"
-  	android:layout_height="wrap_content"
-  	android:id="@+id/list_text_nickname"
-  	android:textStyle="bold"
-  	/>
-  <LinearLayout
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:orientation="horizontal"
-  	>
-	  <TextView
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:id="@+id/list_text_address"
-	  	/>
-	  <TextView
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:text=":"
-	  	/> 	
-	  <TextView
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:id="@+id/list_text_port"
-	  	/> 	
-	  <TextView
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:text=" "
-	  	/> 	
-	  <TextView
-	  	android:layout_width="wrap_content"
-	  	android:layout_height="wrap_content"
-	  	android:id="@+id/list_text_repeater"
-	  	/> 	
-  </LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/list_text_nickname"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/list_text_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":" />
+
+        <TextView
+            android:id="@+id/list_text_port"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" " />
+
+        <TextView
+            android:id="@+id/list_text_repeater"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 </LinearLayout>

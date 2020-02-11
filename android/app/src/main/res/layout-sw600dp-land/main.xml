@@ -2,21 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal" >
+    android:orientation="horizontal">
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
         android:layout_marginRight="50dp"
-        android:scrollbars="vertical" >
+        android:layout_weight="1"
+        android:scrollbars="vertical">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:focusable="true"
             android:orientation="vertical"
-            android:padding="10dip" >
+            android:padding="10dip">
 
             <include
                 android:id="@+id/discovered_servers"
@@ -25,6 +25,7 @@
             <include
                 android:id="@+id/bookmarks"
                 layout="@layout/bookmarks_element" />
+
         </LinearLayout>
     </ScrollView>
 
@@ -32,22 +33,21 @@
         android:layout_width="0dp"
         android:layout_height="fill_parent"
         android:layout_weight="1"
-        android:scrollbars="vertical" >
+        android:scrollbars="vertical">
 
         <!-- this is focusable to start with view focus here! -->
-
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:orientation="vertical"
-            android:padding="10dip" >
+            android:padding="10dip">
 
             <include
                 android:id="@+id/new_conn"
                 layout="@layout/new_conn_element" />
+
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

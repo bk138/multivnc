@@ -1,58 +1,51 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/itemSpecialKeys"
-        android:title="@string/special_keys"/>
+        android:title="@string/special_keys" />
 
     <item
         android:id="@+id/itemSendKeyAgain"
-        android:title="@string/send_key_again"/>
+        android:title="@string/send_key_again" />
 
     <item
         android:id="@+id/itemToggleKeyboard"
-        android:title="@string/toggle_keyboard">
-    </item>
+        android:title="@string/toggle_keyboard" />
 
     <item
         android:id="@+id/itemToggleFramebufferUpdate"
-        android:title="@string/toggle_framebuffer_update">
-    </item>
+        android:title="@string/toggle_framebuffer_update"/>
 
     <item
         android:id="@+id/itemToggleMouseButtons"
-        android:title="@string/toggle_mouse_buttons">
-    </item>
+        android:title="@string/toggle_mouse_buttons"/>
 
     <item
         android:id="@+id/itemTogglePointerHighlight"
-        android:title="@string/toggle_pointer_highlight">
-    </item>
+        android:title="@string/toggle_pointer_highlight" />
 
     <item
         android:id="@+id/itemColorMode"
-        android:title="@string/color_mode">
-    </item>
+        android:title="@string/color_mode" />
 
     <item
         android:id="@+id/itemInfo"
-        android:title="@string/info">
-    </item>
+        android:title="@string/info" />
 
     <item
         android:id="@+id/itemSaveBookmark"
-        android:title="@string/savebookmark_button">
-    </item>
+        android:title="@string/savebookmark_button" />
 
     <item
         android:id="@+id/itemHelp"
-        android:title="@string/help"/>
+        android:title="@string/help" />
 
-     <item
+    <item
         android:id="@+id/itemAbout"
-        android:title="@string/about"/>
+        android:title="@string/about" />
 
-     <item
+    <item
         android:id="@+id/itemDisconnect"
-        android:title="@string/disconnect"/>
+        android:title="@string/disconnect" />
 
 </menu>

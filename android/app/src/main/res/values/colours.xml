@@ -14,5 +14,4 @@
     <color name="ui_text">@android:color/black</color>
     <color name="ui_background">@android:color/white</color>
 
-
 </resources>

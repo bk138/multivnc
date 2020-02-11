@@ -1,83 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
+    android:orientation="vertical">
 
-	<com.coboltforge.dontmind.multivnc.VncCanvas
-    	android:id="@+id/vnc_canvas"
-    	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
-    	android:layout_gravity="bottom|center"
-		android:focusableInTouchMode="true"
-    	>
-	</com.coboltforge.dontmind.multivnc.VncCanvas>
+    <com.coboltforge.dontmind.multivnc.VncCanvas
+        android:id="@+id/vnc_canvas"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom|center"
+        android:focusableInTouchMode="true" />
 
-	<com.coboltforge.dontmind.multivnc.TouchPointView
-    	android:id="@+id/touchpoints"
-    	android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
-    	android:layout_gravity="bottom|center"
-    	android:visibility="gone"
-    />
+    <com.coboltforge.dontmind.multivnc.TouchPointView
+        android:id="@+id/touchpoints"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom|center"
+        android:visibility="gone" />
 
-	<com.coboltforge.dontmind.multivnc.ZoomControls
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/zoomer"
-		android:layout_gravity="center|top"
-		/>
+    <com.coboltforge.dontmind.multivnc.ZoomControls
+        android:id="@+id/zoomer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|top" />
 
-	<com.google.android.material.floatingactionbutton.FloatingActionButton
-		android:id="@+id/fab"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="end|top"
-		android:src="@drawable/ic_menu_black_24dp"
-		android:alpha="0.6"
-		android:layout_margin="16dp" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:layout_margin="16dp"
+        android:alpha="0.6"
+        android:src="@drawable/ic_menu_black_24dp" />
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:orientation="vertical">
 
-	<LinearLayout
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center|bottom">
+        <LinearLayout
+            android:id="@+id/virtualmousebuttons"
+            android:layout_width="fill_parent"
+            android:layout_height="70dip"
+            android:orientation="horizontal">
 
+            <com.coboltforge.dontmind.multivnc.MouseButtonView
+                android:id="@+id/mousebutton1"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:background="#997f7f7f"
+                android:gravity="center_horizontal" />
 
+            <com.coboltforge.dontmind.multivnc.MouseButtonView
+                android:id="@+id/mousebutton2"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:background="#bb7f7f7f"
+                android:gravity="center_horizontal" />
 
-	  <LinearLayout
-	      android:id="@+id/virtualmousebuttons"
-	      android:orientation="horizontal"
-	      android:layout_width="fill_parent"
-	      android:layout_height="70dip">
-	      <com.coboltforge.dontmind.multivnc.MouseButtonView
-	      	  android:id="@+id/mousebutton1"
-	          android:gravity="center_horizontal"
-	          android:background="#997f7f7f"
-	          android:layout_width="wrap_content"
-	          android:layout_height="fill_parent"
-	          android:layout_weight="1"/>
-	      <com.coboltforge.dontmind.multivnc.MouseButtonView
-	       	  android:id="@+id/mousebutton2"
-	          android:gravity="center_horizontal"
-	          android:background="#bb7f7f7f"
-	          android:layout_width="wrap_content"
-	          android:layout_height="fill_parent"
-	          android:layout_weight="1"/>
-	      <com.coboltforge.dontmind.multivnc.MouseButtonView
-	          android:id="@+id/mousebutton3"
-	          android:gravity="center_horizontal"
-	          android:background="#997f7f7f"
-	          android:layout_width="wrap_content"
-	          android:layout_height="fill_parent"
-	          android:layout_weight="1"/>
+            <com.coboltforge.dontmind.multivnc.MouseButtonView
+                android:id="@+id/mousebutton3"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:background="#997f7f7f"
+                android:gravity="center_horizontal" />
 
-	  </LinearLayout>
-
-	 </LinearLayout>
-
-
+        </LinearLayout>
+    </LinearLayout>
 </merge>

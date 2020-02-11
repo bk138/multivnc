@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dip"
         android:paddingTop="10dip"
+        android:paddingBottom="10dip"
         android:text="@string/new_connection"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dip" >
+        android:padding="10dip">
 
         <TableRow>
 
@@ -27,8 +27,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:singleLine="true"
-                android:inputType="text" />
+                android:inputType="text"
+                android:singleLine="true" />
         </TableRow>
 
         <TableRow>
@@ -93,7 +93,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/textPASSWORD"
@@ -130,59 +130,59 @@
         </TableRow>
     </TableLayout>
     <!--
-			<TextView
-			    android:layout_height="wrap_content"
-			    android:layout_width="wrap_content"
-			    android:layout_gravity="left|center_vertical"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:text="@string/color_format_caption"
-			/>
-			<Spinner 
-			    android:id="@+id/colorformat" 
-			    android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-			/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/color_format_caption"
+            />
+            <Spinner 
+                android:id="@+id/colorformat" 
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+            />
     -->
 
 
     <!--
-			<LinearLayout
-				android:orientation="horizontal"
-				android:padding="10dp"
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				>
-				<TextView
-					android:text="@string/force_full_check"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					/> 
-				<RadioGroup
-					android:id="@+id/groupForceFullScreen"
-					android:orientation="horizontal"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					>
-					<RadioButton
-						android:id="@+id/radioForceFullScreenAuto"
-					    android:text="@string/auto"
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content"
-					/>
-					<RadioButton
-						android:id="@+id/radioForceFullScreenOn"
-					    android:text="@string/on"
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content"
-					/>
-					<RadioButton
-						android:id="@+id/radioForceFullScreenOff"
-					    android:text="@string/off"
-					    android:layout_width="wrap_content"
-					    android:layout_height="wrap_content"
-					/>
-				</RadioGroup>
-			</LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                >
+                <TextView
+                    android:text="@string/force_full_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    /> 
+                <RadioGroup
+                    android:id="@+id/groupForceFullScreen"
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <RadioButton
+                        android:id="@+id/radioForceFullScreenAuto"
+                        android:text="@string/auto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                    />
+                    <RadioButton
+                        android:id="@+id/radioForceFullScreenOn"
+                        android:text="@string/on"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                    />
+                    <RadioButton
+                        android:id="@+id/radioForceFullScreenOff"
+                        android:text="@string/off"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                    />
+                </RadioGroup>
+            </LinearLayout>
     -->
 
     <Button

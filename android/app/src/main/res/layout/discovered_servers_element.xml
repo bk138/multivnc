@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dip"
         android:paddingTop="10dip"
+        android:paddingBottom="10dip"
         android:text="@string/discovered_servers"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-      <ProgressBar
+    <ProgressBar
         android:id="@+id/discovered_servers_waitwheel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:visibility="gone" />
-    
+
     <LinearLayout
         android:id="@+id/discovered_servers_list"
         android:layout_width="fill_parent"
