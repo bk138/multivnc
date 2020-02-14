@@ -401,6 +401,18 @@ public class VncCanvas extends GLSurfaceView {
 		super.onPause();
 	}
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        // Synchronize absoluteXPosition & absoluteYPosition with new size.
+        // We use pan() with delta 0 to trigger their re-calculation.
+        //
+        // oldw & oldh will be 0 if we are just now added to activity.
+        if (oldw != 0 || oldh != 0) {
+            pan(0, 0);
+        }
+    }
 
 
 	/*
