@@ -531,7 +531,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
 	Toast notificationToast;
-	PopupMenu popupMenu;
+	PopupMenu fabMenu;
 
 	private SharedPreferences prefs;
 
@@ -577,12 +577,12 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		FloatingActionButton fab = findViewById(R.id.fab);
 		fab.setOnClickListener(view -> {
 			Log.d(TAG, "FAB onClick");
-			preparePopupMenu(popupMenu);
-			popupMenu.show();
+			prepareFabMenu(fabMenu);
+			fabMenu.show();
 		});
-		popupMenu = new PopupMenu(this, fab);
-		popupMenu.inflate(R.menu.vnccanvasactivitymenu);
-		popupMenu.setOnMenuItemClickListener(this);
+		fabMenu = new PopupMenu(this, fab);
+		fabMenu.inflate(R.menu.vnccanvasactivitymenu);
+		fabMenu.setOnMenuItemClickListener(this);
 
 
 		/*
@@ -857,7 +857,10 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 	}
 
-	private void preparePopupMenu(PopupMenu popupMenu) {
+	/**
+	 * Prepare FAB popup menu.
+	 */
+	private void prepareFabMenu(PopupMenu popupMenu) {
 		Menu menu = popupMenu.getMenu();
 		if (touchpoints.getVisibility() == View.VISIBLE) {
 			menu.findItem(R.id.itemColorMode).setVisible(false);
@@ -1005,7 +1008,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		if(Utils.DEBUG()) Log.d(TAG, "Input: key down: " + evt.toString());
 
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
-			popupMenu.show();
+			fabMenu.show();
 			return true;
 		}
 
