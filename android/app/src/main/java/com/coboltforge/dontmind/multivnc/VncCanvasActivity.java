@@ -862,17 +862,13 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	}
 
 	private void preparePopupMenu(PopupMenu popupMenu) {
-		try {
-			Menu menu = popupMenu.getMenu();
-			if (touchpoints.getVisibility() == View.VISIBLE) {
-				menu.findItem(R.id.itemColorMode).setVisible(false);
-				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
-			}
-			else {
-				menu.findItem(R.id.itemColorMode).setVisible(true);
-				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
-			}}
-		catch(NullPointerException e) { // when menu is initially created
+		Menu menu = popupMenu.getMenu();
+		if (touchpoints.getVisibility() == View.VISIBLE) {
+			menu.findItem(R.id.itemColorMode).setVisible(false);
+			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
+		} else {
+			menu.findItem(R.id.itemColorMode).setVisible(true);
+			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
 		}
 	}
 
@@ -902,8 +898,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 				vncCanvas.setVisibility(View.GONE);
 				touchpoints.setVisibility(View.VISIBLE);
 			}
-			// trigger onCreateOptions
-			invalidateMyOptionsMenu();
 			return true;
 
 		case R.id.itemToggleMouseButtons:
@@ -1245,13 +1239,12 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 						| View.SYSTEM_UI_FLAG_FULLSCREEN);
 	}
 
-	private void invalidateMyOptionsMenu() {
-		invalidateOptionsMenu();
-	}
-
 	/*
 	 * Overwrite buggy implementation on Samsung devices where menu would not open when triggered
 	 * from FAB. Stolen from https://github.com/EasyRPG/Player/pull/567 :-)
+	 *
+	 * TODO: This is not used any more and should be removed. 
+	 * TODO: Need to verify that PopupMenu is not affected by similar issue.
 	 */
 	@Override
 	public void openOptionsMenu() {
