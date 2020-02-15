@@ -54,6 +54,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
@@ -61,7 +62,7 @@ import android.content.Context;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 @SuppressWarnings("deprecation")
-public class VncCanvasActivity extends Activity {
+public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
 
 	public class MightyInputHandler extends AbstractGestureInputHandler {
@@ -530,6 +531,7 @@ public class VncCanvasActivity extends Activity {
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
 	Toast notificationToast;
+	PopupMenu popupMenu;
 
 	private SharedPreferences prefs;
 
@@ -573,12 +575,17 @@ public class VncCanvasActivity extends Activity {
 		 * setup floating action button
 		 */
 		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-			    Log.d(TAG, "FAB onClick");
-				openOptionsMenu();
+		fab.setOnClickListener(view -> {
+			Log.d(TAG, "FAB onClick");
+
+			if (popupMenu == null) {
+				popupMenu = new PopupMenu(this, view);
+				popupMenu.inflate(R.menu.vnccanvasactivitymenu);
+				popupMenu.setOnMenuItemClickListener(this);
 			}
+
+			preparePopupMenu(popupMenu);
+			popupMenu.show();
 		});
 
 
@@ -854,19 +861,10 @@ public class VncCanvasActivity extends Activity {
 
 	}
 
-	@SuppressLint("NewApi")
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
-
-		return true;
-	}
-
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
+	private void preparePopupMenu(PopupMenu popupMenu) {
 		try {
-			if(touchpoints.getVisibility() == View.VISIBLE) {
+			Menu menu = popupMenu.getMenu();
+			if (touchpoints.getVisibility() == View.VISIBLE) {
 				menu.findItem(R.id.itemColorMode).setVisible(false);
 				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
 			}
@@ -876,12 +874,10 @@ public class VncCanvasActivity extends Activity {
 			}}
 		catch(NullPointerException e) { // when menu is initially created
 		}
-
-		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onMenuItemClick(MenuItem item) {
 
 		SharedPreferences.Editor ed = prefs.edit();
 
