@@ -572,21 +572,17 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		inputHandler.init();
 
 		/*
-		 * setup floating action button
+		 * Setup floating action button & associated menu
 		 */
 		FloatingActionButton fab = findViewById(R.id.fab);
 		fab.setOnClickListener(view -> {
 			Log.d(TAG, "FAB onClick");
-
-			if (popupMenu == null) {
-				popupMenu = new PopupMenu(this, view);
-				popupMenu.inflate(R.menu.vnccanvasactivitymenu);
-				popupMenu.setOnMenuItemClickListener(this);
-			}
-
 			preparePopupMenu(popupMenu);
 			popupMenu.show();
 		});
+		popupMenu = new PopupMenu(this, fab);
+		popupMenu.inflate(R.menu.vnccanvasactivitymenu);
+		popupMenu.setOnMenuItemClickListener(this);
 
 
 		/*
@@ -1008,8 +1004,10 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	public boolean onKeyDown(int keyCode, KeyEvent evt) {
 		if(Utils.DEBUG()) Log.d(TAG, "Input: key down: " + evt.toString());
 
-		if (keyCode == KeyEvent.KEYCODE_MENU)
-			return super.onKeyDown(keyCode, evt);
+		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			popupMenu.show();
+			return true;
+		}
 
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 
