@@ -54,6 +54,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
@@ -61,7 +62,7 @@ import android.content.Context;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 @SuppressWarnings("deprecation")
-public class VncCanvasActivity extends Activity {
+public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
 
 	public class MightyInputHandler extends AbstractGestureInputHandler {
@@ -530,6 +531,7 @@ public class VncCanvasActivity extends Activity {
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
 	Toast notificationToast;
+	PopupMenu fabMenu;
 
 	private SharedPreferences prefs;
 
@@ -570,16 +572,17 @@ public class VncCanvasActivity extends Activity {
 		inputHandler.init();
 
 		/*
-		 * setup floating action button
+		 * Setup floating action button & associated menu
 		 */
 		FloatingActionButton fab = findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-			    Log.d(TAG, "FAB onClick");
-				openOptionsMenu();
-			}
+		fab.setOnClickListener(view -> {
+			Log.d(TAG, "FAB onClick");
+			prepareFabMenu(fabMenu);
+			fabMenu.show();
 		});
+		fabMenu = new PopupMenu(this, fab);
+		fabMenu.inflate(R.menu.vnccanvasactivitymenu);
+		fabMenu.setOnMenuItemClickListener(this);
 
 
 		/*
@@ -854,34 +857,22 @@ public class VncCanvasActivity extends Activity {
 
 	}
 
-	@SuppressLint("NewApi")
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.vnccanvasactivitymenu, menu);
-
-		return true;
-	}
-
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		try {
-			if(touchpoints.getVisibility() == View.VISIBLE) {
-				menu.findItem(R.id.itemColorMode).setVisible(false);
-				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
-			}
-			else {
-				menu.findItem(R.id.itemColorMode).setVisible(true);
-				menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
-			}}
-		catch(NullPointerException e) { // when menu is initially created
+	/**
+	 * Prepare FAB popup menu.
+	 */
+	private void prepareFabMenu(PopupMenu popupMenu) {
+		Menu menu = popupMenu.getMenu();
+		if (touchpoints.getVisibility() == View.VISIBLE) {
+			menu.findItem(R.id.itemColorMode).setVisible(false);
+			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(false);
+		} else {
+			menu.findItem(R.id.itemColorMode).setVisible(true);
+			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
 		}
-
-		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onMenuItemClick(MenuItem item) {
 
 		SharedPreferences.Editor ed = prefs.edit();
 
@@ -906,8 +897,6 @@ public class VncCanvasActivity extends Activity {
 				vncCanvas.setVisibility(View.GONE);
 				touchpoints.setVisibility(View.VISIBLE);
 			}
-			// trigger onCreateOptions
-			invalidateMyOptionsMenu();
 			return true;
 
 		case R.id.itemToggleMouseButtons:
@@ -1018,8 +1007,10 @@ public class VncCanvasActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent evt) {
 		if(Utils.DEBUG()) Log.d(TAG, "Input: key down: " + evt.toString());
 
-		if (keyCode == KeyEvent.KEYCODE_MENU)
-			return super.onKeyDown(keyCode, evt);
+		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			fabMenu.show();
+			return true;
+		}
 
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 
@@ -1249,13 +1240,12 @@ public class VncCanvasActivity extends Activity {
 						| View.SYSTEM_UI_FLAG_FULLSCREEN);
 	}
 
-	private void invalidateMyOptionsMenu() {
-		invalidateOptionsMenu();
-	}
-
 	/*
 	 * Overwrite buggy implementation on Samsung devices where menu would not open when triggered
 	 * from FAB. Stolen from https://github.com/EasyRPG/Player/pull/567 :-)
+	 *
+	 * TODO: This is not used any more and should be removed. 
+	 * TODO: Need to verify that PopupMenu is not affected by similar issue.
 	 */
 	@Override
 	public void openOptionsMenu() {
