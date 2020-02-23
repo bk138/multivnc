@@ -1241,29 +1241,4 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 						| View.SYSTEM_UI_FLAG_FULLSCREEN);
 	}
 
-	/*
-	 * Overwrite buggy implementation on Samsung devices where menu would not open when triggered
-	 * from FAB. Stolen from https://github.com/EasyRPG/Player/pull/567 :-)
-	 *
-	 * TODO: This is not used any more and should be removed. 
-	 * TODO: Need to verify that PopupMenu is not affected by similar issue.
-	 */
-	@Override
-	public void openOptionsMenu() {
-
-		Configuration config = getResources().getConfiguration();
-
-		if((config.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-				> Configuration.SCREENLAYOUT_SIZE_LARGE) {
-
-			int originalScreenLayout = config.screenLayout;
-			config.screenLayout = Configuration.SCREENLAYOUT_SIZE_LARGE;
-			super.openOptionsMenu();
-			config.screenLayout = originalScreenLayout;
-
-		} else {
-			super.openOptionsMenu();
-		}
-	}
-
 }
