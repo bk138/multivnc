@@ -1008,6 +1008,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		if(Utils.DEBUG()) Log.d(TAG, "Input: key down: " + evt.toString());
 
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			prepareFabMenu(fabMenu);
 			fabMenu.show();
 			return true;
 		}
