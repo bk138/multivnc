@@ -172,7 +172,12 @@ class ZoomScaling extends AbstractScaling {
 		try {
 			super.setScaleTypeForActivity(activity);
 			scaling = (float)1.0;
-			minimumScale = activity.vncCanvas.vncConn.getFramebuffer().getMinimumScale();
+			int canvasWidth = activity.vncCanvas.getWidth();
+			int canvasHeight = activity.vncCanvas.getHeight();
+
+			minimumScale = activity.vncCanvas.vncConn.getFramebuffer()
+					.getMinimumScale(canvasWidth, canvasHeight);
+
 			canvasXOffset = -activity.vncCanvas.getCenteredXOffset();
 			canvasYOffset = -activity.vncCanvas.getCenteredYOffset();
 			resetMatrix();

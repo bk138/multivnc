@@ -26,10 +26,9 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	
 	/**
 	 * @param p
-	 * @param c
 	 */
-	public FullBufferBitmapData(RfbProto p, VncCanvas c, int capacity) {
-		super(p, c);
+	public FullBufferBitmapData(RfbProto p) {
+		super(p);
 		framebufferwidth=rfb.framebufferWidth;
 		framebufferheight=rfb.framebufferHeight;
 		bitmapwidth= Utils.nextPow2(framebufferwidth);
@@ -88,7 +87,7 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	 * @see com.coboltforge.dontmind.multivnc.AbstractBitmapData#scrollChanged(int, int)
 	 */
 	@Override
-	void scrollChanged(int newx, int newy) {
+	void scrollChanged(int newx, int newy, int visibleWidth, int visibleHeight ) {
 		xoffset = newx;
 		yoffset = newy;
 	}

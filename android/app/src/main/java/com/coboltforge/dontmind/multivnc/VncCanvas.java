@@ -564,7 +564,11 @@ public class VncCanvas extends GLSurfaceView {
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
 		super.onScrollChanged(l, t, oldl, oldt);
 		try {
-			vncConn.getFramebuffer().scrollChanged(absoluteXPosition, absoluteYPosition);
+			vncConn.getFramebuffer().scrollChanged(
+					absoluteXPosition,
+					absoluteYPosition,
+					getVisibleWidth(),
+					getVisibleHeight());
 			mouseFollowPan();
 		}
 		catch(NullPointerException e) {
@@ -674,7 +678,7 @@ public class VncCanvas extends GLSurfaceView {
 	 * Convert a motion event to a format suitable for sending over the wire
 	 * @param evt motion event; x and y must already have been converted from screen coordinates
 	 * to remote frame buffer coordinates.
-	 * @param downEvent True if "mouse button" (touch or trackball button) is down when this happens
+	 * @param mouseIsDown True if "mouse button" (touch or trackball button) is down when this happens
 	 * @param useRightButton If true, event is interpreted as happening with right mouse button
 	 * @return true if event was actually sent
 	 */

@@ -57,14 +57,12 @@ class LargeBitmapData extends AbstractBitmapData {
 	/**
 	 * 
 	 * @param p Protocol implementation
-	 * @param c View that will display screen
-	 * @param displayWidth
-	 * @param displayHeight
+	 * @param conn Vnc connection
 	 * @param capacity Max process heap size in bytes
 	 */
-	LargeBitmapData(RfbProto p, VncCanvas c, VNCConn conn, int capacity)
+	LargeBitmapData(RfbProto p, VNCConn conn, int capacity)
 	{
-		super(p,c);
+		super(p);
 		double scaleMultiplier = Math.sqrt((double)(capacity * 1024 * 1024) / (double)(CAPACITY_MULTIPLIER * framebufferwidth * framebufferheight));
 		if (scaleMultiplier > 1)
 			scaleMultiplier = 1;
@@ -113,12 +111,10 @@ class LargeBitmapData extends AbstractBitmapData {
 	 * @see com.coboltforge.dontmind.multivnc.AbstractBitmapData#scrollChanged(int, int)
 	 */
 	@Override
-	synchronized void scrollChanged(int newx, int newy) {
+	synchronized void scrollChanged(int newx, int newy, int visibleWidth, int visibleHeight ) {
 		//android.util.Log.i("LBM","scroll "+newx+" "+newy);
 		int newScrolledToX = scrolledToX;
 		int newScrolledToY = scrolledToY;
-		int visibleWidth = vncCanvas.getVisibleWidth();
-		int visibleHeight = vncCanvas.getVisibleHeight();
 		if (newx - xoffset < 0 )
 		{
 			newScrolledToX = newx + visibleWidth / 2 - bitmapwidth / 2;

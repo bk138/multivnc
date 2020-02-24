@@ -28,12 +28,10 @@ abstract class AbstractBitmapData {
 	int bitmapPixels[];
 	Canvas memGraphics;
 	boolean waitingForInput;
-	VncCanvas vncCanvas;
 
-	AbstractBitmapData( RfbProto p, VncCanvas c)
+	AbstractBitmapData( RfbProto p)
 	{
 		rfb=p;
-		vncCanvas = c;
 		framebufferwidth=rfb.framebufferWidth;
 		framebufferheight=rfb.framebufferHeight;
 	}
@@ -42,24 +40,15 @@ abstract class AbstractBitmapData {
 	{
 		waitingForInput=false;
 	}
-	
-	final void invalidateMousePosition()
-	{
-		if (vncCanvas.vncConn.getConnSettings().getUseLocalCursor())
-			// OpenGL always draws the full framebuffer, request a redraw from GL thread
-			vncCanvas.requestRender();
-	}
-	
+
 	/**
 	 * 
 	 * @return The smallest scale supported by the implementation; the scale at which
 	 * the bitmap would be smaller than the screen
 	 */
-	float getMinimumScale()
+	float getMinimumScale(int displayWidth, int displayHeight)
 	{
 		double scale = 0.75;
-		int displayWidth = vncCanvas.getWidth();
-		int displayHeight = vncCanvas.getHeight();
 		for (; scale >= 0; scale -= 0.25)
 		{
 			if (scale * bitmapwidth < displayWidth || scale * bitmapheight < displayHeight)
@@ -129,8 +118,10 @@ abstract class AbstractBitmapData {
 	 * not change the bitmap data or send a network request until syncScroll is called
 	 * @param newx Position of left edge of visible part in full-frame coordinates
 	 * @param newy Position of top edge of visible part in full-frame coordinates
+	 * @param visibleWidth Width of visible canvas
+	 * @param visibleHeight Height of visible canvas
 	 */
-	abstract void scrollChanged( int newx, int newy);
+	abstract void scrollChanged( int newx, int newy, int visibleWidth, int visibleHeight );
 	
 	/**
 	 * Sync scroll -- called from network thread; copies scroll changes from UI to network state
