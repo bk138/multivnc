@@ -148,7 +148,7 @@ public class Utils {
 	}
 
 
-	public static NetworkInterface getActiveNetworkInterface(Context c) {
+	public static NetworkInterface getActiveNetworkInterface() {
 		try {
 			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				NetworkInterface intf = en.nextElement();
