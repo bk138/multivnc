@@ -1813,7 +1813,89 @@ public class VNCConn {
 			canvas.reDraw();
 	}
 
+	/**
+	 * Utility method to notify observer about updated buffer so that it
+	 * can trigger redraw of canvas.
+	 */
+	private void notifyBufferUpdate() {
+		if (observer != null) {
+			observer.onVncFrameBufferUpdated();
+		}
+	}
 
+	/**
+	 * Interface for observers of VNCConn.
+	 *
+	 * Unless explicitly specified, implemented methods can be called from background
+	 * threads. Hence, implementation should properly post operations to UI thread
+	 * before accessing UI objects inside methods.
+	 */
+	public interface ObserverInterface{
 
+		/**
+		 * Called just before starting VNC connection.
+		 *
+		 * @param bean Settings of connection being started
+		 */
+		void onVncConStarting(ConnectionBean bean);
+
+        /**
+         * Called when server credentials are required from user.
+         *
+         * After this method returns ServerToClientThread is blocked waiting on vncConn.
+         * Implementation must retrieve credential from user, put them in connection
+         * bean and then notify the thread waiting on vncConn.
+         *
+         * @param bean             Connection settings
+         * @param vncConn          Active VNC connection
+         * @param isUsernameNeeded Whether username is required
+         */
+        void onVncCredsRequired(ConnectionBean bean, VNCConn vncConn, boolean isUsernameNeeded);
+
+		/**
+		 * Called after user has been authenticated and VNC protocol has been initialized.
+		 * We are now ready to receive actual screen frames from remote server.
+		 *
+		 * @param vncConn Active VNC connection
+		 */
+		void onVncConEstablished(VNCConn vncConn);
+
+		/**
+		 * Called after first frame has been received from remote server. It can
+		 * be used to remove progress dialog so that VNC canvas is visible.
+		 *
+		 * For the received frame, onVncFrameBufferUpdated() is called before calling
+		 * this method to allow smooth transition from progress overlay to canvas.
+		 */
+		void onVncFirstFrameReceived();
+
+		/**
+		 * Called after frame buffer has been updated with new data from server.
+		 */
+		void onVncFrameBufferUpdated();
+
+        /**
+         * Called when position of mouse pointer is changed.
+         *
+         * Position change can be triggered either locally (in response to touch event)
+         * or on remote server. 'isLocalMove' can be used to differentiate between these cases.
+         *
+         * @param x New horizontal position in framebuffer coordinates
+         * @param y New vertical position in framebuffer coordinates
+         * @param isLocalMove Whether this call is triggered by local change
+         */
+		void onVncPointerMoved(int x, int y, boolean isLocalMove);
+
+		/**
+		 * Called if unrecoverable error occurs during VNCConn runtime.
+		 *
+		 * After the method returns, state of this instance of VNCConn is undefined
+		 * and implementer should not rely on it. Most reasonable action in this
+		 * method is to simply close the Activity hosting this VNCConn.
+		 *
+		 * @param e Cause of error
+		 */
+		void onVncFatalError(Throwable e);
+	}
 }
 
