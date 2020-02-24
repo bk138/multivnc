@@ -17,16 +17,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.Inflater;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.widget.Toast;
 
 
 
@@ -34,7 +30,7 @@ public class VNCConn {
 
 	private final static String TAG = "VNCConn";
 
-	private VncCanvas canvas;
+	private ObserverInterface observer;
 
 	private ServerToClientThread inputThread;
 	private ClientToServerThread outputThread;
@@ -51,6 +47,7 @@ public class VNCConn {
 	// Internal bitmap data
 	private AbstractBitmapData bitmapData;
 	private Lock bitmapDataPixelsLock = new ReentrantLock();
+	private int memoryCapacity;
 
 	// message queue for communicating with the output worker thread
 	private ConcurrentLinkedQueue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<VNCConn.OutputEvent>();
@@ -172,15 +169,6 @@ public class VNCConn {
 
     private class ServerToClientThread extends Thread {
 
-    	private ProgressDialog pd;
-    	private Runnable setModes;
-
-
-    	public ServerToClientThread(ProgressDialog pd, Runnable setModes) {
-    		this.pd = pd;
-    		this.setModes = setModes;
-    	}
-
 
 		public void run() {
 
@@ -188,55 +176,24 @@ public class VNCConn {
 
 			try {
 				connectAndAuthenticate();
-				doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
-				canvas.handler.post(new Runnable() {
-					public void run() {
-						canvas.activity.setTitle(getDesktopName());
-						pd.setMessage("Downloading first frame.\nPlease wait...");
-					}
-				});
+				doProtocolInitialisation();
+
+				if (observer != null) {
+					observer.onVncConEstablished(VNCConn.this);
+				}
 
 				// start output thread here
 				outputThread = new ClientToServerThread();
 				outputThread.start();
 
-				processNormalProtocol(canvas.getContext(), pd, setModes);
+				processNormalProtocol();
 			} catch (Throwable e) {
 				if (maintainConnection) {
 					Log.e(TAG, e.toString());
 					e.printStackTrace();
-					// Ensure we dismiss the progress dialog
-					// before we fatal error finish
-					canvas.handler.post(new Runnable() {
-						public void run() {
-							try {
-								if (pd.isShowing())
-									pd.dismiss();
-							} catch (Exception e) {
-								//unused
-							}
-						}
-					});
-					if (e instanceof OutOfMemoryError) {
-						// TODO  Not sure if this will happen but...
-						// figure out how to gracefully notify the user
-						// Instantiating an alert dialog here doesn't work
-						// because we are out of memory. :(
-					} else {
-						String error = "VNC connection failed!";
-						if (e.getMessage() != null && (e.getMessage().indexOf("authentication") > -1)) {
-							error = "VNC authentication failed!";
-						}
-						final String error_ = error + "<br>" + e.getLocalizedMessage();
-						canvas.handler.post(new Runnable() {
-							public void run() {
-								try {
-									Utils.showFatalErrorMessage(canvas.getContext(), error_);
-								}
-								catch(NullPointerException e) {
-								}
-							}
-						});
+
+					if (observer!= null) {
+						observer.onVncFatalError(e);
 					}
 				}
 			}
@@ -309,6 +266,13 @@ public class VNCConn {
 				authType = secType;
 			}
 
+			//Grab local reference to the observer to avoid race condition with UI thread
+			final ObserverInterface observerRef = observer;
+
+			//Authentication cannot work without using observer
+			if (observerRef == null && authType != RfbProto.AuthNone)
+				throw new Exception("Could not retrieve credentials! Please try again.");
+
 			switch (authType) {
 			case RfbProto.AuthNone:
 				Log.i(TAG, "No authentication needed");
@@ -317,7 +281,7 @@ public class VNCConn {
 			case RfbProto.AuthVNC:
 				Log.i(TAG, "VNC authentication needed");
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-					canvas.getCredsFromUser(connSettings, false);
+					observerRef.onVncCredsRequired(connSettings, VNCConn.this,  false);
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
@@ -326,7 +290,9 @@ public class VNCConn {
 				break;
 			case RfbProto.AuthUltra:
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-					canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
+					boolean isUsernameNeeded = connSettings.getUserName() == null || connSettings.getUserName().isEmpty();
+					observerRef.onVncCredsRequired(connSettings, VNCConn.this,  isUsernameNeeded);
+
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
@@ -335,7 +301,9 @@ public class VNCConn {
 				break;
 			case RfbProto.AuthARD:
 				if(connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
-					canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
+					boolean isUsernameNeeded = connSettings.getUserName() == null || connSettings.getUserName().isEmpty();
+					observerRef.onVncCredsRequired(connSettings, VNCConn.this,  isUsernameNeeded);
+
 					synchronized (VNCConn.this) {
 						VNCConn.this.wait();  // wait for user input to finish
 					}
@@ -349,29 +317,25 @@ public class VNCConn {
 
 
 
-		private void doProtocolInitialisation(int dx, int dy) throws IOException {
+		private void doProtocolInitialisation() throws IOException {
 			rfb.writeClientInit();
 			rfb.readServerInit();
 
 			Log.i(TAG, "Desktop name is " + rfb.desktopName);
 			Log.i(TAG, "Desktop size is " + rfb.framebufferWidth + " x " + rfb.framebufferHeight);
 
-			canvas.mouseX = rfb.framebufferWidth/2;
-			canvas.mouseY = rfb.framebufferHeight/2;
-
 			boolean useFull = false;
-			int capacity = Utils.getActivityManager(canvas.getContext()).getMemoryClass();
 			if (connSettings.getForceFull() == BitmapImplHint.AUTO)
 			{
-				if (rfb.framebufferWidth * rfb.framebufferHeight * FullBufferBitmapData.CAPACITY_MULTIPLIER <= capacity * 1024 * 1024)
+				if (rfb.framebufferWidth * rfb.framebufferHeight * FullBufferBitmapData.CAPACITY_MULTIPLIER <= memoryCapacity * 1024 * 1024)
 					useFull = true;
 			}
 			else
 				useFull = (connSettings.getForceFull() == BitmapImplHint.FULL);
 			if (! useFull)
-				bitmapData=new LargeBitmapData(rfb, canvas, VNCConn.this, capacity);
+				bitmapData=new LargeBitmapData(rfb, VNCConn.this, memoryCapacity);
 			else
-				bitmapData=new FullBufferBitmapData(rfb, canvas, capacity);
+				bitmapData=new FullBufferBitmapData(rfb);
 
 			setPixelFormat();
 
@@ -381,14 +345,14 @@ public class VNCConn {
         }
 
 
-		private void processNormalProtocol(final Context context, final ProgressDialog pd, final Runnable setModes) throws Exception {
+		private void processNormalProtocol() throws Exception {
 			try {
 
 				Log.d(TAG, "Connection initialized");
 
 				bitmapData.writeFullUpdateRequest(false);
 
-				canvas.handler.post(setModes);
+				boolean isFirstFrame = true;
 
 				//
 				// main input loop
@@ -431,8 +395,9 @@ public class VNCConn {
 							}
 
 							if (rfb.updateRectEncoding == RfbProto.EncodingPointerPos) {
-								canvas.mouseX = rx;
-								canvas.mouseY = ry;
+								if(observer != null) {
+									observer.onVncPointerMoved(rx, ry, false);
+								}
 								continue;
 							}
 
@@ -467,17 +432,10 @@ public class VNCConn {
 
 							rfb.stopTiming();
 
-							// Hide progress dialog
-							canvas.handler.post(new Runnable() {
-								public void run() {
-									try {
-										if (pd.isShowing())
-											pd.dismiss();
-									} catch (Exception e){
-										//unused
-									}
-								}
-							});
+							if (observer != null && isFirstFrame) {
+								observer.onVncFirstFrameReceived();
+								isFirstFrame = false;
+							}
 						}
 
 						boolean fullUpdateNeeded = false;
@@ -497,9 +455,14 @@ public class VNCConn {
 						throw new Exception("Can't handle SetColourMapEntries message");
 
 					case RfbProto.Bell:
-						canvas.handler.post( new Runnable() {
-							public void run() { Toast.makeText( context, "VNC Beep", Toast.LENGTH_SHORT); }
-						});
+						//This never worked because show() is not called on the created toast.
+						//Commenting it out during VNCConn refactoring.
+						//If we want it, we can implement a method on ObserverInterface and let the
+						//activity handle it.
+
+						//canvas.handler.post( new Runnable() {
+						//	public void run() { Toast.makeText( context, "VNC Beep", Toast.LENGTH_SHORT); }
+						//});
 						break;
 
 					case RfbProto.ServerCutText:
@@ -664,7 +627,11 @@ public class VNCConn {
 
 			try {
 				if (rfb.inNormalProtocol) {
-					bitmapData.invalidateMousePosition();
+
+					//Trigger a canvas refresh.
+					//Moved here from AbstractBitmapData
+					if (observer!= null && connSettings.getUseLocalCursor())
+						observer.onVncFrameBufferUpdated();
 
 					try {
 						rfb.writePointerEvent(pe.x,pe.y,pe.modifiers,pe.mask);
@@ -758,13 +725,15 @@ public class VNCConn {
 	/**
 	 * Create a view showing a VNC connection
 	 * @param bean Connection settings
-	 * @param setModes Callback to run on UI thread after connection is set up
+	 * @param memoryCapacity Current memory capacity
 	 */
-	public void init(ConnectionBean bean, final Runnable setModes) {
+	public void init(ConnectionBean bean, int memoryCapacity) {
 
 		Log.d(TAG, "initializing");
 
 		connSettings = bean;
+		this.memoryCapacity = memoryCapacity;
+
 		try {
 			this.pendingColorModel = COLORMODEL.valueOf(bean.getColorModel());
 		}
@@ -772,22 +741,11 @@ public class VNCConn {
 			this.pendingColorModel = COLORMODEL.C24bit;
 		}
 
-		// Startup the RFB thread with a nifty progess dialog
-		final ProgressDialog pd = new ProgressDialog(canvas.getContext());
-		pd.setCancelable(false); // on ICS, clicking somewhere cancels the dialog. not what we want...
-	    pd.setTitle("Connecting...");
-	    pd.setMessage("Establishing handshake.\nPlease wait...");
-	    pd.setButton(DialogInterface.BUTTON_NEGATIVE, canvas.getContext().getString(android.R.string.cancel), new DialogInterface.OnClickListener()
-	    {
-	        public void onClick(DialogInterface dialog, int which)
-	        {
-	        	canvas.activity.finish();
-	        }
-	    });
-	    pd.show();
-
-
-		inputThread = new ServerToClientThread(pd, setModes);
+		// Startup the RFB & notify observer
+		if (observer!=null) {
+			observer.onVncConStarting(connSettings);
+		}
+		inputThread = new ServerToClientThread();
 		inputThread.start();
 	}
 
@@ -810,19 +768,19 @@ public class VNCConn {
 		}
 
 		bitmapData = null;
-		canvas = null;
 		connSettings = null;
 
 		System.gc();
 	}
 
 	/**
-	 * Set/unset the canvas for this connection.
-	 * Unset canvas when keeping the VNCConn across application restarts to avoid memleaks.
-	 * @param c
+	 * Set/unset observer for this connection.
+	 * Pass null to unset previously set observer.
+	 *
+	 * @param observer
 	 */
-	public void setCanvas(VncCanvas c) {
-		canvas = c;
+	public void setObserver(ObserverInterface observer) {
+		this.observer = observer;
 	}
 
 
@@ -858,9 +816,8 @@ public class VNCConn {
 				outputEventQueue.notify();
 			}
 
-			canvas.mouseX = x;
-			canvas.mouseY = y;
-			canvas.panToMouse();
+			if (observer != null)
+				observer.onVncPointerMoved(x,y, true);
 
 			return true;
 		}
@@ -1216,7 +1173,7 @@ public class VNCConn {
 
 		bitmapData.copyRect(new Rect(leftSrc, topSrc, rightSrc, bottomSrc), new Rect(leftDest, topDest, rightDest, bottomDest), handleCopyRectPaint);
 
-		canvas.reDraw();
+		notifyBufferUpdate();
 	}
 	private byte[] bg_buf = new byte[4];
 	private byte[] rre_buf = new byte[128];
@@ -1265,7 +1222,7 @@ public class VNCConn {
 			bitmapData.drawRect(sx, sy, sw, sh, handleRREPaint);
 		}
 
-		canvas.reDraw();
+		notifyBufferUpdate();
 	}
 
 	//
@@ -1314,7 +1271,7 @@ public class VNCConn {
 			bitmapData.drawRect(sx, sy, sw, sh, handleRREPaint);
 		}
 
-		canvas.reDraw();
+		notifyBufferUpdate();
 	}
 
 	//
@@ -1343,7 +1300,7 @@ public class VNCConn {
 			}
 
 			// Finished with a row of tiles, now let's show it.
-			canvas.reDraw();
+			notifyBufferUpdate();
 		}
 	}
 
@@ -1525,7 +1482,7 @@ public class VNCConn {
 
 		zrleInStream.reset();
 
-		canvas.reDraw();
+		notifyBufferUpdate();
 	}
 
 	//
@@ -1592,7 +1549,7 @@ public class VNCConn {
 			return;
 		bitmapData.updateBitmap(x, y, w, h);
 
-		canvas.reDraw();
+		notifyBufferUpdate();
 	}
 
 	private int readPixel(InStream is) throws Exception {
@@ -1810,7 +1767,7 @@ public class VNCConn {
 		bitmapData.updateBitmap( x, y, w, h);
 
 		if (paint)
-			canvas.reDraw();
+			notifyBufferUpdate();
 	}
 
 	/**
@@ -1839,18 +1796,18 @@ public class VNCConn {
 		 */
 		void onVncConStarting(ConnectionBean bean);
 
-        /**
-         * Called when server credentials are required from user.
-         *
-         * After this method returns ServerToClientThread is blocked waiting on vncConn.
-         * Implementation must retrieve credential from user, put them in connection
-         * bean and then notify the thread waiting on vncConn.
-         *
-         * @param bean             Connection settings
-         * @param vncConn          Active VNC connection
-         * @param isUsernameNeeded Whether username is required
-         */
-        void onVncCredsRequired(ConnectionBean bean, VNCConn vncConn, boolean isUsernameNeeded);
+		/**
+		 * Called when server credentials are required from user.
+		 *
+		 * After this method returns ServerToClientThread is blocked waiting on vncConn.
+		 * Implementation must retrieve credential from user, put them in connection
+		 * bean and then notify the thread waiting on vncConn.
+		 *
+		 * @param bean	           Connection settings
+		 * @param vncConn          Active VNC connection
+		 * @param isUsernameNeeded Whether username is required
+		 */
+		void onVncCredsRequired(ConnectionBean bean, VNCConn vncConn, boolean isUsernameNeeded);
 
 		/**
 		 * Called after user has been authenticated and VNC protocol has been initialized.
@@ -1874,16 +1831,16 @@ public class VNCConn {
 		 */
 		void onVncFrameBufferUpdated();
 
-        /**
-         * Called when position of mouse pointer is changed.
-         *
-         * Position change can be triggered either locally (in response to touch event)
-         * or on remote server. 'isLocalMove' can be used to differentiate between these cases.
-         *
-         * @param x New horizontal position in framebuffer coordinates
-         * @param y New vertical position in framebuffer coordinates
-         * @param isLocalMove Whether this call is triggered by local change
-         */
+		/**
+		 * Called when position of mouse pointer is changed.
+		 *
+		 * Position change can be triggered either locally (in response to touch event)
+		 * or on remote server. 'isLocalMove' can be used to differentiate between these cases.
+		 *
+		 * @param x New horizontal position in framebuffer coordinates
+		 * @param y New vertical position in framebuffer coordinates
+		 * @param isLocalMove Whether this call is triggered by local change
+		 */
 		void onVncPointerMoved(int x, int y, boolean isLocalMove);
 
 		/**

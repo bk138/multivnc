@@ -30,6 +30,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.text.ClipboardManager;
 import android.content.ContentValues;
@@ -54,6 +55,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
@@ -62,8 +64,7 @@ import android.content.Context;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 @SuppressWarnings("deprecation")
-public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
-
+public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemClickListener, VNCConn.ObserverInterface {
 
 	public class MightyInputHandler extends AbstractGestureInputHandler {
 
@@ -532,6 +533,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	TouchPointView touchpoints;
 	Toast notificationToast;
 	PopupMenu fabMenu;
+	ProgressDialog progressDialog;
 
 	private SharedPreferences prefs;
 
@@ -560,6 +562,10 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
 		zoomer = (ZoomControls) findViewById(R.id.zoomer);
+
+		progressDialog  = new ProgressDialog(this);
+		progressDialog.setCancelable(false); // on ICS, clicking somewhere cancels the dialog. not what we want...
+
 
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
@@ -661,13 +667,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		 */
 		VNCConn conn = new VNCConn();
 		vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
-		conn.setCanvas(vncCanvas); // add canvas to conn. be sure to call this before init!
-		// the actual connection init
-		conn.init(connection, new Runnable() {
-			public void run() {
-				setModes();
-			}
-		});
+		conn.setObserver(this);
+		conn.init(connection, getMemoryCapacity()); // the actual connection init
 
 
 
@@ -1166,7 +1167,9 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		return vncCanvas.pan(dX, dY);
 	}
 
-
+	private int getMemoryCapacity(){
+		return Utils.getActivityManager(this).getMemoryClass();
+	}
 
 	boolean touchPan(MotionEvent event) {
 		switch (event.getAction()) {
@@ -1241,4 +1244,141 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 						| View.SYSTEM_UI_FLAG_FULLSCREEN);
 	}
 
+	//region VNC Connection
+	/**
+	 * Handle VNC connection start.
+	 *
+	 * @param bean Settings of connection being started
+	 */
+	@Override
+	public void onVncConStarting(ConnectionBean bean) {
+		runOnUiThread(() -> {
+			//Show progress dialog
+			progressDialog.setTitle("Connecting...");
+			progressDialog.setMessage("Establishing handshake.\nPlease wait...");
+			progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+					getString(android.R.string.cancel),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					});
+			progressDialog.show();
+		});
+	}
+
+	/**
+	 * Updates UI after VNC connection is complete.
+	 */
+	@Override
+	public void onVncConEstablished(VNCConn vncConn) {
+		runOnUiThread(() -> {
+			setModes();
+			setTitle(vncConn.getDesktopName());
+
+			progressDialog.setMessage("Downloading first frame.\nPlease wait...");
+			progressDialog.show();
+
+			//Move pointer overlay to center
+			vncCanvas.mouseX = vncConn.getFramebufferWidth() / 2;
+			vncCanvas.mouseY = vncConn.getFramebufferHeight() / 2;
+		});
+	}
+
+	/**
+	 * Opens the credential dialog.
+	 *
+	 * @param bean             Connection settings
+	 * @param vncConn          Active VNC connection
+	 * @param isUsernameNeeded Whether username is required
+	 */
+	@Override
+	public void onVncCredsRequired(ConnectionBean bean, VNCConn vncConn, boolean isUsernameNeeded) {
+		runOnUiThread(() -> {
+			View credentialsDialog = getLayoutInflater().inflate(R.layout.credentials_dialog, null);
+
+			if(!isUsernameNeeded)
+				credentialsDialog.findViewById(R.id.username_row).setVisibility(View.GONE);
+
+			new AlertDialog.Builder(this)
+					.setTitle(getString(R.string.credentials_needed_title))
+					.setView(credentialsDialog)
+					.setCancelable(false)
+					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							if(isUsernameNeeded) {
+								bean.setUserName(((EditText) credentialsDialog.findViewById(R.id.userName)).getText().toString());
+							}
+							bean.setPassword(((EditText)credentialsDialog.findViewById(R.id.password)).getText().toString());
+
+							synchronized (vncConn) {
+								vncConn.notify();
+							}
+						}
+					}).show();
+		});
+	}
+
+	/**
+	 * Hide progress dialog after first frame is received
+	 */
+	@Override
+	public void onVncFirstFrameReceived() {
+		progressDialog.dismiss(); //Thread-safe
+	}
+
+	/**
+	 * Updates canvas after frame buffer has been updated.
+	 */
+	@Override
+	public void onVncFrameBufferUpdated() {
+		vncCanvas.reDraw();
+	}
+
+	/**
+	 * Handle pointer move events
+	 */
+	@Override
+	public void onVncPointerMoved(int x, int y, boolean isLocalMove) {
+		vncCanvas.mouseX = x;
+		vncCanvas.mouseY = y;
+
+		if (isLocalMove) {
+			runOnUiThread(() -> {
+				vncCanvas.panToMouse();
+			});
+		}
+	}
+
+	/**
+	 * Handle fatal VNC connection error.
+	 * Closes this activity after notifying the user.
+	 *
+	 * @param e Cause of error
+	 */
+	@Override
+	public void onVncFatalError(Throwable e) {
+
+		if (e instanceof OutOfMemoryError) {
+			// TODO  Not sure if this will happen but...
+			// figure out how to gracefully notify the user
+			// Instantiating an alert dialog here doesn't work
+			// because we are out of memory. :(
+
+			return;
+		}
+
+		progressDialog.dismiss();
+
+		//Prepare error message TODO: Maybe create separate exception types??
+		String error = "VNC connection failed!";
+		if (e.getMessage() != null && (e.getMessage().contains("authentication"))) {
+			error = "VNC authentication failed!";
+		}
+		final String error_ = error + "<br>" + e.getLocalizedMessage();
+
+		//Show error. Error dialog will close the activity.
+		runOnUiThread(() -> Utils.showFatalErrorMessage(this, error_));
+	}
+	//endregion
 }

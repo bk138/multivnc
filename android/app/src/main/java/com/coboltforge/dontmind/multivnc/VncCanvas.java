@@ -837,37 +837,6 @@ public class VncCanvas extends GLSurfaceView {
 		return yoffset;
 	}
 
-
-	public void getCredsFromUser(final ConnectionBean c, boolean isUserNameNeeded) {
-		// this method is probably called from the vnc thread
-		post(new Runnable() {
-			@Override
-			public void run() {
-
-				LayoutInflater layoutinflater = LayoutInflater.from(activity);
-				View credentialsDialog = layoutinflater.inflate(R.layout.credentials_dialog, null);
-				if(!isUserNameNeeded)
-					credentialsDialog.findViewById(R.id.username_row).setVisibility(GONE);
-
-				new AlertDialog.Builder(getContext())
-						.setTitle(getContext().getString(R.string.credentials_needed_title))
-						.setView(credentialsDialog)
-						.setCancelable(false)
-						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								if(isUserNameNeeded)
-									c.setUserName(((EditText)credentialsDialog.findViewById(R.id.userName)).getText().toString());
-								c.setPassword(((EditText)credentialsDialog.findViewById(R.id.password)).getText().toString());
-								synchronized (vncConn) {
-									vncConn.notify();
-								}
-							}
-						}).show();
-			}
-		});
-
-	}
-
 	public ScaleType getScaleType() {
 		// TODO Auto-generated method stub
 		return null;
