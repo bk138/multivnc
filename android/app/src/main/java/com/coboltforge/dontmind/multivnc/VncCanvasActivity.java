@@ -835,8 +835,14 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		vncCanvas.onPause();
 
 		// get VNC cuttext and post to Android
-		if(vncCanvas.vncConn.getCutText() != null)
-			mClipboardManager.setText(vncCanvas.vncConn.getCutText());
+		if(vncCanvas.vncConn.getCutText() != null) {
+			try {
+				mClipboardManager.setText(vncCanvas.vncConn.getCutText());
+			} catch (Exception e) {
+				//unused
+			}
+		}
+
 	}
 
 	@Override
