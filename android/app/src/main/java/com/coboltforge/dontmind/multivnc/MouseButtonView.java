@@ -200,8 +200,12 @@ public class MouseButtonView extends View {
 		if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " CLICK");
 
 		// bzzt!
-		performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
-				HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+		try {
+			performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
+					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING | HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+		} catch (Exception ex) {
+			//unused
+		}
 
 		// beep!
 		playSoundEffect(SoundEffectConstants.CLICK);
