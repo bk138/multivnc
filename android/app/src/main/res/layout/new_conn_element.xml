@@ -59,8 +59,7 @@
 
             <Spinner
                 android:id="@+id/spinnerColorMode"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:prompt="@string/colormode_caption" />
         </TableRow>
 
