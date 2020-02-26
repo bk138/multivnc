@@ -17,7 +17,7 @@
         <TableRow>
 
             <TextView
-                android:gravity="right|center_vertical"
+                android:layout_gravity="right|center_vertical"
                 android:paddingRight="10dip"
                 android:text="@string/address_caption"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -34,7 +34,7 @@
         <TableRow>
 
             <TextView
-                android:gravity="right|center_vertical"
+                android:layout_gravity="right|center_vertical"
                 android:paddingRight="10dip"
                 android:text="@string/port_caption"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -52,7 +52,7 @@
         <TableRow>
 
             <TextView
-                android:gravity="right|center_vertical"
+                android:layout_gravity="right|center_vertical"
                 android:paddingRight="10dip"
                 android:text="@string/colormode_caption"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -66,7 +66,7 @@
         <TableRow>
 
             <TextView
-                android:gravity="right|center_vertical"
+                android:layout_gravity="right|center_vertical"
                 android:paddingRight="10dip"
                 android:text="@string/username_caption"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -83,7 +83,7 @@
         <TableRow>
 
             <TextView
-                android:gravity="right|center_vertical"
+                android:layout_gravity="right|center_vertical"
                 android:paddingRight="10dip"
                 android:text="@string/password_caption"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -114,7 +114,7 @@
         <TableRow>
 
             <TextView
-                android:gravity="right|center_vertical"
+                android:layout_gravity="right|center_vertical"
                 android:paddingRight="10dip"
                 android:text="@string/repeater_caption"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
