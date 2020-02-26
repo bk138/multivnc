@@ -60,6 +60,8 @@
             <Spinner
                 android:id="@+id/spinnerColorMode"
                 android:layout_weight="1"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:prompt="@string/colormode_caption" />
         </TableRow>
 
