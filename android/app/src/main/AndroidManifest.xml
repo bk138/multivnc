@@ -24,7 +24,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:screenOrientation="landscape" android:configChanges="orientation|keyboardHidden" android:name="VncCanvasActivity">
+		<activity  android:configChanges="orientation|keyboardHidden|screenSize|screenLayout" android:name="VncCanvasActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 			</intent-filter>
