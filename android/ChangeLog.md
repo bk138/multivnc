@@ -1,5 +1,12 @@
 # Version 1.8.x:
 
+1.8.9
+
+-   VNC activity is now rotatable thanks to work done by Gaurav Ujjwal.
+-   Added ability to make key combos with 'Super' key.
+-   Turned more icons into vector icons.
+-   Fixed some possible crashes.
+
 1.8.8
 
 -   Now hides navigation bar per default, resulting in more usable screen space.
