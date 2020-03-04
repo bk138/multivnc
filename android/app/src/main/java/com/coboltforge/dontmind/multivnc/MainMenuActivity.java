@@ -735,7 +735,12 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				findViewById(R.id.discovered_servers_waitwheel).setVisibility(View.GONE);
+				try {
+					findViewById(R.id.discovered_servers_waitwheel).setVisibility(View.GONE);
+				}
+				catch(Exception e) {
+					//unused
+				}
 			}
 		});
 	}
