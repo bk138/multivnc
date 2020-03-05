@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
  * -              |                                                |
  * -              |                                                |
  * -      +-------v--------+       +--------------+       +--------v---------+
- * -      | Native Methods |------>| Libvncclient |<----->| Native Callbacks |
+ * -      | Native Methods |------>| LibVNCClient |<----->| Native Callbacks |
  * -      +----------------+       +--------------+       +------------------+
  */
 public final class NativeRfbClient {

@@ -200,11 +200,11 @@ public class VNCConn {
 				if(isDoingNativeConn) {
 					//rfbInit(connSettings.getAddress(), connSettings.getPort());
                     //TODO: We should move the construction to VNCConn constructor and make it final.
-                    nativeRfbClient = new NativeRfbClient(this);
+					nativeRfbClient = new NativeRfbClient(this);
 
-                    if (!nativeRfbClient.init(connSettings.getAddress(), connSettings.getPort())){
-                        throw new Exception("Could not initialize connection to remote server.");
-                    }
+					if (!nativeRfbClient.init(connSettings.getAddress(), connSettings.getPort())){
+					    throw new Exception("Could not initialize connection to remote server.");
+					}
 
 					canvas.mouseX = nativeRfbClient.getFrameBufferWidth()/2;
 					canvas.mouseY = nativeRfbClient.getFrameBufferHeight()/2;
@@ -234,18 +234,18 @@ public class VNCConn {
 						//if(!rfbProcessServerMessage())
 						//	shutdown();
 
-                        if (!nativeRfbClient.processServerMessage()) {
-                            throw new Exception("Could not process server message!");
-                        }
+					if (!nativeRfbClient.processServerMessage()) {
+							throw new Exception("Could not process server message!");
+						}
 					}
 				}
 				else {
 					processNormalProtocol(canvas.getContext(), pd, setModes);
 				}
 			} catch (Throwable e) {
-			    if (nativeRfbClient != null) {
-                    nativeRfbClient.cleanup();
-                }
+				if (nativeRfbClient != null) {
+					nativeRfbClient.cleanup();
+				}
 
 				if (maintainConnection) {
 					Log.e(TAG, e.toString());
@@ -655,10 +655,10 @@ public class VNCConn {
 		 * To avoid extra socket connection and memory allocation, {@link RfbProto} & {@link FullBufferBitmapData}
 		 * are slightly modified to tell them that they are dummy objects.
 		 *
-         * Note: Because these are dummy object, accessing properties other than the configured once
-         *       might cause NullPinterException. (Ex. Toggling touchpad mode on/off sends buffer update
-         *       request through 'rfb' which fails right now).
-         *
+		 * Note: Because these are dummy object, accessing properties other than the configured once
+		 *       might cause NullPinterException. (Ex. Toggling touchpad mode on/off sends buffer update
+		 *       request through 'rfb' which fails right now).
+		 *
 		 * TODO: Remove this once migration to native RfbClient is complete.
 		 */
 		private void createDummyOldFramebuffer() throws Exception{

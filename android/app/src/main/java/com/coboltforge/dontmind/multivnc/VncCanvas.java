@@ -220,15 +220,15 @@ public class VncCanvas extends GLSurfaceView {
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 				if (mIsDoingNativeDrawing && vncConn.nativeRfbClient != null){
-                    /**
-                     * Currently only image texture is prepared in native code because we need access
-                     * to native frame buffer for creating image texture. Also, I want to remove bugs
-                     * before looking for optimizations.
-                     *
-                     * We might want to move the whole drawing pipeline to native code because
-                     * managed OpenGL methods are just JNI wrappers around native OpenGL functions
-                     * and we can avoid multiple JNI calls by doing everything in native code.
-                     */
+					/**
+					 * Currently only image texture is prepared in native code because we need access
+					 * to native frame buffer for creating image texture. Also, I want to remove bugs
+					 * before looking for optimizations.
+					 *
+					 * We might want to move the whole drawing pipeline to native code because
+					 * managed OpenGL methods are just JNI wrappers around native OpenGL functions
+					 * and we can avoid multiple JNI calls by doing everything in native code.
+					 */
 				    prepareTexture(vncConn.nativeRfbClient.getNativeRfbClientPtr());
 			    }else {
 
