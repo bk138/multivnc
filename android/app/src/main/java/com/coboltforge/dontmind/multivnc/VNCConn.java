@@ -50,6 +50,7 @@ public class VNCConn {
 	// the native rfbClient
 	@SuppressWarnings("unused")
 	private long rfbClient;
+	public NativeRfbClient nativeRfbClient;
 	private boolean isDoingNativeConn = false;
 	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
@@ -179,7 +180,7 @@ public class VNCConn {
     }
 
 
-    private class ServerToClientThread extends Thread {
+    private class ServerToClientThread extends Thread implements NativeRfbClient.RfbListenerInterface {
 
     	private ProgressDialog pd;
     	private Runnable setModes;
@@ -197,7 +198,18 @@ public class VNCConn {
 
 			try {
 				if(isDoingNativeConn) {
-					rfbInit(connSettings.getAddress(), connSettings.getPort());
+					//rfbInit(connSettings.getAddress(), connSettings.getPort());
+                    //TODO: We should move the construction to VNCConn constructor and make it final.
+                    nativeRfbClient = new NativeRfbClient(this);
+
+                    if (!nativeRfbClient.init(connSettings.getAddress(), connSettings.getPort())){
+                        throw new Exception("Could not initialize connection to remote server.");
+                    }
+
+					canvas.mouseX = nativeRfbClient.getFrameBufferWidth()/2;
+					canvas.mouseY = nativeRfbClient.getFrameBufferHeight()/2;
+
+					createDummyOldFramebuffer();
 				}
 				else {
 					connectAndAuthenticate();
@@ -215,16 +227,26 @@ public class VNCConn {
 				outputThread.start();
 
 				if(isDoingNativeConn) {
+					canvas.handler.post(setModes);
+
 					// main loop
 					while(maintainConnection) {
-						if(!rfbProcessServerMessage())
-							shutdown();
+						//if(!rfbProcessServerMessage())
+						//	shutdown();
+
+                        if (!nativeRfbClient.processServerMessage()) {
+                            throw new Exception("Could not process server message!");
+                        }
 					}
 				}
 				else {
 					processNormalProtocol(canvas.getContext(), pd, setModes);
 				}
 			} catch (Throwable e) {
+			    if (nativeRfbClient != null) {
+                    nativeRfbClient.cleanup();
+                }
+
 				if (maintainConnection) {
 					Log.e(TAG, e.toString());
 					e.printStackTrace();
@@ -295,7 +317,7 @@ public class VNCConn {
 
 			Log.i(TAG, "Connecting to " + connSettings.getAddress() + ", port " + connSettings.getPort() + "...");
 
-			rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort());
+			rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort(), false);
 			Log.v(TAG, "Connected to server");
 
 			// <RepeaterMagic>
@@ -394,7 +416,7 @@ public class VNCConn {
 			if (! useFull)
 				bitmapData=new LargeBitmapData(rfb, canvas, VNCConn.this, capacity);
 			else
-				bitmapData=new FullBufferBitmapData(rfb, canvas, capacity);
+				bitmapData=new FullBufferBitmapData(rfb, canvas, capacity, false);
 
 			setPixelFormat();
 
@@ -624,10 +646,107 @@ public class VNCConn {
 			}
 		}
 
+		/**
+		 * Currently, there are a LOT of references to bitmapData & rfb. I tried to put checks for
+		 * 'isDoingNativeConn' in some places but they are too many to do in one go (I gave up after 10 'if's).
+		 * So then I decided to create dummy bitmapData & rfb so that we don't have to modify existing
+		 * code all at once.
+		 *
+		 * To avoid extra socket connection and memory allocation, {@link RfbProto} & {@link FullBufferBitmapData}
+		 * are slightly modified to tell them that they are dummy objects.
+		 *
+         * Note: Because these are dummy object, accessing properties other than the configured once
+         *       might cause NullPinterException. (Ex. Toggling touchpad mode on/off sends buffer update
+         *       request through 'rfb' which fails right now).
+         *
+		 * TODO: Remove this once migration to native RfbClient is complete.
+		 */
+		private void createDummyOldFramebuffer() throws Exception{
+			rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort(), true);
 
+			//Most of the code uses following properties
+			rfb.framebufferWidth = nativeRfbClient.getFrameBufferWidth();
+			rfb.framebufferHeight = nativeRfbClient.getFrameBufferHeight();
+			rfb.inNormalProtocol = true;
+			rfb.desktopName = nativeRfbClient.getDesktopName();
 
+			bitmapData = new FullBufferBitmapData(rfb, canvas, 0, true); //Capacity is not used by FullBufferBitmapData
+		}
 
+        @Override
+        public String rfbGetPassword() {
+			boolean isPasswordRequired = connSettings.getPassword() == null || connSettings.getPassword().isEmpty();
 
+			//Ask from user if required
+			if (isPasswordRequired) {
+				canvas.getCredsFromUser(connSettings, false);
+				synchronized (VNCConn.this) {
+					try {
+						VNCConn.this.wait();  // wait for user input to finish
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+            return connSettings.getPassword();
+        }
+
+        @Override
+        public NativeRfbClient.RfbUserCredential rfbGetCredential() {
+			boolean isPasswordRequired = connSettings.getPassword() == null || connSettings.getPassword().isEmpty();
+			boolean isUsernameRequired = connSettings.getUserName() == null || connSettings.getUserName().isEmpty();
+
+			//Ask from user if required
+			if (isPasswordRequired || isUsernameRequired) {
+				canvas.getCredsFromUser(connSettings, isUsernameRequired);
+				synchronized (VNCConn.this) {
+					try {
+						VNCConn.this.wait();  // wait for user input to finish
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+            NativeRfbClient.RfbUserCredential creds = new NativeRfbClient.RfbUserCredential();
+            creds.username = connSettings.getUserName();
+            creds.password = connSettings.getPassword();
+            return creds;
+        }
+
+        @Override
+        public void rfbBell() {
+		    //TODO: Implementation
+        }
+
+        @Override
+        public void rfbGotXCutText(String text) {
+		    serverCutText = text;
+        }
+
+        @Override
+        public void rfbFinishedFrameBufferUpdate() {
+    	  	canvas.reDraw();
+
+            canvas.handler.post(new Runnable() {
+                public void run() {
+                    try {
+                        if (pd.isShowing())
+                            pd.dismiss();
+                    } catch (Exception e){
+                        //unused
+                    }
+                }
+            });
+        }
+
+        @Override
+        public boolean rfbHandleCursorPos(int x, int y) {
+    		canvas.mouseX = x;
+    		canvas.mouseY = y;
+            return true;
+        }
     }
 
 
@@ -690,6 +809,12 @@ public class VNCConn {
 					bitmapData.invalidateMousePosition();
 
 					try {
+						if (isDoingNativeConn){
+							canvas.reDraw();
+							return nativeRfbClient.sendPointerEvent(pe.x, pe.y, pe.mask);
+
+						}
+
 						rfb.writePointerEvent(pe.x,pe.y,pe.modifiers,pe.mask);
 						return true;
 					} catch (Exception e) {
@@ -710,7 +835,8 @@ public class VNCConn {
 			   try {
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
 				   if(isDoingNativeConn)
-				   	 	rfbSendKeyEvent(evt.keyCode, evt.down);
+				   	 	//rfbSendKeyEvent(evt.keyCode, evt.down);
+				       nativeRfbClient.sendKeyEvent(evt.keyCode, evt.down);
 				   else
 					   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
 				   return true;
@@ -727,6 +853,11 @@ public class VNCConn {
 
 				try {
 					if(Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
+
+                    if (isDoingNativeConn){
+                        return nativeRfbClient.sendCutText(text);
+                    }
+
 					rfb.writeClientCutText(text);
 					return true;
 				} catch (Exception e) {
@@ -804,7 +935,7 @@ public class VNCConn {
 
 		try {
 			if(isDoingNativeConn) {
-				rfbShutdown();
+				//rfbShutdown();
 			}
 			else {
 				bitmapData.dispose();
@@ -1068,9 +1199,9 @@ public class VNCConn {
 
 
 	public final String getDesktopName() {
-		if(isDoingNativeConn)
-			return rfbGetDesktopName();
-		else
+//		if(isDoingNativeConn)
+//			return rfbGetDesktopName();
+//		else
 			return rfb.desktopName;
 	}
 

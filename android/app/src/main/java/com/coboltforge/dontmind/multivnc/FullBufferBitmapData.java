@@ -28,14 +28,16 @@ class FullBufferBitmapData extends AbstractBitmapData {
 	 * @param p
 	 * @param c
 	 */
-	public FullBufferBitmapData(RfbProto p, VncCanvas c, int capacity) {
+	public FullBufferBitmapData(RfbProto p, VncCanvas c, int capacity, boolean isDummy) {
 		super(p, c);
 		framebufferwidth=rfb.framebufferWidth;
 		framebufferheight=rfb.framebufferHeight;
 		bitmapwidth= Utils.nextPow2(framebufferwidth);
 		bitmapheight=Utils.nextPow2(framebufferheight);
 		android.util.Log.i("FBBM", "bitmapsize = ("+bitmapwidth+","+bitmapheight+")");
-		bitmapPixels = new int[bitmapwidth * bitmapheight];
+
+		if (!isDummy)
+		    bitmapPixels = new int[bitmapwidth * bitmapheight];
 	}
 
 	/* (non-Javadoc)

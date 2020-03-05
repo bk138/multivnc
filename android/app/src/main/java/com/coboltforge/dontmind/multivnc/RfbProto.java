@@ -234,10 +234,13 @@ class RfbProto {
 
   
   //-RfbProto(String h, int p, VncViewer v) throws IOException {
-  RfbProto(String h, int p) throws IOException{
+  RfbProto(String h, int p, boolean isDummy) throws IOException{
   	//- viewer = v;
     host = h;
     port = p;
+
+    if(isDummy)
+      return;
 
     /*
     if (viewer.socketFactory == null) {
