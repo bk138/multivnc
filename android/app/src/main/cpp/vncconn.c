@@ -19,13 +19,17 @@
 #include <jni.h>
 #include <android/log.h>
 #include <errno.h>
-#include "rfb/rfbclient.h"
+#include <rfb/rfbclient.h>
 
 #define TAG "VNCConn-native"
 
 /* id for the managed VNCConn */
 #define VNCCONN_OBJ_ID (void*)1
 #define VNCCONN_ENV_ID (void*)2
+
+/* id for the managed NativeRfbClient  */
+#define JAVA_RFBCLIENT_OBJ_ID (void*)10
+#define JAVA_RFBCLIENT_ENV_ID (void*)11
 
 
 /*
@@ -250,3 +254,241 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
     else
         return JNI_FALSE;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+//   rfbClient wrapper
+//
+//   1. It provides implementation for native methods of 'NativeRfbClient'.
+//   2. It executes the managed callbacks when native callbacks are invoked.
+///////////////////////////////////////////////////////////////////////////////
+
+/******************************************************************************
+  Some utilities for working with JNI
+******************************************************************************/
+
+/**
+ * Returns a native copy of the given jstring.
+ * Caller is responsible for releasing the memory.
+ */
+char *getNativeStrCopy(JNIEnv *env, jstring jStr) {
+    const char *cStr = (*env)->GetStringUTFChars(env, jStr, NULL);
+    char *str = strdup(cStr);
+    (*env)->ReleaseStringUTFChars(env, jStr, cStr);
+    return str;
+}
+
+/******************************************************************************
+  Callbacks
+  TODO: See if we can reduce the boilerplate required for calling managed methods
+******************************************************************************/
+
+static char *onGetPassword(rfbClient *client) {
+    jobject obj = rfbClientGetClientData(client, JAVA_RFBCLIENT_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, JAVA_RFBCLIENT_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "cbGetPassword", "()Ljava/lang/String;");
+    jstring jPassword = (*env)->CallObjectMethod(env, obj, mid);
+
+    return getNativeStrCopy(env, jPassword);
+}
+
+static rfbCredential *onGetCredential(rfbClient *client, int credentialType) {
+    if (credentialType != rfbCredentialTypeUser) {
+        //Only user credentials (i.e. username & password) are currently supported
+        rfbClientErr("Unsupported credential type requested");
+        return NULL;
+    }
+
+    jobject obj = rfbClientGetClientData(client, JAVA_RFBCLIENT_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, JAVA_RFBCLIENT_ENV_ID);
+
+    //Retrieve credentials
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "cbGetCredential", "()Lcom/coboltforge/dontmind/multivnc/NativeRfbClient$RfbUserCredential;");
+    jobject jCredential = (*env)->CallObjectMethod(env, obj, mid);
+
+    //Extract username & password
+    jclass jCredentialCls = (*env)->GetObjectClass(env, jCredential);
+    jfieldID usernameField = (*env)->GetFieldID(env, jCredentialCls, "username", "Ljava/lang/String;");
+    jstring jUsername = (*env)->GetObjectField(env, jCredential, usernameField);
+
+    jfieldID passwordField = (*env)->GetFieldID(env, jCredentialCls, "password", "Ljava/lang/String;");
+    jstring jPassword = (*env)->GetObjectField(env, jCredential, passwordField);
+
+    //Create native rfbCredential
+    rfbCredential *credential = malloc(sizeof(rfbCredential));
+    credential->userCredential.username = getNativeStrCopy(env, jUsername);
+    credential->userCredential.password = getNativeStrCopy(env, jPassword);
+
+    return credential;
+}
+
+static void onBell(rfbClient *client) {
+    jobject obj = rfbClientGetClientData(client, JAVA_RFBCLIENT_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, JAVA_RFBCLIENT_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "cbBell", "()V");
+    (*env)->CallVoidMethod(env, obj, mid);
+}
+
+static void onGotXCutText(rfbClient *client, const char *text, int len) {
+    jobject obj = rfbClientGetClientData(client, JAVA_RFBCLIENT_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, JAVA_RFBCLIENT_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "cbGotXCutText", "(Ljava/lang/String;)V");
+    jstring jText = (*env)->NewStringUTF(env, text);
+    (*env)->CallVoidMethod(env, obj, mid, jText);
+    (*env)->DeleteLocalRef(env, jText);
+}
+
+static rfbBool onHandleCursorPos(rfbClient *client, int x, int y) {
+    jobject obj = rfbClientGetClientData(client, JAVA_RFBCLIENT_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, JAVA_RFBCLIENT_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "cbHandleCursorPos", "(II)Z");
+    jboolean result = (*env)->CallBooleanMethod(env, obj, mid, x, y);
+
+    return result == JNI_TRUE ? TRUE : FALSE;
+}
+
+static void onFinishedFrameBufferUpdate(rfbClient *client) {
+    jobject obj = rfbClientGetClientData(client, JAVA_RFBCLIENT_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, JAVA_RFBCLIENT_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "cbFinishedFrameBufferUpdate", "()V");
+    (*env)->CallVoidMethod(env, obj, mid);
+}
+
+/**
+ * Hooks callbacks to rfbClient.
+ */
+static void setCallbacks(rfbClient *client) {
+    client->GetPassword = onGetPassword;
+    client->GetCredential = onGetCredential;
+    client->Bell = onBell;
+    client->GotXCutText = onGotXCutText;
+    client->HandleCursorPos = onHandleCursorPos;
+    client->FinishedFrameBufferUpdate = onFinishedFrameBufferUpdate;
+}
+
+
+/******************************************************************************
+  Native method Implementation
+******************************************************************************/
+
+JNIEXPORT jlong JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeCreateClient(JNIEnv *env, jobject thiz) {
+    rfbClient *client = rfbGetClient(BITSPERSAMPLE, SAMPLESPERPIXEL, BYTESPERPIXEL);
+
+    setCallbacks(client);
+
+    //TODO: Fixme: Allowing only few auths during testing because TLS is causing a segfault.
+    //             It might be a bug in libvncclient OR I am doing something wrong.
+    uint32_t auths[] = {rfbVncAuth, rfbMSLogon};
+    SetClientAuthSchemes(client, auths, 2);
+
+    return (jlong) client;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeInit(JNIEnv *env, jobject thiz,
+                                                                  jlong client_ptr,
+                                                                  jstring host,
+                                                                  jint port) {
+    rfbClient *client = (rfbClient *) client_ptr;
+    rfbClientSetClientData(client, JAVA_RFBCLIENT_OBJ_ID, thiz);
+    rfbClientSetClientData(client, JAVA_RFBCLIENT_ENV_ID, env);
+
+    client->serverHost = getNativeStrCopy(env, host);
+    client->serverPort = port < 100 ? port + 5900 : port;  // Support short-form (:0, :1)
+
+    if (!rfbInitClient(client, 0, NULL)) {
+        rfbClientErr("rfbInitClient() failed inside nativeInit().");
+        return JNI_FALSE;
+    }
+
+    return JNI_TRUE;
+}
+
+JNIEXPORT void JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeCleanup(JNIEnv *env, jobject thiz,
+                                                                     jlong client_ptr) {
+    rfbClient *client = (rfbClient *) client_ptr;
+
+    if (client->frameBuffer) {
+        free(client->frameBuffer);
+        client->frameBuffer = 0;
+    }
+
+    rfbClientCleanup(client);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeProcessServerMessage(JNIEnv *env,
+                                                                                  jobject thiz,
+                                                                                  jlong client_ptr) {
+    rfbClient *client = (rfbClient *) client_ptr;
+
+    /*
+     * Save pointers to the managed RfbClient and env in the rfbClient for use in the onXYZ callbacks.
+     * We do this each time here and not in createClient() because the managed objects get moved
+     * around by the VM.
+     */
+    rfbClientSetClientData(client, JAVA_RFBCLIENT_OBJ_ID, thiz);
+    rfbClientSetClientData(client, JAVA_RFBCLIENT_ENV_ID, env);
+
+    if (!rfbProcessServerMessage(client, 500)) { //TODO: Is 500 microseconds timeout too low???
+        if (errno != EINTR) {
+            log_obj_tostring(env, thiz, "nativeProcessServerMessage() failed");
+            return JNI_FALSE;
+        }
+    }
+    return JNI_TRUE;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendKeyEvent(JNIEnv *env, jobject thiz,
+                                                                          jlong client_ptr,
+                                                                          jlong key,
+                                                                          jboolean is_down) {
+    return (jboolean) SendKeyEvent((rfbClient *) client_ptr, (uint32_t) key, is_down);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendPointerEvent(JNIEnv *env,
+                                                                              jobject thiz,
+                                                                              jlong client_ptr,
+                                                                              jint x, jint y,
+                                                                              jint mask) {
+    return (jboolean) SendPointerEvent((rfbClient *) client_ptr, x, y, mask);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendCutText(JNIEnv *env, jobject thiz, jlong client_ptr, jstring text) {
+    char *cText = getNativeStrCopy(env, text);
+    rfbBool result = SendClientCutText((rfbClient *) client_ptr, cText, strlen(cText));
+    free(cText);
+    return (jboolean) result;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetFrameBufferWidth(JNIEnv *env, jobject thiz, jlong client_ptr) {
+    return ((rfbClient *) client_ptr)->width;
+}
+
+JNIEXPORT jint JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetFrameBufferHeight(JNIEnv *env, jobject thiz, jlong client_ptr) {
+    return ((rfbClient *) client_ptr)->height;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetDesktopName(JNIEnv *env, jobject thiz, jlong client_ptr) {
+    return (*env)->NewStringUTF(env, ((rfbClient *) client_ptr)->desktopName);
+}
+
+
