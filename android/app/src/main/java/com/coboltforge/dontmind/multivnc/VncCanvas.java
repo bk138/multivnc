@@ -126,6 +126,7 @@ public class VncCanvas extends GLSurfaceView {
     private static native void on_surface_created();
     private static native void on_surface_changed(int width, int height);
     private static native void on_draw_frame();
+    private native void prepareTexture(long clientPtr);
 
 
 
@@ -139,10 +140,10 @@ public class VncCanvas extends GLSurfaceView {
 		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
-			if(mIsDoingNativeDrawing) {
-				on_surface_created();
-				return;
-			}
+//			if(mIsDoingNativeDrawing) {
+//				on_surface_created();
+//				return;
+//			}
 
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
 
@@ -184,10 +185,10 @@ public class VncCanvas extends GLSurfaceView {
 		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
 
-			if(mIsDoingNativeDrawing) {
-				on_surface_changed(width, height);
-				return;
-			}
+//			if(mIsDoingNativeDrawing) {
+//				on_surface_changed(width, height);
+//				return;
+//			}
 
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
 
@@ -207,16 +208,29 @@ public class VncCanvas extends GLSurfaceView {
 		@Override
 		public void onDrawFrame(GL10 gl) {
 
-			if(mIsDoingNativeDrawing) {
-				on_draw_frame();
-				return;
-			}
+//			if(mIsDoingNativeDrawing) {
+//				on_draw_frame();
+//				return;
+//			}
 
 			// TODO optimize: texSUBimage ?
 			// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
 
 			try{
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+
+				if (mIsDoingNativeDrawing && vncConn.nativeRfbClient != null){
+                    /**
+                     * Currently only image texture is prepared in native code because we need access
+                     * to native frame buffer for creating image texture. Also, I want to remove bugs
+                     * before looking for optimizations.
+                     *
+                     * We might want to move the whole drawing pipeline to native code because
+                     * managed OpenGL methods are just JNI wrappers around native OpenGL functions
+                     * and we can avoid multiple JNI calls by doing everything in native code.
+                     */
+				    prepareTexture(vncConn.nativeRfbClient.getNativeRfbClientPtr());
+			    }else {
 
 				if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
 
@@ -239,6 +253,7 @@ public class VncCanvas extends GLSurfaceView {
 							0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.getFramebuffer().bitmapPixels));
 
 					vncConn.unlockFramebuffer();
+				}
 				}
 
 
