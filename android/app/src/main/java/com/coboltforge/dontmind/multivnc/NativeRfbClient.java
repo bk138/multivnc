@@ -31,6 +31,11 @@ public final class NativeRfbClient {
      */
     private final RfbListenerInterface callbackListener;
 
+    /**
+     * Holds information about the current connection.
+     */
+    private ConnectionInfo connectionInfo;
+
     //region Initialization
     static {
         System.loadLibrary("vncconn");
@@ -69,6 +74,7 @@ public final class NativeRfbClient {
      * @return true if initialization was successful
      */
     public boolean init(String host, int port) {
+        connectionInfo = null;
         return nativeInit(nativeRfbClientPtr, host, port);
     }
 
@@ -117,32 +123,57 @@ public final class NativeRfbClient {
     }
 
     /**
-     * Returns width of frame buffer (in pixels).
-     */
-    public int getFrameBufferWidth() {
-        return nativeGetFrameBufferWidth(nativeRfbClientPtr);
-    }
-
-    /**
-     * Returns height of frame buffer (in pixels).
-     */
-    public int getFrameBufferHeight() {
-        return nativeGetFrameBufferHeight(nativeRfbClientPtr);
-    }
-
-    /**
-     * Returns name of the remote desktop.
-     */
-    public String getDesktopName() {
-        return nativeGetDesktopName(nativeRfbClientPtr);
-    }
-
-    /**
      * Releases all resource (native & managed) currently held.
      * After cleanup, this object should not be used any more.
      */
     public void cleanup() {
         nativeCleanup(nativeRfbClientPtr);
+    }
+
+    /**
+     * Returns information about current connection.
+     *
+     * @return
+     */
+    public ConnectionInfo getConnectionInfo() {
+        return getConnectionInfo(false);
+    }
+
+    /**
+     * Returns information about current connection.
+     *
+     * @param refresh Whether information should be reloaded from native rfbClient.
+     */
+    public ConnectionInfo getConnectionInfo(boolean refresh) {
+
+        if (refresh || connectionInfo == null) {
+            connectionInfo = new ConnectionInfo(
+                    nativeGetDesktopName(nativeRfbClientPtr),
+                    nativeGetFrameBufferWidth(nativeRfbClientPtr),
+                    nativeGetFrameBufferHeight(nativeRfbClientPtr)
+            );
+        }
+
+        return connectionInfo;
+    }
+
+    /**
+     * This class is used for representing information about the current
+     * connection.
+     *
+     * TODO: Should we make this a standalone class?
+     * TODO: Add info about encoding, security etc.
+     */
+    public static final class ConnectionInfo {
+        public final String desktopName;
+        public final int frameWidth;
+        public final int frameHeight;
+
+        public ConnectionInfo(String desktopName, int frameWidth, int frameHeight) {
+            this.desktopName = desktopName;
+            this.frameWidth = frameWidth;
+            this.frameHeight = frameHeight;
+        }
     }
     //endregion
 
@@ -152,15 +183,6 @@ public final class NativeRfbClient {
     private native boolean nativeInit(long clientPtr, String host, int port);
 
     private native boolean nativeProcessServerMessage(long clientPtr);
-
-    //TODO: This should return something like a 'ConnectionInfo' class which can contain
-    //      Remote desktop name, framebuffer size, encoding, encryption status etc...
-    //      OR
-    //      Maybe we can create separate native function for each value and assemble
-    //      'ConnectionInfo' in Java.
-    //      OR
-    //      Maybe we should return ConnectionInfo from init()
-    //private native ??????? nativeGetConnectionInfo(long clientPtr);
 
     private native boolean nativeSendKeyEvent(long clientPtr, long key, boolean isDown);
 

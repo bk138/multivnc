@@ -206,8 +206,8 @@ public class VNCConn {
 					    throw new Exception("Could not initialize connection to remote server.");
 					}
 
-					canvas.mouseX = nativeRfbClient.getFrameBufferWidth()/2;
-					canvas.mouseY = nativeRfbClient.getFrameBufferHeight()/2;
+					canvas.mouseX = nativeRfbClient.getConnectionInfo().frameWidth/2;
+					canvas.mouseY = nativeRfbClient.getConnectionInfo().frameHeight/2;
 
 					createDummyOldFramebuffer();
 				}
@@ -665,10 +665,10 @@ public class VNCConn {
 			rfb = new RfbProto(connSettings.getAddress(), connSettings.getPort(), true);
 
 			//Most of the code uses following properties
-			rfb.framebufferWidth = nativeRfbClient.getFrameBufferWidth();
-			rfb.framebufferHeight = nativeRfbClient.getFrameBufferHeight();
+			rfb.framebufferWidth = nativeRfbClient.getConnectionInfo().frameWidth;
+			rfb.framebufferHeight = nativeRfbClient.getConnectionInfo().frameHeight;
 			rfb.inNormalProtocol = true;
-			rfb.desktopName = nativeRfbClient.getDesktopName();
+			rfb.desktopName = nativeRfbClient.getConnectionInfo().desktopName;
 
 			bitmapData = new FullBufferBitmapData(rfb, canvas, 0, true); //Capacity is not used by FullBufferBitmapData
 		}
