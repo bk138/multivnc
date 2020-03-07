@@ -123,6 +123,35 @@ public final class NativeRfbClient {
     }
 
     /**
+     * Sends a request for full frame buffer update to remote server.
+     *
+     * @return Whether sent successfully
+     */
+    public boolean sendFrameBufferUpdateRequest() {
+        return sendFrameBufferUpdateRequest(
+                0,
+                0,
+                getConnectionInfo().frameWidth,
+                getConnectionInfo().frameHeight,
+                false
+        );
+    }
+
+    /**
+     * Sends frame buffer update request for given region.
+     *
+     * @param x           Horizontal start position
+     * @param y           Vertical start position
+     * @param w           Width of the region
+     * @param h           Height of the region
+     * @param incremental True if only updated parts of the region should be returned
+     * @return Whether sent successfully
+     */
+    public boolean sendFrameBufferUpdateRequest(int x, int y, int w, int h, boolean incremental) {
+        return nativeSendFrameBufferUpdateRequest(nativeRfbClientPtr, x, y, w, h, incremental);
+    }
+
+    /**
      * Releases all resource (native & managed) currently held.
      * After cleanup, this object should not be used any more.
      */
@@ -189,6 +218,8 @@ public final class NativeRfbClient {
     private native boolean nativeSendPointerEvent(long clientPtr, int x, int y, int mask);
 
     private native boolean nativeSendCutText(long clientPtr, String text);
+
+    private native boolean nativeSendFrameBufferUpdateRequest(long clientPtr, int x, int y, int w, int h, boolean incremental);
 
     private native int nativeGetFrameBufferWidth(long clientPtr);
 

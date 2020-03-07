@@ -655,9 +655,8 @@ public class VNCConn {
 		 * To avoid extra socket connection and memory allocation, {@link RfbProto} & {@link FullBufferBitmapData}
 		 * are slightly modified to tell them that they are dummy objects.
 		 *
-		 * Note: Because these are dummy object, accessing properties other than the configured once
-		 *       might cause NullPinterException. (Ex. Toggling touchpad mode on/off sends buffer update
-		 *       request through 'rfb' which fails right now).
+		 * Note: Because these are dummy object, accessing properties other than the configured ones
+		 *       might cause NullPointerException.
 		 *
 		 * TODO: Remove this once migration to native RfbClient is complete.
 		 */
@@ -772,13 +771,19 @@ public class VNCConn {
     					sendKeyEvent(ev.key);
     				if(ev.ffur != null)
 						try {
-							bitmapData.writeFullUpdateRequest(ev.ffur.incremental);
+							if (isDoingNativeConn)
+								nativeRfbClient.sendFrameBufferUpdateRequest();
+							else
+								bitmapData.writeFullUpdateRequest(ev.ffur.incremental);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
 					if(ev.fur != null)
 						try {
-							rfb.writeFramebufferUpdateRequest(ev.fur.x, ev.fur.y, ev.fur.w, ev.fur.h, ev.fur.incremental);
+							if (isDoingNativeConn)
+								nativeRfbClient.sendFrameBufferUpdateRequest(ev.fur.x, ev.fur.y, ev.fur.w, ev.fur.h, ev.fur.incremental);
+							else
+								rfb.writeFramebufferUpdateRequest(ev.fur.x, ev.fur.y, ev.fur.w, ev.fur.h, ev.fur.incremental);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}

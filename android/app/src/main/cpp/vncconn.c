@@ -476,6 +476,18 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendCutText(JNIEnv 
     return (jboolean) result;
 }
 
+JNIEXPORT jboolean JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendFrameBufferUpdateRequest(JNIEnv *env,
+                                                                                          jobject thiz,
+                                                                                          jlong client_ptr,
+                                                                                          jint x,
+                                                                                          jint y,
+                                                                                          jint w,
+                                                                                          jint h,
+                                                                                          jboolean incremental) {
+    return (jboolean) SendFramebufferUpdateRequest((rfbClient *) client_ptr, x, y, w, h, incremental);
+}
+
 JNIEXPORT jint JNICALL
 Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetFrameBufferWidth(JNIEnv *env, jobject thiz, jlong client_ptr) {
     return ((rfbClient *) client_ptr)->width;
