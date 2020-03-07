@@ -234,7 +234,7 @@ public class VNCConn {
 						//if(!rfbProcessServerMessage())
 						//	shutdown();
 
-					if (!nativeRfbClient.processServerMessage()) {
+					if (!nativeRfbClient.processServerMessage(500)) { //TODO: Is 500 microseconds timeout too low???
 							throw new Exception("Could not process server message!");
 						}
 					}

@@ -431,7 +431,8 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeCleanup(JNIEnv *env
 JNIEXPORT jboolean JNICALL
 Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeProcessServerMessage(JNIEnv *env,
                                                                                   jobject thiz,
-                                                                                  jlong client_ptr) {
+                                                                                  jlong client_ptr,
+                                                                                  jint usec_timeout) {
     rfbClient *client = (rfbClient *) client_ptr;
 
     /*
@@ -442,7 +443,7 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeProcessServerMessag
     rfbClientSetClientData(client, JAVA_RFBCLIENT_OBJ_ID, thiz);
     rfbClientSetClientData(client, JAVA_RFBCLIENT_ENV_ID, env);
 
-    if (!rfbProcessServerMessage(client, 500)) { //TODO: Is 500 microseconds timeout too low???
+    if (!rfbProcessServerMessage(client, usec_timeout)) {
         if (errno != EINTR) {
             log_obj_tostring(env, thiz, "nativeProcessServerMessage() failed");
             return JNI_FALSE;

@@ -82,11 +82,12 @@ public final class NativeRfbClient {
      * Waits for incoming server message, parses it and then invokes appropriate
      * callbacks.
      *
-     * @return true if message was successfully handled or no message was received,
+     * @param uSecTimeout Timeout in microseconds.
+     * @return true if message was successfully handled or no message was received within timeout,
      * false otherwise.
      */
-    public boolean processServerMessage() {
-        return nativeProcessServerMessage(nativeRfbClientPtr);
+    public boolean processServerMessage(int uSecTimeout) {
+        return nativeProcessServerMessage(nativeRfbClientPtr, uSecTimeout);
     }
 
     /**
@@ -211,7 +212,7 @@ public final class NativeRfbClient {
 
     private native boolean nativeInit(long clientPtr, String host, int port);
 
-    private native boolean nativeProcessServerMessage(long clientPtr);
+    private native boolean nativeProcessServerMessage(long clientPtr, int uSecTimeout);
 
     private native boolean nativeSendKeyEvent(long clientPtr, long key, boolean isDown);
 
