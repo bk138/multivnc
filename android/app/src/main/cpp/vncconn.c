@@ -504,4 +504,7 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetDesktopName(JNIE
     return (*env)->NewStringUTF(env, ((rfbClient *) client_ptr)->desktopName);
 }
 
-
+JNIEXPORT jboolean JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeIsEncrypted(JNIEnv *env, jobject thiz, jlong client_ptr) {
+    return ((rfbClient *) client_ptr)->tlsSession ? JNI_TRUE : JNI_FALSE;
+}

@@ -180,7 +180,8 @@ public final class NativeRfbClient {
             connectionInfo = new ConnectionInfo(
                     nativeGetDesktopName(nativeRfbClientPtr),
                     nativeGetFrameBufferWidth(nativeRfbClientPtr),
-                    nativeGetFrameBufferHeight(nativeRfbClientPtr)
+                    nativeGetFrameBufferHeight(nativeRfbClientPtr),
+                    nativeIsEncrypted(nativeRfbClientPtr)
             );
         }
 
@@ -192,17 +193,19 @@ public final class NativeRfbClient {
      * connection.
      *
      * TODO: Should we make this a standalone class?
-     * TODO: Add info about encoding, security etc.
+     * TODO: Add info about encoding etc.
      */
     public static final class ConnectionInfo {
         public final String desktopName;
         public final int frameWidth;
         public final int frameHeight;
+        public final boolean isEncrypted;
 
-        public ConnectionInfo(String desktopName, int frameWidth, int frameHeight) {
+        public ConnectionInfo(String desktopName, int frameWidth, int frameHeight, boolean isEncrypted) {
             this.desktopName = desktopName;
             this.frameWidth = frameWidth;
             this.frameHeight = frameHeight;
+            this.isEncrypted = isEncrypted;
         }
     }
     //endregion
@@ -227,6 +230,8 @@ public final class NativeRfbClient {
     private native int nativeGetFrameBufferHeight(long clientPtr);
 
     private native String nativeGetDesktopName(long clientPtr);
+
+    private native boolean nativeIsEncrypted(long clientPtr);
 
     private native void nativeCleanup(long clientPtr);
     //endregion
