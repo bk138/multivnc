@@ -396,11 +396,12 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeCreateClient(JNIEnv
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeInit(JNIEnv *env, jobject thiz,
-                                                                  jlong client_ptr,
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeInit(JNIEnv *env,
+                                                                  jobject thiz,
+                                                                  jlong clientPtr,
                                                                   jstring host,
                                                                   jint port) {
-    rfbClient *client = (rfbClient *) client_ptr;
+    rfbClient *client = (rfbClient *) clientPtr;
     rfbClientSetClientData(client, JAVA_RFBCLIENT_OBJ_ID, thiz);
     rfbClientSetClientData(client, JAVA_RFBCLIENT_ENV_ID, env);
 
@@ -416,9 +417,10 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeInit(JNIEnv *env, j
 }
 
 JNIEXPORT void JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeCleanup(JNIEnv *env, jobject thiz,
-                                                                     jlong client_ptr) {
-    rfbClient *client = (rfbClient *) client_ptr;
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeCleanup(JNIEnv *env,
+                                                                     jobject thiz,
+                                                                     jlong clientPtr) {
+    rfbClient *client = (rfbClient *) clientPtr;
 
     if (client->frameBuffer) {
         free(client->frameBuffer);
@@ -431,9 +433,9 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeCleanup(JNIEnv *env
 JNIEXPORT jboolean JNICALL
 Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeProcessServerMessage(JNIEnv *env,
                                                                                   jobject thiz,
-                                                                                  jlong client_ptr,
-                                                                                  jint usec_timeout) {
-    rfbClient *client = (rfbClient *) client_ptr;
+                                                                                  jlong clientPtr,
+                                                                                  jint usecTimeout) {
+    rfbClient *client = (rfbClient *) clientPtr;
 
     /*
      * Save pointers to the managed RfbClient and env in the rfbClient for use in the onXYZ callbacks.
@@ -443,7 +445,7 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeProcessServerMessag
     rfbClientSetClientData(client, JAVA_RFBCLIENT_OBJ_ID, thiz);
     rfbClientSetClientData(client, JAVA_RFBCLIENT_ENV_ID, env);
 
-    if (!rfbProcessServerMessage(client, usec_timeout)) {
+    if (!rfbProcessServerMessage(client, usecTimeout)) {
         if (errno != EINTR) {
             log_obj_tostring(env, thiz, "nativeProcessServerMessage() failed");
             return JNI_FALSE;
@@ -453,26 +455,30 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeProcessServerMessag
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendKeyEvent(JNIEnv *env, jobject thiz,
-                                                                          jlong client_ptr,
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendKeyEvent(JNIEnv *env,
+                                                                          jobject thiz,
+                                                                          jlong clientPtr,
                                                                           jlong key,
-                                                                          jboolean is_down) {
-    return (jboolean) SendKeyEvent((rfbClient *) client_ptr, (uint32_t) key, is_down);
+                                                                          jboolean isDown) {
+    return (jboolean) SendKeyEvent((rfbClient *) clientPtr, (uint32_t) key, isDown);
 }
 
 JNIEXPORT jboolean JNICALL
 Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendPointerEvent(JNIEnv *env,
                                                                               jobject thiz,
-                                                                              jlong client_ptr,
+                                                                              jlong clientPtr,
                                                                               jint x, jint y,
                                                                               jint mask) {
-    return (jboolean) SendPointerEvent((rfbClient *) client_ptr, x, y, mask);
+    return (jboolean) SendPointerEvent((rfbClient *) clientPtr, x, y, mask);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendCutText(JNIEnv *env, jobject thiz, jlong client_ptr, jstring text) {
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendCutText(JNIEnv *env,
+                                                                         jobject thiz,
+                                                                         jlong clientPtr,
+                                                                         jstring text) {
     char *cText = getNativeStrCopy(env, text);
-    rfbBool result = SendClientCutText((rfbClient *) client_ptr, cText, strlen(cText));
+    rfbBool result = SendClientCutText((rfbClient *) clientPtr, cText, strlen(cText));
     free(cText);
     return (jboolean) result;
 }
@@ -480,13 +486,13 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendCutText(JNIEnv 
 JNIEXPORT jboolean JNICALL
 Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendFrameBufferUpdateRequest(JNIEnv *env,
                                                                                           jobject thiz,
-                                                                                          jlong client_ptr,
+                                                                                          jlong clientPtr,
                                                                                           jint x,
                                                                                           jint y,
                                                                                           jint w,
                                                                                           jint h,
                                                                                           jboolean incremental) {
-    return (jboolean) SendFramebufferUpdateRequest((rfbClient *) client_ptr, x, y, w, h, incremental);
+    return (jboolean) SendFramebufferUpdateRequest((rfbClient *) clientPtr, x, y, w, h, incremental);
 }
 
 JNIEXPORT jint JNICALL

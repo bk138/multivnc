@@ -27,7 +27,7 @@ public final class NativeRfbClient {
     private final long nativeRfbClientPtr;
 
     /**
-     * RBF callback listener.
+     * RFB callback listener.
      */
     private final RfbListenerInterface callbackListener;
 
