@@ -175,22 +175,17 @@ public final class NativeRfbClient {
      * @param refresh Whether information should be reloaded from native rfbClient.
      */
     public ConnectionInfo getConnectionInfo(boolean refresh) {
-
-        if (refresh || connectionInfo == null) {
-            connectionInfo = new ConnectionInfo(
-                    nativeGetDesktopName(nativeRfbClientPtr),
-                    nativeGetFrameBufferWidth(nativeRfbClientPtr),
-                    nativeGetFrameBufferHeight(nativeRfbClientPtr),
-                    nativeIsEncrypted(nativeRfbClientPtr)
-            );
+        if (connectionInfo == null || refresh) {
+            connectionInfo = nativeGetConnectionInfo(nativeRfbClientPtr);
         }
-
         return connectionInfo;
     }
 
     /**
-     * This class is used for representing information about the current
-     * connection.
+     * This class is used for representing information about the current connection.
+     *
+     * Note: This class is instantiates by the native code. Any change in fields & constructor
+     * arguments should be synchronized with native side.
      *
      * TODO: Should we make this a standalone class?
      * TODO: Add info about encoding etc.
@@ -225,13 +220,7 @@ public final class NativeRfbClient {
 
     private native boolean nativeSendFrameBufferUpdateRequest(long clientPtr, int x, int y, int w, int h, boolean incremental);
 
-    private native int nativeGetFrameBufferWidth(long clientPtr);
-
-    private native int nativeGetFrameBufferHeight(long clientPtr);
-
-    private native String nativeGetDesktopName(long clientPtr);
-
-    private native boolean nativeIsEncrypted(long clientPtr);
+    private native ConnectionInfo nativeGetConnectionInfo(long clientPtr);
 
     private native void nativeCleanup(long clientPtr);
     //endregion

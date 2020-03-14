@@ -495,22 +495,24 @@ Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeSendFrameBufferUpda
     return (jboolean) SendFramebufferUpdateRequest((rfbClient *) clientPtr, x, y, w, h, incremental);
 }
 
-JNIEXPORT jint JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetFrameBufferWidth(JNIEnv *env, jobject thiz, jlong client_ptr) {
-    return ((rfbClient *) client_ptr)->width;
-}
+JNIEXPORT jobject JNICALL
+Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetConnectionInfo(JNIEnv *env,
+                                                                               jobject thiz,
+                                                                               jlong clientPtr) {
+    rfbClient *client = (rfbClient *) clientPtr;
 
-JNIEXPORT jint JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetFrameBufferHeight(JNIEnv *env, jobject thiz, jlong client_ptr) {
-    return ((rfbClient *) client_ptr)->height;
-}
+    jclass infoClass = (*env)->FindClass(env, "com/coboltforge/dontmind/multivnc/NativeRfbClient$ConnectionInfo");
+    jmethodID ctorId = (*env)->GetMethodID(env, infoClass, "<init>", "(Ljava/lang/String;IIZ)V");
+    if (ctorId == NULL) {
+        rfbClientErr("Could not find the constructor for 'ConnectionInfo'. Constructor signature may be incorrect");
+    }
 
-JNIEXPORT jstring JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeGetDesktopName(JNIEnv *env, jobject thiz, jlong client_ptr) {
-    return (*env)->NewStringUTF(env, ((rfbClient *) client_ptr)->desktopName);
-}
+    // Important: Keep the arguments in sync with 'ConnectionInfo' constructor.
+    jobject infoObject = (*env)->NewObject(env, infoClass, ctorId,
+                                           (*env)->NewStringUTF(env, client->desktopName),  // desktopName
+                                           client->width,                                   // frameWidth
+                                           client->height,                                  // frameHeight
+                                           client->tlsSession ? JNI_TRUE : JNI_FALSE);      // isEncrypted
 
-JNIEXPORT jboolean JNICALL
-Java_com_coboltforge_dontmind_multivnc_NativeRfbClient_nativeIsEncrypted(JNIEnv *env, jobject thiz, jlong client_ptr) {
-    return ((rfbClient *) client_ptr)->tlsSession ? JNI_TRUE : JNI_FALSE;
+    return infoObject;
 }
