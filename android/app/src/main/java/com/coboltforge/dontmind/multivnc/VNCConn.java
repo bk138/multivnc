@@ -180,7 +180,7 @@ public class VNCConn {
     }
 
 
-    private class ServerToClientThread extends Thread implements NativeRfbClient.RfbListenerInterface {
+    private class ServerToClientThread extends Thread implements NativeRfbClient.ICallbackListener {
 
     	private ProgressDialog pd;
     	private Runnable setModes;

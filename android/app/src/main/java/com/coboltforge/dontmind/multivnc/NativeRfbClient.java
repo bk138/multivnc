@@ -29,7 +29,7 @@ public final class NativeRfbClient {
     /**
      * RFB callback listener.
      */
-    private final RfbListenerInterface callbackListener;
+    private final ICallbackListener callbackListener;
 
     /**
      * Holds information about the current connection.
@@ -47,7 +47,7 @@ public final class NativeRfbClient {
      * After successful construction, you must call cleanup() on this object
      * once you are done with it so that allocated resources can be freed.
      */
-    NativeRfbClient(@NonNull RfbListenerInterface callbackListener) {
+    NativeRfbClient(@NonNull ICallbackListener callbackListener) {
         this.callbackListener = callbackListener;
         this.nativeRfbClientPtr = nativeCreateClient();
 
@@ -259,7 +259,7 @@ public final class NativeRfbClient {
     /**
      * Interface for RFB callback listener.
      */
-    interface RfbListenerInterface {
+    interface ICallbackListener {
         String rfbGetPassword();
 
         RfbUserCredential rfbGetCredential();
