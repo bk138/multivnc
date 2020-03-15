@@ -305,7 +305,7 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType) {
 
     //Retrieve credentials
     jclass cls = (*env)->GetObjectClass(env, obj);
-    jmethodID mid = (*env)->GetMethodID(env, cls, "cbGetCredential", "()Lcom/coboltforge/dontmind/multivnc/NativeRfbClient/RfbUserCredential;");
+    jmethodID mid = (*env)->GetMethodID(env, cls, "cbGetCredential", "()Lcom/coboltforge/dontmind/multivnc/NativeRfbClient/UserCredential;");
     jobject jCredential = (*env)->CallObjectMethod(env, obj, mid);
 
     //Extract username & password

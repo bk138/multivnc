@@ -232,7 +232,7 @@ public final class NativeRfbClient {
     }
 
     @Keep
-    private RfbUserCredential cbGetCredential() {
+    private UserCredential cbGetCredential() {
         return callbackListener.rfbGetCredential();
     }
 
@@ -262,7 +262,7 @@ public final class NativeRfbClient {
     interface ICallbackListener {
         String rfbGetPassword();
 
-        RfbUserCredential rfbGetCredential();
+        UserCredential rfbGetCredential();
 
         void rfbBell();
 
@@ -276,7 +276,7 @@ public final class NativeRfbClient {
     /**
      * This class is used for returning user credentials from callbacks.
      */
-    public static class RfbUserCredential {
+    public static class UserCredential {
         public String username;
         public String password;
     }

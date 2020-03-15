@@ -692,7 +692,7 @@ public class VNCConn {
         }
 
         @Override
-        public NativeRfbClient.RfbUserCredential rfbGetCredential() {
+        public NativeRfbClient.UserCredential rfbGetCredential() {
 			boolean isPasswordRequired = connSettings.getPassword() == null || connSettings.getPassword().isEmpty();
 			boolean isUsernameRequired = connSettings.getUserName() == null || connSettings.getUserName().isEmpty();
 
@@ -708,7 +708,7 @@ public class VNCConn {
 				}
 			}
 
-            NativeRfbClient.RfbUserCredential creds = new NativeRfbClient.RfbUserCredential();
+            NativeRfbClient.UserCredential creds = new NativeRfbClient.UserCredential();
             creds.username = connSettings.getUserName();
             creds.password = connSettings.getPassword();
             return creds;
