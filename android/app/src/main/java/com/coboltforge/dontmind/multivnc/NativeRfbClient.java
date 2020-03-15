@@ -252,15 +252,6 @@ public final class NativeRfbClient {
     }
 
     @Keep
-    private void cbGotFrameBufferUpdate(int x, int y, int w, int h) {
-        //TODO: 1. Decide if we really need this callback
-        //         Ex: We may want to trigger a canvas redraw,
-        //             but we already do that in cbFinishedFrameBufferUpdate
-        //      2. Do we also need all these parameters?
-        //      3. After deciding, remove OR implement it.
-    }
-
-    @Keep
     private void cbFinishedFrameBufferUpdate() {
         callbackListener.rfbFinishedFrameBufferUpdate();
     }
