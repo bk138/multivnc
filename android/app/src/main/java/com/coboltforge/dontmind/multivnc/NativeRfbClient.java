@@ -196,6 +196,7 @@ public final class NativeRfbClient {
         public final int frameHeight;
         public final boolean isEncrypted;
 
+        @Keep
         public ConnectionInfo(String desktopName, int frameWidth, int frameHeight, boolean isEncrypted) {
             this.desktopName = desktopName;
             this.frameWidth = frameWidth;
