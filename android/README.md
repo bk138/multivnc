@@ -2,6 +2,10 @@
 
 ## Technical Notes
 
+### Supported URL Schemes
+
+* `vnc://host:port`
+
 ### I/O Architecture of the Java Version
 
 * MainMenuActivity
