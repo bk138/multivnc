@@ -184,7 +184,7 @@ public final class NativeRfbClient {
     /**
      * This class is used for representing information about the current connection.
      *
-     * Note: This class is instantiates by the native code. Any change in fields & constructor
+     * Note: This class is instantiated by the native code. Any change in fields & constructor
      * arguments should be synchronized with native side.
      *
      * TODO: Should we make this a standalone class?
