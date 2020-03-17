@@ -333,7 +333,7 @@ public class VncCanvas extends GLSurfaceView {
 	private void mouseFollowPan()
 	{
 		try {
-			if (vncConn.getConnSettings().getFollowPan() & scaling.isAbleToPan())
+			if (vncConn.getConnSettings().getFollowPan())
 			{
 				int scrollx = absoluteXPosition;
 				int scrolly = absoluteYPosition;
@@ -459,10 +459,6 @@ public class VncCanvas extends GLSurfaceView {
 		} catch (NullPointerException e) {
 			return;
 		}
-
-		if (scaling != null && ! scaling.isAbleToPan())
-			return;
-
 
 		int x = mouseX;
 		int y = mouseY;
@@ -822,18 +818,6 @@ public class VncCanvas extends GLSurfaceView {
 		return (int)((double)getHeight() / getScale() + 0.5);
 	}
 
-
-	public int getCenteredXOffset() {
-		int xoffset = (vncConn.getFramebufferWidth() - getWidth()) / 2;
-		return xoffset;
-	}
-
-	public int getCenteredYOffset() {
-		int yoffset = (vncConn.getFramebufferHeight() - getHeight()) / 2;
-		return yoffset;
-	}
-
-
 	public void getCredsFromUser(final ConnectionBean c, boolean isUserNameNeeded) {
 		// this method is probably called from the vnc thread
 		post(new Runnable() {
@@ -861,21 +845,6 @@ public class VncCanvas extends GLSurfaceView {
 						}).show();
 			}
 		});
-
-	}
-
-	public ScaleType getScaleType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	// called by zoomer
-	public void setImageMatrix(Matrix matrix) {
-		reDraw();
-	}
-
-	public void setScaleType(ScaleType scaleType) {
-		// TODO Auto-generated method stub
 
 	}
 
