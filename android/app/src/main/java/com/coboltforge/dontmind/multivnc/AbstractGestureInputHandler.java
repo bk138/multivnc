@@ -23,8 +23,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	protected ScaleGestureDetector scaleGestures;
 	private VncCanvasActivity activity;
 
-	float xInitialFocus;
-	float yInitialFocus;
 	float scale_orig;
 	boolean inScaling;
 
@@ -54,28 +52,17 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	 */
 	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
-		boolean consumed = true;
-		//if (detector.)
-		//Log.i(TAG,"Focus("+detector.getFocusX()+","+detector.getFocusY()+") scaleFactor = "+detector.getScaleFactor());
-		// Calculate focus shift
 		float fx = detector.getFocusX();
 		float fy = detector.getFocusY();
-		double xfs = fx - xInitialFocus;
-		double yfs = fy - yInitialFocus;
-		double fs = Math.sqrt(xfs * xfs + yfs * yfs);
-		if (Math.abs(1.0 - detector.getScaleFactor())<0.02)
-			consumed = false;
-		if (fs * 2< Math.abs(detector.getCurrentSpan() - detector.getPreviousSpan()))
-		{
-			inScaling = true;
-			if (consumed)
-			{
-				//Log.i(TAG,"Adjust scaling "+detector.getScaleFactor());
-				if (activity.vncCanvas != null && activity.vncCanvas.scaling != null)
-					activity.vncCanvas.scaling.adjust(activity, detector.getScaleFactor(), fx, fy);
-			}
-		}
-		return consumed;
+		float sf = detector.getScaleFactor();
+
+		if (Math.abs(1.0 - sf ) < 0.01)
+			return false;
+
+		if (activity.vncCanvas != null && activity.vncCanvas.scaling != null)
+			activity.vncCanvas.scaling.adjust(activity, sf, fx, fy);
+
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -83,9 +70,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	 */
 	@Override
 	public boolean onScaleBegin(ScaleGestureDetector detector) {
-		xInitialFocus = detector.getFocusX();
-		yInitialFocus = detector.getFocusY();
-		inScaling = false;
+		inScaling = true;
 		scale_orig = activity.vncCanvas.getScale();
 		// set to continuous drawing for smoother screen updates
 		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
