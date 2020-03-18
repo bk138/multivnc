@@ -75,8 +75,7 @@ class ZoomScaling extends AbstractScaling {
 	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#adjust(com.coboltforge.dontmind.multivnc.VncCanvasActivity, float, float, float)
 	 */
 	@Override
-	void adjust(VncCanvasActivity activity, float scaleFactor, float fx,
-			float fy) {
+	void adjust(VncCanvasActivity activity, float scaleFactor, float fx, float fy) {
 		float newScale = scaleFactor * scaling;
 		if (scaleFactor < 1)
 		{
@@ -96,16 +95,13 @@ class ZoomScaling extends AbstractScaling {
 			}
 			activity.zoomer.setIsZoomOutEnabled(true);
 		}
-		// ax is the absolute x of the focus
-		int xPan = activity.vncCanvas.absoluteXPosition;
-		float ax = (fx / scaling) + xPan;
-		float newXPan = (scaling * xPan - scaling * ax + newScale * ax)/newScale;
-		int yPan = activity.vncCanvas.absoluteYPosition;
-		float ay = (fy / scaling) + yPan;
-		float newYPan = (scaling * yPan - scaling * ay + newScale * ay)/newScale;
 		scaling = newScale;
 		resolveZoom(activity);
-		activity.vncCanvas.pan((int)(newXPan - xPan), (int)(newYPan - yPan));
+
+		//Keep the focal point fixed.
+		int focusShiftX = (int) (fx * (1 - scaleFactor));
+		int focusShiftY = (int) (fy * (1 - scaleFactor));
+		activity.vncCanvas.pan(-focusShiftX, -focusShiftY);
 	}
 
 	/**
