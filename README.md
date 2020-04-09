@@ -3,7 +3,7 @@
 [![Become a patron](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bk138)
 
 MultiVNC is a cross-platform Multicast-enabled VNC viewer using
-wxWidgets and libvncclient . It runs on Unix, Mac OS X and Windows.
+wxWidgets and libvncclient. It runs on Unix, Mac OS X and Windows.
 There also is an [Android version](/android/).
 
 Both the desktop and the mobile version feature:
@@ -81,9 +81,9 @@ And cross fingers...
 
 
 To install:
-* 'make install' as root
+* `make install` as root
 * or copy binary wherever you like to
 
 
 
-That's pretty much it, have fun !
+That's pretty much it, have fun!
