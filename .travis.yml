@@ -41,4 +41,3 @@ deploy:
   project: build/package
   on:
     condition: $TRAVIS_OS_NAME = osx
-    all_branches: true
