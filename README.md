@@ -43,14 +43,6 @@ For features that are planned, but not completed yet, look at the
 
 
 
-# MulticastVNC notes
-
-You can get a modified libvncserver/libvncclient at
-https://github.com/LibVNC/libvncserver/tree/multicastvnc -
-this is the same library that MultiVNC uses internally.
-
-
-
 
 # How to compile the desktop wxWidgets version from source
 
@@ -87,3 +79,10 @@ To install:
 
 
 That's pretty much it, have fun!
+
+
+# MulticastVNC notes
+
+You can get a modified libvncserver/libvncclient at
+https://github.com/LibVNC/libvncserver/tree/multicastvnc -
+this is the same library that MultiVNC uses internally.
