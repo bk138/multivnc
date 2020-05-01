@@ -41,7 +41,19 @@ For features that are planned, but not completed yet, look at the
 [TODO](TODO.md) file.
 
 
+# How to get prebuilt packages
 
+## Prereleases
+
+These are automatically built from the current master branch and contain cutting edge features and bug fixes.
+
+  * [MultiVNC MacOS prerelease](https://multivnc-mac.surge.sh/MultiVNC-prerelease.dmg)
+
+## Releases
+
+  * [MultiVNC 0.5 (64bit) for Debian](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-1_amd64.deb/download)
+  * [MultiVNC 0.5 (64bit) for Fedora/Redhat](https://sourceforge.net/projects/multivnc/files/0.5/multivnc-0.5-2.x86_64.rpm/download)
+  * [MultiVNC 0.5 (32bit) for Microsoft Windows](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-win32-setup.exe/download)
 
 
 # How to compile the desktop wxWidgets version from source
