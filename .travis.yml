@@ -26,3 +26,19 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake .. -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl; else cmake ..; fi
   - cmake --build .
   - cpack -V
+
+# make builds available
+before_deploy:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkdir package; cp *.dmg package/MultiVNC-prerelease.dmg; fi
+
+deploy:
+  provider: surge
+  login: dontmind@sdf.org
+  token:
+    secure: JK8jvuj7scuDGAdtbDPKlraao6NuloXSseWU8ZWJm+y/mvhlr14m1ITN8wTw3T/py1GDUpSI/Z9ilxv6tlpJSLKiqzx/1L5W8NGoPczfhMN/ugwvntyzGeGr56PF/bIUHDTNRwO5WH7JeGEyqqtEGr7Ms7dK3u0mmLS3xYr0izmsV0k2/0QN7Eo5Y6VS/RZyysVTM0oysrbJbMYxcH4KcarU3Hl11jzUyE/TWpGLJA8l7uCSDBBzjBnGtFlpmHRVuM5JQ7xvNd1m9fJS6pCMfP1zZakB5rpPbnZqUEWqWM/55Jo9zVUpn2o9jxNgcmD5mVKgKmjt4ZS/d6C7ORcP8OicsuLcnMYPBxmaMGEg9sJOZtiHPMPMII9H78vcX+7RYmtZ7FXUNWBtHWx07qhZAeeXtNro4yUJ8oKI7Pzf/uPZMhp2HNHL0dTfqxerksOzamtjwASzT4D8kCytDH7bKVbH5NRUvJn/hJBBAPEycPF6DnKidBxNfoGmOnAD40GMAxJDVDqaa4OELdohclPNrehDNLF42eQ7MFtAxw60I7voHTj/PgEnIstHzqQGaolV4y6I5+aQlGQwKfkT/K21wVxvqjD49oolv7M1qlvjMQ2EfmuQ+QEC3n9pe51XEYlJLQfJkRC5oSlHyF+6AKIjqw0vdBBYW39yfbJeilvEoOo=
+  edge: true # opt in to dpl v2
+  domain: multivnc-mac.surge.sh
+  project: build/package
+  on:
+    condition: $TRAVIS_OS_NAME = osx
+    all_branches: true
