@@ -31,7 +31,6 @@
    
 # Android version:
 
-* make rotatable
 * port to libvncclient
 - unified mode of operation (?)
 
