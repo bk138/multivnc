@@ -51,6 +51,8 @@ These are automatically built from the current master branch and contain cutting
 
 ## Releases
 
+  * MultiVNC for Android is available from [Google Play](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
+    and [F-Droid](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/).
   * [MultiVNC 0.5 (64bit) for Debian](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-1_amd64.deb/download)
   * [MultiVNC 0.5 (64bit) for Fedora/Redhat](https://sourceforge.net/projects/multivnc/files/0.5/multivnc-0.5-2.x86_64.rpm/download)
   * [MultiVNC 0.5 (32bit) for Microsoft Windows](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-win32-setup.exe/download)
