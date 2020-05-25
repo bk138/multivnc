@@ -32,6 +32,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.res.Configuration;
 import android.text.ClipboardManager;
+import android.text.InputType;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -54,6 +55,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
@@ -934,6 +936,11 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		case R.id.itemSendKeyAgain:
 			sendSpecialKeyAgain();
 			return true;
+
+    case R.id.itemSetZoom:
+      setZoom();
+      return true;
+
 		case R.id.itemSaveBookmark:
 			connection.save(database.getWritableDatabase());
 			Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
@@ -987,6 +994,34 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		}
 		vncCanvas.sendMetaKey(lastSentKey);
 	}
+
+  String zoomAmount = "";
+  private void setZoom() {
+
+    AlertDialog.Builder b = new AlertDialog.Builder(this)
+      .setTitle("Set Zoom percentage");
+
+    final EditText input = new EditText(this);
+    input.setInputType(InputType.TYPE_CLASS_NUMBER);
+    b.setView(input);
+
+    b.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+          @Override
+              public void onClick(DialogInterface dialog, int which) {
+                        float zoomPercent = Float.parseFloat(input.getText().toString());
+                        float zoomFactor = zoomPercent / 100.0f;
+                        vncCanvas.scaling.setZoom(VncCanvasActivity.this, zoomFactor);
+                            }
+    });
+    b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+          @Override
+              public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                            }
+    });
+
+    b.show();
+  }
 
 	private void toggleKeyboard() {
 		InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);

@@ -110,6 +110,25 @@ class ZoomScaling extends AbstractScaling {
 		activity.showScaleToast();
 	}
 
+  @Override
+  void setZoom(VncCanvasActivity activity, float zoomFactor) {
+		resetMatrix();
+		standardizeScaling();
+    scaling = zoomFactor;
+    if (scaling < zoomFactor)
+    {
+      scaling = minimumScale;
+    }
+    if (scaling > (float)4.0)
+    {
+			scaling = (float)4.0;
+    }
+		matrix.postScale(scaling, scaling);
+		activity.vncCanvas.setImageMatrix(matrix);
+		resolveZoom(activity);
+		activity.showScaleToast();
+  }
+
 	/* (non-Javadoc)
 	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#adjust(com.coboltforge.dontmind.multivnc.VncCanvasActivity, float, float, float)
 	 */

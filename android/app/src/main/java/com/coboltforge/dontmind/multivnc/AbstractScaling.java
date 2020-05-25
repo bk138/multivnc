@@ -46,6 +46,7 @@ abstract class AbstractScaling {
 	
 	void zoomIn(VncCanvasActivity activity) {}
 	void zoomOut(VncCanvasActivity activity) {}
+  void setZoom(VncCanvasActivity activity, float zoomFactor) {}
 	
 	static AbstractScaling getByScaleType(ImageView.ScaleType scaleType)
 	{

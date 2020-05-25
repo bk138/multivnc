@@ -44,6 +44,10 @@
     </item>
 
     <item
+        android:id="@+id/itemSetZoom"
+        android:title="@string/set_zoom"/>
+
+    <item
         android:id="@+id/itemHelp"
         android:title="@string/help"/>
 
