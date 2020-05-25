@@ -995,7 +995,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		vncCanvas.sendMetaKey(lastSentKey);
 	}
 
-  String zoomAmount = "";
   private void setZoom() {
 
     AlertDialog.Builder b = new AlertDialog.Builder(this)
@@ -1006,18 +1005,19 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
     b.setView(input);
 
     b.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
-          @Override
-              public void onClick(DialogInterface dialog, int which) {
-                        float zoomPercent = Float.parseFloat(input.getText().toString());
-                        float zoomFactor = zoomPercent / 100.0f;
-                        vncCanvas.scaling.setZoom(VncCanvasActivity.this, zoomFactor);
-                            }
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        float zoomPercent = Float.parseFloat(input.getText().toString());
+        float zoomFactor = zoomPercent / 100.0f;
+        vncCanvas.scaling.setZoom(VncCanvasActivity.this, zoomFactor);
+      }
     });
+
     b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-          @Override
-              public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                            }
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        dialog.cancel();
+      }
     });
 
     b.show();
