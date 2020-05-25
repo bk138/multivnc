@@ -88,4 +88,5 @@
     ]]>
 </string>
 <string name="set_zoom">Set Zoom</string>
+<string name="set_zoom_dialog_caption">Set zoom percentage</string>
 </resources>

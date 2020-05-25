@@ -999,7 +999,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
   private void setZoom() {
 
     AlertDialog.Builder b = new AlertDialog.Builder(this)
-      .setTitle("Set Zoom percentage");
+      .setTitle(getString(R.string.set_zoom_dialog_caption));
 
     final EditText input = new EditText(this);
     input.setInputType(InputType.TYPE_CLASS_NUMBER);
