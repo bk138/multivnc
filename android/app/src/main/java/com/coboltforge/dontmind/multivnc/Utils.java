@@ -23,7 +23,6 @@ import android.view.MotionEvent;
 public class Utils {
 
 	private static final String TAG = "Utils";
-	private static boolean debug = false;
 	/**
 	 * number of app starts
 	 */
@@ -73,19 +72,9 @@ public class Utils {
 		}
 	}
 
-	public static void DEBUG(Context c)
-	{
-		try {
-			debug = (c.getPackageManager().getApplicationInfo(c.getPackageName(), 0).flags &
-					ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static boolean DEBUG()
 	{
-		return debug;
+		return BuildConfig.DEBUG;
 	}
 
 	public static void inspectEvent(MotionEvent e)

@@ -124,8 +124,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		// get package debug flag and set it
-		Utils.DEBUG(this);
 		// update appstart cound
 		Utils.updateAppStartCount(this);
 
