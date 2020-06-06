@@ -29,29 +29,12 @@ public class Utils {
 	 */
 	public static int appstarts;
 
-	public static void showYesNoPrompt(Context _context, String title, String message, OnClickListener onYesListener, OnClickListener onNoListener) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-		builder.setTitle(title);
-		builder.setIcon(android.R.drawable.ic_dialog_info); // lame icon
-		builder.setMessage(message);
-		builder.setCancelable(false);
-		builder.setPositiveButton("Yes", onYesListener);
-		builder.setNegativeButton("No", onNoListener);
-		builder.show();
-	}
-
 	public static ActivityManager getActivityManager(Context context)
 	{
 		ActivityManager result = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
 		if (result == null)
 			throw new UnsupportedOperationException("Could not retrieve ActivityManager");
 		return result;
-	}
-
-	public static MemoryInfo getMemoryInfo(Context _context) {
-		MemoryInfo info = new MemoryInfo();
-		getActivityManager(_context).getMemoryInfo(info);
-		return info;
 	}
 
 	private static int nextNoticeID = 0;
