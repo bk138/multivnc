@@ -10,9 +10,7 @@ import android.os.Build;
 import android.view.GestureDetector;
 import android.view.InputDevice;
 import android.view.MotionEvent;
-import com.antlersoft.android.bc.BCFactory;
-import com.antlersoft.android.bc.IBCScaleGestureDetector;
-import com.antlersoft.android.bc.OnScaleGestureListener;
+import android.view.ScaleGestureDetector;
 
 /**
  * An AbstractInputHandler that uses GestureDetector to detect standard gestures in touch events
@@ -20,9 +18,9 @@ import com.antlersoft.android.bc.OnScaleGestureListener;
  * @author Michael A. MacDonald
  */
 @SuppressLint("NewApi")
-abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestureListener implements OnScaleGestureListener {
+abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
 	protected GestureDetector gestures;
-	protected IBCScaleGestureDetector scaleGestures;
+	protected ScaleGestureDetector scaleGestures;
 	private VncCanvasActivity activity;
 
 	float xInitialFocus;
@@ -41,15 +39,11 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		else
 			gestures= new GestureDetector(c, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
 		gestures.setOnDoubleTapListener(this);
-		scaleGestures=BCFactory.getInstance().getScaleGestureDetector(c, this);
+		scaleGestures = new ScaleGestureDetector(c, this);
 	}
 
 	public boolean onTouchEvent(MotionEvent evt) {
-		try {
-			scaleGestures.onTouchEvent(evt);
-		}
-		catch(IllegalArgumentException e) {
-		}
+		scaleGestures.onTouchEvent(evt);
 		return gestures.onTouchEvent(evt);
 	}
 
@@ -59,7 +53,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	 * @see com.antlersoft.android.bc.OnScaleGestureListener#onScale(com.antlersoft.android.bc.IBCScaleGestureDetector)
 	 */
 	@Override
-	public boolean onScale(IBCScaleGestureDetector detector) {
+	public boolean onScale(ScaleGestureDetector detector) {
 		boolean consumed = true;
 		//if (detector.)
 		//Log.i(TAG,"Focus("+detector.getFocusX()+","+detector.getFocusY()+") scaleFactor = "+detector.getScaleFactor());
@@ -88,7 +82,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	 * @see com.antlersoft.android.bc.OnScaleGestureListener#onScaleBegin(com.antlersoft.android.bc.IBCScaleGestureDetector)
 	 */
 	@Override
-	public boolean onScaleBegin(IBCScaleGestureDetector detector) {
+	public boolean onScaleBegin(ScaleGestureDetector detector) {
 		xInitialFocus = detector.getFocusX();
 		yInitialFocus = detector.getFocusY();
 		inScaling = false;
@@ -103,7 +97,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	 * @see com.antlersoft.android.bc.OnScaleGestureListener#onScaleEnd(com.antlersoft.android.bc.IBCScaleGestureDetector)
 	 */
 	@Override
-	public void onScaleEnd(IBCScaleGestureDetector detector) {
+	public void onScaleEnd(ScaleGestureDetector detector) {
 		//Log.i(TAG,"scale end");
 		inScaling = false;
 		// reset to on-request drawing to save battery
