@@ -1,5 +1,10 @@
 # Version 1.8.x:
 
+1.8.10
+
+-   Added support for external mouse's scroll wheels.
+-   MultiVNC now completely uses vector images.
+
 1.8.9
 
 -   VNC activity is now rotatable thanks to work done by Gaurav Ujjwal.
