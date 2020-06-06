@@ -389,8 +389,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 
 
-
-		@TargetApi(14)
 		@Override
 		public boolean onGenericMotionEvent(MotionEvent e) {
 			int action = MotionEvent.ACTION_MASK;
@@ -433,6 +431,17 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 						vncCanvas.processPointerEvent(e, true, secondary);
 					}
 					vncCanvas.panToMouse();
+				}
+
+				if(e.getAction() == MotionEvent.ACTION_SCROLL) {
+					if (e.getAxisValue(MotionEvent.AXIS_VSCROLL) < 0.0f) {
+						if (Utils.DEBUG()) Log.d(TAG, "Input: scroll down");
+						vncCanvas.vncConn.sendPointerEvent(vncCanvas.mouseX, vncCanvas.mouseY, e.getMetaState(), VNCConn.MOUSE_BUTTON_SCROLL_DOWN);
+					}
+					else {
+						if (Utils.DEBUG()) Log.d(TAG, "Input: scroll up");
+						vncCanvas.vncConn.sendPointerEvent(vncCanvas.mouseX, vncCanvas.mouseY, e.getMetaState(), VNCConn.MOUSE_BUTTON_SCROLL_UP);
+					}
 				}
 
 			if(Utils.DEBUG())
