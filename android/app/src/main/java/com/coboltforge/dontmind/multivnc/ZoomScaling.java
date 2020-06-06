@@ -3,9 +3,6 @@
  */
 package com.coboltforge.dontmind.multivnc;
 
-import android.graphics.Matrix;
-import android.widget.ImageView.ScaleType;
-
 /**
  * @author Michael A. MacDonald
  */
@@ -13,46 +10,14 @@ class ZoomScaling extends AbstractScaling {
 	
 	static final String TAG = "ZoomScaling";
 
-	private Matrix matrix;
-	int canvasXOffset;
-	int canvasYOffset;
-	float scaling;
+	float scaling = 1;
 	float minimumScale;
-	
-	/**
-	 * @param id
-	 * @param scaleType
-	 */
-	public ZoomScaling() {
-		super(AbstractScaling.zoomableId, ScaleType.MATRIX);
-		matrix = new Matrix();
-		scaling = 1;
-	}
 
-	
-
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#isAbleToPan()
-	 */
-	@Override
-	boolean isAbleToPan() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#isValidInputMode(int)
-	 */
-	@Override
-	boolean isValidInputMode(int mode) {
-		return true;
-	}
-	
 	/**
 	 * Call after scaling and matrix have been changed to resolve scrolling
 	 * @param activity
 	 */
-	private void resolveZoom(VncCanvasActivity activity)
-	{
+	private void resolveZoom(VncCanvasActivity activity) {
 		activity.vncCanvas.scrollToAbsolute();
 		activity.vncCanvas.pan(0,0);
 	}
@@ -62,7 +27,6 @@ class ZoomScaling extends AbstractScaling {
 	 */
 	@Override
 	void zoomIn(VncCanvasActivity activity) {
-		resetMatrix();
 		standardizeScaling();
 		scaling += 0.25;
 		if (scaling > 4.0)
@@ -71,9 +35,8 @@ class ZoomScaling extends AbstractScaling {
 			activity.zoomer.setIsZoomInEnabled(false);
 		}
 		activity.zoomer.setIsZoomOutEnabled(true);
-		matrix.postScale(scaling, scaling);
 		//Log.v(TAG,String.format("before set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
-		activity.vncCanvas.setImageMatrix(matrix);
+		activity.vncCanvas.reDraw();
 		resolveZoom(activity);
 		// show scale
 		activity.showScaleToast();
@@ -92,7 +55,6 @@ class ZoomScaling extends AbstractScaling {
 	 */
 	@Override
 	void zoomOut(VncCanvasActivity activity) {
-		resetMatrix();
 		standardizeScaling();
 		scaling -= 0.25;
 		if (scaling < minimumScale)
@@ -101,9 +63,8 @@ class ZoomScaling extends AbstractScaling {
 			activity.zoomer.setIsZoomOutEnabled(false);
 		}
 		activity.zoomer.setIsZoomInEnabled(true);
-		matrix.postScale(scaling, scaling);
 		//Log.v(TAG,String.format("before set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
-		activity.vncCanvas.setImageMatrix(matrix);
+		activity.vncCanvas.reDraw();
 		//Log.v(TAG,String.format("after set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		resolveZoom(activity);
 		// show scale
@@ -142,20 +103,11 @@ class ZoomScaling extends AbstractScaling {
 		int yPan = activity.vncCanvas.absoluteYPosition;
 		float ay = (fy / scaling) + yPan;
 		float newYPan = (scaling * yPan - scaling * ay + newScale * ay)/newScale;
-		resetMatrix();
 		scaling = newScale;
-		matrix.postScale(scaling, scaling);
-		activity.vncCanvas.setImageMatrix(matrix);
 		resolveZoom(activity);
 		activity.vncCanvas.pan((int)(newXPan - xPan), (int)(newYPan - yPan));
 	}
 
-	private void resetMatrix()
-	{
-		matrix.reset();
-		matrix.preTranslate(canvasXOffset, canvasYOffset);
-	}
-	
 	/**
 	 *  Set scaling to one of the clicks on the zoom scale
 	 */
@@ -173,10 +125,7 @@ class ZoomScaling extends AbstractScaling {
 			super.setScaleTypeForActivity(activity);
 			scaling = (float)1.0;
 			minimumScale = activity.vncCanvas.vncConn.getFramebuffer().getMinimumScale();
-			canvasXOffset = -activity.vncCanvas.getCenteredXOffset();
-			canvasYOffset = -activity.vncCanvas.getCenteredYOffset();
-			resetMatrix();
-			activity.vncCanvas.setImageMatrix(matrix);
+			activity.vncCanvas.reDraw();
 			// Reset the pan position to (0,0)
 			resolveZoom(activity);
 		}

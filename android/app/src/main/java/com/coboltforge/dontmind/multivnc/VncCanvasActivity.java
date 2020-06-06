@@ -779,10 +779,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	 * color mode (already done), scaling
 	 */
 	void setModes() {
-
-		AbstractScaling.getByScaleType(connection.getScaleMode())
-				.setScaleTypeForActivity(this);
-
+		new ZoomScaling().setScaleTypeForActivity(this);
 	}
 
 	ConnectionBean getConnection() {
