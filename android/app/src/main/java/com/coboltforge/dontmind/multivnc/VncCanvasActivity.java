@@ -241,6 +241,21 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 					twoFingerFlingVelocityTracker.addMovement(e2);
 					twoFingerFlingVelocityTracker.computeCurrentVelocity(TWO_FINGER_FLING_UNITS);
 
+					//Ensure that both fingers are moving in same direction.
+					{
+						int id0 = e2.getPointerId(0);
+						int id1 = e2.getPointerId(1);
+
+						float velocity0X = twoFingerFlingVelocityTracker.getXVelocity(id0);
+						float velocity0Y = twoFingerFlingVelocityTracker.getYVelocity(id0);
+						float velocity1X = twoFingerFlingVelocityTracker.getXVelocity(id1);
+						float velocity1Y = twoFingerFlingVelocityTracker.getYVelocity(id1);
+
+						//Product of velocities will be negative if their sign (i.e. direction) is different
+						if (velocity0X * velocity1X < 0 || velocity0Y * velocity1Y < 0)
+							return false;
+					}
+
 					float velocityX = twoFingerFlingVelocityTracker.getXVelocity();
 					float velocityY = twoFingerFlingVelocityTracker.getYVelocity();
 
