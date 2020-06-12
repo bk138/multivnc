@@ -38,6 +38,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 			gestures= new GestureDetector(c, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
 		gestures.setOnDoubleTapListener(this);
 		scaleGestures = new ScaleGestureDetector(c, this);
+		scaleGestures.setQuickScaleEnabled(false);
 	}
 
 	public boolean onTouchEvent(MotionEvent evt) {
