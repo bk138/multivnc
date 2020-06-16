@@ -40,8 +40,6 @@ import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ZoomButton;
@@ -104,19 +102,17 @@ public class ZoomControls extends LinearLayout {
     }
     
     public void show() {
-        fade(View.VISIBLE, 0.0f, 1.0f);
+        setVisibility(VISIBLE);
+
+        //Workaround for buggy GLSurfaceView.
+        //See https://stackoverflow.com/questions/11236336/setvisibilityview-visible-doesnt-always-work-ideas
+        requestLayout();
     }
     
     public void hide() {
-        fade(View.GONE, 1.0f, 0.0f);
+        setVisibility(INVISIBLE);
     }
-    
-    private void fade(int visibility, float startAlpha, float endAlpha) {
-        AlphaAnimation anim = new AlphaAnimation(startAlpha, endAlpha);
-        anim.setDuration(500);
-        startAnimation(anim);
-        setVisibility(visibility);
-    }
+
     
     public void setIsZoomInEnabled(boolean isEnabled) {
         mZoomIn.setEnabled(isEnabled);
