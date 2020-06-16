@@ -1199,26 +1199,17 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	}
 
 
-	long hideZoomAfterMs;
 	static final long ZOOM_HIDE_DELAY_MS = 2500;
-	HideZoomRunnable hideZoomInstance = new HideZoomRunnable();
+	Runnable hideZoomInstance = () -> zoomer.hide();
 
 	private void showZoomer(boolean force) {
 		if (force || zoomer.getVisibility() != View.VISIBLE) {
 			zoomer.show();
-			hideZoomAfterMs = SystemClock.uptimeMillis() + ZOOM_HIDE_DELAY_MS;
-			vncCanvas.handler
-					.postAtTime(hideZoomInstance, hideZoomAfterMs + 10);
-		}
-	}
 
-	private class HideZoomRunnable implements Runnable {
-		public void run() {
-			if (SystemClock.uptimeMillis() >= hideZoomAfterMs) {
-				zoomer.hide();
-			}
+			//Schedule hiding of zoom controls.
+			vncCanvas.handler.removeCallbacks(hideZoomInstance);
+			vncCanvas.handler.postDelayed(hideZoomInstance, ZOOM_HIDE_DELAY_MS);
 		}
-
 	}
 
 	public void showScaleToast()
