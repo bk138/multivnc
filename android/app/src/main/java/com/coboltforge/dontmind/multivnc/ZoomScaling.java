@@ -38,8 +38,7 @@ class ZoomScaling extends AbstractScaling {
 		//Log.v(TAG,String.format("before set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		activity.vncCanvas.reDraw();
 		resolveZoom(activity);
-		// show scale
-		activity.showScaleToast();
+		activity.showZoomLevel();
 	}
 
 	/* (non-Javadoc)
@@ -67,8 +66,7 @@ class ZoomScaling extends AbstractScaling {
 		activity.vncCanvas.reDraw();
 		//Log.v(TAG,String.format("after set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		resolveZoom(activity);
-		// show scale
-		activity.showScaleToast();
+		activity.showZoomLevel();
 	}
 
 	/* (non-Javadoc)
@@ -102,6 +100,7 @@ class ZoomScaling extends AbstractScaling {
 		int focusShiftX = (int) (fx * (1 - scaleFactor));
 		int focusShiftY = (int) (fy * (1 - scaleFactor));
 		activity.vncCanvas.pan(-focusShiftX, -focusShiftY);
+		activity.showZoomLevel();
 	}
 
 	/**

@@ -55,6 +55,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
@@ -535,6 +536,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	private ConnectionBean connection;
 
 	ZoomControls zoomer;
+	TextView zoomLevel;
 	MightyInputHandler inputHandler;
 
 	ViewGroup mousebuttons;
@@ -569,6 +571,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
 		zoomer = (ZoomControls) findViewById(R.id.zoomer);
+		zoomLevel = findViewById(R.id.zoomLevel);
 
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
@@ -1212,11 +1215,13 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		}
 	}
 
-	public void showScaleToast()
+	Runnable hideZoomLevelInstance = () -> zoomLevel.setVisibility(View.INVISIBLE);
+	public void showZoomLevel()
 	{
-		// show scale
-		notificationToast.setText(getString(R.string.scale_msg) + " " + (int)(100*vncCanvas.getScale()) + "%");
-		notificationToast.show();
+		zoomLevel.setText("" + (int)(vncCanvas.getScale()*100) +"%");
+		zoomLevel.setVisibility(View.VISIBLE);
+		vncCanvas.handler.removeCallbacks(hideZoomLevelInstance);
+		vncCanvas.handler.postDelayed(hideZoomLevelInstance, ZOOM_HIDE_DELAY_MS);
 	}
 
 

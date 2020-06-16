@@ -31,6 +31,19 @@
 		android:layout_gravity="center|top"
 		/>
 
+	<TextView
+		android:id="@+id/zoomLevel"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="top|left"
+		android:layout_margin="16dp"
+		android:background="@drawable/rounded_rectangle"
+		android:text="100%"
+		android:textColor="#fff"
+		android:gravity="center"
+		android:visibility="invisible"
+		android:minWidth="50sp"/>
+
 	<com.google.android.material.floatingactionbutton.FloatingActionButton
 		android:id="@+id/fab"
 		android:layout_width="wrap_content"
