@@ -82,16 +82,7 @@ public class ZoomControls extends LinearLayout {
     public void setOnZoomKeyboardClickListener(OnClickListener listener) {
     	mZoomKeyboard.setOnClickListener(listener);
     }
-    
-    /*
-     * Sets how fast you get zoom events when the user holds down the
-     * zoom in/out buttons.
-     */
-    public void setZoomSpeed(long speed) {
-        mZoomIn.setZoomSpeed(speed);
-        mZoomOut.setZoomSpeed(speed);
-    }
-    
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         
