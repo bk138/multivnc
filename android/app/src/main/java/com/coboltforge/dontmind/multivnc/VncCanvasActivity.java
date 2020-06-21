@@ -212,8 +212,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			{
 				if(Utils.DEBUG()) Log.d(TAG, "Input: scroll multitouch");
 
-				if (inScaling)
-					return false;
 
 				// pan on 3 fingers and more
 				if(e2.getPointerCount() > 2) {

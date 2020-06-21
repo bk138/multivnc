@@ -24,7 +24,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	private VncCanvasActivity activity;
 
 	float scale_orig;
-	boolean inScaling;
 
 	private static final String TAG = "AbstractGestureInputHandler";
 
@@ -71,7 +70,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	 */
 	@Override
 	public boolean onScaleBegin(ScaleGestureDetector detector) {
-		inScaling = true;
 		scale_orig = activity.vncCanvas.getScale();
 		// set to continuous drawing for smoother screen updates
 		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
@@ -85,7 +83,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	@Override
 	public void onScaleEnd(ScaleGestureDetector detector) {
 		//Log.i(TAG,"scale end");
-		inScaling = false;
 		// reset to on-request drawing to save battery
 		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 		// show scale
