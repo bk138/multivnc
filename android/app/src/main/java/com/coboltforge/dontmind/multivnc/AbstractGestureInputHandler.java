@@ -59,7 +59,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		float fx = detector.getFocusX();
 		float fy = detector.getFocusY();
 
-		if (Math.abs(1.0 - detector.getScaleFactor()) < 0.02)
+		if (Math.abs(1.0 - detector.getScaleFactor()) < 0.01)
 			consumed = false;
 
 		if (!inScaling) {
