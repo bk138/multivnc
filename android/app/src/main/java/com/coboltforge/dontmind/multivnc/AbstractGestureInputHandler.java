@@ -62,6 +62,10 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		if (Math.abs(1.0 - detector.getScaleFactor()) < 0.01)
 			consumed = false;
 
+		//`inScaling` is used to disable multi-finger scroll/fling gestures while scaling.
+		//But instead of setting it in `onScaleBegin()`, we do it here after some checks.
+		//This is a work around for some devices which triggers scaling very early which
+		//disables fling gestures.
 		if (!inScaling) {
 			double xfs = fx - xInitialFocus;
 			double yfs = fy - yInitialFocus;
