@@ -40,6 +40,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 			gestures= new GestureDetector(c, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
 		gestures.setOnDoubleTapListener(this);
 		scaleGestures = new ScaleGestureDetector(c, this);
+		scaleGestures.setQuickScaleEnabled(false);
 	}
 
 	public boolean onTouchEvent(MotionEvent evt) {
@@ -55,26 +56,30 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
 		boolean consumed = true;
-		//if (detector.)
-		//Log.i(TAG,"Focus("+detector.getFocusX()+","+detector.getFocusY()+") scaleFactor = "+detector.getScaleFactor());
-		// Calculate focus shift
 		float fx = detector.getFocusX();
 		float fy = detector.getFocusY();
-		double xfs = fx - xInitialFocus;
-		double yfs = fy - yInitialFocus;
-		double fs = Math.sqrt(xfs * xfs + yfs * yfs);
-		if (Math.abs(1.0 - detector.getScaleFactor())<0.02)
+
+		if (Math.abs(1.0 - detector.getScaleFactor()) < 0.01)
 			consumed = false;
-		if (fs * 2< Math.abs(detector.getCurrentSpan() - detector.getPreviousSpan()))
-		{
-			inScaling = true;
-			if (consumed)
-			{
-				//Log.i(TAG,"Adjust scaling "+detector.getScaleFactor());
-				if (activity.vncCanvas != null && activity.vncCanvas.scaling != null)
-					activity.vncCanvas.scaling.adjust(activity, detector.getScaleFactor(), fx, fy);
+
+		//`inScaling` is used to disable multi-finger scroll/fling gestures while scaling.
+		//But instead of setting it in `onScaleBegin()`, we do it here after some checks.
+		//This is a work around for some devices which triggers scaling very early which
+		//disables fling gestures.
+		if (!inScaling) {
+			double xfs = fx - xInitialFocus;
+			double yfs = fy - yInitialFocus;
+			double fs = Math.sqrt(xfs * xfs + yfs * yfs);
+			if (fs * 2 < Math.abs(detector.getCurrentSpan() - detector.getPreviousSpan())) {
+				inScaling = true;
 			}
 		}
+
+		if (consumed && inScaling) {
+			if (activity.vncCanvas != null && activity.vncCanvas.scaling != null)
+				activity.vncCanvas.scaling.adjust(activity, detector.getScaleFactor(), fx, fy);
+		}
+
 		return consumed;
 	}
 
