@@ -227,7 +227,7 @@ public class VNCConn {
 						if (e.getMessage() != null && (e.getMessage().indexOf("authentication") > -1)) {
 							error = "VNC authentication failed!";
 						}
-						final String error_ = error + "<br>" + e.getLocalizedMessage();
+						final String error_ = error + "<br>" + ((e.getLocalizedMessage() != null) ? e.getLocalizedMessage() : "");
 						canvas.handler.post(new Runnable() {
 							public void run() {
 								try {
