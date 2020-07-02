@@ -1222,6 +1222,10 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		zoomLevel.setVisibility(View.VISIBLE);
 		vncCanvas.handler.removeCallbacks(hideZoomLevelInstance);
 		vncCanvas.handler.postDelayed(hideZoomLevelInstance, ZOOM_HIDE_DELAY_MS);
+
+		//Workaround for buggy GLSurfaceView.
+		//See https://stackoverflow.com/questions/11236336/setvisibilityview-visible-doesnt-always-work-ideas
+		zoomLevel.requestLayout();
 	}
 
 
