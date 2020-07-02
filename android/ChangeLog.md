@@ -1,5 +1,11 @@
 # Version 1.8.x:
 
+1.8.11
+
+-   The whole screen scaling user experience is now way smoother thanks to Gaurav Ujjwal.
+-   The online help text was updated.
+-   MultiVNC now requires Android 5 in order to make better use of vector drawables.
+
 1.8.10
 
 -   Added support for external mouse's scroll wheels.
