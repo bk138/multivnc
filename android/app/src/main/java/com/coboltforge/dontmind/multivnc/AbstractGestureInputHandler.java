@@ -76,8 +76,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		xInitialFocus = detector.getFocusX();
 		yInitialFocus = detector.getFocusY();
 		inScaling = false;
-		// set to continuous drawing for smoother screen updates
-		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 		//Log.i(TAG,"scale begin ("+xInitialFocus+","+yInitialFocus+")");
 		return true;
 	}
@@ -86,8 +84,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 	public void onScaleEnd(ScaleGestureDetector detector) {
 		//Log.i(TAG,"scale end");
 		inScaling = false;
-		// reset to on-request drawing to save battery
-		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 	}
 
 	protected boolean isTouchEvent(MotionEvent event) {
