@@ -243,6 +243,22 @@ JNIEXPORT jstring JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbGetD
         return NULL;
 }
 
+JNIEXPORT jint JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbGetFramebufferWidth(JNIEnv *env, jobject obj) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return cl->width;
+    else
+        return 0;
+}
+
+JNIEXPORT jint JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbGetFramebufferHeight(JNIEnv *env, jobject obj) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return cl->height;
+    else
+        return 0;
+}
+
 JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendKeyEvent(JNIEnv *env, jobject obj, jlong keysym, jboolean down) {
     rfbClient *cl = getRfbClient(env, obj);
     if(cl)

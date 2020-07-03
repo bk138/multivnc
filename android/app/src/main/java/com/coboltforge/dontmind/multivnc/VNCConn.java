@@ -744,6 +744,8 @@ public class VNCConn {
 	private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native String rfbGetDesktopName();
+	private native int rfbGetFramebufferWidth();
+	private native int rfbGetFramebufferHeight();
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
 
 
@@ -1075,6 +1077,10 @@ public class VNCConn {
 	}
 
 	public final int getFramebufferWidth() {
+
+		if(isDoingNativeConn)
+			return rfbGetFramebufferWidth();
+
 		try {
 			return bitmapData.framebufferwidth;
 		}
@@ -1084,6 +1090,10 @@ public class VNCConn {
 	}
 
 	public final int getFramebufferHeight() {
+
+		if(isDoingNativeConn)
+			return rfbGetFramebufferHeight();
+
 		try {
 			return bitmapData.framebufferheight;
 		}
