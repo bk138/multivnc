@@ -10,86 +10,50 @@ class ZoomScaling {
 	
 	static final String TAG = "ZoomScaling";
 
-	float scaling = 1;
-	float minimumScale;
+	float currentScale = 1;
+	float minimumScale = 1;
+	float maximumScale = 4;
 
 	/**
-	 * Call after scaling and matrix have been changed to resolve scrolling
+	 * Updates scale to given value.
 	 * @param activity
 	 */
-	private void resolveZoom(VncCanvasActivity activity) {
+	private void updateScale(float newScale, VncCanvasActivity activity) {
+		//Clamp scale to min/max limits
+		currentScale = Math.max(minimumScale, Math.min(newScale, maximumScale));
+
+		//Update Zoom controls
+		activity.zoomer.setIsZoomInEnabled(currentScale < maximumScale);
+		activity.zoomer.setIsZoomOutEnabled(currentScale > minimumScale);
+
+		//Refresh Canvas
+		activity.vncCanvas.reDraw();
 		activity.vncCanvas.scrollToAbsolute();
-		activity.vncCanvas.pan(0,0);
+		activity.vncCanvas.pan(0, 0);
+
+		//Notify user
+		activity.showZoomLevel();
 	}
 	
 	void zoomIn(VncCanvasActivity activity) {
-		standardizeScaling();
-		scaling += 0.25;
-		if (scaling > 4.0)
-		{
-			scaling = (float)4.0;
-			activity.zoomer.setIsZoomInEnabled(false);
-		}
-		activity.zoomer.setIsZoomOutEnabled(true);
-		activity.vncCanvas.reDraw();
-		resolveZoom(activity);
-		activity.showZoomLevel();
+		updateScale(currentScale + 0.25f, activity);
 	}
 
 	float getScale() {
-		return scaling;
+		return currentScale;
 	}
 
 	void zoomOut(VncCanvasActivity activity) {
-		standardizeScaling();
-		scaling -= 0.25;
-		if (scaling < minimumScale)
-		{
-			scaling = minimumScale;
-			activity.zoomer.setIsZoomOutEnabled(false);
-		}
-		activity.zoomer.setIsZoomInEnabled(true);
-		activity.vncCanvas.reDraw();
-		resolveZoom(activity);
-		activity.showZoomLevel();
+		updateScale(currentScale - 0.25f, activity);
 	}
 
 	void adjust(VncCanvasActivity activity, float scaleFactor, float fx, float fy) {
-		float newScale = scaleFactor * scaling;
-		if (scaleFactor < 1)
-		{
-			if (newScale < minimumScale)
-			{
-				newScale = minimumScale;
-				activity.zoomer.setIsZoomOutEnabled(false);
-			}
-			activity.zoomer.setIsZoomInEnabled(true);
-		}
-		else
-		{
-			if (newScale > 4)
-			{
-				newScale = 4;
-				activity.zoomer.setIsZoomInEnabled(false);
-			}
-			activity.zoomer.setIsZoomOutEnabled(true);
-		}
-		scaling = newScale;
-		resolveZoom(activity);
+		updateScale(currentScale * scaleFactor, activity);
 
 		//Keep the focal point fixed.
 		int focusShiftX = (int) (fx * (1 - scaleFactor));
 		int focusShiftY = (int) (fy * (1 - scaleFactor));
 		activity.vncCanvas.pan(-focusShiftX, -focusShiftY);
-		activity.showZoomLevel();
-	}
-
-	/**
-	 *  Set scaling to one of the clicks on the zoom scale
-	 */
-	private void standardizeScaling()
-	{
-		scaling = ((float)((int)(scaling * 4))) / 4;
 	}
 
 	/**
@@ -100,14 +64,12 @@ class ZoomScaling {
 		try {
 			activity.zoomer.hide();
 			activity.vncCanvas.scaling = this;
-			scaling = (float)1.0;
+			currentScale = (float) 1.0;
 			minimumScale = activity.vncCanvas.vncConn.getFramebuffer().getMinimumScale();
-			activity.vncCanvas.reDraw();
 			// Reset the pan position to (0,0)
-			resolveZoom(activity);
+			updateScale(currentScale, activity);
 		}
 		catch(NullPointerException e) {
 		}
 	}
-
 }
