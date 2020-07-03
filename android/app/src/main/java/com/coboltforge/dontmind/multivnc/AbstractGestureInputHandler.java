@@ -3,10 +3,7 @@
  */
 package com.coboltforge.dontmind.multivnc;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
 import android.view.GestureDetector;
 import android.view.InputDevice;
 import android.view.MotionEvent;
@@ -17,7 +14,6 @@ import android.view.ScaleGestureDetector;
  *
  * @author Michael A. MacDonald
  */
-@SuppressLint("NewApi")
 abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
 	protected GestureDetector gestures;
 	protected ScaleGestureDetector scaleGestures;
@@ -29,14 +25,10 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 
 	private static final String TAG = "AbstractGestureInputHandler";
 
-	@TargetApi(8)
 	AbstractGestureInputHandler(VncCanvasActivity c)
 	{
 		activity = c;
-		if(Build.VERSION.SDK_INT < 8)
-			gestures  = new GestureDetector(c, this);
-		else
-			gestures= new GestureDetector(c, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
+		gestures= new GestureDetector(c, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
 		gestures.setOnDoubleTapListener(this);
 		scaleGestures = new ScaleGestureDetector(c, this);
 		scaleGestures.setQuickScaleEnabled(false);
@@ -98,20 +90,8 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		activity.vncCanvas.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 	}
 
-
-	@TargetApi(9)
 	protected boolean isTouchEvent(MotionEvent event) {
-		if(Build.VERSION.SDK_INT >= 9) {
-			if ((event.getSource() == InputDevice.SOURCE_TOUCHSCREEN) ||
-				(event.getSource() == InputDevice.SOURCE_TOUCHPAD)) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-
-		// Make sure older APIs get the event
-		return true;
+		return event.getSource() == InputDevice.SOURCE_TOUCHSCREEN ||
+				event.getSource() == InputDevice.SOURCE_TOUCHPAD;
 	}
 }
