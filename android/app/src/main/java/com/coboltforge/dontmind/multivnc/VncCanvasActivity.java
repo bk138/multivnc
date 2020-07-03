@@ -697,7 +697,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			public void onClick(View v) {
 				try {
 					showZoomer(true);
-					vncCanvas.scaling.zoomIn(VncCanvasActivity.this);
+					vncCanvas.scaling.zoomIn();
 				}
 				catch(NullPointerException e) {
 				}
@@ -715,7 +715,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			public void onClick(View v) {
 				try {
 					showZoomer(true);
-					vncCanvas.scaling.zoomOut(VncCanvasActivity.this);
+					vncCanvas.scaling.zoomOut();
 				}
 				catch(NullPointerException e) {
 				}
@@ -791,7 +791,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	 * color mode (already done), scaling
 	 */
 	void setModes() {
-		new ZoomScaling().setScaleTypeForActivity(this);
+		float minScale = vncCanvas.vncConn.getFramebuffer().getMinimumScale();
+		vncCanvas.scaling = new ZoomScaling(this, minScale, 4);
 	}
 
 	ConnectionBean getConnection() {

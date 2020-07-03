@@ -13,12 +13,23 @@ class ZoomScaling {
 	float currentScale = 1;
 	float minimumScale = 1;
 	float maximumScale = 4;
+	VncCanvasActivity activity;
+
+	ZoomScaling(VncCanvasActivity activity, float minimumScale, float maximumScale) {
+		this.minimumScale = minimumScale;
+		this.maximumScale = maximumScale;
+		this.activity = activity;
+
+		// Reset the pan position to (0,0)
+		updateScale(currentScale);
+	}
 
 	/**
 	 * Updates scale to given value.
-	 * @param activity
 	 */
-	private void updateScale(float newScale, VncCanvasActivity activity) {
+	private void updateScale(float newScale) {
+		float oldScale = currentScale;
+
 		//Clamp scale to min/max limits
 		currentScale = Math.max(minimumScale, Math.min(newScale, maximumScale));
 
@@ -32,44 +43,28 @@ class ZoomScaling {
 		activity.vncCanvas.pan(0, 0);
 
 		//Notify user
-		activity.showZoomLevel();
+		if (newScale != oldScale)
+			activity.showZoomLevel();
 	}
 	
-	void zoomIn(VncCanvasActivity activity) {
-		updateScale(currentScale + 0.25f, activity);
+	void zoomIn() {
+		updateScale(currentScale + 0.25f);
 	}
 
 	float getScale() {
 		return currentScale;
 	}
 
-	void zoomOut(VncCanvasActivity activity) {
-		updateScale(currentScale - 0.25f, activity);
+	void zoomOut() {
+		updateScale(currentScale - 0.25f);
 	}
 
-	void adjust(VncCanvasActivity activity, float scaleFactor, float fx, float fy) {
-		updateScale(currentScale * scaleFactor, activity);
+	void adjust(float scaleFactor, float fx, float fy) {
+		updateScale(currentScale * scaleFactor);
 
 		//Keep the focal point fixed.
 		int focusShiftX = (int) (fx * (1 - scaleFactor));
 		int focusShiftY = (int) (fy * (1 - scaleFactor));
 		activity.vncCanvas.pan(-focusShiftX, -focusShiftY);
-	}
-
-	/**
-	 * Sets the activity's scale type to the scaling
-	 * @param activity
-	 */
-	void setScaleTypeForActivity(VncCanvasActivity activity) {
-		try {
-			activity.zoomer.hide();
-			activity.vncCanvas.scaling = this;
-			currentScale = (float) 1.0;
-			minimumScale = activity.vncCanvas.vncConn.getFramebuffer().getMinimumScale();
-			// Reset the pan position to (0,0)
-			updateScale(currentScale, activity);
-		}
-		catch(NullPointerException e) {
-		}
 	}
 }

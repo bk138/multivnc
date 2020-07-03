@@ -65,7 +65,7 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 
 		if (consumed && inScaling) {
 			if (activity.vncCanvas != null && activity.vncCanvas.scaling != null)
-				activity.vncCanvas.scaling.adjust(activity, detector.getScaleFactor(), fx, fy);
+				activity.vncCanvas.scaling.adjust(detector.getScaleFactor(), fx, fy);
 		}
 
 		return consumed;
