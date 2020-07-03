@@ -6,7 +6,7 @@ package com.coboltforge.dontmind.multivnc;
 /**
  * @author Michael A. MacDonald
  */
-class ZoomScaling extends AbstractScaling {
+class ZoomScaling {
 	
 	static final String TAG = "ZoomScaling";
 
@@ -22,10 +22,6 @@ class ZoomScaling extends AbstractScaling {
 		activity.vncCanvas.pan(0,0);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#zoomIn(com.coboltforge.dontmind.multivnc.VncCanvasActivity)
-	 */
-	@Override
 	void zoomIn(VncCanvasActivity activity) {
 		standardizeScaling();
 		scaling += 0.25;
@@ -41,18 +37,10 @@ class ZoomScaling extends AbstractScaling {
 		activity.showZoomLevel();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#getScale()
-	 */
-	@Override
 	float getScale() {
 		return scaling;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#zoomOut(com.coboltforge.dontmind.multivnc.VncCanvasActivity)
-	 */
-	@Override
 	void zoomOut(VncCanvasActivity activity) {
 		standardizeScaling();
 		scaling -= 0.25;
@@ -69,10 +57,6 @@ class ZoomScaling extends AbstractScaling {
 		activity.showZoomLevel();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#adjust(com.coboltforge.dontmind.multivnc.VncCanvasActivity, float, float, float)
-	 */
-	@Override
 	void adjust(VncCanvasActivity activity, float scaleFactor, float fx, float fy) {
 		float newScale = scaleFactor * scaling;
 		if (scaleFactor < 1)
@@ -111,13 +95,14 @@ class ZoomScaling extends AbstractScaling {
 		scaling = ((float)((int)(scaling * 4))) / 4;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractScaling#setScaleTypeForActivity(com.coboltforge.dontmind.multivnc.VncCanvasActivity)
+	/**
+	 * Sets the activity's scale type to the scaling
+	 * @param activity
 	 */
-	@Override
 	void setScaleTypeForActivity(VncCanvasActivity activity) {
 		try {
-			super.setScaleTypeForActivity(activity);
+			activity.zoomer.hide();
+			activity.vncCanvas.scaling = this;
 			scaling = (float)1.0;
 			minimumScale = activity.vncCanvas.vncConn.getFramebuffer().getMinimumScale();
 			activity.vncCanvas.reDraw();
@@ -126,7 +111,6 @@ class ZoomScaling extends AbstractScaling {
 		}
 		catch(NullPointerException e) {
 		}
-
 	}
 
 }
