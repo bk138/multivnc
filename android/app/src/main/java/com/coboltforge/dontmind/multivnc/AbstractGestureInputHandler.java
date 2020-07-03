@@ -49,9 +49,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 
 	abstract public boolean onGenericMotionEvent(MotionEvent event);
 
-	/* (non-Javadoc)
-	 * @see com.antlersoft.android.bc.OnScaleGestureListener#onScale(com.antlersoft.android.bc.IBCScaleGestureDetector)
-	 */
 	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
 		boolean consumed = true;
@@ -82,9 +79,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		return consumed;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.antlersoft.android.bc.OnScaleGestureListener#onScaleBegin(com.antlersoft.android.bc.IBCScaleGestureDetector)
-	 */
 	@Override
 	public boolean onScaleBegin(ScaleGestureDetector detector) {
 		xInitialFocus = detector.getFocusX();
@@ -96,9 +90,6 @@ abstract class AbstractGestureInputHandler extends GestureDetector.SimpleOnGestu
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.antlersoft.android.bc.OnScaleGestureListener#onScaleEnd(com.antlersoft.android.bc.IBCScaleGestureDetector)
-	 */
 	@Override
 	public void onScaleEnd(ScaleGestureDetector detector) {
 		//Log.i(TAG,"scale end");

@@ -31,7 +31,6 @@ class ZoomScaling {
 			activity.zoomer.setIsZoomInEnabled(false);
 		}
 		activity.zoomer.setIsZoomOutEnabled(true);
-		//Log.v(TAG,String.format("before set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		activity.vncCanvas.reDraw();
 		resolveZoom(activity);
 		activity.showZoomLevel();
@@ -50,9 +49,7 @@ class ZoomScaling {
 			activity.zoomer.setIsZoomOutEnabled(false);
 		}
 		activity.zoomer.setIsZoomInEnabled(true);
-		//Log.v(TAG,String.format("before set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		activity.vncCanvas.reDraw();
-		//Log.v(TAG,String.format("after set matrix scrollx = %d scrolly = %d", activity.vncCanvas.getScrollX(), activity.vncCanvas.getScrollY()));
 		resolveZoom(activity);
 		activity.showZoomLevel();
 	}
