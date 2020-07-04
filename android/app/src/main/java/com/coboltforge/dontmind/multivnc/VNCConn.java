@@ -49,7 +49,7 @@ public class VNCConn {
 	private RfbProto rfb;
 	// the native rfbClient
 	@SuppressWarnings("unused")
-	private long rfbClient;
+	long rfbClient;
 	private boolean isDoingNativeConn = false;
 	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
@@ -215,6 +215,8 @@ public class VNCConn {
 				outputThread.start();
 
 				if(isDoingNativeConn) {
+					// actually set scale type with this, otherwise no scaling
+					canvas.activity.setModes();
 					// main loop
 					while(maintainConnection) {
 						if(!rfbProcessServerMessage())
@@ -1838,6 +1840,9 @@ public class VNCConn {
 	// called from native via worker thread context
 	@SuppressWarnings("unused")
 	private void onFramebufferUpdateFinished() {
+
+		canvas.reDraw();
+
 		// Hide progress dialog
 		if (canvas.activity.firstFrameWaitDialog.isShowing())
 			canvas.handler.post(new Runnable() {

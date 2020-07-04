@@ -126,7 +126,7 @@ public class VncCanvas extends GLSurfaceView {
     private static native void on_surface_created();
     private static native void on_surface_changed(int width, int height);
     private static native void on_draw_frame();
-
+	private static native void prepareTexture(long rfbClient);
 
 
 	private class VNCGLRenderer implements GLSurfaceView.Renderer {
@@ -138,11 +138,6 @@ public class VncCanvas extends GLSurfaceView {
 
 		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
-			if(mIsDoingNativeDrawing) {
-				on_surface_created();
-				return;
-			}
 
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceCreated()");
 
@@ -184,11 +179,6 @@ public class VncCanvas extends GLSurfaceView {
 		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
 
-			if(mIsDoingNativeDrawing) {
-				on_surface_changed(width, height);
-				return;
-			}
-
 			if(Utils.DEBUG()) Log.d(TAG, "onSurfaceChanged()");
 
 			// Set the viewport (display area) to cover the entire window
@@ -207,16 +197,14 @@ public class VncCanvas extends GLSurfaceView {
 		@Override
 		public void onDrawFrame(GL10 gl) {
 
-			if(mIsDoingNativeDrawing) {
-				on_draw_frame();
-				return;
-			}
-
 			// TODO optimize: texSUBimage ?
 			// pbuffer: http://blog.shayanjaved.com/2011/05/13/android-opengl-es-2-0-render-to-texture/
 
 			try{
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+
+				if(mIsDoingNativeDrawing && vncConn.rfbClient != 0)
+					prepareTexture(vncConn.rfbClient);
 
 				if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
 
@@ -605,7 +593,7 @@ public class VncCanvas extends GLSurfaceView {
 
 	void reDraw() {
 
-		if (repaintsEnabled && vncConn.getFramebuffer() != null) {
+		if (repaintsEnabled && (vncConn.getFramebuffer() != null || (mIsDoingNativeDrawing && vncConn.rfbClient != 0))) {
 
 			// request a redraw from GL thread
 			requestRender();
