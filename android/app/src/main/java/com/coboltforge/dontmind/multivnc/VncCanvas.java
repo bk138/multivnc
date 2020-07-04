@@ -833,6 +833,24 @@ public class VncCanvas extends GLSurfaceView {
 		return scaling.getScale();
 	}
 
+	/**
+	 *
+	 * @return The smallest scale supported by the implementation; the scale at which
+	 * the bitmap would be smaller than the screen
+	 */
+	float getMinimumScale()
+	{
+		double scale = 0.75;
+		int displayWidth = getWidth();
+		int displayHeight = getHeight();
+		for (; scale >= 0; scale -= 0.25)
+		{
+			if (scale * vncConn.getFramebufferWidth() < displayWidth || scale * vncConn.getFramebufferHeight() < displayHeight)
+				break;
+		}
+		return (float)(scale + 0.25);
+	}
+
 	public int getVisibleWidth() {
 		return (int)((double)getWidth() / getScale() + 0.5);
 	}
