@@ -1875,5 +1875,22 @@ public class VNCConn {
 		Log.d(TAG, "got server cuttext: " + serverCutText);
 	}
 
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private String onGetPassword() {
+		while (connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
+			canvas.getCredsFromUser(connSettings, false); // this cares for running on the main thread
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+		}
+		return connSettings.getPassword();
+	}
+
+
 }
 

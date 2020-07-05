@@ -143,6 +143,22 @@ static void onGotCutText(rfbClient *client, const char *text, int len)
     (*env)->CallVoidMethod(env, obj, mid, jText);
 }
 
+static char *onGetPassword(rfbClient *client)
+{
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onGetPassword", "()Ljava/lang/String;");
+    jstring passwd = (*env)->CallObjectMethod(env, obj, mid);
+
+    const char *cPasswd = (*env)->GetStringUTFChars(env, passwd, NULL);
+    char *cPasswdCopy = strdup(cPasswd); // this is free()'d by LibVNCClient in HandleVncAuth()
+    (*env)->ReleaseStringUTFChars(env, passwd, cPasswd);
+
+    return cPasswdCopy;
+}
+
 
 /**
  * Allocates and sets up the VNCConn's rfbClient.
@@ -164,6 +180,7 @@ static jboolean setupClient(JNIEnv *env, jobject obj) {
     // set callbacks
     cl->FinishedFrameBufferUpdate = onFramebufferUpdateFinished;
     cl->GotXCutText = onGotCutText;
+    cl->GetPassword = onGetPassword;
 
     setRfbClient(env, obj, cl);
 
@@ -207,6 +224,14 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
         cl->serverPort += 5900;
 
     log_obj_tostring(env, obj, "rfbInit() about to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
+
+    /*
+     * Save pointers to the managed VNCConn and env in the rfbClient for use in the onXYZ callbacks.
+     * In addition to rfbProcessServerMessage(), we have to do this are as some callbacks (namely
+     * related to authentication) are called before rfbProcessServerMessage().
+     */
+    rfbClientSetClientData(cl, VNCCONN_OBJ_ID, obj);
+    rfbClientSetClientData(cl, VNCCONN_ENV_ID, env);
 
     if(!rfbInitClient(cl, 0, NULL)) {
         setRfbClient(env, obj, 0); //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
