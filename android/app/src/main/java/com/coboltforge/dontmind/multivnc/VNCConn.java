@@ -731,11 +731,14 @@ public class VNCConn {
 
 
 		private boolean sendCutText(String text) {
-			if (rfb != null && rfb.inNormalProtocol) {
+			if ((rfb != null && rfb.inNormalProtocol) || rfbClient != 0) {
 
 				try {
 					if(Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
-					rfb.writeClientCutText(text);
+					if(isDoingNativeConn)
+						rfbSendClientCutText(text);
+					else
+						rfb.writeClientCutText(text);
 					return true;
 				} catch (Exception e) {
 					return false;
@@ -756,7 +759,7 @@ public class VNCConn {
 	private native int rfbGetFramebufferHeight();
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
 	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
-
+	private native boolean rfbSendClientCutText(String text);
 
 
 	public VNCConn() {
@@ -849,7 +852,7 @@ public class VNCConn {
 
 	public boolean sendCutText(String text) {
 
-		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+		if(rfb != null && rfb.inNormalProtocol || (isDoingNativeConn && rfbClient != 0)) { // only queue if already connected
 			OutputEvent e = new OutputEvent(text);
 			outputEventQueue.add(e);
 			synchronized (outputEventQueue) {

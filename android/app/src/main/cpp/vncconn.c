@@ -286,3 +286,15 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
     else
         return JNI_FALSE;
 }
+
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendClientCutText(JNIEnv *env, jobject obj, jstring text) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl) {
+        const char *cText = (*env)->GetStringUTFChars(env, text, NULL);
+        jboolean status = SendClientCutText(cl, cText, strlen(cText));
+        (*env)->ReleaseStringUTFChars(env, text, cText);
+        return status;
+    }
+    else
+        return JNI_FALSE;
+}
