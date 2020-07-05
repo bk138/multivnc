@@ -19,6 +19,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <errno.h>
+#include <rfb/rfbclient.h>
 #include "rfb/rfbclient.h"
 
 #define TAG "VNCConn-native"
@@ -159,6 +160,44 @@ static char *onGetPassword(rfbClient *client)
     return cPasswdCopy;
 }
 
+static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
+{
+    if (credentialType != rfbCredentialTypeUser) {
+        //Only user credentials (i.e. username & password) are currently supported
+        rfbClientErr("Unsupported credential type %d requested", credentialType);
+        return NULL;
+    }
+
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    // Retrieve credentials
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onGetUserCredential", "()Lcom/coboltforge/dontmind/multivnc/VNCConn$UserCredential;");
+    jobject jCredential = (*env)->CallObjectMethod(env, obj, mid);
+
+    // Extract username & password
+    jclass jCredentialCls = (*env)->GetObjectClass(env, jCredential);
+    jfieldID usernameField = (*env)->GetFieldID(env, jCredentialCls, "username", "Ljava/lang/String;");
+    jstring jUsername = (*env)->GetObjectField(env, jCredential, usernameField);
+
+    jfieldID passwordField = (*env)->GetFieldID(env, jCredentialCls, "password", "Ljava/lang/String;");
+    jstring jPassword = (*env)->GetObjectField(env, jCredential, passwordField);
+
+    // Create native rfbCredential, this is free()'d by FreeUserCredential() in LibVNCClient
+    rfbCredential *credential = malloc(sizeof(rfbCredential));
+
+    const char *cUsername = (*env)->GetStringUTFChars(env, jUsername, NULL);
+    credential->userCredential.username = strdup(cUsername);
+    (*env)->ReleaseStringUTFChars(env, jUsername, cUsername);
+
+    const char *cPassword = (*env)->GetStringUTFChars(env, jPassword, NULL);
+    credential->userCredential.password = strdup(cPassword);
+    (*env)->ReleaseStringUTFChars(env, jPassword, cPassword);
+
+    return credential;
+}
+
 
 /**
  * Allocates and sets up the VNCConn's rfbClient.
@@ -181,6 +220,7 @@ static jboolean setupClient(JNIEnv *env, jobject obj) {
     cl->FinishedFrameBufferUpdate = onFramebufferUpdateFinished;
     cl->GotXCutText = onGotCutText;
     cl->GetPassword = onGetPassword;
+    cl->GetCredential = onGetCredential;
 
     setRfbClient(env, obj, cl);
 

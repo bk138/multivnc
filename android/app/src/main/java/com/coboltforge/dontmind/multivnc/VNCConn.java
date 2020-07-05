@@ -109,6 +109,7 @@ public class VNCConn {
     public static final int MOUSE_BUTTON_SCROLL_DOWN = 16;
 
 
+
     private class OutputEvent {
 
     	public OutputEvent(int x, int y, int modifiers, int pointerMask) {
@@ -1892,6 +1893,35 @@ public class VNCConn {
 		return connSettings.getPassword();
 	}
 
+	/**
+	 * This class is used for returning user credentials from onGetCredential() to native
+	 */
+	private static class UserCredential {
+		public String username;
+		public String password;
+	}
+
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private UserCredential onGetUserCredential() {
+
+		while (connSettings.getUserName() == null || connSettings.getUserName().isEmpty()
+			   || connSettings.getPassword() == null || connSettings.getPassword().isEmpty()) {
+			canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+		}
+
+		UserCredential creds = new UserCredential();
+		creds.username = connSettings.getUserName();
+		creds.password = connSettings.getPassword();
+		return creds;
+	}
 
 }
 
