@@ -197,7 +197,8 @@ public class VNCConn {
 
 			try {
 				if(isDoingNativeConn) {
-					rfbInit(connSettings.getAddress(), connSettings.getPort());
+					if(!rfbInit(connSettings.getAddress(), connSettings.getPort()))
+						throw new Exception(); //TODO add some error reoprting here
 				}
 				else {
 					connectAndAuthenticate();
