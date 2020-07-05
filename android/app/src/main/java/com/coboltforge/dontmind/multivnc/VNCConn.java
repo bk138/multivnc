@@ -217,6 +217,9 @@ public class VNCConn {
 				if(isDoingNativeConn) {
 					// actually set scale type with this, otherwise no scaling
 					canvas.activity.setModes();
+					// center pointer
+					canvas.mouseX = getFramebufferWidth()/2;
+					canvas.mouseY = getFramebufferHeight()/2;
 					// main loop
 					while(maintainConnection) {
 						if(!rfbProcessServerMessage())
@@ -687,6 +690,9 @@ public class VNCConn {
 
 		private boolean sendPointerEvent(OutputEvent.PointerEvent pe) {
 
+			if(isDoingNativeConn)
+				return rfbSendPointerEvent(pe.x,pe.y,pe.mask);
+
 			try {
 				if (rfb.inNormalProtocol) {
 					bitmapData.invalidateMousePosition();
@@ -749,6 +755,8 @@ public class VNCConn {
 	private native int rfbGetFramebufferWidth();
 	private native int rfbGetFramebufferHeight();
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
+	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
+
 
 
 	public VNCConn() {
@@ -857,13 +865,14 @@ public class VNCConn {
 
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 
-		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+
+		if((rfb != null && rfb.inNormalProtocol) || (isDoingNativeConn && rfbClient != 0)) { // only queue if already connected
 
 			// trim coodinates
 			if (x<0) x=0;
-			else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
+			else if (x>=getFramebufferWidth()) x=getFramebufferWidth()-1;
 			if (y<0) y=0;
-			else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
+			else if (y>=getFramebufferHeight()) y=getFramebufferHeight()-1;
 
 			OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
 			outputEventQueue.add(e);

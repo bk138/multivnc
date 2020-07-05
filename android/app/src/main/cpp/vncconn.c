@@ -266,3 +266,11 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
     else
         return JNI_FALSE;
 }
+
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendPointerEvent(JNIEnv *env, jobject obj, jint x, jint y, jint buttonMask) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return (jboolean) SendPointerEvent(cl, x, y, buttonMask);
+    else
+        return JNI_FALSE;
+}
