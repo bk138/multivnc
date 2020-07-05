@@ -1865,6 +1865,12 @@ public class VNCConn {
 			});
 	}
 
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private void onGotCutText(String text) {
+		serverCutText = text;
+		Log.d(TAG, "got server cuttext: " + serverCutText);
+	}
 
 }
 

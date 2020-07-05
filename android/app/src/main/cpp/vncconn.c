@@ -132,6 +132,17 @@ static void onFramebufferUpdateFinished(rfbClient* client)
     (*env)->CallVoidMethod(env, obj, mid);
 }
 
+static void onGotCutText(rfbClient *client, const char *text, int len)
+{
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onGotCutText", "(Ljava/lang/String;)V");
+    jstring jText = (*env)->NewStringUTF(env, text);
+    (*env)->CallVoidMethod(env, obj, mid, jText);
+}
+
 
 /**
  * Allocates and sets up the VNCConn's rfbClient.
@@ -152,6 +163,7 @@ static jboolean setupClient(JNIEnv *env, jobject obj) {
 
     // set callbacks
     cl->FinishedFrameBufferUpdate = onFramebufferUpdateFinished;
+    cl->GotXCutText = onGotCutText;
 
     setRfbClient(env, obj, cl);
 
