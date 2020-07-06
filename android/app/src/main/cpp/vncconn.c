@@ -144,8 +144,18 @@ static jboolean setRfbClient(JNIEnv *env, jobject conn, rfbClient* cl) {
 
 static void onFramebufferUpdateFinished(rfbClient* client)
 {
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onFramebufferUpdateFinished failed due to client NULL");
+        return;
+    }
+
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onFramebufferUpdateFinished failed due to env NULL");
+        return;
+    }
 
     jclass cls = (*env)->GetObjectClass(env, obj);
     jmethodID mid = (*env)->GetMethodID(env, cls, "onFramebufferUpdateFinished", "()V");
@@ -154,8 +164,18 @@ static void onFramebufferUpdateFinished(rfbClient* client)
 
 static void onGotCutText(rfbClient *client, const char *text, int len)
 {
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutText failed due to client NULL");
+        return;
+    }
+
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutText failed due to env NULL");
+        return;
+    }
 
     jclass cls = (*env)->GetObjectClass(env, obj);
     jmethodID mid = (*env)->GetMethodID(env, cls, "onGotCutText", "(Ljava/lang/String;)V");
@@ -165,14 +185,28 @@ static void onGotCutText(rfbClient *client, const char *text, int len)
 
 static char *onGetPassword(rfbClient *client)
 {
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetPassword failed due to client NULL");
+        return NULL;
+    }
+
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetPassword failed due to env NULL");
+        return NULL;
+    }
 
     jclass cls = (*env)->GetObjectClass(env, obj);
     jmethodID mid = (*env)->GetMethodID(env, cls, "onGetPassword", "()Ljava/lang/String;");
     jstring passwd = (*env)->CallObjectMethod(env, obj, mid);
 
     const char *cPasswd = (*env)->GetStringUTFChars(env, passwd, NULL);
+    if(!cPasswd) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetPassword failed due to cPasswd NULL");
+        return NULL;
+    }
     char *cPasswdCopy = strdup(cPasswd); // this is free()'d by LibVNCClient in HandleVncAuth()
     (*env)->ReleaseStringUTFChars(env, passwd, cPasswd);
 
@@ -181,14 +215,24 @@ static char *onGetPassword(rfbClient *client)
 
 static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
 {
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to client NULL");
+        return NULL;
+    }
+
     if (credentialType != rfbCredentialTypeUser) {
         //Only user credentials (i.e. username & password) are currently supported
-        rfbClientErr("Unsupported credential type %d requested", credentialType);
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to unsupported credential type %d requested", credentialType);
         return NULL;
     }
 
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to env NULL");
+        return NULL;
+    }
 
     // Retrieve credentials
     jclass cls = (*env)->GetObjectClass(env, obj);
@@ -205,12 +249,24 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
 
     // Create native rfbCredential, this is free()'d by FreeUserCredential() in LibVNCClient
     rfbCredential *credential = malloc(sizeof(rfbCredential));
+    if(!credential) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to credential NULL");
+        return NULL;
+    }
 
     const char *cUsername = (*env)->GetStringUTFChars(env, jUsername, NULL);
+    if(!cUsername) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to cUsername NULL");
+        return NULL;
+    }
     credential->userCredential.username = strdup(cUsername);
     (*env)->ReleaseStringUTFChars(env, jUsername, cUsername);
 
     const char *cPassword = (*env)->GetStringUTFChars(env, jPassword, NULL);
+    if(!cPassword) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to cPassword NULL");
+        return NULL;
+    }
     credential->userCredential.password = strdup(cPassword);
     (*env)->ReleaseStringUTFChars(env, jPassword, cPassword);
 
