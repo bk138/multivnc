@@ -291,6 +291,11 @@ static jboolean setupClient(JNIEnv *env, jobject obj) {
 
     rfbClient *cl = rfbGetClient(BITSPERSAMPLE, SAMPLESPERPIXEL, BYTESPERPIXEL);
 
+    if(!cl) {
+        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "setupClient() failed due to client NULL");
+        return JNI_FALSE;
+    }
+
     // set callbacks
     cl->FinishedFrameBufferUpdate = onFramebufferUpdateFinished;
     cl->GotXCutText = onGotCutText;
@@ -327,11 +332,18 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
 
     rfbClient *cl = getRfbClient(env, obj);
 
+    if(!cl) {
+        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbInit() failed due to client NULL");
+        return JNI_FALSE;
+    }
+
     cl->programName = "VNCConn";
 
     const char *cHost = (*env)->GetStringUTFChars(env, host, NULL);
-    cl->serverHost = strdup(cHost);
-    (*env)->ReleaseStringUTFChars(env, host, cHost);
+    if(cHost) {
+        cl->serverHost = strdup(cHost);
+        (*env)->ReleaseStringUTFChars(env, host, cHost);
+    }
 
     cl->serverPort = port;
     // Support short-form (:0, :1)
@@ -350,12 +362,13 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
 
     if(!rfbInitClient(cl, 0, NULL)) {
         setRfbClient(env, obj, 0); //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
-        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbInit() failed. Cleanup by library.");
+        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbInit() connection failed. Cleanup by library.");
         return JNI_FALSE;
     }
 
     // if there was an error in alloc_framebuffer(), catch that here
     if(!cl->frameBuffer) {
+        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbInit() failed due to framebuffer NULL");
         Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdown(env, obj);
         return JNI_FALSE;
     }
@@ -366,6 +379,11 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
 
 JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbProcessServerMessage(JNIEnv *env, jobject obj) {
     rfbClient *cl = getRfbClient(env, obj);
+
+    if(!cl) {
+        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbProcessServerMessage() failed due to client NULL");
+        return JNI_FALSE;
+    }
 
     /*
      * Save pointers to the managed VNCConn and env in the rfbClient for use in the onXYZ callbacks.
