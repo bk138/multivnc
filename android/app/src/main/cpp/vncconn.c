@@ -162,7 +162,7 @@ static void onFramebufferUpdateFinished(rfbClient* client)
     (*env)->CallVoidMethod(env, obj, mid);
 }
 
-static void onGotCutText(rfbClient *client, const char *text, int len)
+static void onGotCutText(rfbClient *client, const char *text, int __unused len)
 {
     if(!client) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutText failed due to client NULL");
@@ -449,7 +449,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
     rfbClient *cl = getRfbClient(env, obj);
     if(cl) {
         const char *cText = (*env)->GetStringUTFChars(env, text, NULL);
-        jboolean status = SendClientCutText(cl, cText, strlen(cText));
+        jboolean status = SendClientCutText(cl, (char*)cText, (int)strlen(cText));
         (*env)->ReleaseStringUTFChars(env, text, cText);
         return status;
     }
