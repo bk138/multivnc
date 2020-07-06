@@ -104,6 +104,12 @@ JNIEXPORT jint JNI_OnLoad(JavaVM __unused * vm, void __unused * reserved) {
  * Get the managed VNCConn's rfbClient.
  */
 static rfbClient* getRfbClient(JNIEnv *env, jobject conn) {
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "getRfbClient failed due to env NULL");
+        return NULL;
+    }
+
     rfbClient* cl = NULL;
     jclass cls = (*env)->GetObjectClass(env, conn);
     jfieldID fid = (*env)->GetFieldID(env, cls, "rfbClient", "J");
@@ -119,6 +125,12 @@ static rfbClient* getRfbClient(JNIEnv *env, jobject conn) {
  * Set the managed VNCConn's rfbClient.
  */
 static jboolean setRfbClient(JNIEnv *env, jobject conn, rfbClient* cl) {
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "setRfbClient failed due to env NULL");
+        return JNI_FALSE;
+    }
+
     jclass cls = (*env)->GetObjectClass(env, conn);
     jfieldID fid = (*env)->GetFieldID(env, cls, "rfbClient", "J");
     if (fid == 0)
