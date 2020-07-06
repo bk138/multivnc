@@ -58,7 +58,7 @@ static void logcat_logger(const char *format, ...)
 }
 
 
-static void log_obj_tostring(JNIEnv *env, jobject obj, const char *format, ...) {
+static void log_obj_tostring(JNIEnv *env, jobject obj, int prio, const char *format, ...) {
 
     if(!env)
         return;
@@ -78,7 +78,7 @@ static void log_obj_tostring(JNIEnv *env, jobject obj, const char *format, ...) 
     snprintf((char*)format_buf, format_buf_len, "%s: %s", cStr, format);
 
     va_start(args, format);
-    __android_log_vprint(ANDROID_LOG_INFO, TAG, (char*)format_buf, args);
+    __android_log_vprint(prio, TAG, (char*)format_buf, args);
     va_end(args);
 
     (*env)->ReleaseStringUTFChars(env, jStr, cStr);
@@ -282,10 +282,10 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
  */
 static jboolean setupClient(JNIEnv *env, jobject obj) {
 
-    log_obj_tostring(env, obj, "setupClient()");
+    log_obj_tostring(env, obj, ANDROID_LOG_INFO, "setupClient()");
 
     if(getRfbClient(env, obj)) { /* already set up */
-        log_obj_tostring(env, obj, "setupClient() already done");
+        log_obj_tostring(env, obj, ANDROID_LOG_INFO, "setupClient() already done");
         return JNI_FALSE;
     }
 
@@ -305,7 +305,7 @@ static jboolean setupClient(JNIEnv *env, jobject obj) {
 JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdown(JNIEnv *env, jobject obj) {
     rfbClient *cl = getRfbClient(env, obj);
     if(cl) {
-        log_obj_tostring(env, obj,  "rfbShutdown() closing connection");
+        log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbShutdown() closing connection");
         close(cl->sock);
 
         if(cl->frameBuffer) {
@@ -320,7 +320,7 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
 }
 
 JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port) {
-    log_obj_tostring(env, obj, "rfbInit()");
+    log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit()");
 
     if(!getRfbClient(env, obj))
         setupClient(env, obj);
@@ -338,7 +338,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
     if(cl->serverPort < 100)
         cl->serverPort += 5900;
 
-    log_obj_tostring(env, obj, "rfbInit() about to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
+    log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() about to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
 
     /*
      * Save pointers to the managed VNCConn and env in the rfbClient for use in the onXYZ callbacks.
@@ -350,7 +350,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
 
     if(!rfbInitClient(cl, 0, NULL)) {
         setRfbClient(env, obj, 0); //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
-        log_obj_tostring(env, obj, "rfbInit() failed. Cleanup by library.");
+        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbInit() failed. Cleanup by library.");
         return JNI_FALSE;
     }
 
@@ -380,7 +380,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbPro
         if(errno == EINTR)
             return JNI_TRUE;
 
-        log_obj_tostring(env, obj,"rfbProcessServerMessage() failed");
+        log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbProcessServerMessage() failed");
         return JNI_FALSE;
     }
     return JNI_TRUE;
