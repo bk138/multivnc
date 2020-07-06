@@ -59,10 +59,17 @@ static void logcat_logger(const char *format, ...)
 
 
 static void log_obj_tostring(JNIEnv *env, jobject obj, const char *format, ...) {
+
+    if(!env)
+        return;
+
     jclass cls = (*env)->GetObjectClass(env, obj);
     jmethodID mid = (*env)->GetMethodID(env, cls, "toString", "()Ljava/lang/String;");
     jstring jStr = (*env)->CallObjectMethod(env, obj, mid);
     const char *cStr = (*env)->GetStringUTFChars(env, jStr, NULL);
+    if(!cStr)
+        return;
+
     va_list args;
 
     /* prefix format string with result of toString() */
