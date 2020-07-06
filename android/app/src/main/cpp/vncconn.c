@@ -45,7 +45,7 @@
  * There's no per-connection log since we cannot find out which client
  * called the logger function :-(
  */
-static void logcat_logger(const char *format, ...)
+static void logcat_info(const char *format, ...)
 {
     va_list args;
 
@@ -57,6 +57,17 @@ static void logcat_logger(const char *format, ...)
     va_end(args);
 }
 
+static void logcat_err(const char *format, ...)
+{
+    va_list args;
+
+    if(!rfbEnableClientLogging)
+        return;
+
+    va_start(args, format);
+    __android_log_vprint(ANDROID_LOG_ERROR, TAG, format, args);
+    va_end(args);
+}
 
 static void log_obj_tostring(JNIEnv *env, jobject obj, int prio, const char *format, ...) {
 
@@ -94,7 +105,8 @@ JNIEXPORT jint JNI_OnLoad(JavaVM __unused * vm, void __unused * reserved) {
 
     __android_log_print(ANDROID_LOG_DEBUG, TAG, "libvncconn loading\n");
 
-    rfbClientLog = rfbClientErr = logcat_logger;
+    rfbClientLog = logcat_info;
+    rfbClientErr = logcat_err;
 
     return JNI_VERSION_1_6;
 }
