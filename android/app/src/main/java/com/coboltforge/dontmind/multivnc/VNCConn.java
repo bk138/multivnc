@@ -224,8 +224,10 @@ public class VNCConn {
 					canvas.mouseY = getFramebufferHeight()/2;
 					// main loop
 					while(maintainConnection) {
-						if(!rfbProcessServerMessage())
-							shutdown();
+						if(!rfbProcessServerMessage()) {
+							rfbShutdown();
+							throw new Exception();
+						}
 					}
 				}
 				else {
