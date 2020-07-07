@@ -203,8 +203,11 @@ public class VncCanvas extends GLSurfaceView {
 			try{
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-				if(mIsDoingNativeDrawing && vncConn.rfbClient != 0)
+				if(mIsDoingNativeDrawing && vncConn.rfbClient != 0) {
+					vncConn.lockFramebuffer();
 					prepareTexture(vncConn.rfbClient);
+					vncConn.unlockFramebuffer();
+				}
 
 				if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
 

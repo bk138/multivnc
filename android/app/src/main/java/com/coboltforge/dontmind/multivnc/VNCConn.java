@@ -198,8 +198,12 @@ public class VNCConn {
 
 			try {
 				if(isDoingNativeConn) {
-					if(!rfbInit(connSettings.getAddress(), connSettings.getPort()))
+					lockFramebuffer();
+					if(!rfbInit(connSettings.getAddress(), connSettings.getPort())) {
+						unlockFramebuffer();
 						throw new Exception(); //TODO add some error reoprting here
+					}
+					unlockFramebuffer();
 				}
 				else {
 					connectAndAuthenticate();
@@ -225,7 +229,9 @@ public class VNCConn {
 					// main loop
 					while(maintainConnection) {
 						if(!rfbProcessServerMessage()) {
+							lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
 							rfbShutdown();
+							unlockFramebuffer();
 							throw new Exception();
 						}
 					}
