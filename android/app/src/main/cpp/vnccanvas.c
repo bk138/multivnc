@@ -23,15 +23,18 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VncCanvas_prepareT
 
     rfbClient *client = (rfbClient *) rfbClientPtr;
 
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_RGBA,
-                 client->width,
-                 client->height,
-                 0,
-                 GL_RGBA,
-                 GL_UNSIGNED_BYTE,
-                 client->frameBuffer);
+    if (client && client->frameBuffer) {
+        //TODO fix race that occurs on client cleanup
+        glTexImage2D(GL_TEXTURE_2D,
+                     0,
+                     GL_RGBA,
+                     client->width,
+                     client->height,
+                     0,
+                     GL_RGBA,
+                     GL_UNSIGNED_BYTE,
+                     client->frameBuffer);
+    }
 
 }
 
