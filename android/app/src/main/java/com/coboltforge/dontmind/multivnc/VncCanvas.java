@@ -345,6 +345,7 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		mouseX=x;
 		mouseY=y;
+		reDraw(); // update local pointer position
 		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
 	}
 

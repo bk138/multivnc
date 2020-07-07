@@ -124,6 +124,7 @@ public class MouseButtonView extends View {
 
 					canvas.mouseX = (int) newRemoteX;
 					canvas.mouseY = (int) newRemoteY;
+					canvas.reDraw(); // update local pointer position
 					canvas.panToMouse();
 				}
 				break;
