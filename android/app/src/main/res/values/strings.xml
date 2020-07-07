@@ -86,4 +86,5 @@
         Change Log</a>.
     ]]>
 </string>
+    <string name="beta_use_native_connections">BETA: Use Native Connections (support MacOS/TurboVNC/Vino)\nPlease write to multivnc@christianbeier.net for feedback.</string>
 </resources>

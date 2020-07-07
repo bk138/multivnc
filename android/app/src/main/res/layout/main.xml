@@ -17,7 +17,8 @@
             android:id="@+id/checkBoxNative"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BETA: Use Native Connections"
+            android:text="@string/beta_use_native_connections"
+            android:autoLink="email"
             android:textColor="@android:color/holo_red_dark"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
 
