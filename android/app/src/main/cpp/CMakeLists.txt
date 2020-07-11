@@ -1,11 +1,8 @@
 
-cmake_minimum_required(VERSION 3.4.1)
-
-project (MultiVNC C ASM) # defaults to C, the ASM is needed for LibreSSL
-
-set(BUILD_SHARED_LIBS OFF)
+cmake_minimum_required(VERSION 3.6)
 
 # build libJPEG
+set(BUILD_SHARED_LIBS OFF)
 set(libjpeg_src_DIR ../../../../../libjpeg-turbo)
 set(libjpeg_build_DIR ${CMAKE_BINARY_DIR}/libjpeg)
 # adds a source subdir with specifying a build output dir
@@ -19,21 +16,19 @@ include_directories(
         ${libjpeg_build_DIR}
 )
 
-# build libressl
-set(libssl_src_DIR ../../../../../libressl)
-set(libssl_build_DIR ${CMAKE_BINARY_DIR}/libssl)
-# adds a source subdir with specifying a build output dir
-add_subdirectory(${libssl_src_DIR} ${libssl_build_DIR})
+# find openssl prefab
+find_package(openssl REQUIRED CONFIG)
 # set these variables so Findssl can find the library
-set(OPENSSL_SSL_LIBRARY ${libssl_build_DIR}/ssl/libssl.a)
-set(OPENSSL_CRYPTO_LIBRARY ${libssl_build_DIR}/crypto/libcrypto.a)
-set(OPENSSL_INCLUDE_DIR ${libssl_src_DIR}/include)
+get_target_property(OPENSSL_SSL_LIBRARY openssl::ssl IMPORTED_LOCATION)
+get_target_property(OPENSSL_CRYPTO_LIBRARY openssl::crypto IMPORTED_LOCATION)
+get_target_property(OPENSSL_INCLUDE_DIR openssl::ssl INTERFACE_INCLUDE_DIRECTORIES)
 # set include directories so dependent code can find the headers
 include_directories(
-        ${libssl_src_DIR}/include
+        ${OPENSSL_INCLUDE_DIR}
 )
 
 # build LibVNCClient
+set(BUILD_SHARED_LIBS OFF)
 set(libvnc_src_DIR ../../../../../libvncserver)
 set(libvnc_build_DIR ${CMAKE_BINARY_DIR}/libvnc)
 # adds a source subdir with specifying a build output dir
@@ -47,6 +42,8 @@ include_directories(
 # build VNCConn
 add_library(vncconn SHARED vncconn.c)
 target_link_libraries(vncconn
+    openssl::crypto
+    openssl::ssl
     log
     vncclient)
 

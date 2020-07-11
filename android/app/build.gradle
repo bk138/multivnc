@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 29
+    ndkVersion '21.2.6472646'
 
     defaultConfig {
         applicationId "com.coboltforge.dontmind.multivnc"
@@ -10,8 +10,10 @@ android {
         targetSdkVersion 28
         externalNativeBuild {
             cmake {
+                // needed to use prefabs
+                arguments "-DANDROID_STL=c++_shared"
                 // exclude the other LibVNCServer targets
-                targets "ssl", "crypto", "turbojpeg-static", "vncclient", "vncconn" , "vnccanvas"
+                targets "turbojpeg-static", "vncclient", "vncconn" , "vnccanvas"
             }
         }
     }
@@ -29,7 +31,6 @@ android {
     }
     externalNativeBuild {
         cmake {
-            version '3.10.2'
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
@@ -44,4 +45,5 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-compiler:2.2.0'
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.2.0'
+    implementation "com.android.ndk.thirdparty:openssl:1.1.1g-alpha-1"
 }
