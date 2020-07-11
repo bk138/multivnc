@@ -1889,7 +1889,7 @@ public class VNCConn {
 	// called from native via worker thread context
 	@SuppressWarnings("unused")
 	private String onGetPassword() {
-		while (connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
+		if (connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
 			canvas.getCredsFromUser(connSettings, false); // this cares for running on the main thread
 			synchronized (VNCConn.this) {
 				try {
@@ -1914,7 +1914,7 @@ public class VNCConn {
 	@SuppressWarnings("unused")
 	private UserCredential onGetUserCredential() {
 
-		while (connSettings.getUserName() == null || connSettings.getUserName().isEmpty()
+		if (connSettings.getUserName() == null || connSettings.getUserName().isEmpty()
 			   || connSettings.getPassword() == null || connSettings.getPassword().isEmpty()) {
 			canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
 			synchronized (VNCConn.this) {
