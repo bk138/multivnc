@@ -85,4 +85,6 @@
         verf&uuml;gbare <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">&Auml;nderungsprotokoll (in Englisch)</a> werfen.
     ]]>
 </string>
+    <string name="beta_use_native_connections">BETA: Native Verbindungen verwenden (unterstützt MacOS/TurboVNC/Vino)\nBitte schreiben Sie an multivnc@christianbeier.net für Feedback.</string>
+
 </resources>

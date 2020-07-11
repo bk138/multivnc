@@ -45,6 +45,7 @@ import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -202,6 +203,19 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 
 		final SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
+
+
+		CheckBox cbBeta = (CheckBox)findViewById(R.id.checkBoxNative);
+		cbBeta.setChecked((settings.getBoolean(Constants.PREFS_KEY_NATIVECONN, false)));
+		cbBeta.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+				SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
+				SharedPreferences.Editor ed = settings.edit();
+				ed.putBoolean(Constants.PREFS_KEY_NATIVECONN, b);
+				ed.commit();
+			}
+		});
 
 
 		/*

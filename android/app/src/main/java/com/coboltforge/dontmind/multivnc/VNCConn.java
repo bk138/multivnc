@@ -28,9 +28,15 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class VNCConn {
+	static {
+		// order is important here
+		System.loadLibrary("vncclient");
+		System.loadLibrary("vncconn");
+	}
 
 	private final static String TAG = "VNCConn";
 
@@ -41,6 +47,10 @@ public class VNCConn {
 
 	// VNC protocol connection
 	private RfbProto rfb;
+	// the native rfbClient
+	@SuppressWarnings("unused")
+	long rfbClient;
+	private boolean isDoingNativeConn = false;
 	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 
@@ -98,6 +108,7 @@ public class VNCConn {
     public static final int MOUSE_BUTTON_RIGHT = 4;
     public static final int MOUSE_BUTTON_SCROLL_UP = 8;
     public static final int MOUSE_BUTTON_SCROLL_DOWN = 16;
+
 
 
     private class OutputEvent {
@@ -187,8 +198,18 @@ public class VNCConn {
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread started!");
 
 			try {
-				connectAndAuthenticate();
-				doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
+				if(isDoingNativeConn) {
+					lockFramebuffer();
+					if(!rfbInit(connSettings.getAddress(), connSettings.getPort())) {
+						unlockFramebuffer();
+						throw new Exception(); //TODO add some error reoprting here
+					}
+					unlockFramebuffer();
+				}
+				else {
+					connectAndAuthenticate();
+					doProtocolInitialisation(canvas.getWidth(), canvas.getHeight());
+				}
 				canvas.handler.post(new Runnable() {
 					public void run() {
 						canvas.activity.setTitle(getDesktopName());
@@ -200,7 +221,25 @@ public class VNCConn {
 				outputThread = new ClientToServerThread();
 				outputThread.start();
 
-				processNormalProtocol(canvas.getContext(), pd, setModes);
+				if(isDoingNativeConn) {
+					// actually set scale type with this, otherwise no scaling
+					canvas.activity.setModes();
+					// center pointer
+					canvas.mouseX = getFramebufferWidth()/2;
+					canvas.mouseY = getFramebufferHeight()/2;
+					// main loop
+					while(maintainConnection) {
+						if(!rfbProcessServerMessage()) {
+							lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
+							rfbShutdown();
+							unlockFramebuffer();
+							throw new Exception();
+						}
+					}
+				}
+				else {
+					processNormalProtocol(canvas.getContext(), pd, setModes);
+				}
 			} catch (Throwable e) {
 				if (maintainConnection) {
 					Log.e(TAG, e.toString());
@@ -662,6 +701,9 @@ public class VNCConn {
 
 		private boolean sendPointerEvent(OutputEvent.PointerEvent pe) {
 
+			if(isDoingNativeConn)
+				return rfbSendPointerEvent(pe.x,pe.y,pe.mask);
+
 			try {
 				if (rfb.inNormalProtocol) {
 					bitmapData.invalidateMousePosition();
@@ -682,11 +724,14 @@ public class VNCConn {
 
 
 		private boolean sendKeyEvent(OutputEvent.KeyboardEvent evt) {
-			if (rfb != null && rfb.inNormalProtocol) {
+			if ((rfb != null && rfb.inNormalProtocol) || rfbClient != 0) {
 
 			   try {
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
-				   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
+				   if(isDoingNativeConn)
+				   	 	rfbSendKeyEvent(evt.keyCode, evt.down);
+				   else
+					   rfb.writeKeyEvent(evt.keyCode, evt.metaState, evt.down);
 				   return true;
 				} catch (Exception e) {
 					return false;
@@ -697,11 +742,14 @@ public class VNCConn {
 
 
 		private boolean sendCutText(String text) {
-			if (rfb != null && rfb.inNormalProtocol) {
+			if ((rfb != null && rfb.inNormalProtocol) || rfbClient != 0) {
 
 				try {
 					if(Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
-					rfb.writeClientCutText(text);
+					if(isDoingNativeConn)
+						rfbSendClientCutText(text);
+					else
+						rfb.writeClientCutText(text);
 					return true;
 				} catch (Exception e) {
 					return false;
@@ -714,6 +762,15 @@ public class VNCConn {
     }
 
 
+	private native boolean rfbInit(String host, int port);
+	private native void rfbShutdown();
+	private native boolean rfbProcessServerMessage();
+	private native String rfbGetDesktopName();
+	private native int rfbGetFramebufferWidth();
+	private native int rfbGetFramebufferHeight();
+	private native boolean rfbSendKeyEvent(long keysym, boolean down);
+	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
+	private native boolean rfbSendClientCutText(String text);
 
 
 	public VNCConn() {
@@ -726,33 +783,6 @@ public class VNCConn {
 	protected void finalize() {
 		if(Utils.DEBUG()) Log.d(TAG, this + " finalized!");
 	}
-
-
-	/*
-		    to make a connection, call
-		    Setup(), then
-		    Listen() (optional), then
-		    Init(), then
-		    Shutdown, then
-		    Cleanup()
-
-		    NB: If Init() fails, you have to call Setup() again!
-
-		    The semantic counterparts are:
-		       Setup() <-> Cleanup()
-		       Init()  <-> Shutdown()
-	 */
-
-	boolean Setup() {
-
-		return true;
-	}
-
-
-	void Cleanup() {
-
-	}
-
 
 
 	/**
@@ -785,12 +815,11 @@ public class VNCConn {
 	        }
 	    });
 	    pd.show();
-
+		canvas.activity.firstFrameWaitDialog = pd;
 
 		inputThread = new ServerToClientThread(pd, setModes);
 		inputThread.start();
 	}
-
 
 
 	public void shutdown() {
@@ -800,8 +829,13 @@ public class VNCConn {
 		maintainConnection = false;
 
 		try {
-			bitmapData.dispose();
-			rfb.close(); // close immediatly
+			if(isDoingNativeConn) {
+				rfbShutdown();
+			}
+			else {
+				bitmapData.dispose();
+				rfb.close(); // close immediatly
+			}
 
 			// the input thread stops by itself, but the putput thread not
 			outputThread.interrupt();
@@ -823,12 +857,13 @@ public class VNCConn {
 	 */
 	public void setCanvas(VncCanvas c) {
 		canvas = c;
+		isDoingNativeConn = canvas.activity.getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false);
 	}
 
 
 	public boolean sendCutText(String text) {
 
-		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+		if(rfb != null && rfb.inNormalProtocol || (isDoingNativeConn && rfbClient != 0)) { // only queue if already connected
 			OutputEvent e = new OutputEvent(text);
 			outputEventQueue.add(e);
 			synchronized (outputEventQueue) {
@@ -844,13 +879,14 @@ public class VNCConn {
 
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 
-		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+
+		if((rfb != null && rfb.inNormalProtocol) || (isDoingNativeConn && rfbClient != 0)) { // only queue if already connected
 
 			// trim coodinates
 			if (x<0) x=0;
-			else if (x>=rfb.framebufferWidth) x=rfb.framebufferWidth-1;
+			else if (x>=getFramebufferWidth()) x=getFramebufferWidth()-1;
 			if (y<0) y=0;
-			else if (y>=rfb.framebufferHeight) y=rfb.framebufferHeight-1;
+			else if (y>=getFramebufferHeight()) y=getFramebufferHeight()-1;
 
 			OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
 			outputEventQueue.add(e);
@@ -860,6 +896,7 @@ public class VNCConn {
 
 			canvas.mouseX = x;
 			canvas.mouseY = y;
+			canvas.reDraw(); // update local pointer position
 			canvas.panToMouse();
 
 			return true;
@@ -877,7 +914,7 @@ public class VNCConn {
 	 */
 	public boolean sendKeyEvent(int keyCode, KeyEvent evt, boolean sendDirectly) {
 
-		if(rfb != null && rfb.inNormalProtocol) { // only queue if already connected
+		if((rfb != null && rfb.inNormalProtocol) || rfbClient != 0) { // only queue if already connected
 
 			if(Utils.DEBUG()) Log.d(TAG, "queueing key evt " + evt.toString() + " code 0x" + Integer.toHexString(keyCode));
 
@@ -1059,10 +1096,17 @@ public class VNCConn {
 
 
 	public final String getDesktopName() {
-		return rfb.desktopName;
+		if(isDoingNativeConn)
+			return rfbGetDesktopName();
+		else
+			return rfb.desktopName;
 	}
 
 	public final int getFramebufferWidth() {
+
+		if(isDoingNativeConn)
+			return rfbGetFramebufferWidth();
+
 		try {
 			return bitmapData.framebufferwidth;
 		}
@@ -1072,6 +1116,10 @@ public class VNCConn {
 	}
 
 	public final int getFramebufferHeight() {
+
+		if(isDoingNativeConn)
+			return rfbGetFramebufferHeight();
+
 		try {
 			return bitmapData.framebufferheight;
 		}
@@ -1813,7 +1861,77 @@ public class VNCConn {
 			canvas.reDraw();
 	}
 
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private void onFramebufferUpdateFinished() {
 
+		canvas.reDraw();
+
+		// Hide progress dialog
+		if (canvas.activity.firstFrameWaitDialog.isShowing())
+			canvas.handler.post(new Runnable() {
+				public void run() {
+					try {
+						canvas.activity.firstFrameWaitDialog.dismiss();
+					} catch (Exception e){
+						//unused
+					}
+				}
+			});
+	}
+
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private void onGotCutText(String text) {
+		serverCutText = text;
+		Log.d(TAG, "got server cuttext: " + serverCutText);
+	}
+
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private String onGetPassword() {
+		if (connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
+			canvas.getCredsFromUser(connSettings, false); // this cares for running on the main thread
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+		}
+		return connSettings.getPassword();
+	}
+
+	/**
+	 * This class is used for returning user credentials from onGetCredential() to native
+	 */
+	private static class UserCredential {
+		public String username;
+		public String password;
+	}
+
+	// called from native via worker thread context
+	@SuppressWarnings("unused")
+	private UserCredential onGetUserCredential() {
+
+		if (connSettings.getUserName() == null || connSettings.getUserName().isEmpty()
+			   || connSettings.getPassword() == null || connSettings.getPassword().isEmpty()) {
+			canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+		}
+
+		UserCredential creds = new UserCredential();
+		creds.username = connSettings.getUserName();
+		creds.password = connSettings.getPassword();
+		return creds;
+	}
 
 }
 

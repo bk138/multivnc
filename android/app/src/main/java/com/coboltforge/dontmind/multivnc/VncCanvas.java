@@ -59,14 +59,21 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 public class VncCanvas extends GLSurfaceView {
+	static {
+		System.loadLibrary("vnccanvas");
+    }
+
 	private final static String TAG = "VncCanvas";
 
 	AbstractScaling scaling;
 
 
 	// Runtime control flags
+	private boolean mIsDoingNativeDrawing = false;
 	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
 
@@ -113,6 +120,13 @@ public class VncCanvas extends GLSurfaceView {
 	int absoluteXPosition = 0, absoluteYPosition = 0;
 
 
+	/*
+		native drawing functions
+	*/
+    private static native void on_surface_created();
+    private static native void on_surface_changed(int width, int height);
+    private static native void on_draw_frame();
+	private static native void prepareTexture(long rfbClient);
 
 
 	private class VNCGLRenderer implements GLSurfaceView.Renderer {
@@ -188,6 +202,12 @@ public class VncCanvas extends GLSurfaceView {
 
 			try{
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+
+				if(mIsDoingNativeDrawing && vncConn.getFramebufferWidth() >0 && vncConn.getFramebufferHeight() > 0) {
+					vncConn.lockFramebuffer();
+					prepareTexture(vncConn.rfbClient);
+					vncConn.unlockFramebuffer();
+				}
 
 				if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
 
@@ -315,6 +335,8 @@ public class VncCanvas extends GLSurfaceView {
 		activity = a;
 		this.inputHandler = inputHandler;
 		vncConn = conn;
+
+		mIsDoingNativeDrawing = a.getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false);
 	}
 
 	/**
@@ -326,6 +348,7 @@ public class VncCanvas extends GLSurfaceView {
 	{
 		mouseX=x;
 		mouseY=y;
+		reDraw(); // update local pointer position
 		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
 	}
 
@@ -582,7 +605,7 @@ public class VncCanvas extends GLSurfaceView {
 
 	void reDraw() {
 
-		if (repaintsEnabled && vncConn.getFramebuffer() != null) {
+		if (repaintsEnabled && (vncConn.getFramebuffer() != null || (mIsDoingNativeDrawing && vncConn.rfbClient != 0))) {
 
 			// request a redraw from GL thread
 			requestRender();
@@ -810,6 +833,24 @@ public class VncCanvas extends GLSurfaceView {
 		return scaling.getScale();
 	}
 
+	/**
+	 *
+	 * @return The smallest scale supported by the implementation; the scale at which
+	 * the bitmap would be smaller than the screen
+	 */
+	float getMinimumScale()
+	{
+		double scale = 0.75;
+		int displayWidth = getWidth();
+		int displayHeight = getHeight();
+		for (; scale >= 0; scale -= 0.25)
+		{
+			if (scale * vncConn.getFramebufferWidth() < displayWidth || scale * vncConn.getFramebufferHeight() < displayHeight)
+				break;
+		}
+		return (float)(scale + 0.25);
+	}
+
 	public int getVisibleWidth() {
 		return (int)((double)getWidth() / getScale() + 0.5);
 	}
@@ -847,6 +888,7 @@ public class VncCanvas extends GLSurfaceView {
 		});
 
 	}
+
 
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {

@@ -50,24 +50,7 @@ abstract class AbstractBitmapData {
 			vncCanvas.requestRender();
 	}
 	
-	/**
-	 * 
-	 * @return The smallest scale supported by the implementation; the scale at which
-	 * the bitmap would be smaller than the screen
-	 */
-	float getMinimumScale()
-	{
-		double scale = 0.75;
-		int displayWidth = vncCanvas.getWidth();
-		int displayHeight = vncCanvas.getHeight();
-		for (; scale >= 0; scale -= 0.25)
-		{
-			if (scale * bitmapwidth < displayWidth || scale * bitmapheight < displayHeight)
-				break;
-		}
-		return (float)(scale + 0.25);
-	}
-	
+
 	/**
 	 * Send a request through the protocol to get the data for the currently held bitmap
 	 * @param incremental True if we want incremental update; false for full update

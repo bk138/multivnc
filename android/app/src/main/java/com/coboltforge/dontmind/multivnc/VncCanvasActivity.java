@@ -31,6 +31,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.res.Configuration;
+import android.app.ProgressDialog;
 import android.text.ClipboardManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -543,6 +544,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	TouchPointView touchpoints;
 	Toast notificationToast;
 	PopupMenu fabMenu;
+
+	ProgressDialog firstFrameWaitDialog;
 
 	private SharedPreferences prefs;
 

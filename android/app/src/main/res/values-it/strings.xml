@@ -83,4 +83,5 @@
        Se vuoi sapere quali modifiche sono state apportate con questa versione, puoi dare un\'occhiata online lanciare il <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">registro delle modifiche disponibili (in inglese)</a>.
     ]]>
 </string>
+    <string name="beta_use_native_connections">BETA: Utilizzare connessioni native (supporto MacOS/TurboVNC/Vino)\nSi prega di scrivere a multivnc@christianbeier.net per il feedback.</string>
 </resources>

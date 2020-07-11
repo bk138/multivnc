@@ -119,7 +119,7 @@ class ZoomScaling extends AbstractScaling {
 		try {
 			super.setScaleTypeForActivity(activity);
 			scaling = (float)1.0;
-			minimumScale = activity.vncCanvas.vncConn.getFramebuffer().getMinimumScale();
+			minimumScale = activity.vncCanvas.getMinimumScale();
 			activity.vncCanvas.reDraw();
 			// Reset the pan position to (0,0)
 			resolveZoom(activity);
