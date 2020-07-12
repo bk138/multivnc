@@ -33,8 +33,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class VNCConn {
 	static {
-		// order is important here
-		System.loadLibrary("vncclient");
 		System.loadLibrary("vncconn");
 	}
 
