@@ -830,7 +830,9 @@ public class VNCConn {
 
 		try {
 			if(isDoingNativeConn) {
+				lockFramebuffer();
 				rfbShutdown();
+				unlockFramebuffer();
 			}
 			else {
 				bitmapData.dispose();
