@@ -3,9 +3,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project (MultiVNC C ASM) # defaults to C, the ASM is needed for LibreSSL
 
-set(BUILD_SHARED_LIBS OFF)
-
 # build libJPEG
+set(BUILD_SHARED_LIBS OFF)
 set(libjpeg_src_DIR ../../../../../libjpeg-turbo)
 set(libjpeg_build_DIR ${CMAKE_BINARY_DIR}/libjpeg)
 # adds a source subdir with specifying a build output dir
@@ -20,6 +19,7 @@ include_directories(
 )
 
 # build libressl
+set(BUILD_SHARED_LIBS OFF)
 set(libssl_src_DIR ../../../../../libressl)
 set(libssl_build_DIR ${CMAKE_BINARY_DIR}/libssl)
 # adds a source subdir with specifying a build output dir
@@ -34,6 +34,7 @@ include_directories(
 )
 
 # build LibVNCClient
+set(BUILD_SHARED_LIBS OFF)
 set(libvnc_src_DIR ../../../../../libvncserver)
 set(libvnc_build_DIR ${CMAKE_BINARY_DIR}/libvnc)
 # adds a source subdir with specifying a build output dir
