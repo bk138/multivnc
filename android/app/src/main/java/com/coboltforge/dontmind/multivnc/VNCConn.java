@@ -28,6 +28,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import androidx.annotation.Keep;
+
 import static android.content.Context.MODE_PRIVATE;
 
 
@@ -46,7 +48,7 @@ public class VNCConn {
 	// VNC protocol connection
 	private RfbProto rfb;
 	// the native rfbClient
-	@SuppressWarnings("unused")
+	@Keep
 	long rfbClient;
 	private boolean isDoingNativeConn = false;
 	private ConnectionBean connSettings;
@@ -1860,7 +1862,7 @@ public class VNCConn {
 	}
 
 	// called from native via worker thread context
-	@SuppressWarnings("unused")
+	@Keep
 	private void onFramebufferUpdateFinished() {
 
 		canvas.reDraw();
@@ -1879,14 +1881,14 @@ public class VNCConn {
 	}
 
 	// called from native via worker thread context
-	@SuppressWarnings("unused")
+	@Keep
 	private void onGotCutText(String text) {
 		serverCutText = text;
 		Log.d(TAG, "got server cuttext: " + serverCutText);
 	}
 
 	// called from native via worker thread context
-	@SuppressWarnings("unused")
+	@Keep
 	private String onGetPassword() {
 		if (connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
 			canvas.getCredsFromUser(connSettings, false); // this cares for running on the main thread
@@ -1904,13 +1906,14 @@ public class VNCConn {
 	/**
 	 * This class is used for returning user credentials from onGetCredential() to native
 	 */
+	@Keep
 	private static class UserCredential {
 		public String username;
 		public String password;
 	}
 
 	// called from native via worker thread context
-	@SuppressWarnings("unused")
+	@Keep
 	private UserCredential onGetUserCredential() {
 
 		if (connSettings.getUserName() == null || connSettings.getUserName().isEmpty()
