@@ -416,6 +416,27 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbPro
     return JNI_TRUE;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-signed-bitwise"
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSetFramebufferUpdatesEnabled(JNIEnv *env, jobject obj, jboolean enable) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl) {
+        log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbSetFramebufferUpdatesEnabled() %d", enable);
+        if(enable) {
+            // set
+            cl->supportedMessages.client2server[((rfbFramebufferUpdateRequest & 0xFF)/8)] |= (1<<(rfbFramebufferUpdateRequest % 8));
+            // request full update
+            SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
+        } else {
+            // clear
+            cl->supportedMessages.client2server[((rfbFramebufferUpdateRequest & 0xFF)/8)] &= ~(1<<(rfbFramebufferUpdateRequest % 8));
+        }
+        return JNI_TRUE;
+    }
+    else
+        return JNI_FALSE;
+}
+#pragma clang diagnostic pop
 
 JNIEXPORT jstring JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbGetDesktopName(JNIEnv *env, jobject obj) {
     rfbClient *cl = getRfbClient(env, obj);

@@ -765,6 +765,7 @@ public class VNCConn {
 	private native boolean rfbInit(String host, int port);
 	private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
+	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);
 	private native String rfbGetDesktopName();
 	private native int rfbGetFramebufferWidth();
 	private native int rfbGetFramebufferHeight();
@@ -1027,6 +1028,11 @@ public class VNCConn {
 	public boolean toggleFramebufferUpdates()
 	{
 		framebufferUpdatesEnabled = !framebufferUpdatesEnabled;
+
+		if(isDoingNativeConn) {
+			rfbSetFramebufferUpdatesEnabled(framebufferUpdatesEnabled);
+		}
+
 		if(framebufferUpdatesEnabled)
 		{
 			try {
