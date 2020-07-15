@@ -608,7 +608,13 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
 				Intent serviceIntent = new Intent(Intent.ACTION_VIEW, null, this, MDNSService.class);
-				this.startService(serviceIntent);
+				try {
+					this.startService(serviceIntent);
+				}
+				catch(IllegalStateException e) {
+					// Can still happen on Android 9 due to https://issuetracker.google.com/issues/113122354
+					// At least, don't crash - user's can restart the scanner manually anyway.
+				}
 			} else {
 				ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
 			}
