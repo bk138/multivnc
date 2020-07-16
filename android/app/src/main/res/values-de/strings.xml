@@ -67,8 +67,8 @@
 
     <string name="utils_title_error">Fehler!</string>
 
-<string name="support_dialog_title">"Bitte unterstützen Sie MultiVNC"</string>
-<string name="support_dialog_text">"Wenn Ihnen MultiVNC gefällt, können Sie die Entwicklung unterstützen, indem Sie die App bewerten oder eine Kleinigkeit spenden. Vielen Dank!"</string>
+<string name="support_dialog_title">MultiVNC 2 Beta Ausprobieren?</string>
+<string name="support_dialog_text">Es gibt eine neue Beta-Version von MultiVNC, die TightVNC und TurboVNC, Apple Remote Desktop und zusätzliche Authentifizierungsmethoden (wie sie von den Servern Vino und UltraVNC verwendet werden) unterstützt. Wenn Sie möchten, können Sie sich für das offene Beta-Testprogramm anmelden. Vielen Dank!</string>
 
 <string name="support_dialog_yes">"Ja, gute Idee!"</string>
 <string name="support_dialog_no">"Nein, nicht jetzt."</string>

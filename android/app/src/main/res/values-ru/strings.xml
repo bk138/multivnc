@@ -67,8 +67,8 @@
 
     <string name="utils_title_error">"Ошибка!"</string>
 
-<string name="support_dialog_title">"Пожалуйста, поддержите MultiVNC"</string>
-<string name="support_dialog_text">"Если вам нравится MultiVNC, почему бы не подумать о поддержке его разработки? В настоящее время вы можете сделать это легко, оценив приложение или пожертвовав. Спасибо!"</string>
+<string name="support_dialog_title">Попробуйте MultiVNC 2 Beta?</string>
+<string name="support_dialog_text">Доступна новая бета-версия MultiVNC, которая поддерживает TightVNC и TurboVNC, Apple Remote Desktop и дополнительные методы аутентификации (например, используемые серверами Vino и UltraVNC). Если хотите, вы можете подписаться на программу открытого бета-тестирования. Спасибо!</string>
 <string name="support_dialog_yes">"Да, хорошая идея!"</string>
 <string name="support_dialog_no">"Нет, не сейчас."</string>
 <string name="support_dialog_neveragain">"Никогда не спрашивай снова!"</string>

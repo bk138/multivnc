@@ -32,6 +32,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -219,7 +220,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 				dialog.setPositiveButton(getString(R.string.support_dialog_yes), new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						startActivity(new Intent(MainMenuActivity.this, AboutActivity.class));
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/apps/testing/com.coboltforge.dontmind.multivnc")));
 						try{
 							dialog.dismiss();
 						}

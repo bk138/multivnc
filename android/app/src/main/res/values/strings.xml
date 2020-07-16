@@ -69,10 +69,9 @@
 
     <string name="utils_title_error">Error!</string>
 
-<string name="support_dialog_title">Please Support MultiVNC</string>
-<string name="support_dialog_text">If you like MultiVNC, why not consider supporting its development? For the time being, you can do so easily by rating the app or by donating. Thanks!</string>
+<string name="support_dialog_title">Try MultiVNC 2 Beta?</string>
+<string name="support_dialog_text">There is a new Beta version of MultiVNC available that supports TightVNC and TurboVNC, Apple Remote Desktop and additional authentication methods (such as used by the Vino and UltraVNC servers). If you like, you can sign up for the open Beta test program. Thanks!</string><string name="support_dialog_yes">Yes, good idea!</string>
 
-<string name="support_dialog_yes">Yes, good idea!</string>
 <string name="support_dialog_no">No, not now.</string>
 <string name="support_dialog_neveragain">Never ask again!</string>
 
