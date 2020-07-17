@@ -1,5 +1,9 @@
 # Version 1.9.x:
 
+1.9.2
+
+-   Fixed native connections not working with IPv6.
+
 1.9.1
 
 -   Added functionality to not ask for frambuffer updates in native-connection touchpad mode.
