@@ -1,16 +1,26 @@
 # Version 1.9.x:
 
+1.9.1
+
+-   Added functionality to not ask for frambuffer updates in native-connection touchpad mode.
+-   Worked around crash in Zeroconf scanner on Android 9.
+
 1.9.0
 
 -   The first MultiVNC for Android to sport a native backend implementation that
     supports TightVNC and TurboVNC, Apple Remote Desktop and Vino's AnonTLS authentication.
-	In the 1.9.x builds this will be an opt-in feature. 1.9.x builds will be available via
-	the Google Play Beta program or F-Droid only.
+    In the 1.9.x builds this will be an opt-in feature. 1.9.x builds will be available via
+    the Google Play Beta program or F-Droid only.
 -   Improved scaling so the whole remote screen can be seen at once in portrait orientation.
 -   Improved the credentials dialog to provide more hints on what is being entered in
     landscape mode.
 
 # Version 1.8.x:
+
+1.8.12
+
+-   Added dialog notifying about beta test program.
+-   Worked around crash in Zeroconf scanner on Android 9.
 
 1.8.11
 
