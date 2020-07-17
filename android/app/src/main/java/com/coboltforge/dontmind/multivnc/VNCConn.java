@@ -198,6 +198,27 @@ public class VNCConn {
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread started!");
 
 			try {
+
+				/*
+				 * if IPv6 address, add scope id
+				 */
+				try {
+					InetAddress address = InetAddress.getByName(connSettings.getAddress());
+
+					Inet6Address in6 = Inet6Address.getByAddress(
+							address.getHostName(),
+							address.getAddress(),
+							Utils.getActiveNetworkInterface(canvas.getContext()));
+
+					connSettings.setAddress(in6.getHostAddress());
+					Log.i(TAG, "Using IPv6");
+
+				} catch (UnknownHostException e) {
+					Log.i(TAG, "Using IPv4: " + e.toString());
+				} catch (NullPointerException ne) {
+					Log.e(TAG, ne.toString());
+				}
+
 				if(isDoingNativeConn) {
 					lockFramebuffer();
 					if(!rfbInit(connSettings.getAddress(), connSettings.getPort())) {
@@ -286,28 +307,6 @@ public class VNCConn {
 
 
 		private void connectAndAuthenticate() throws Exception {
-
-			/*
-		     * if IPv6 address, add scope id
-		     */
-		    try {
-				InetAddress address = InetAddress.getByName(connSettings.getAddress());
-
-				Inet6Address in6 = Inet6Address.getByAddress(
-						address.getHostName(),
-						address.getAddress(),
-						Utils.getActiveNetworkInterface(canvas.getContext()));
-
-				connSettings.setAddress(in6.getHostAddress());
-				Log.i(TAG, "Using IPv6");
-
-			} catch (UnknownHostException e) {
-				Log.i(TAG, "Using IPv4: " + e.toString());
-			} catch (NullPointerException ne) {
-				Log.e(TAG, ne.toString());
-			}
-
-
 
 			Log.i(TAG, "Connecting to " + connSettings.getAddress() + ", port " + connSettings.getPort() + "...");
 
