@@ -251,16 +251,9 @@ public class VNCConn {
 					// main loop
 					while(maintainConnection) {
 						if(!rfbProcessServerMessage()) {
-							lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
-							rfbShutdown();
-							unlockFramebuffer();
 							throw new Exception();
 						}
 					}
-					// maintainConnection false now
-					lockFramebuffer();
-					rfbShutdown();
-					unlockFramebuffer();
 				}
 				else {
 					processNormalProtocol(canvas.getContext(), pd, setModes);
@@ -303,6 +296,13 @@ public class VNCConn {
 						});
 					}
 				}
+			}
+
+			if(isDoingNativeConn) {
+				// we might get here when maintainConnection is set to false or when an exception was thrown
+				lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
+				rfbShutdown();
+				unlockFramebuffer();
 			}
 
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread done!");
