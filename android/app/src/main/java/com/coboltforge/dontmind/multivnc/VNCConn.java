@@ -257,6 +257,10 @@ public class VNCConn {
 							throw new Exception();
 						}
 					}
+					// maintainConnection false now
+					lockFramebuffer();
+					rfbShutdown();
+					unlockFramebuffer();
 				}
 				else {
 					processNormalProtocol(canvas.getContext(), pd, setModes);
@@ -829,12 +833,7 @@ public class VNCConn {
 		maintainConnection = false;
 
 		try {
-			if(isDoingNativeConn) {
-				lockFramebuffer();
-				rfbShutdown();
-				unlockFramebuffer();
-			}
-			else {
+			if(!isDoingNativeConn) {
 				bitmapData.dispose();
 				rfb.close(); // close immediatly
 			}
