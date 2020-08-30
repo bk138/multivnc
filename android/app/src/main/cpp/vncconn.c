@@ -30,15 +30,6 @@
 
 
 /*
- * PixelFormat defaults.
- * Seems 8,3,4 and 5,3,2 are possible with rfbGetClient().
- */
-#define BITSPERSAMPLE 8
-#define SAMPLESPERPIXEL 3
-#define BYTESPERPIXEL 4
-
-
-/*
  * Modeled after rfbDefaultClientLog:
  *  - with Android log functions
  *  - without time stamping as the Android logging does this already
@@ -290,9 +281,10 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
  * Allocates and sets up the VNCConn's rfbClient.
  * @param env
  * @param obj
+ * @param bytesPerPixel
  * @return
  */
-static jboolean setupClient(JNIEnv *env, jobject obj) {
+static jboolean setupClient(JNIEnv *env, jobject obj, jint bytesPerPixel) {
 
     log_obj_tostring(env, obj, ANDROID_LOG_INFO, "setupClient()");
 
@@ -301,7 +293,28 @@ static jboolean setupClient(JNIEnv *env, jobject obj) {
         return JNI_FALSE;
     }
 
-    rfbClient *cl = rfbGetClient(BITSPERSAMPLE, SAMPLESPERPIXEL, BYTESPERPIXEL);
+    rfbClient *cl = NULL;
+
+    /*
+     * We only allow 24 and 15 bit colour, as the GL canvas is not able to digest any other format
+     * _directly_, without converting the whole client framebuffer byte-per-byte.
+    */
+    switch(bytesPerPixel) {
+        case 2:
+            // 15-bit colour
+            cl = rfbGetClient(5, 3, 2);
+            // the GL canvas is using GL_UNSIGNED_SHORT_5_5_5_1 for 15-bit colour depth
+            cl->format.redShift = 11;
+            cl->format.greenShift = 6;
+            cl->format.blueShift = 1;
+            break;
+        case 4:
+            // 24-bit colour, occupying 4 bytes
+            cl = rfbGetClient(8, 3, 4);
+            break;
+        default:
+            break;
+    }
 
     if(!cl) {
         log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "setupClient() failed due to client NULL");
@@ -336,11 +349,11 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
     }
 }
 
-JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port) {
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port, jint bytesPerPixel) {
     log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit()");
 
     if(!getRfbClient(env, obj))
-        setupClient(env, obj);
+        setupClient(env, obj, bytesPerPixel);
 
     rfbClient *cl = getRfbClient(env, obj);
 

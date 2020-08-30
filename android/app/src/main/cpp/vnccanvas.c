@@ -31,7 +31,7 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VncCanvas_prepareT
                      client->height,
                      0,
                      GL_RGBA,
-                     GL_UNSIGNED_BYTE,
+                     client->format.depth == 15 ? GL_UNSIGNED_SHORT_5_5_5_1 : GL_UNSIGNED_BYTE,
                      client->frameBuffer);
     }
 

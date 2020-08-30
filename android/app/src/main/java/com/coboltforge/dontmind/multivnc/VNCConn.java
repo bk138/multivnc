@@ -221,7 +221,7 @@ public class VNCConn {
 
 				if(isDoingNativeConn) {
 					lockFramebuffer();
-					if(!rfbInit(connSettings.getAddress(), connSettings.getPort())) {
+					if(!rfbInit(connSettings.getAddress(), connSettings.getPort(), pendingColorModel.bpp())) {
 						unlockFramebuffer();
 						throw new Exception(); //TODO add some error reoprting here
 					}
@@ -765,7 +765,7 @@ public class VNCConn {
     }
 
 
-	private native boolean rfbInit(String host, int port);
+	private native boolean rfbInit(String host, int port, int bytesPerPixel);
 	private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);
