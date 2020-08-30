@@ -1,5 +1,11 @@
 # Version 1.9.x:
 
+1.9.3
+
+-   Fixed an ANR that occurred when a native connection setup timed out.
+-   Added colour mode selection for native connections.
+-   Added functionality to keep screen on when remote screen is shown.
+
 1.9.2
 
 -   Fixed native connections not working with IPv6.
