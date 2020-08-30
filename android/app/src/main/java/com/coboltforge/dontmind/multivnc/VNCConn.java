@@ -225,6 +225,7 @@ public class VNCConn {
 						unlockFramebuffer();
 						throw new Exception(); //TODO add some error reoprting here
 					}
+					colorModel = pendingColorModel;
 					unlockFramebuffer();
 				}
 				else {
