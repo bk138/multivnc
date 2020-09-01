@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/bk138/multivnc.svg?branch=master)](https://travis-ci.org/bk138/multivnc)
 [![Help making this possible](https://img.shields.io/badge/liberapay-donate-yellow.png)](https://liberapay.com/bk138/donate)
 [![Become a patron](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bk138)
+[![Gitter](https://badges.gitter.im/multivnc/community.svg)](https://gitter.im/multivnc/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 MultiVNC is a cross-platform Multicast-enabled VNC viewer using
 wxWidgets and libvncclient. It runs on Unix, Mac OS X and Windows.
