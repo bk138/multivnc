@@ -1025,6 +1025,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 	private void toggleKeyboard() {
 		InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		vncCanvas.requestFocus();
 		inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
