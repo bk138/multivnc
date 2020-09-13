@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnDismissListener;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -568,6 +569,31 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			public void onSystemUiVisibilityChange(int visibility) {
 				hideSystemUI();
 			}
+		});
+
+		// Setup resizing when keyboard is visible.
+		//
+		// Ideally, we would let Android manage resizing but because we are using a fullscreen window,
+		// most of the "normal" options don't work for us.
+		//
+		// We have to hook into layout phase and manually shift our view up by adding appropriate
+		// bottom padding.
+		final View contentView = findViewById(android.R.id.content);
+		contentView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+			Rect frame = new Rect();
+			contentView.getWindowVisibleDisplayFrame(frame);
+
+			int contentBottom = contentView.getBottom();
+			int paddingBottom = contentBottom - frame.bottom;
+
+			if (paddingBottom < 0)
+				paddingBottom = 0;
+
+			//When padding is less then 20% of height, it is most probably navigation bar.
+			if (paddingBottom > 0 && paddingBottom < contentBottom * .20)
+				return;
+
+			contentView.setPadding(0, 0, 0, paddingBottom); //Update bottom
 		});
 
 		setContentView(R.layout.canvas);
