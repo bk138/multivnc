@@ -69,7 +69,7 @@ public class VncCanvas extends GLSurfaceView {
 
 	private final static String TAG = "VncCanvas";
 
-	AbstractScaling scaling;
+	ZoomScaling scaling;
 
 
 	// Runtime control flags
