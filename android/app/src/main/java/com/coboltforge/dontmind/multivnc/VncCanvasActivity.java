@@ -1040,7 +1040,10 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 
 			// handle right mouse button of USB-OTG devices
-			if(evt.getSource() == InputDevice.SOURCE_MOUSE) {
+			// Also, https://fossies.org/linux/SDL2/android-project/app/src/main/java/org/libsdl/app/SDLActivity.java line 1943 states:
+			// 12290 = Samsung DeX mode desktop mouse
+			// 12290 = 0x3002 = 0x2002 | 0x1002 = SOURCE_MOUSE | SOURCE_TOUCHSCREEN
+			if(evt.getSource() == InputDevice.SOURCE_MOUSE || evt.getSource() == (InputDevice.SOURCE_MOUSE | InputDevice.SOURCE_TOUCHSCREEN)) {
 				MotionEvent e = MotionEvent.obtain(
 						SystemClock.uptimeMillis(),
 						SystemClock.uptimeMillis(),
