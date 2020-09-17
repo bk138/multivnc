@@ -40,11 +40,9 @@
 <string name="password_caption">"пароль"</string>
 <string name="keep_password_button">"Держать"</string>
 <string name="port_caption">"порт"</string>
-<string name="repeater_caption">"повторитель"</string>
-<string name="repeater_hint">"Для адреса ретранслятора в стиле UltraVNC"</string>
-<string name="repeater_clear">"Не используйте репитер"</string>
+<string name="repeater_caption">"ID на ретрансляторе"</string>
+<string name="repeater_hint">"ID сервера при подключении к UltraVNC-ретранслятору"</string>
 <string name="save_as_copy">"Сохранить как копию"</string>
-    <string name="repeater_save">"Сохранить"</string>
     <string name="credentials_needed_title">необходимы учетные данные…</string>
     <!-- Send selected metakey -->
 <string name="send_button">"послать"</string>

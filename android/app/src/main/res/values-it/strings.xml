@@ -40,11 +40,9 @@
 <string name="password_caption">"Parola d'ordine"</string>
 <string name="keep_password_button">"Conservare"</string>
 <string name="port_caption">"Port"</string>
-<string name="repeater_caption">"Ripetitore"</string>
-<string name="repeater_hint">"Per l'indirizzo del ripetitore in stile UltraVNC"</string>
-<string name="repeater_clear">"Non usare il ripetitore"</string>
+<string name="repeater_caption">"ID sul ripetitore"</string>
+<string name="repeater_hint">"ID server quando ci si collega a un ripetitore UltraVNC"</string>
 <string name="save_as_copy">"Salva come copia"</string>
-    <string name="repeater_save">"Salvare"</string>
     <string name="credentials_needed_title">Credenziali necessarie…</string>
 <!-- Send selected metakey -->
 <string name="send_button">"Inviare"</string>

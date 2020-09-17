@@ -349,7 +349,7 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
     }
 }
 
-JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port, jint bytesPerPixel) {
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port, jint repeaterId, jint bytesPerPixel) {
     log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit()");
 
     if(!getRfbClient(env, obj))
@@ -375,7 +375,12 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
     if(cl->serverPort < 100)
         cl->serverPort += 5900;
 
-    log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() about to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
+    if(repeaterId >= 0) {
+        cl->destHost = strdup("ID");
+        cl->destPort = repeaterId;
+    }
+
+    log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() about to connect to '%s', port %d, repeaterId %d\n", cl->serverHost, cl->serverPort, cl->destPort);
 
     /*
      * Save pointers to the managed VNCConn and env in the rfbClient for use in the onXYZ callbacks.

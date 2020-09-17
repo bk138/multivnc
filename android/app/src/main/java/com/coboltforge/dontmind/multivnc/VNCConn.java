@@ -220,8 +220,9 @@ public class VNCConn {
 				}
 
 				if(isDoingNativeConn) {
+					int repeaterId = (connSettings.getUseRepeater() && connSettings.getRepeaterId() != null && connSettings.getRepeaterId().length()>0) ? Integer.parseInt(connSettings.getRepeaterId()) : -1;
 					lockFramebuffer();
-					if(!rfbInit(connSettings.getAddress(), connSettings.getPort(), pendingColorModel.bpp())) {
+					if(!rfbInit(connSettings.getAddress(), connSettings.getPort(), repeaterId, pendingColorModel.bpp())) {
 						unlockFramebuffer();
 						throw new Exception(); //TODO add some error reoprting here
 					}
@@ -324,7 +325,8 @@ public class VNCConn {
 				byte[] protocolMsg = new byte[12];
 				rfb.is.read(protocolMsg);
 				byte[] buffer = new byte[250];
-				System.arraycopy(connSettings.getRepeaterId().getBytes(), 0, buffer, 0, connSettings.getRepeaterId().length());
+				String repeaterMsg = "ID:" + connSettings.getRepeaterId();
+				System.arraycopy(repeaterMsg.getBytes(), 0, buffer, 0, repeaterMsg.length());
 				rfb.os.write(buffer);
 			}
 			// </RepeaterMagic>
@@ -766,7 +768,7 @@ public class VNCConn {
     }
 
 
-	private native boolean rfbInit(String host, int port, int bytesPerPixel);
+	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel);
 	private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);
