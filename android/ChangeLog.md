@@ -1,5 +1,10 @@
 # Version 1.9.x:
 
+1.9.4
+
+-   Reworked UltraVNC-repeater connection functionality to be more user-friendly.
+-   Fixed right mouse/touchpad button handling for more devices.
+
 1.9.3
 
 -   Fixed an ANR that occurred when a native connection setup timed out.
