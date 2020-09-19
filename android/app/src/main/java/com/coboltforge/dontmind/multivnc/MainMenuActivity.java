@@ -133,6 +133,11 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		// and (re-)bind to MDNS service
 		bindToMDNSService(new Intent(this, MDNSService.class));
 
+		// make native connections the default
+		SharedPreferences.Editor ed = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).edit();
+		ed.putBoolean(Constants.PREFS_KEY_NATIVECONN, true);
+		ed.commit();
+
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
@@ -205,20 +210,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 
 		final SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
-
-
-		CheckBox cbBeta = (CheckBox)findViewById(R.id.checkBoxNative);
-		cbBeta.setChecked((settings.getBoolean(Constants.PREFS_KEY_NATIVECONN, false)));
-		cbBeta.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-				SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
-				SharedPreferences.Editor ed = settings.edit();
-				ed.putBoolean(Constants.PREFS_KEY_NATIVECONN, b);
-				ed.commit();
-			}
-		});
-
 
 		/*
 		 * show support dialog on third (and maybe later) runs
