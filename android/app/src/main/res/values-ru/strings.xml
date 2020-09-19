@@ -6,7 +6,7 @@
     <string name="server_removed">"VNC сервер исчез"</string>
     <string name="restartMDNS">"Перезапустите Обнаружение Сервера"</string>
     <string name="scale_msg">"Масштаб сейчас"</string>
-<string name="madeby">"MultiVNC на Android предоставлен вам Кристианом Бейером (christianbeier.net). Он основан на android-vnc-viewer (http://code.google.com/p/android-vnc-viewer), а основные исправления и улучшения сделаны Кристиан Бейер. nСтраница проекта находится по адресу https://github.com/bk138/multivnc ."</string>
+<string name="madeby">"MultiVNC на Android предоставлен вам Кристианом Бейером (christianbeier.net).\n\nnСтраница проекта находится по адресу https://github.com/bk138/multivnc ."</string>
 <string name="colormode_caption">"Цветовой режим"</string>
 <string name="color_mode">"Установить цветовой режим"</string>
 <string name="connect_button">"соединять"</string>
