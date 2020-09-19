@@ -81,5 +81,4 @@
     Если вы хотите узнать, что нового, посетите <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">онлайн-журнал изменений</а>.
     ]]>
 </string>
-    <string name="beta_use_native_connections">БЕТА: использовать собственные соединения (поддерживает MacOS/TurboVNC/Vino)\nПожалуйста, пишите по адресу multivnc@christianbeier.net для обратной связи.</string>
 </resources>
