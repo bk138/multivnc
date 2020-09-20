@@ -6,7 +6,7 @@
     <string name="server_removed">"VNC Server è scomparso"</string>
     <string name="restartMDNS">"Riavvia Server Discovery"</string>
     <string name="scale_msg">"Scala ora"</string>
-<string name="madeby">"MultiVNC su Android è offerto da Christian Beier (christianbeier.net).\n\nLa home page del progetto è https://github.com/bk138/multivnc ."</string>
+<string name="madeby">"MultiVNC su Android è offerto da Christian Beier (christianbeier.net).\n\nLa home page del progetto è https://github.com/bk138/multivnc\n\nSe volete segnalare un bug o richiedere una funzione, andate su https://github.com/bk138/multivnc/issues\n\nIl registro delle modifiche può essere trovato su https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md"</string>
 <string name="colormode_caption">"Modalità colore"</string>
 <string name="color_mode">"Imposta la modalità colore"</string>
 <string name="connect_button">"Collegare"</string>
