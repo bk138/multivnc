@@ -74,6 +74,17 @@ public class AboutActivity extends Activity {
 			}
 		});
 
+
+		/*
+			Don't show donation links when installed via Google Play to not violate their payments policy.
+		 */
+		String installerPackageName = getPackageManager().getInstallerPackageName(getPackageName());
+		if(installerPackageName == null || installerPackageName.equals("com.android.vending")) {
+			liberapayButton.setVisibility(View.GONE);
+			paypalButton.setVisibility(View.GONE);
+		}
+
+
 	}
 	
 	
