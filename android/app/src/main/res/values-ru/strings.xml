@@ -58,7 +58,7 @@
 <string name="bookmark_save_question">"Вы хотите добавить этот сервер в закладки?"</string>
 <string name="bookmark_delete_question">"Вы уверены, что хотите удалить эту закладку?"</string>
 <string name="disconnect_question">"Вы уверены, что хотите отключиться?"</string>
-<string name="about">"Около"</string>
+<string name="about">"О MultiVNC"</string>
 <string name="help">"Помощь"</string>
 <string name="edit">"Редактировать"</string>
     <string name="save">Сохранить</string>
