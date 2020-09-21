@@ -3,15 +3,15 @@
     <string name="alt_check">"Alt"</string>
     <string name="super_check">Super</string>
     <string name="server_found">"Найден VNC-сервер"</string>
-    <string name="server_removed">"VNC сервер исчез"</string>
+    <string name="server_removed">"VNC сервер недоступен"</string>
     <string name="restartMDNS">"Перезапустите Обнаружение Сервера"</string>
     <string name="scale_msg">"Масштаб сейчас"</string>
-<string name="madeby">"MultiVNC на Android предоставлен вам Кристианом Бейером (christianbeier.net).\n\nnСтраница проекта находится по адресу https://github.com/bk138/multivnc\n\nЕсли вы хотите сообщить об ошибке или запросить функцию, перейдите по адресу https://github.com/bk138/multivnc/issues.\n\nЖурнал изменений можно смонтировать по адресу https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md"</string>
+<string name="madeby">"MultiVNC на Android разрабатывается Кристианом Бейером (christianbeier.net).\n\nСам проект доступен по адресу https://github.com/bk138/multivnc\n\nЕсли вы хотите сообщить об ошибке или запросить функцию, перейдите по адресу https://github.com/bk138/multivnc/issues.\n\nЖурнал изменений доступен по адресу https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md"</string>
 <string name="colormode_caption">"Цветовой режим"</string>
 <string name="color_mode">"Установить цветовой режим"</string>
-<string name="connect_button">"соединять"</string>
+<string name="connect_button">"Подключиться"</string>
 <string name="control_check">"Ctrl"</string>
-<string name="delete_connection">"удалять"</string>
+<string name="delete_connection">"Удалить"</string>
 <string name="disconnect">"Отключить"</string>
 <string name="toggle_framebuffer_update">"Переключить вид"</string>
 <string name="toggle_mouse_buttons">"Переключить кнопки мыши"</string>
@@ -31,54 +31,54 @@
 <string name="info">"Информация о соединении"</string>
 <string name="meta_key_title">"Отправить ключ комбо"</string>
 <string name="new_connection">"Новое соединение"</string>
-<string name="nickname_caption">"закладка"</string>
-<string name="discovered_servers">"Обнаруженные серверы"</string>
-<string name="bookmarks">"закладки"</string>
+<string name="nickname_caption">"Закладка"</string>
+<string name="discovered_servers">"Известные сервера"</string>
+<string name="bookmarks">"Закладки"</string>
 <string name="savebookmark_button">"Сохранить закладку"</string>
 <string name="bookmark_saved">"Закладка сохранена!"</string>
-<string name="bookmark_invalid">"Это не действительная закладка больше!"</string>
-<string name="password_caption">"пароль"</string>
-<string name="keep_password_button">"Держать"</string>
-<string name="port_caption">"порт"</string>
+<string name="bookmark_invalid">"Это закладка больше не действительна!"</string>
+<string name="password_caption">"Пароль"</string>
+<string name="keep_password_button">"Запомнить"</string>
+<string name="port_caption">"Порт"</string>
 <string name="repeater_caption">"ID на ретрансляторе"</string>
 <string name="repeater_hint">"ID сервера при подключении к UltraVNC-ретранслятору"</string>
 <string name="save_as_copy">"Сохранить как копию"</string>
     <string name="credentials_needed_title">необходимы учетные данные…</string>
     <!-- Send selected metakey -->
-<string name="send_button">"послать"</string>
+<string name="send_button">"Отправить"</string>
 <string name="send_key_again">"Отправить комбинацию клавиш еще раз"</string>
 <string name="shift_check">"Shift"</string>
 <string name="shortcut_label">"Ярлык соединения VNC"</string>
     <string name="shortcut_no_entries">"Еще нет закладок"</string>
 <string name="special_keys">"ключевая комбинация"</string>
-<string name="username_caption">"имя пользователя"</string>
+<string name="username_caption">"Имя пользователя"</string>
 <string name="username_hint">"Для проверки подлинности Windows/Mac"</string>
 <string name="editbookmark_title">"Изменить закладку"</string>
 <string name="enterbookmarkname">"Пожалуйста, введите название закладки…"</string>
-<string name="bookmark_save_question">"Вы хотите добавить в закладки этот сервер?"</string>
+<string name="bookmark_save_question">"Вы хотите добавить этот сервер в закладки?"</string>
 <string name="bookmark_delete_question">"Вы уверены, что хотите удалить эту закладку?"</string>
 <string name="disconnect_question">"Вы уверены, что хотите отключиться?"</string>
-<string name="about">"Около"</string>
-<string name="help">"Помогите"</string>
-<string name="edit">"редактировать"</string>
-    <string name="save">спасти</string>
+<string name="about">"О MultiVNC"</string>
+<string name="help">"Помощь"</string>
+<string name="edit">"Редактировать"</string>
+    <string name="save">Сохранить</string>
 
     <string name="utils_title_error">"Ошибка!"</string>
 
-<string name="support_dialog_title">"Пожалуйста, поддержите MultiVNC"</string>
-<string name="support_dialog_text">"Если вам нравится MultiVNC, почему бы не подумать о поддержке его разработки? В настоящее время вы можете сделать это легко, оценив приложение или пожертвовав. Спасибо!"</string>
+<string name="support_dialog_title">"Поддержите MultiVNC"</string>
+<string name="support_dialog_text">"Вы можете выразить брагодарность проекту MultiVNC, поддержав его разработку! Это просто, оцените приложение в Google Play или пожертвуйте на https://github.com/bk138/multivnc. Согласны?"</string>
 <string name="support_dialog_yes">"Да, хорошая идея!"</string>
 <string name="support_dialog_no">"Нет, не сейчас."</string>
-<string name="support_dialog_neveragain">"Никогда не спрашивай снова!"</string>
+<string name="support_dialog_neveragain">"Больше не спрашивать."</string>
 
-<string name="firstrun_help_dialog_title">"Показать справку?"</string>
-<string name="firstrun_help_dialog_text">"Кажется, вы впервые используете MultiVNC. Вы хотите прочитать руководство по приложению? Это не очень долго, но информативно…"</string>
+<string name="firstrun_help_dialog_title">"Уже знакомы с работой MultiVNC?"</string>
+<string name="firstrun_help_dialog_text">"Наши сенсоры засекли что Вы запустили MultiVNC в первый раз. Хотите прочитать краткое руководство к приложению?"</string>
 
-<string name="pleaserate">"Если вам нравится MultiVNC, почему бы не проявить любовь, щелкнув сердцем?"</string>
+<string name="pleaserate">"Вам понравился MultiVNC? Несомненно, вы можете поделиться этим щелкнув по сердцу."</string>
 <string name="changelog_dialog_title">"Что нового…"</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-    Если вы хотите узнать, что нового, посетите <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">онлайн-журнал изменений</а>.
+    Список свежих изменений доступен <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">по ссылке</а> онлайн.
     ]]>
 </string>
 </resources>
