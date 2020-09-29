@@ -12,6 +12,9 @@ If you'd like to put out an incentive for fixing this bug, you can do so at http
 **Is your bug report about the Desktop Multivnc or the Mobile MultiVNC?**
  - Desktop (wxWidgets) or Mobile (Android):
 
+**Which MultiVNC version are you using?**
+<!-- Can be found via 'About'. -->
+
 **Describe the bug**
 <!-- A clear and concise description of what the bug is. -->
 
@@ -36,7 +39,7 @@ If you'd like to put out an incentive for fixing this bug, you can do so at http
 
 **For the Mobile Version (please complete the following information):**
  - Android version:
- - Installed from Play Store or F-Droid:
+ - Installed from Play Store, F-Droid, Amazon Appstore:
 
 **Additional context**
 <!-- Add any other context about the problem here. -->
