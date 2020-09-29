@@ -1,5 +1,13 @@
 # Version 1.9.x:
 
+1.9.5
+
+-   Made native connections the default, removed chooser dialog.
+-   Added links to GitHub issues and ChangeLog in About.
+-   Removed donation links in About for Google Play version.
+-   Improved russian translation thanks to Alexandr Kondratev.
+-   Added Chinese (machine) translation.
+
 1.9.4
 
 -   Reworked UltraVNC-repeater connection functionality to be more user-friendly.
