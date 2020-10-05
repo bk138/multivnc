@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="address_caption">Адреса</string>
+    <string name="alt_check">Alt</string>
+    <string name="super_check">Super</string>
+    <string name="server_found">Знайдено VNC сервер</string>
+    <string name="server_removed">VNC сервер зник</string>
+    <string name="restartMDNS">Перезапустити виявлення сервера</string>
+    <string name="scale_msg">Масштаб зараз</string>
+<string name="madeby">MultiVNC на Android розробляється Крістіаном Бейером (christianbeier.net).\n\nДомашня сторінка проекту знаходиться за адресою https://github.com/bk138/multivnc\n\nЯкщо Ви хочете повідомити про помилку або запитати нову функцію, перейдіть за посиланням https://github.com/bk138/multivnc/issues\n\nЖурнал змін можна знайти за адресою https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md</string>
+<string name="colormode_caption">Режим кольору</string>
+<string name="color_mode">Встановити режим кольору</string>
+<string name="connect_button">Підключитися</string>
+<string name="control_check">Ctrl</string>
+<string name="delete_connection">Видалити</string>
+<string name="disconnect">Відключитися</string>
+<string name="toggle_framebuffer_update">Переключити перегляд</string>
+<string name="toggle_mouse_buttons">Переключити кнопки миші</string>
+<string name="toggle_pointer_highlight">Переключити підсвічування вказівника</string>
+<string name="toggle_keyboard">Переключити клавіатуру</string>
+
+<string name="export_settings">Експортувати</string>
+<string name="export_settings_path">Експортувати у файл</string>
+<string name="database_error_open">Помилка відкриття бази даних!</string>
+<string name="import_export_settings">Імпорт/Експорт</string>
+<string name="import_settings">Імпортувати</string>
+<string name="import_settings_file_url">Імпортувати з файлу чи URL-адреси</string>
+    <string name="import_error_url">Вказано неправильну URL-адресу:</string>
+    <string name="import_error_io">Помилка I/O під час читання кофігурації</string>
+    <string name="import_error_xml">Формат XML імпортованої кофігурації недійсний</string>
+
+<string name="info">Інформація про з\'єднання</string>
+<string name="meta_key_title">Надіслати комбінацію клавіш</string>
+<string name="new_connection">Нове з\'єднання</string>
+<string name="nickname_caption">Закладка</string>
+<string name="discovered_servers">Виявлені сервери</string>
+<string name="bookmarks">Закладки</string>
+<string name="savebookmark_button">Зберегти закладку</string>
+<string name="bookmark_saved">Закладку збережено!</string>
+<string name="bookmark_invalid">Це вже недійсна закладка!</string>
+<string name="password_caption">Пароль</string>
+<string name="keep_password_button">Запам\'ятати</string>
+<string name="port_caption">Порт</string>
+<string name="repeater_caption">ID на ретрансляторі</string>
+<string name="repeater_hint">ID сервера при підключенні до ретранслятора UltraVNC</string>
+<string name="save_as_copy">Зберегти як копію</string>
+    <string name="credentials_needed_title">Потрібні облікові дані…</string>
+<!-- Send selected metakey -->
+<string name="send_button">Надіслати</string>
+<string name="send_key_again">Надіслати комбінацію клавіш знову</string>
+<string name="shift_check">Shift</string>
+<string name="shortcut_label">Ярлик підключення VNC</string>
+    <string name="shortcut_no_entries">Закладок ще немає</string>
+<string name="special_keys">Комбінація клавіш</string>
+<string name="username_caption">Ім\'я користувача</string>
+<string name="username_hint">Для автентифікації Windows/Mac</string>
+<string name="editbookmark_title">Редагувати закладку</string>
+<string name="enterbookmarkname">Будь ласка, введіть назву закладки…</string>
+<string name="bookmark_save_question">Ви хочете зробити закладку для цього сервера?</string>
+<string name="bookmark_delete_question">Ви впевнені, що хочете видалити цю закладку?</string>
+<string name="disconnect_question">Ви впевнені, що хочете відключитися?</string>
+<string name="about">Про</string>
+<string name="help">Довідка</string>
+<string name="edit">Редагувати</string>
+    <string name="save">Зберегти</string>
+
+    <string name="utils_title_error">Помилка!</string>
+
+<string name="support_dialog_title">Будь ласка, підтримайте MultiVNC</string>
+<string name="support_dialog_text">Якщо Вам подобається MultiVNC, чому б не розглянути можливість підтримки його розробки? Наразі це можна зробити легко, оцінивши додаток або пожертвувавши. Дякую!</string>
+
+<string name="support_dialog_yes">Так, гарна ідея!</string>
+<string name="support_dialog_no">Ні, не зараз.</string>
+<string name="support_dialog_neveragain">Ніколи більше не питати!</string>
+
+<string name="firstrun_help_dialog_title">Показати довідку?</string>
+<string name="firstrun_help_dialog_text">Здається, Ви впереше використовуєте MultiVNC. Хочете прочитати посібник із програми? Це не дуже довго, але інформативно…</string>
+
+<string name="pleaserate">Якщо Вам подобається MultiVNC, чому б не проявити любов, натиснувши на серце?</string>
+<string name="changelog_dialog_title">Що нового…</string>
+<string name="changelog_dialog_text">
+<![CDATA[
+        Якщо Ви хочете дізнатися, що нового, відвідайте <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">журнал змін</a> онлайн.
+    ]]>
+</string>
+</resources>
