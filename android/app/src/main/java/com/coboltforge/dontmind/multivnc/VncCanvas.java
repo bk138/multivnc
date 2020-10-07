@@ -53,6 +53,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
@@ -843,7 +844,7 @@ public class VncCanvas extends GLSurfaceView {
 				if(!isUserNameNeeded)
 					credentialsDialog.findViewById(R.id.username_row).setVisibility(GONE);
 
-				new AlertDialog.Builder(getContext())
+				AlertDialog dialog = new AlertDialog.Builder(getContext())
 						.setTitle(getContext().getString(R.string.credentials_needed_title))
 						.setView(credentialsDialog)
 						.setCancelable(false)
@@ -856,7 +857,10 @@ public class VncCanvas extends GLSurfaceView {
 									vncConn.notify();
 								}
 							}
-						}).show();
+						}).create();
+
+				dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+				dialog.show();
 			}
 		});
 
