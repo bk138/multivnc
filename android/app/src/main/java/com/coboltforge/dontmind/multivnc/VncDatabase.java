@@ -35,8 +35,7 @@ class VncDatabase extends SQLiteOpenHelper {
 		db.execSQL(MostRecentBean.GEN_CREATE);
 		db.execSQL(MetaList.GEN_CREATE);
 		db.execSQL(AbstractMetaKeyBean.GEN_CREATE);
-		db.execSQL(SentTextBean.GEN_CREATE);
-		
+
 		db.execSQL("INSERT INTO "+MetaList.GEN_TABLE_NAME+" VALUES ( 1, 'DEFAULT')");
 	}
 
@@ -54,8 +53,7 @@ class VncDatabase extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + MostRecentBean.GEN_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + MetaList.GEN_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + AbstractMetaKeyBean.GEN_TABLE_NAME);
-		db.execSQL("DROP TABLE IF EXISTS " + SentTextBean.GEN_TABLE_NAME);
-		onCreate(db);		
+		onCreate(db);
 	}
 
 	/* (non-Javadoc)
@@ -89,9 +87,6 @@ class VncDatabase extends SQLiteOpenHelper {
 				oldVersion = DBV_0_4_7;
 			}
 			Log.i(TAG,"Doing upgrade from 11 to 12");
-			// Haven't been using SentText before, primary key handling changed so drop and recreate it
-			db.execSQL("DROP TABLE IF EXISTS " + SentTextBean.GEN_TABLE_NAME);
-			db.execSQL(SentTextBean.GEN_CREATE);
 			db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_SHOWZOOMBUTTONS+" INTEGER DEFAULT 1");
 			db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_DOUBLE_TAP_ACTION+" TEXT");
 		}
