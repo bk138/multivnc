@@ -616,19 +616,20 @@ public class VncCanvas extends GLSurfaceView {
 
 
 	public void showConnectionInfo() {
-		String msg = vncConn.getDesktopName();
-		int idx = vncConn.getDesktopName().indexOf("(");
-		if (idx > -1) {
-			// Breakup actual desktop name from IP addresses for improved
-			// readability
-			String dn = vncConn.getDesktopName().substring(0, idx).trim();
-			String ip = vncConn.getDesktopName().substring(idx).trim();
-			msg = dn + "\n" + ip;
-		}
-		msg += "\n" + vncConn.getFramebufferWidth() + "x" + vncConn.getFramebufferHeight();
-		String enc = vncConn.getEncoding();
-		// Encoding might not be set when we display this message
+		String msg = "";
 		try {
+			msg = vncConn.getDesktopName();
+			int idx = vncConn.getDesktopName().indexOf("(");
+			if (idx > -1) {
+				// Breakup actual desktop name from IP addresses for improved
+				// readability
+				String dn = vncConn.getDesktopName().substring(0, idx).trim();
+				String ip = vncConn.getDesktopName().substring(idx).trim();
+				msg = dn + "\n" + ip;
+			}
+			msg += "\n" + vncConn.getFramebufferWidth() + "x" + vncConn.getFramebufferHeight();
+			String enc = vncConn.getEncoding();
+			// Encoding might not be set when we display this message
 			if (enc != null && !enc.equals(""))
 				msg += ", " + vncConn.getEncoding() + " encoding, " + vncConn.getColorModel().toString();
 			else
