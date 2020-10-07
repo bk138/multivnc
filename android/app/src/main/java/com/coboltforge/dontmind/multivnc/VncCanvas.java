@@ -73,7 +73,6 @@ public class VncCanvas extends GLSurfaceView {
 
 
 	// Runtime control flags
-	private boolean mIsDoingNativeDrawing = false;
 	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
 
@@ -203,35 +202,11 @@ public class VncCanvas extends GLSurfaceView {
 			try{
 				gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
-				if(mIsDoingNativeDrawing && vncConn.getFramebufferWidth() >0 && vncConn.getFramebufferHeight() > 0) {
+				if(vncConn.getFramebufferWidth() >0 && vncConn.getFramebufferHeight() > 0) {
 					vncConn.lockFramebuffer();
 					prepareTexture(vncConn.rfbClient);
 					vncConn.unlockFramebuffer();
 				}
-
-				if(vncConn.getFramebuffer() instanceof LargeBitmapData) {
-
-					vncConn.lockFramebuffer();
-
-					// Build Texture from bitmap
-					GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, vncConn.getFramebuffer().mbitmap, 0);
-
-					vncConn.unlockFramebuffer();
-
-				}
-
-				if(vncConn.getFramebuffer() instanceof FullBufferBitmapData) {
-
-					vncConn.lockFramebuffer();
-
-					// build texture from pixel array
-					gl.glTexImage2D(GL10.GL_TEXTURE_2D, 0, GL10.GL_RGBA,
-							vncConn.getFramebuffer().bitmapwidth, vncConn.getFramebuffer().bitmapheight,
-							0, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, IntBuffer.wrap(vncConn.getFramebuffer().bitmapPixels));
-
-					vncConn.unlockFramebuffer();
-				}
-
 
 				/*
 				 * The crop rectangle is given as Ucr, Vcr, Wcr, Hcr.
@@ -335,8 +310,6 @@ public class VncCanvas extends GLSurfaceView {
 		activity = a;
 		this.inputHandler = inputHandler;
 		vncConn = conn;
-
-		mIsDoingNativeDrawing = a.getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false);
 	}
 
 	/**
@@ -605,7 +578,7 @@ public class VncCanvas extends GLSurfaceView {
 
 	void reDraw() {
 
-		if (repaintsEnabled && (vncConn.getFramebuffer() != null || (mIsDoingNativeDrawing && vncConn.rfbClient != 0))) {
+		if (repaintsEnabled && vncConn.rfbClient != 0) {
 
 			// request a redraw from GL thread
 			requestRender();
