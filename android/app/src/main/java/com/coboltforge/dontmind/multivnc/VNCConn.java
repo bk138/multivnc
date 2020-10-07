@@ -643,23 +643,7 @@ public class VNCConn {
 
 
 	public String getEncoding() {
-		switch (preferredEncoding) {
-		case RfbProto.EncodingRaw:
-			return "RAW";
-		case RfbProto.EncodingTight:
-			return "TIGHT";
-		case RfbProto.EncodingCoRRE:
-			return "CoRRE";
-		case RfbProto.EncodingHextile:
-			return "HEXTILE";
-		case RfbProto.EncodingRRE:
-			return "RRE";
-		case RfbProto.EncodingZlib:
-			return "ZLIB";
-		case RfbProto.EncodingZRLE:
-			return "ZRLE";
-		}
-		return "";
+		return ""; //TODO: wire up to native
 	}
 
 
