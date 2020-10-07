@@ -50,8 +50,6 @@ public class VNCConn {
 	private boolean maintainConnection = true;
 	private boolean framebufferUpdatesEnabled = true;
 
-	// Internal bitmap data
-	private AbstractBitmapData bitmapData;
 	private Lock bitmapDataPixelsLock = new ReentrantLock();
 
 	// message queue for communicating with the output worker thread
@@ -295,8 +293,8 @@ public class VNCConn {
     					sendKeyEvent(ev.key);
     				if(ev.ffur != null)
 						try {
-							bitmapData.writeFullUpdateRequest(ev.ffur.incremental);
-						} catch (IOException e) {
+							// bitmapData.writeFullUpdateRequest(ev.ffur.incremental);
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					if(ev.fur != null)
@@ -430,7 +428,6 @@ public class VNCConn {
 		catch(Exception e) {
 		}
 
-		bitmapData = null;
 		canvas = null;
 		connSettings = null;
 
@@ -680,10 +677,6 @@ public class VNCConn {
 
 	public String getCutText() {
 		return serverCutText;
-	}
-
-	public final AbstractBitmapData getFramebuffer() {
-		return bitmapData;
 	}
 
 	public void lockFramebuffer() {
