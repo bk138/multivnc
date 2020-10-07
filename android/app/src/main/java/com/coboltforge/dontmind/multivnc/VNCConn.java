@@ -43,7 +43,6 @@ public class VNCConn {
 	// the native rfbClient
 	@Keep
 	long rfbClient;
-	private boolean isDoingNativeConn = false;
 	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 
@@ -191,16 +190,15 @@ public class VNCConn {
 					Log.e(TAG, ne.toString());
 				}
 
-				if(isDoingNativeConn) {
-					int repeaterId = (connSettings.getUseRepeater() && connSettings.getRepeaterId() != null && connSettings.getRepeaterId().length()>0) ? Integer.parseInt(connSettings.getRepeaterId()) : -1;
-					lockFramebuffer();
-					if(!rfbInit(connSettings.getAddress(), connSettings.getPort(), repeaterId, pendingColorModel.bpp())) {
-						unlockFramebuffer();
-						throw new Exception(); //TODO add some error reoprting here
-					}
-					colorModel = pendingColorModel;
+
+				int repeaterId = (connSettings.getUseRepeater() && connSettings.getRepeaterId() != null && connSettings.getRepeaterId().length() > 0) ? Integer.parseInt(connSettings.getRepeaterId()) : -1;
+				lockFramebuffer();
+				if (!rfbInit(connSettings.getAddress(), connSettings.getPort(), repeaterId, pendingColorModel.bpp())) {
 					unlockFramebuffer();
+					throw new Exception(); //TODO add some error reoprting here
 				}
+				colorModel = pendingColorModel;
+				unlockFramebuffer();
 
 				canvas.handler.post(new Runnable() {
 					public void run() {
@@ -213,17 +211,15 @@ public class VNCConn {
 				outputThread = new ClientToServerThread();
 				outputThread.start();
 
-				if(isDoingNativeConn) {
-					// actually set scale type with this, otherwise no scaling
-					canvas.activity.setModes();
-					// center pointer
-					canvas.mouseX = getFramebufferWidth()/2;
-					canvas.mouseY = getFramebufferHeight()/2;
-					// main loop
-					while(maintainConnection) {
-						if(!rfbProcessServerMessage()) {
-							throw new Exception();
-						}
+				// actually set scale type with this, otherwise no scaling
+				canvas.activity.setModes();
+				// center pointer
+				canvas.mouseX = getFramebufferWidth() / 2;
+				canvas.mouseY = getFramebufferHeight() / 2;
+				// main loop
+				while (maintainConnection) {
+					if (!rfbProcessServerMessage()) {
+						throw new Exception();
 					}
 				}
 			} catch (Throwable e) {
@@ -266,12 +262,10 @@ public class VNCConn {
 				}
 			}
 
-			if(isDoingNativeConn) {
-				// we might get here when maintainConnection is set to false or when an exception was thrown
-				lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
-				rfbShutdown();
-				unlockFramebuffer();
-			}
+			// we might get here when maintainConnection is set to false or when an exception was thrown
+			lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
+			rfbShutdown();
+			unlockFramebuffer();
 
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread done!");
 		}
@@ -332,12 +326,7 @@ public class VNCConn {
 
 
 		private boolean sendPointerEvent(OutputEvent.PointerEvent pe) {
-
-			if(isDoingNativeConn)
-				return rfbSendPointerEvent(pe.x,pe.y,pe.mask);
-
-			return false;
-
+			return rfbSendPointerEvent(pe.x, pe.y, pe.mask);
 		}
 
 
@@ -346,9 +335,7 @@ public class VNCConn {
 
 			   try {
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
-				   if(isDoingNativeConn)
-				   	 	rfbSendKeyEvent(evt.keyCode, evt.down);
-				   return true;
+				   return rfbSendKeyEvent(evt.keyCode, evt.down);
 				} catch (Exception e) {
 					return false;
 				}
@@ -359,15 +346,8 @@ public class VNCConn {
 
 		private boolean sendCutText(String text) {
 			if (rfbClient != 0) {
-
-				try {
-					if(Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
-					if(isDoingNativeConn)
-						rfbSendClientCutText(text);
-					return true;
-				} catch (Exception e) {
-					return false;
-				}
+				if (Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
+				return rfbSendClientCutText(text);
 			}
 			return false;
 		}
@@ -464,13 +444,12 @@ public class VNCConn {
 	 */
 	public void setCanvas(VncCanvas c) {
 		canvas = c;
-		isDoingNativeConn = canvas.activity.getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false);
 	}
 
 
 	public boolean sendCutText(String text) {
 
-		if((isDoingNativeConn && rfbClient != 0)) { // only queue if already connected
+		if(rfbClient != 0) { // only queue if already connected
 			OutputEvent e = new OutputEvent(text);
 			outputEventQueue.add(e);
 			synchronized (outputEventQueue) {
@@ -487,7 +466,7 @@ public class VNCConn {
 	public boolean sendPointerEvent(int x, int y, int modifiers, int pointerMask) {
 
 
-		if((isDoingNativeConn && rfbClient != 0)) { // only queue if already connected
+		if(rfbClient != 0) { // only queue if already connected
 
 			// trim coodinates
 			if (x<0) x=0;
@@ -632,27 +611,7 @@ public class VNCConn {
 	public boolean toggleFramebufferUpdates()
 	{
 		framebufferUpdatesEnabled = !framebufferUpdatesEnabled;
-
-		if(isDoingNativeConn) {
-			rfbSetFramebufferUpdatesEnabled(framebufferUpdatesEnabled);
-		}
-
-		if(framebufferUpdatesEnabled)
-		{
-			try {
-				// clear old framebuffer
-				bitmapData.clear();
-				// request full non-incremental update to get going again
-				OutputEvent e = new OutputEvent(false);
-				outputEventQueue.add(e);
-				synchronized (outputEventQueue) {
-					outputEventQueue.notify();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
+		rfbSetFramebufferUpdatesEnabled(framebufferUpdatesEnabled);
 		return framebufferUpdatesEnabled;
 	}
 
@@ -708,36 +667,15 @@ public class VNCConn {
 
 
 	public final String getDesktopName() {
-		if(isDoingNativeConn)
-			return rfbGetDesktopName();
-		else
-			return "";
+		return rfbGetDesktopName();
 	}
 
 	public final int getFramebufferWidth() {
-
-		if(isDoingNativeConn)
-			return rfbGetFramebufferWidth();
-
-		try {
-			return bitmapData.framebufferwidth;
-		}
-		catch(NullPointerException e) {
-			return 0;
-		}
+		return rfbGetFramebufferWidth();
 	}
 
 	public final int getFramebufferHeight() {
-
-		if(isDoingNativeConn)
-			return rfbGetFramebufferHeight();
-
-		try {
-			return bitmapData.framebufferheight;
-		}
-		catch(NullPointerException e) {
-			return 0;
-		}
+		return rfbGetFramebufferHeight();
 	}
 
 	public String getCutText() {
