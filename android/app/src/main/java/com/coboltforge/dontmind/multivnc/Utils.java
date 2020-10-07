@@ -28,20 +28,6 @@ public class Utils {
 	 */
 	public static int appstarts;
 
-	public static ActivityManager getActivityManager(Context context)
-	{
-		ActivityManager result = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-		if (result == null)
-			throw new UnsupportedOperationException("Could not retrieve ActivityManager");
-		return result;
-	}
-
-	private static int nextNoticeID = 0;
-	public static int nextNoticeID() {
-		nextNoticeID++;
-		return nextNoticeID;
-	}
-
 	public static void showErrorMessage(Context _context, String message) {
 		showMessage(_context, _context.getString(R.string.utils_title_error), message, 0, android.R.attr.alertDialogIcon, null);
 	}
@@ -94,18 +80,6 @@ public class Utils {
 		}
 	}
 
-	public static int nextPow2(int x) {
-
-		x--;
-		x |= (x >> 1);
-		x |= (x >> 2);
-		x |= (x >> 4);
-		x |= (x >> 8);
-		x |= (x >> 16);
-		x++;
-
-		return x;
-	}
 
 	/**
 	 * get and set number of successful app starts
