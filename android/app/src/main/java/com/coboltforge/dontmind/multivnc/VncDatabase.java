@@ -32,7 +32,6 @@ class VncDatabase extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(AbstractConnectionBean.GEN_CREATE);
-		db.execSQL(MostRecentBean.GEN_CREATE);
 		db.execSQL(MetaList.GEN_CREATE);
 		db.execSQL(AbstractMetaKeyBean.GEN_CREATE);
 
@@ -50,7 +49,6 @@ class VncDatabase extends SQLiteOpenHelper {
 	{
 		Log.i(TAG, "Doing default database upgrade (drop and create tables)");
 		db.execSQL("DROP TABLE IF EXISTS " + AbstractConnectionBean.GEN_TABLE_NAME);
-		db.execSQL("DROP TABLE IF EXISTS " + MostRecentBean.GEN_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + MetaList.GEN_TABLE_NAME);
 		db.execSQL("DROP TABLE IF EXISTS " + AbstractMetaKeyBean.GEN_TABLE_NAME);
 		onCreate(db);
@@ -82,8 +80,6 @@ class VncDatabase extends SQLiteOpenHelper {
 				Log.i(TAG,"Doing upgrade from 10 to 11");
 				db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_USERNAME+" TEXT");
 				db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_SECURECONNECTIONTYPE+" TEXT");
-				db.execSQL("ALTER TABLE " + MostRecentBean.GEN_TABLE_NAME + " ADD COLUMN " + MostRecentBean.GEN_FIELD_SHOW_SPLASH_VERSION + " INTEGER");
-				db.execSQL("ALTER TABLE " + MostRecentBean.GEN_TABLE_NAME + " ADD COLUMN " + MostRecentBean.GEN_FIELD_TEXT_INDEX);
 				oldVersion = DBV_0_4_7;
 			}
 			Log.i(TAG,"Doing upgrade from 11 to 12");

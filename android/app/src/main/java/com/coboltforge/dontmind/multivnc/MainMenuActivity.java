@@ -160,7 +160,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 				ConnectionBean conn = makeNewConnFromView();
 				if(conn == null)
 					return;
-				writeRecent(conn);
 				Log.d(TAG, "Starting NEW connection " + conn.toString());
 				Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 				intent.putExtra(Constants.CONNECTION,conn.Gen_getValues());
@@ -373,23 +372,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 	}
 
 
-
-	/**
-	 * Return the object representing the app global state in the database, or null
-	 * if the object hasn't been set up yet
-	 * @param db App's database -- only needs to be readable
-	 * @return Object representing the single persistent instance of MostRecentBean, which
-	 * is the app's global state
-	 */
-	static MostRecentBean getMostRecent(SQLiteDatabase db)
-	{
-		ArrayList<MostRecentBean> recents = new ArrayList<MostRecentBean>(1);
-		MostRecentBean.getAll(db, MostRecentBean.GEN_TABLE_NAME, recents, MostRecentBean.GEN_NEW);
-		if (recents.size() == 0)
-			return null;
-		return recents.get(0);
-	}
-
 	void updateBookmarkView() {
 		ArrayList<ConnectionBean> bookmarked_connections=new ArrayList<ConnectionBean>();
 		try {
@@ -438,7 +420,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 				@Override
 				public void onClick(View view) {
 					Log.d(TAG, "Starting bookmarked connection " + conn.toString());
-					writeRecent(conn);
 					Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 					intent.putExtra(Constants.CONNECTION , conn.Gen_getValues());
 					startActivity(intent);
@@ -522,33 +503,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		return database;
 	}
 
-
-
-	private void writeRecent(ConnectionBean conn)
-	{
-		SQLiteDatabase db = database.getWritableDatabase();
-		db.beginTransaction();
-		try
-		{
-			MostRecentBean mostRecent = getMostRecent(db);
-			if (mostRecent == null)
-			{
-				mostRecent = new MostRecentBean();
-				mostRecent.setConnectionId(conn.get_Id());
-				mostRecent.Gen_insert(db);
-			}
-			else
-			{
-				mostRecent.setConnectionId(conn.get_Id());
-				mostRecent.Gen_update(db);
-			}
-			db.setTransactionSuccessful();
-		}
-		finally
-		{
-			db.endTransaction();
-		}
-	}
 
 	private void saveBookmark(ConnectionBean conn) 	{
 		SQLiteDatabase db = database.getWritableDatabase();
@@ -687,7 +641,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 							@Override
 							public void onClick(View view) {
 								Log.d(TAG, "Starting discovered connection " + c.toString());
-								writeRecent(c);
 								Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
 								intent.putExtra(Constants.CONNECTION , c.Gen_getValues());
 								startActivity(intent);

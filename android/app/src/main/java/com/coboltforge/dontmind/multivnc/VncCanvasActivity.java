@@ -626,13 +626,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 				// read in this bookmarked connection
 				if (connection.Gen_read(database.getReadableDatabase(), connection.getPort()))
 				{
-					// and set to most recently used
-					MostRecentBean bean = MainMenuActivity.getMostRecent(database.getReadableDatabase());
-					if (bean != null)
-					{
-						bean.setConnectionId(connection.get_Id());
-						bean.Gen_update(database.getWritableDatabase());
-					}
 				}
 				else {
 					Log.e(TAG, "Bookmarked connection " + connection.getPort() + " does not exist!");
