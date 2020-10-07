@@ -133,11 +133,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		// and (re-)bind to MDNS service
 		bindToMDNSService(new Intent(this, MDNSService.class));
 
-		// make native connections the default
-		SharedPreferences.Editor ed = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).edit();
-		ed.putBoolean(Constants.PREFS_KEY_NATIVECONN, true);
-		ed.commit();
-
 		ipText = (EditText) findViewById(R.id.textIP);
 		portText = (EditText) findViewById(R.id.textPORT);
 		passwordText = (EditText) findViewById(R.id.textPASSWORD);
@@ -149,8 +144,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 		colorSpinner = (Spinner)findViewById(R.id.spinnerColorMode);
 		COLORMODEL[] models = {COLORMODEL.C24bit, COLORMODEL.C16bit};
-		if(!getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false))
-			models = COLORMODEL.values();
+
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
 		colorSpinner.setAdapter(colorSpinnerAdapter);
 		//colorSpinner.setSelection(0);

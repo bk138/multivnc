@@ -54,8 +54,6 @@ public class EditBookmarkActivity extends Activity {
 		repeaterText = (TextView)findViewById(R.id.textRepeaterIdBookmark);
 		colorSpinner = (Spinner)findViewById(R.id.spinnerColorMode);
 		COLORMODEL[] models = {COLORMODEL.C24bit, COLORMODEL.C16bit};
-		if(!getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false))
-			models = COLORMODEL.values();
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
 		colorSpinner.setAdapter(colorSpinnerAdapter);
 		
@@ -136,8 +134,7 @@ public class EditBookmarkActivity extends Activity {
 		
 		COLORMODEL cm = COLORMODEL.valueOf(bookmark.getColorModel());
 		COLORMODEL[] colors = {COLORMODEL.C24bit, COLORMODEL.C16bit};
-		if(!getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false))
-			colors = COLORMODEL.values();
+
 		for (int i=0; i<colors.length; ++i)
 			if (colors[i] == cm) {
 				colorSpinner.setSelection(i);

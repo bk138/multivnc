@@ -889,10 +889,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			menu.findItem(R.id.itemTogglePointerHighlight).setVisible(true);
 		}
 
-		if(getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE).getBoolean(Constants.PREFS_KEY_NATIVECONN, false)) {
-			// changing pixel format without Fence extension (https://github.com/rfbproto/rfbproto/blob/master/rfbproto.rst#clientfence) not safely possible
-			menu.findItem(R.id.itemColorMode).setVisible(false);
-		}
+		// changing pixel format without Fence extension (https://github.com/rfbproto/rfbproto/blob/master/rfbproto.rst#clientfence) not safely possible
+		menu.findItem(R.id.itemColorMode).setVisible(false);
 	}
 
 	@Override
