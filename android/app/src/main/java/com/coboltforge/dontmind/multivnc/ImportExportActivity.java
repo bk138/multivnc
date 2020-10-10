@@ -20,12 +20,11 @@ import com.antlersoft.android.contentxml.SqliteElement;
 import com.antlersoft.android.contentxml.SqliteElement.ReplaceStrategy;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.Writer;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -55,11 +54,19 @@ public class ImportExportActivity extends Activity {
 			try {
 				URLConnection connection = new URL(urls[0]).openConnection();
 				connection.connect();
-				Reader reader = new InputStreamReader(connection.getInputStream());
-				SqliteElement.importXmlStreamToDb(
-						mDatabase.getWritableDatabase(),
-						reader,
-						ReplaceStrategy.REPLACE_EXISTING);
+				if(urls[0].endsWith(".xml")) {
+					Reader reader = new InputStreamReader(connection.getInputStream());
+					SqliteElement.importXmlStreamToDb(
+							mDatabase.getWritableDatabase(),
+							reader,
+							ReplaceStrategy.REPLACE_EXISTING);
+				} else {
+					mDatabase.close(); // Close any open database object
+					FileOutputStream dst = new FileOutputStream(mDatabase.getWritableDatabase().getPath());
+					Utils.copy(connection.getInputStream(), dst);
+					connection.getInputStream().close();
+					dst.close();
+				}
 				return null;
 			} catch (Exception e) {
 				return e;
@@ -105,7 +112,7 @@ public class ImportExportActivity extends Activity {
 			f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 		}
 
-		f = new File(f, "MultiVNC-Export.xml");
+		f = new File(f, "MultiVNC-Export.sqlite");
 
 		_textSaveUrl.setText(f.getAbsolutePath());
 		try {
@@ -125,17 +132,19 @@ public class ImportExportActivity extends Activity {
 
 				try {
 					File f = new File(_textSaveUrl.getText().toString());
-					Writer writer = new OutputStreamWriter(new FileOutputStream(f, false));
-					SqliteElement.exportDbAsXmlToStream(mDatabase.getReadableDatabase(), writer);
-					writer.close();
+
+					FileInputStream src = new FileInputStream(mDatabase.getReadableDatabase().getPath());
+					FileOutputStream dst = new FileOutputStream(f);
+					Utils.copy(src, dst);
+					src.close();
+					dst.close();
+
 					finish();
 					Log.d(TAG, "export successful!");
 				}
 				catch (IOException ioe)
 				{
 					errorNotify("I/O Exception exporting config", ioe);
-				} catch (SAXException e) {
-					errorNotify("XML Exception exporting config", e);
 				}
 			}
 
