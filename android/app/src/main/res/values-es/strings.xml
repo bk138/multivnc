@@ -39,7 +39,7 @@
 <string name="savebookmark_button">Guardar como marcador</string>
 <string name="bookmark_saved">¡Marcador guardado!</string>
 <string name="bookmark_invalid">¡Esto ya no es un marcador válido!</string>
-<string name="password_caption">Contraseñ</string>
+<string name="password_caption">Contraseña</string>
 <string name="keep_password_button">Mantener</string>
 <string name="port_caption">Puerto</string>
 <string name="repeater_caption">ID en el repetidor</string>
@@ -52,14 +52,14 @@
 <string name="shift_check">Cambio</string>
 <string name="shortcut_label">Atajo de la conexión VNC</string>
     <string name="shortcut_no_entries">No hay marcadores todavía</string>
-<string name="special_keys">Cpmbinación de teclas</string>
+<string name="special_keys">Combinación de teclas</string>
 <string name="username_caption">Usuario</string>
 <string name="username_hint">Para la autentificación de Windows/Mac</string>
 <string name="editbookmark_title">Editar Marcadores</string>
-<string name="enterbookmarkname">Por favor, introducir un nombre de marcador...</string>
+<string name="enterbookmarkname">Por favor, introduzca un nombre de marcador...</string>
 <string name="bookmark_save_question">¿Quiere añadir este servidor a los marcadores?</string>
-<string name="bookmark_delete_question">¿Estás seguro de que quiere borrar este marcador?</string>
-<string name="disconnect_question">¿Estás seguro de que quiere desconectar?</string>
+<string name="bookmark_delete_question">¿Está seguro de que quiere borrar este marcador?</string>
+<string name="disconnect_question">¿Está seguro de que quiere desconectar?</string>
 <string name="about">Acerca de</string>
 <string name="help">Ayuda</string>
 <string name="edit">Editar</string>
@@ -75,7 +75,7 @@
 <string name="support_dialog_neveragain">No vuelver a preguntar.!</string>
 
 <string name="firstrun_help_dialog_title">¿Mostrar Ayuda?</string>
-<string name="firstrun_help_dialog_text">Parece que es la primera vez que usas MultiVNC. ¿Quieres leer el manual de la aplicación? No es muy largo, pero es informativo...</string>
+<string name="firstrun_help_dialog_text">Parece que es la primera vez que usa MultiVNC. ¿Quiere leer el manual de la aplicación? No es muy largo, pero es informativo...</string>
 
 <string name="pleaserate">Si le gusta MultiVNC, ¿por qué no mostrar algo de amor haciendo clic en el corazón?</string>
 <string name="changelog_dialog_title">¿Qué hay de nuevo...?</string>
