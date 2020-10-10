@@ -1,5 +1,13 @@
 # Version 1.9.x:
 
+1.9.6
+
+- Added Ukrainian translation thanks to Sergiy Stupar.
+- Removed legacy Java RFB engine, all things VNC are now native. 🎉
+- Fixed crash in connection info toast.
+- Added functionality to auto-open soft keyboard for credentials dialog.
+- Changed Import/Export to use native format, keeping the possibility for legacy XML import.
+
 1.9.5
 
 - Made native connections the default, removed chooser dialog.
