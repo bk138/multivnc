@@ -77,8 +77,8 @@
 <string name="firstrun_help_dialog_title">¿Mostrar Ayuda?</string>
 <string name="firstrun_help_dialog_text">Parece que es la primera vez que usas MultiVNC. ¿Quieres leer el manual de la aplicación? No es muy largo, pero es informativo...</string>
 
-<string name="pleaserate">If you like MultiVNC, why not show some love by clicking the heart?</string>
-<string name="changelog_dialog_title">What\'s new…</string>
+<string name="pleaserate">Si le gusta MultiVNC, ¿por qué no mostrar algo de amor haciendo clic en el corazón?</string>
+<string name="changelog_dialog_title">¿Qué hay\ de nuevo...?</string>
 <string name="changelog_dialog_text">
 <![CDATA[
         If you\'d like to know what\'s new, please visit the <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">online
