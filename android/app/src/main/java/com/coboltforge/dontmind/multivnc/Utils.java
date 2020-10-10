@@ -1,5 +1,8 @@
 package com.coboltforge.dontmind.multivnc;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -7,15 +10,10 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnClickListener;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.text.Html;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -129,5 +127,14 @@ public class Utils {
 		}
 		return inetAddress;
 	}
+
+	public static void copy(InputStream in, OutputStream out) throws IOException {
+		byte[] buffer = new byte[4096];
+		int read;
+		while ((read = in.read(buffer)) != -1) {
+			out.write(buffer, 0, read);
+		}
+	}
+
 
 }
