@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="address_caption">Address</string>
+    <string name="address_caption">Dirección</string>
     <string name="alt_check">Alt</string>
     <string name="super_check">Super</string>
     <string name="app_name" translatable="false">MultiVNC</string>
-    <string name="server_found">Found VNC Server</string>
-    <string name="server_removed">VNC Server disappeared</string>
-    <string name="restartMDNS">Restart Server Discovery</string>
-    <string name="scale_msg">Scale now</string>
-<string name="madeby">MultiVNC on Android is brought to you by Christian Beier (christianbeier.net).\n\nThe project home page is at https://github.com/bk138/multivnc\n\nIf you want to report a bug or request a feature, go to https://github.com/bk138/multivnc/issues\n\nThe change log can be fount at https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md</string>
-<string name="colormode_caption">Color Mode</string>
-<string name="color_mode">Set Color Mode</string>
-<string name="connect_button">Connect</string>
+    <string name="server_found">Servidor VNC encontrado</string>
+    <string name="server_removed">Servidor VNC no encontrado</string>
+    <string name="restartMDNS">Reiniciar el descubrimiento del servidor</string>
+    <string name="scale_msg">Escalar ahora</string>
+<string name="madeby">MultiVNC para Android fue desarrollado para usted por Christian Beier (christianbeier.net).\n\nLa página principal del proyecto está en https://github.com/bk138/multivnc\n\nSi desea informar de un error o solicitar una función, diríjase a https://github.com/bk138/multivnc/issues\n\nEl registro de cambios se puede encontrar en https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md</string>
+<string name="colormode_caption">Modo de color</string>
+<string name="color_mode">Establecer el modo de color</string>
+<string name="connect_button">Conectr</string>
 <string name="control_check">Ctrl</string>
-<string name="delete_connection">Delete</string>
-<string name="disconnect">Disconnect</string>
-<string name="toggle_framebuffer_update">Toggle View</string>
-<string name="toggle_mouse_buttons">Toggle Mouse Buttons</string>
-<string name="toggle_pointer_highlight">Toggle Pointer Highlighting</string>
-<string name="toggle_keyboard">Toggle Keyboard</string>
+<string name="delete_connection">Eliminar</string>
+<string name="disconnect">Desconectar</string>
+<string name="toggle_framebuffer_update">Cambiar la vista</string>
+<string name="toggle_mouse_buttons">Cambiar los botones del ratón</string>
+<string name="toggle_pointer_highlight">Cambiar el resaltado del puntero</string>
+<string name="toggle_keyboard">Cambiar el teclado</string>
 
 <string name="export_settings">Export</string>
 <string name="export_settings_path">Export to file</string>
