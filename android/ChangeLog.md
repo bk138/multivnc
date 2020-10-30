@@ -1,5 +1,10 @@
 # Version 1.9.x:
 
+1.9.7
+
+- Updated Chinese translation.
+- Added Spanish and Japanese translations.
+
 1.9.6
 
 - Added Ukrainian translation thanks to Sergiy Stupar.
