@@ -525,7 +525,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 		ConnectionBean conn = new ConnectionBean();
 
-		conn.setAddress(ipText.getText().toString());
+		conn.setAddress(ipText.getText().toString().trim());
 
 		if(conn.getAddress().length() == 0)
 			return null;
@@ -533,18 +533,18 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		conn.set_Id(0); // is new!!
 
 		try {
-			conn.setPort(Integer.parseInt(portText.getText().toString()));
+			conn.setPort(Integer.parseInt(portText.getText().toString().trim()));
 		}
 		catch (NumberFormatException nfe) {
 		}
-		conn.setUserName(textUsername.getText().toString());
-		conn.setPassword(passwordText.getText().toString());
+		conn.setUserName(textUsername.getText().toString().trim());
+		conn.setPassword(passwordText.getText().toString().trim());
 		conn.setKeepPassword(checkboxKeepPassword.isChecked());
 		conn.setUseLocalCursor(true); // always enable
 		conn.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
 		if (repeaterText.getText().length() > 0)
 		{
-			conn.setRepeaterId(repeaterText.getText().toString());
+			conn.setRepeaterId(repeaterText.getText().toString().trim());
 			conn.setUseRepeater(true);
 		}
 		else
