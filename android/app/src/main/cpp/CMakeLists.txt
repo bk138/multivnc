@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project (MultiVNC C ASM) # defaults to C, the ASM is needed for LibreSSL
 
+# Requred to enable SIMD support
+if (CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a")
+    set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} --target=aarch64-linux-android${ANDROID_VERSION}")
+elseif (CMAKE_ANDROID_ARCH_ABI MATCHES "^armeabi.*")  # armeabi-v7a || armeabi-v6 || armeabi
+    set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} --target=arm-linux-androideabi${ANDROID_VERSION}")
+endif ()
+
 # build libJPEG
 set(BUILD_SHARED_LIBS OFF)
 set(libjpeg_src_DIR ../../../../../libjpeg-turbo)
