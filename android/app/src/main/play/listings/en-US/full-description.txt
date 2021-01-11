@@ -1,0 +1,10 @@
+MultiVNC is an open-source VNC viewer that aims to be easy to use and fast. It includes the following features:
+
+- Bonjour/ZeroConf service discovery that automatically detects supported VNC servers in your network.
+- Virtual mouse button controls with haptic feedback.
+- Two-finger swipe gesture recognition.
+- A super fast touchpad mode for local use.
+- Hardware-accelerated OpenGL drawing and zooming.
+- Copy&paste to and from Android.
+- Bookmarking of connections.
+
