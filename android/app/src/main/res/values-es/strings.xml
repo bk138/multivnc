@@ -22,13 +22,13 @@
 
 <string name="export_settings">Exportar</string>
 <string name="export_settings_path">Exportar a un archivo</string>
-<string name="database_error_open">!Error al abrir la base de datos!</string>
+<string name="database_error_open">¡Error al abrir la base de datos!</string>
 <string name="import_export_settings">Importar/Exportar</string>
 <string name="import_settings">Importar</string>
 <string name="import_settings_file_url">Importar desde un archivo o URL</string>
     <string name="import_error_url">Se ha dado una URL incorrecta:</string>
     <string name="import_error_io">Configuración de la lectura de errores de I/O</string>
-    <string name="import_error_xml">Configuración de la lectura de errores deformato o XML </string>
+    <string name="import_error_xml">Configuración de la lectura de errores de formato XML</string>
 
 <string name="info">Información de la conexión</string>
 <string name="meta_key_title">Enviar combinación de teclas</string>
@@ -71,8 +71,8 @@
 <string name="support_dialog_text">Si le gusta MultiVNC, ¿por qué no considera colaborar con su desarrollo? Por el momento, puede hacerlo fácilmente calificando la aplicación o donando. Gracias.</string>
 
 <string name="support_dialog_yes">Si, ¡buena idea!</string>
-<string name="support_dialog_no">No, ahora no.</string>
-<string name="support_dialog_neveragain">No vuelver a preguntar.!</string>
+<string name="support_dialog_no">¡No, ahora no!</string>
+<string name="support_dialog_neveragain">¡No volver a preguntar!</string>
 
 <string name="firstrun_help_dialog_title">¿Mostrar Ayuda?</string>
 <string name="firstrun_help_dialog_text">Parece que es la primera vez que usa MultiVNC. ¿Quiere leer el manual de la aplicación? No es muy largo, pero es informativo...</string>
