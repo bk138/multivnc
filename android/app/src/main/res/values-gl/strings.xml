@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="address_caption">Dirección</string>
+    <string name="alt_check">Alt</string>
+    <string name="super_check">Super</string>
+    <string name="app_name" translatable="false">MultiVNC</string>
+    <string name="server_found">Servidor VNC atopado</string>
+    <string name="server_removed">Servidor VNC non atopado</string>
+    <string name="restartMDNS">Reiniciar o descubrimento do servidor</string>
+    <string name="scale_msg">Escalar ahora</string>
+<string name="madeby">MultiVNC para Android foi desenvolvido para vostede por Christian Beier (christianbeier.net).\n\nA páxina principal do proxecto está en https://github.com/bk138/multivnc\n\nSe desexa informar dun erro ou solicitar unha función, diríxase a https://github.com/bk138/multivnc/issues\n\nO rexistro de cambios pódese atopar en https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md</string>
+<string name="colormode_caption">Modo de cor</string>
+<string name="color_mode">Establecer o modo de cor</string>
+<string name="connect_button">Conectar</string>
+<string name="control_check">Ctrl</string>
+<string name="delete_connection">Eliminar</string>
+<string name="disconnect">Desconectar</string>
+<string name="toggle_framebuffer_update">Mudar a vista</string>
+<string name="toggle_mouse_buttons">Mudar os botóns do rato</string>
+<string name="toggle_pointer_highlight">Mudar o resaltado do punteiro</string>
+<string name="toggle_keyboard">Mudar o teclado</string>
+
+<string name="export_settings">Exportar</string>
+<string name="export_settings_path">Exportar a un arquivo</string>
+<string name="database_error_open">Erro ao abrir a base de datos!</string>
+<string name="import_export_settings">Importar/Exportar</string>
+<string name="import_settings">Importar</string>
+<string name="import_settings_file_url">Importar dende un arquivo ou URL</string>
+    <string name="import_error_url">Deuse una URL incorrecta:</string>
+    <string name="import_error_io">Configuración da lectura de erros de I/O</string>
+    <string name="import_error_xml">Configuración da lectura de erros de formato XML</string>
+
+<string name="info">Información da conexión</string>
+<string name="meta_key_title">Enviar combinación de teclas</string>
+<string name="new_connection">Conexión nova</string>
+<string name="nickname_caption">Marcadores</string>
+<string name="discovered_servers">Servidores descubertos</string>
+<string name="bookmarks">Marcadores</string>
+<string name="savebookmark_button">Gardar como marcador</string>
+<string name="bookmark_saved">¡Marcador gardado!</string>
+<string name="bookmark_invalid">¡Isto xa non é un marcador válido!</string>
+<string name="password_caption">Contraseña</string>
+<string name="keep_password_button">Manter</string>
+<string name="port_caption">Porto</string>
+<string name="repeater_caption">ID no repetidor</string>
+<string name="repeater_hint">Identificación do servidor cando se conecta a un repetidor UltraVNC</string>
+<string name="save_as_copy">Gardar como copia</string>
+    <string name="credentials_needed_title">Necesítanse credenciais...</string>
+<!-- Send selected metakey -->
+<string name="send_button">Enviar</string>
+<string name="send_key_again">Envíar a combinación de teclas de novo</string>
+<string name="shift_check">Cambio</string>
+<string name="shortcut_label">Atallo da conexión VNC</string>
+    <string name="shortcut_no_entries">Non hai marcadores todavía</string>
+<string name="special_keys">Combinación de teclas</string>
+<string name="username_caption">Usuario</string>
+<string name="username_hint">Para a autentificación de Windows/Mac</string>
+<string name="editbookmark_title">Editar Marcadores</string>
+<string name="enterbookmarkname">Por favor, introduza un nome de marcador...</string>
+<string name="bookmark_save_question">Quere engadir este servidor aos marcadores?</string>
+<string name="bookmark_delete_question">Está seguro de que quere borrar este marcador?</string>
+<string name="disconnect_question">Está seguro de que quere desconectar?</string>
+<string name="about">Acerca de</string>
+<string name="help">Axuda</string>
+<string name="edit">Editar</string>
+    <string name="save">Gardar</string>
+
+    <string name="utils_title_error">Error!</string>
+
+<string name="support_dialog_title">Por favor, colabore con MultiVNC</string>
+<string name="support_dialog_text">Si lle gusta MultiVNC, ¿por qué non considera colaborar co seu desenvolvemento? Polo momento, pode facelo facilmente cualificando a aplicación ou doando. Grazas.</string>
+
+<string name="support_dialog_yes">Si, boa idea!</string>
+<string name="support_dialog_no">Non, agora non!</string>
+<string name="support_dialog_neveragain">Non volver preguntar!</string>
+
+<string name="firstrun_help_dialog_title">¿Mostrar axuda?</string>
+<string name="firstrun_help_dialog_text">Seica é a primeira vez que usa MultiVNC. Quere ler o manual da aplicación? Non é moi longo, pero é informativo...</string>
+
+<string name="pleaserate">Se lle gusta MultiVNC, por que non mostrar algo de amor facendo clic no corazón?</string>
+<string name="changelog_dialog_title">¿Qué hai de novo...?</string>
+<string name="changelog_dialog_text">
+<![CDATA[
+        Se quere saber que hai de novo, por favor visite <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">Rexistro de cambios
+        en Línea</a>.
+    ]]>
+</string>
+</resources>
