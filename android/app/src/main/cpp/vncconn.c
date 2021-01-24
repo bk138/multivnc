@@ -369,6 +369,14 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
         cl->serverHost = strdup(cHost);
         (*env)->ReleaseStringUTFChars(env, host, cHost);
     }
+    if (0 == strcmp("localhost", cl->serverHost) || 0 == strcmp("127.0.0.1", cl->serverHost))
+    {
+        cl->appData.encodingsString = "raw";
+    }
+    else
+    {
+        cl->appData.encodingsString = "tight zrle ultra copyrect hextile zlib corre rre raw";
+    }
 
     cl->serverPort = port;
     // Support short-form (:0, :1)
