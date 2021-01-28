@@ -8,7 +8,7 @@
     <string name="server_removed">Servidor VNC no trobat</string>
     <string name="restartMDNS">Reiniciar el descobriment del servidor</string>
     <string name="scale_msg">Escalar ara</string>
-<string name="madeby">MultiVNC per a Android va ser desenvolupat per a vostè per Christian Beier (christianbeier.net).\n\nLa pàgina principal del projecte està en https://github.com/bk138/multivnc\n\nSi desitja informar d'un error o sol·licitar una funció, dirigeixi's https://github.com/bk138/multivnc/issues\n\nEl registre de canvis es pot trobar en https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md</string>
+<string name="madeby">MultiVNC per a Android va ser desenvolupat per a vostè per Christian Beier (christianbeier.net).\n\nLa pàgina principal del projecte està en https://github.com/bk138/multivnc\n\nSi desitja informar d\'un error o sol·licitar una funció, dirigeixi\'s https://github.com/bk138/multivnc/issues\n\nEl registre de canvis es pot trobar en https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md</string>
 <string name="colormode_caption">Manera de color</string>
 <string name="color_mode">Establir la manera de color</string>
 <string name="connect_button">Conectar</string>
@@ -25,10 +25,10 @@
 <string name="database_error_open">¡Error en obrir la base de dades!</string>
 <string name="import_export_settings">Importar/Exportar</string>
 <string name="import_settings">Importar</string>
-<string name="import_settings_file_url">Importar des d'un arxiu o URL</string>
-    <string name="import_error_url">S'ha donat una URL incorrecta:</string>
-    <string name="import_error_io">Configuració de la lectura d'errors d'I/O</string>
-    <string name="import_error_xml">Configuració de la lectura d'errors de format o XML</string>
+<string name="import_settings_file_url">Importar des d\'un arxiu o URL</string>
+    <string name="import_error_url">S\'ha donat una URL incorrecta:</string>
+    <string name="import_error_io">Configuració de la lectura d\'errors d\'I/O</string>
+    <string name="import_error_xml">Configuració de la lectura d\'errors de format o XML</string>
 
 <string name="info">Informació de la connexió</string>
 <string name="meta_key_title">Enviar combinació de tecles</string>
@@ -54,7 +54,7 @@
     <string name="shortcut_no_entries">No hi ha marcadors encara</string>
 <string name="special_keys">Combinació de tecles</string>
 <string name="username_caption">Usuari</string>
-<string name="username_hint">Per a l'autenticació de Windows/Mac</string>
+<string name="username_hint">Per a l\'autenticació de Windows/Mac</string>
 <string name="editbookmark_title">Editar Marcadors</string>
 <string name="enterbookmarkname">Si us plau, introdueixi un nom de marcador...</string>
 <string name="bookmark_save_question">Vol afegir aquest servidor als marcadors?</string>
@@ -68,16 +68,16 @@
     <string name="utils_title_error">Error!</string>
 
 <string name="support_dialog_title">Si us plau, col·labori amb MultiVNC</string>
-<string name="support_dialog_text">Si li agrada MultiVNC, per què no considera col·laborar amb el seu desenvolupament? De moment, pot fer-ho fàcilment qualificant l'aplicació o donant. Gràcies.</string>
+<string name="support_dialog_text">Si li agrada MultiVNC, per què no considera col·laborar amb el seu desenvolupament? De moment, pot fer-ho fàcilment qualificant l\'aplicació o donant. Gràcies.</string>
 
 <string name="support_dialog_yes">Si, bona idea!</string>
 <string name="support_dialog_no">No, ara no.</string>
 <string name="support_dialog_neveragain">No tornar a preguntar!</string>
 
 <string name="firstrun_help_dialog_title">Mostrar ajuda?</string>
-<string name="firstrun_help_dialog_text">Sembla que és la primera vegada que usa MultiVNC. Vol llegir el manual de l'aplicació? No és molt llarg, però és informatiu...</string>
+<string name="firstrun_help_dialog_text">Sembla que és la primera vegada que usa MultiVNC. Vol llegir el manual de l\'aplicació? No és molt llarg, però és informatiu...</string>
 
-<string name="pleaserate">Si li agrada MultiVNC, per què no mostrar una mica d'amor fent clic en el cor?</string>
+<string name="pleaserate">Si li agrada MultiVNC, per què no mostrar una mica d\'amor fent clic en el cor?</string>
 <string name="changelog_dialog_title">Què hi ha de nou...?</string>
 <string name="changelog_dialog_text">
 <![CDATA[
