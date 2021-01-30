@@ -329,7 +329,14 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 				e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
-				vncCanvas.processPointerEvent(e, true, false);
+				// set ACTION according to stylus ACTION (is working on Samsung Galaxy Tab S4) and activate rightButton
+				boolean rightButton = false;
+				if(e.getAction() >= 211 && e.getAction() <= 213){
+					e.setAction(e.getAction()-211);
+					rightButton = true;
+				}
+
+				vncCanvas.processPointerEvent(e, true, rightButton);
 				vncCanvas.panToMouse();
 
 				return true;
