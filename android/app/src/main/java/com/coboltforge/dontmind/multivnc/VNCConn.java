@@ -163,14 +163,14 @@ public class VNCConn {
 				 * if IPv6 address, add scope id
 				 */
 				try {
-					InetAddress address = InetAddress.getByName(connSettings.getAddress());
+					InetAddress address = InetAddress.getByName(connSettings.address);
 
 					Inet6Address in6 = Inet6Address.getByAddress(
 							address.getHostName(),
 							address.getAddress(),
 							Utils.getActiveNetworkInterface(canvas.getContext()));
 
-					connSettings.setAddress(in6.getHostAddress());
+					connSettings.address = in6.getHostAddress();
 					Log.i(TAG, "Using IPv6");
 
 				} catch (UnknownHostException e) {
@@ -180,9 +180,9 @@ public class VNCConn {
 				}
 
 
-				int repeaterId = (connSettings.getUseRepeater() && connSettings.getRepeaterId() != null && connSettings.getRepeaterId().length() > 0) ? Integer.parseInt(connSettings.getRepeaterId()) : -1;
+				int repeaterId = (connSettings.useRepeater && connSettings.repeaterId != null && connSettings.repeaterId.length() > 0) ? Integer.parseInt(connSettings.repeaterId) : -1;
 				lockFramebuffer();
-				if (!rfbInit(connSettings.getAddress(), connSettings.getPort(), repeaterId, pendingColorModel.bpp())) {
+				if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp())) {
 					unlockFramebuffer();
 					throw new Exception(); //TODO add some error reoprting here
 				}
@@ -377,7 +377,7 @@ public class VNCConn {
 
 		connSettings = bean;
 		try {
-			this.pendingColorModel = COLORMODEL.valueOf(bean.getColorModel());
+			this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 		}
 		catch(IllegalArgumentException e) {
 			this.pendingColorModel = COLORMODEL.C24bit;
@@ -694,7 +694,7 @@ public class VNCConn {
 	// called from native via worker thread context
 	@Keep
 	private String onGetPassword() {
-		if (connSettings.getPassword() == null || connSettings.getPassword().length() == 0) {
+		if (connSettings.password == null || connSettings.password.length() == 0) {
 			canvas.getCredsFromUser(connSettings, false); // this cares for running on the main thread
 			synchronized (VNCConn.this) {
 				try {
@@ -704,7 +704,7 @@ public class VNCConn {
 				}
 			}
 		}
-		return connSettings.getPassword();
+		return connSettings.password;
 	}
 
 	/**
@@ -720,9 +720,9 @@ public class VNCConn {
 	@Keep
 	private UserCredential onGetUserCredential() {
 
-		if (connSettings.getUserName() == null || connSettings.getUserName().isEmpty()
-			   || connSettings.getPassword() == null || connSettings.getPassword().isEmpty()) {
-			canvas.getCredsFromUser(connSettings, connSettings.getUserName() == null || connSettings.getUserName().isEmpty());
+		if (connSettings.userName == null || connSettings.userName.isEmpty()
+			   || connSettings.password == null || connSettings.password.isEmpty()) {
+			canvas.getCredsFromUser(connSettings, connSettings.userName == null || connSettings.userName.isEmpty());
 			synchronized (VNCConn.this) {
 				try {
 					VNCConn.this.wait();  // wait for user input to finish
@@ -733,8 +733,8 @@ public class VNCConn {
 		}
 
 		UserCredential creds = new UserCredential();
-		creds.username = connSettings.getUserName();
-		creds.password = connSettings.getPassword();
+		creds.username = connSettings.userName;
+		creds.password = connSettings.password;
 		return creds;
 	}
 

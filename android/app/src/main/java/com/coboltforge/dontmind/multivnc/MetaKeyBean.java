@@ -118,28 +118,28 @@ class MetaKeyBean implements Comparable<MetaKeyBean> {
 
 	@PrimaryKey(autoGenerate = true)
 	@ColumnInfo(name = "_id")
-	private long id;
+	public long id;
 
 	@ColumnInfo(name = "METALISTID")
-	private long metaListId;
+	public long metaListId;
 
 	@ColumnInfo(name = "KEYDESC")
-	private String keyDesc;
+	public String keyDesc;
 
 	@ColumnInfo(name = "METAFLAGS")
-	private int metaFlags;
+	public int metaFlags;
 
 	@ColumnInfo(name = "MOUSECLICK")
-	private boolean isMouseClick;
+	public boolean isMouseClick;
 
 	@ColumnInfo(name = "MOUSEBUTTONS")
-	private int mouseButtons;
+	public int mouseButtons;
 
 	@ColumnInfo(name = "KEYSYM")
-	private int keySym;
+	public int keySym;
 
 	@ColumnInfo(name = "SHORTCUT")
-	private String shortcut;
+	public String shortcut;
 
 	MetaKeyBean()
 	{
@@ -148,65 +148,20 @@ class MetaKeyBean implements Comparable<MetaKeyBean> {
 	MetaKeyBean(MetaKeyBean toCopy)
 	{
 		_regenDesc = true;
-		if (toCopy.isMouseClick())
-			setMouseButtons(toCopy.getMouseButtons());
+		if (toCopy.isMouseClick)
+			setMouseButtons(toCopy.mouseButtons);
 		else
-			setKeySym(toCopy.getKeySym());
-		setMetaListId(toCopy.getMetaListId());
-		setMetaFlags(toCopy.getMetaFlags());
+			setKeySym(toCopy.keySym);
+		metaListId = toCopy.metaListId;
+		setMetaFlags(toCopy.metaFlags);
 	}
 	
 	MetaKeyBean(long listId, int metaFlags, MetaKeyBase base)
 	{
-		setMetaListId(listId);
+		metaListId = listId;
 		setKeyBase(base);
 		setMetaFlags(metaFlags);
 		_regenDesc = true;
-	}
-
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public long getMetaListId() {
-		return metaListId;
-	}
-
-	public void setMetaListId(long metaListId) {
-		this.metaListId = metaListId;
-	}
-
-	public int getMetaFlags() {
-		return metaFlags;
-	}
-
-	public boolean isMouseClick() {
-		return isMouseClick;
-	}
-
-	public void setMouseClick(boolean mouseClick) {
-		isMouseClick = mouseClick;
-	}
-
-	public int getMouseButtons() {
-		return mouseButtons;
-	}
-
-	public int getKeySym() {
-		return keySym;
-	}
-
-	public String getShortcut() {
-		return shortcut;
-	}
-
-	public void setShortcut(String shortcut) {
-		this.shortcut = shortcut;
 	}
 
 	public String getKeyDesc() {
@@ -217,7 +172,7 @@ class MetaKeyBean implements Comparable<MetaKeyBean> {
 				if (_regenDesc)
 				{
 					StringBuilder sb=new StringBuilder();
-					int meta=getMetaFlags();
+					int meta=metaFlags;
 					if (0 != (meta & VNCConn.SHIFT_MASK))
 					{
 						sb.append("Shift");
@@ -243,10 +198,10 @@ class MetaKeyBean implements Comparable<MetaKeyBean> {
 					if (sb.length()>0)
 						sb.append(' ');
 					MetaKeyBase base;
-					if (isMouseClick())
-						base=keysByMouseButton.get(getMouseButtons());
+					if (isMouseClick)
+						base=keysByMouseButton.get(mouseButtons);
 					else
-						base=keysByKeySym.get(getKeySym());
+						base=keysByKeySym.get(keySym);
 					sb.append(base.name);
 					setKeyDesc(sb.toString());
 				}

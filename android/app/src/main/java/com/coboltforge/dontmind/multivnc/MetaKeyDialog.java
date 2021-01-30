@@ -164,7 +164,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		if (keyCode != KeyEvent.KEYCODE_BACK && keyCode != KeyEvent.KEYCODE_MENU && getCurrentFocus() == null)
 		{
 			int flags = event.getMetaState();
-			int currentFlags = _currentKeyBean.getMetaFlags();
+			int currentFlags = _currentKeyBean.metaFlags;
 			MetaKeyBase base = MetaKeyBean.keysByKeyCode.get(keyCode);
 			if (base != null)
 			{
@@ -232,12 +232,12 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			int insertionPoint = -(index + 1);
 			_database.getMetaKeyDao().insert(_currentKeyBean);
 			_keysInList.add(insertionPoint,_currentKeyBean);
-			_connection.setLastMetaKeyId(_currentKeyBean.getId());
+			_connection.lastMetaKeyId = _currentKeyBean.id;
 		}
 		else
 		{
 			MetaKeyBean bean = _keysInList.get(index);
-			_connection.setLastMetaKeyId(bean.getId());
+			_connection.lastMetaKeyId = bean.id;
 		}
 		_database.getConnectionDao().update(_connection);
 		_canvasActivity.lastSentKey = _currentKeyBean;
@@ -247,24 +247,24 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 
 	void setMetaKeyList()
 	{
-		long listId = _connection.getMetaListId();
+		long listId = _connection.metaListId;
 		if (listId!=_listId) {
 			for (int i=0; i<_lists.size(); ++i)
 			{
 				MetaList list = _lists.get(i);
-				if (list.getId() ==listId)
+				if (list.id==listId)
 				{
 					_keysInList.clear();
 					_keysInList.addAll(_database.getMetaKeyDao().getByMetaList(listId));
 
 					ArrayList<String> keys = new ArrayList<String>(_keysInList.size());
 					int selectedOffset = 0;
-					long lastSelectedKeyId = _canvasActivity.getConnection().getLastMetaKeyId();
+					long lastSelectedKeyId = _canvasActivity.getConnection().lastMetaKeyId;
 					for (int j=0; j<_keysInList.size(); j++)
 					{
 						MetaKeyBean key = _keysInList.get(j);
 						keys.add( key.getKeyDesc());
-						if (lastSelectedKeyId==key.getId())
+						if (lastSelectedKeyId==key.id)
 						{
 							selectedOffset = j;
 						}
@@ -287,17 +287,17 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 
 	private void updateDialogForCurrentKey()
 	{
-		int flags = _currentKeyBean.getMetaFlags();
+		int flags = _currentKeyBean.metaFlags;
 		_checkAlt.setChecked(0 != (flags & VNCConn.ALT_MASK));
 		_checkShift.setChecked(0 != (flags & VNCConn.SHIFT_MASK));
 		_checkCtrl.setChecked(0 != (flags & VNCConn.CTRL_MASK));
 		_checkSuper.setChecked(0 != (flags & VNCConn.SUPER_MASK));
 		MetaKeyBase base = null;
-		if (_currentKeyBean.isMouseClick())
+		if (_currentKeyBean.isMouseClick)
 		{
-			base = MetaKeyBean.keysByMouseButton.get(_currentKeyBean.getMouseButtons());
+			base = MetaKeyBean.keysByMouseButton.get(_currentKeyBean.mouseButtons);
 		} else {
-			base = MetaKeyBean.keysByKeySym.get(_currentKeyBean.getKeySym());
+			base = MetaKeyBean.keysByKeySym.get(_currentKeyBean.keySym);
 		}
 		if (base != null) {
 			int index = Collections.binarySearch(MetaKeyBean.allKeys,base);
@@ -336,11 +336,11 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 				boolean isChecked) {
 			if (isChecked)
 			{
-				_currentKeyBean.setMetaFlags(_currentKeyBean.getMetaFlags() | _mask);
+				_currentKeyBean.setMetaFlags(_currentKeyBean.metaFlags | _mask);
 			}
 			else
 			{
-				_currentKeyBean.setMetaFlags(_currentKeyBean.getMetaFlags() & ~_mask);
+				_currentKeyBean.setMetaFlags(_currentKeyBean.metaFlags & ~_mask);
 			}
 			_textKeyDesc.setText(_currentKeyBean.getKeyDesc());
 		}

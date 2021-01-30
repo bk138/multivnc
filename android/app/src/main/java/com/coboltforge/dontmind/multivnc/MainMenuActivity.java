@@ -183,8 +183,8 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String name = input.getText().toString();
 						if(name.length() == 0)
-							name = conn.getAddress() + ":" + conn.getPort();
-						conn.setNickname(name);
+							name = conn.address + ":" + conn.port;
+						conn.nickname = name;
 						saveBookmark(conn);
 						updateBookmarkView();
 					}
@@ -404,7 +404,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 			// name
 			TextView name = (TextView) v.findViewById(R.id.bookmark_name);
-			name.setText(conn.getNickname());
+			name.setText(conn.nickname);
 			name.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
@@ -436,8 +436,8 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 					    		/* the ConnectionBean objects are transient and generated
 					    		   anew with each call to this function
 					    		 */
-					    		conn.setNickname("Copy of " + conn.getNickname());
-					    		conn.setId(0); // this saves a new one in the DB!
+					    		conn.nickname = "Copy of " + conn.nickname;
+					    		conn.id = 0L; // this saves a new one in the DB!
 								saveBookmark(conn);
 								// update
 								updateBookmarkView();
@@ -449,7 +449,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 								.setCancelable(false)
 								.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
-										Log.d(TAG, "Deleting bookmark " + conn.getId());
+										Log.d(TAG, "Deleting bookmark " + conn.id);
 										// delete from DB
 										database.getConnectionDao().delete(conn);
 										// update
@@ -466,9 +466,9 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 					    		break;
 
 					    	case 2: // edit
-								Log.d(TAG, "Editing bookmark " + conn.getId());
+								Log.d(TAG, "Editing bookmark " + conn.id);
 					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
-					    		intent.putExtra(Constants.CONNECTION, conn.getId());
+					    		intent.putExtra(Constants.CONNECTION, conn.id);
 					    		startActivity(intent);
 					    		break;
 
@@ -508,31 +508,31 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 		ConnectionBean conn = new ConnectionBean();
 
-		conn.setAddress(ipText.getText().toString().trim());
+		conn.address = ipText.getText().toString().trim();
 
-		if(conn.getAddress().length() == 0)
+		if(conn.address.length() == 0)
 			return null;
 
-		conn.setId(0); // is new!!
+		conn.id = 0; // is new!!
 
 		try {
-			conn.setPort(Integer.parseInt(portText.getText().toString().trim()));
+			conn.port = Integer.parseInt(portText.getText().toString().trim());
 		}
 		catch (NumberFormatException nfe) {
 		}
-		conn.setUserName(textUsername.getText().toString().trim());
-		conn.setPassword(passwordText.getText().toString().trim());
-		conn.setKeepPassword(checkboxKeepPassword.isChecked());
-		conn.setUseLocalCursor(true); // always enable
-		conn.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
+		conn.userName = textUsername.getText().toString().trim();
+		conn.password = passwordText.getText().toString().trim();
+		conn.keepPassword = checkboxKeepPassword.isChecked();
+		conn.useLocalCursor = true; // always enable
+		conn.colorModel = ((COLORMODEL)colorSpinner.getSelectedItem()).nameString();
 		if (repeaterText.getText().length() > 0)
 		{
-			conn.setRepeaterId(repeaterText.getText().toString().trim());
-			conn.setUseRepeater(true);
+			conn.repeaterId = repeaterText.getText().toString().trim();
+			conn.useRepeater = true;
 		}
 		else
 		{
-			conn.setUseRepeater(false);
+			conn.useRepeater = false;
 		}
 
 		return conn;
@@ -619,7 +619,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 						// name part of list item
 						TextView name = (TextView) v.findViewById(R.id.discovered_server_name);
-						name.setText(c.getNickname());
+						name.setText(c.nickname);
 						name.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View view) {
@@ -640,11 +640,11 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 								.setCancelable(false)
 								.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
-										Log.d(TAG, "Bookmarking connection " + c.getId());
+										Log.d(TAG, "Bookmarking connection " + c.id);
 										// save bookmark
 										saveBookmark(c);
 										// set as 'new' again. makes this ConnectionBean saveable again
-										c.setId(0);
+										c.id = 0;
 										// and update view
 										updateBookmarkView();
 									}

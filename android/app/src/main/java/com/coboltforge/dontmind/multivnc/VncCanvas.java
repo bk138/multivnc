@@ -330,7 +330,7 @@ public class VncCanvas extends GLSurfaceView {
 	private void mouseFollowPan()
 	{
 		try {
-			if (vncConn.getConnSettings().getFollowPan())
+			if (vncConn.getConnSettings().followPan)
 			{
 				int scrollx = absoluteXPosition;
 				int scrolly = absoluteYPosition;
@@ -451,7 +451,7 @@ public class VncCanvas extends GLSurfaceView {
 	void panToMouse()
 	{
 		try {
-			if (!vncConn.getConnSettings().getFollowMouse())
+			if (!vncConn.getConnSettings().followMouse)
 				return;
 		} catch (NullPointerException e) {
 			return;
@@ -777,10 +777,10 @@ public class VncCanvas extends GLSurfaceView {
 		if(meta == null)
 			return;
 
-		if (meta.isMouseClick())
+		if (meta.isMouseClick)
 		{
-			vncConn.sendPointerEvent(mouseX, mouseY, meta.getMetaFlags(), meta.getMouseButtons());
-			vncConn.sendPointerEvent(mouseX, mouseY, meta.getMetaFlags(), 0);
+			vncConn.sendPointerEvent(mouseX, mouseY, meta.metaFlags, meta.mouseButtons);
+			vncConn.sendPointerEvent(mouseX, mouseY, meta.metaFlags, 0);
 		}
 		else {
 			// KeyEvent(downTime, eventTime, action, code, repeat, metaState)
@@ -788,9 +788,9 @@ public class VncCanvas extends GLSurfaceView {
 					System.currentTimeMillis(),
 					System.currentTimeMillis(),
 					KeyEvent.ACTION_DOWN,
-					meta.getKeySym(),
+					meta.keySym,
 					0,
-					meta.getMetaFlags());
+					meta.metaFlags);
 			vncConn.sendKeyEvent(downEvent.getKeyCode(), downEvent, true);
 
 			// and up again
@@ -851,8 +851,8 @@ public class VncCanvas extends GLSurfaceView {
 						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int whichButton) {
 								if(isUserNameNeeded)
-									c.setUserName(((EditText)credentialsDialog.findViewById(R.id.userName)).getText().toString());
-								c.setPassword(((EditText)credentialsDialog.findViewById(R.id.password)).getText().toString());
+									c.userName = ((EditText)credentialsDialog.findViewById(R.id.userName)).getText().toString();
+								c.password = ((EditText)credentialsDialog.findViewById(R.id.password)).getText().toString();
 								synchronized (vncConn) {
 									vncConn.notify();
 								}

@@ -35,12 +35,12 @@ public interface ConnectionDao {
      * Update the given connection. If it is new then inserts it.
      */
     default void save(ConnectionBean c) {
-        if (!c.getKeepPassword())
-            c.setPassword("");
+        if (!c.keepPassword)
+            c.password = "";
 
-        if (c.getId() > 0)
+        if (c.id > 0)
             update(c);
         else
-            c.setId(insert(c));
+            c.id = insert(c);
     }
 }

@@ -46,8 +46,8 @@ abstract class VncDatabase extends RoomDatabase {
     private static void setupDefaultMetaList(VncDatabase db) {
         if (db.getMetaListDao().getAll().isEmpty()) {
             MetaList l = new MetaList();
-            l.setId(1);
-            l.setName("DEFAULT");
+            l.id = 1;
+            l.name = "DEFAULT";
             db.getMetaListDao().insert(l);
         }
     }

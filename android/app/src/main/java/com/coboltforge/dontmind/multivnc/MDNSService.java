@@ -186,7 +186,7 @@ public class MDNSService extends Service {
 						break;
 					case MDNSWorkerThread.MESSAGE_DUMP:
 						for(ConnectionBean c : connections_discovered.values()) {
-							mDNSnotify(c.getNickname(), c);
+							mDNSnotify(c.nickname, c);
 						}
 						break;
 					}
@@ -226,11 +226,11 @@ public class MDNSService extends Service {
 						@Override
 						public void serviceResolved(ServiceEvent ev) {
 							ConnectionBean c = new ConnectionBean();
-							c.setId(0); // new!
-							c.setNickname(ev.getName());
-							c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
-							c.setPort(ev.getInfo().getPort());
-							c.setUseLocalCursor(true); // always enable
+							c.id = 0; // new!
+							c.nickname = ev.getName();
+							c.address = ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim();
+							c.port = ev.getInfo().getPort();
+							c.useLocalCursor = true; // always enable
 
 							connections_discovered.put(ev.getInfo().getQualifiedName(), c);
 
@@ -299,7 +299,7 @@ public class MDNSService extends Service {
 
 			// notify our callback about our internal state, i.e. the removals
 			for(ConnectionBean c: connections_discovered.values())
-				mDNSnotify(c.getNickname(), null);
+				mDNSnotify(c.nickname, null);
 			// and clear internal state
 			connections_discovered.clear();
 

@@ -82,12 +82,12 @@ public class ConnectionListActivity extends ListActivity {
             
             Intent launchIntent = new Intent(this,VncCanvasActivity.class);
             Uri.Builder builder = new Uri.Builder();
-            builder.authority(Constants.CONNECTION + ":" + connection.getId());
+            builder.authority(Constants.CONNECTION + ":" + connection.id);
             builder.scheme("vnc");
             launchIntent.setData(builder.build());
             
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, launchIntent);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, connection.getNickname());
+            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, connection.nickname);
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
 
             setResult(RESULT_OK, intent);

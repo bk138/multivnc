@@ -17,262 +17,94 @@ class ConnectionBean implements Comparable<ConnectionBean> {
 
 	@PrimaryKey(autoGenerate = true)
 	@ColumnInfo(name = "_id")
-	private long id;
+	public long id;
 
 	@ColumnInfo(name = "NICKNAME")
-	private String nickname;
+	public String nickname;
 
 	@ColumnInfo(name = "ADDRESS")
-	private String address;
+	public String address;
 
 	@ColumnInfo(name = "PORT")
-	private int port;
+	public int port;
 
 	@ColumnInfo(name = "PASSWORD")
-	private String password;
+	public String password;
 
 	@ColumnInfo(name = "COLORMODEL")
-	private String colorModel;
+	public String colorModel;
 
 	@ColumnInfo(name = "FORCEFULL")
-	private long forceFull;
+	public long forceFull;
 
 	@ColumnInfo(name = "REPEATERID")
-	private String repeaterId;
+	public String repeaterId;
 
 	@ColumnInfo(name = "INPUTMODE")
-	private String inputMode;
+	public String inputMode;
 
 	@ColumnInfo(name = "SCALEMODE")
-	private String scalemode;
+	public String scalemode;
 
 	@ColumnInfo(name = "USELOCALCURSOR")
-	private boolean useLocalCursor;
+	public boolean useLocalCursor;
 
 	@ColumnInfo(name = "KEEPPASSWORD")
-	private boolean keepPassword;
+	public boolean keepPassword;
 
 	@ColumnInfo(name = "FOLLOWMOUSE")
-	private boolean followMouse;
+	public boolean followMouse;
 
 	@ColumnInfo(name = "USEREPEATER")
-	private boolean useRepeater;
+	public boolean useRepeater;
 
 	@ColumnInfo(name = "METALISTID")
-	private long metaListId;
+	public long metaListId;
 
 	@ColumnInfo(name = "LAST_META_KEY_ID")
-	private long lastMetaKeyId;
+	public long lastMetaKeyId;
 
 	@ColumnInfo(name = "FOLLOWPAN", defaultValue = "0")
-	private boolean followPan;
+	public boolean followPan;
 
 	@ColumnInfo(name = "USERNAME")
-	private String userName;
+	public String userName;
 
 	@ColumnInfo(name = "SECURECONNECTIONTYPE")
-	private String secureConnectionType;
+	public String secureConnectionType;
 
 	@ColumnInfo(name = "SHOWZOOMBUTTONS", defaultValue = "1")
-	private boolean showZoomButtons;
+	public boolean showZoomButtons;
 
 	@ColumnInfo(name = "DOUBLE_TAP_ACTION")
-	private String doubleTapAction;
+	public String doubleTapAction;
 
 	ConnectionBean() {
-		setId(0);
-		setAddress("");
-		setPassword("");
-		setKeepPassword(true);
-		setNickname("");
-		setUserName("");
-		setPort(5900);
-		setColorModel(COLORMODEL.C24bit.nameString());
-		setFollowMouse(true);
-		setRepeaterId("");
-		setMetaListId(1);
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getNickname() {
-		return nickname;
-	}
-
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getColorModel() {
-		return colorModel;
-	}
-
-	public void setColorModel(String colorModel) {
-		this.colorModel = colorModel;
-	}
-
-	public long getForceFull() {
-		return forceFull;
-	}
-
-	public void setForceFull(long forceFull) {
-		this.forceFull = forceFull;
-	}
-
-	public String getRepeaterId() {
-		return repeaterId;
-	}
-
-	public void setRepeaterId(String repeaterId) {
-		this.repeaterId = repeaterId;
-	}
-
-	public String getInputMode() {
-		return inputMode;
-	}
-
-	public void setInputMode(String inputMode) {
-		this.inputMode = inputMode;
-	}
-
-	public String getScalemode() {
-		return scalemode;
-	}
-
-	public void setScalemode(String scalemode) {
-		this.scalemode = scalemode;
-	}
-
-	public boolean getUseLocalCursor() {
-		return useLocalCursor;
-	}
-
-	public void setUseLocalCursor(boolean useLocalCursor) {
-		this.useLocalCursor = useLocalCursor;
-	}
-
-	public boolean getKeepPassword() {
-		return keepPassword;
-	}
-
-	public void setKeepPassword(boolean keepPassword) {
-		this.keepPassword = keepPassword;
-	}
-
-	public boolean getFollowMouse() {
-		return followMouse;
-	}
-
-	public void setFollowMouse(boolean followMouse) {
-		this.followMouse = followMouse;
-	}
-
-	public boolean getUseRepeater() {
-		return useRepeater;
-	}
-
-	public void setUseRepeater(boolean useRepeater) {
-		this.useRepeater = useRepeater;
-	}
-
-	public long getMetaListId() {
-		return metaListId;
-	}
-
-	public void setMetaListId(long metaListId) {
-		this.metaListId = metaListId;
-	}
-
-	public long getLastMetaKeyId() {
-		return lastMetaKeyId;
-	}
-
-	public void setLastMetaKeyId(long lastMetaKeyId) {
-		this.lastMetaKeyId = lastMetaKeyId;
-	}
-
-	public boolean getFollowPan() {
-		return followPan;
-	}
-
-	public void setFollowPan(boolean followPan) {
-		this.followPan = followPan;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getSecureConnectionType() {
-		return secureConnectionType;
-	}
-
-	public void setSecureConnectionType(String secureConnectionType) {
-		this.secureConnectionType = secureConnectionType;
-	}
-
-	public boolean isShowZoomButtons() {
-		return showZoomButtons;
-	}
-
-	public void setShowZoomButtons(boolean showZoomButtons) {
-		this.showZoomButtons = showZoomButtons;
-	}
-
-	public String getDoubleTapAction() {
-		return doubleTapAction;
-	}
-
-	public void setDoubleTapAction(String doubleTapAction) {
-		this.doubleTapAction = doubleTapAction;
+		id = 0;
+		address = "";
+		password = "";
+		keepPassword = true;
+		nickname = "";
+		userName = "";
+		port = 5900;
+		colorModel = COLORMODEL.C24bit.nameString();
+		followMouse = true;
+		repeaterId = "";
+		metaListId = 1;
 	}
 
 	@Override
 	public String toString() {
-		return getId() + " " + getNickname() + ": " + getAddress() + ", port " + getPort();
+		return id + " " + nickname + ": " + address + ", port " + port;
 	}
 
 	@Override
 	public int compareTo(ConnectionBean another) {
-		int result = getNickname().compareTo(another.getNickname());
+		int result = nickname.compareTo(another.nickname);
 		if (result == 0) {
-			result = getAddress().compareTo(another.getAddress());
-			if ( result == 0) {
-				result = getPort() - another.getPort();
+			result = address.compareTo(another.address);
+			if (result == 0) {
+				result = port - another.port;
 			}
 		}
 		return result;
@@ -290,19 +122,19 @@ class ConnectionBean implements Comparable<ConnectionBean> {
 		if (nr_colons == 1) { // IPv4
 			String p = hostport_str.substring(hostport_str.indexOf(':') + 1);
 			try {
-				setPort(Integer.parseInt(p));
+				port = Integer.parseInt(p);
 			} catch (Exception e) {
 			}
-			setAddress(hostport_str.substring(0, hostport_str.indexOf(':')));
+			address = hostport_str.substring(0, hostport_str.indexOf(':'));
 			return true;
 		}
 		if(nr_colons > 1 && nr_endbrackets == 1) {
 			String p = hostport_str.substring(hostport_str.indexOf(']') + 2); // it's [addr]:port
 			try {
-				setPort(Integer.parseInt(p));
+				port = Integer.parseInt(p);
 			} catch (Exception e) {
 			}
-			setAddress(hostport_str.substring(0, hostport_str.indexOf(']') + 1));
+			address = hostport_str.substring(0, hostport_str.indexOf(']') + 1);
 			return true;
 		}
 		return false;
