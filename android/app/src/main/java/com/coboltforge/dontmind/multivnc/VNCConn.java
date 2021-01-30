@@ -8,24 +8,17 @@
 
 package com.coboltforge.dontmind.multivnc;
 
-import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.util.Log;
 import android.view.KeyEvent;
-
 import androidx.annotation.Keep;
-
-import static android.content.Context.MODE_PRIVATE;
 
 
 public class VNCConn {
@@ -54,8 +47,6 @@ public class VNCConn {
 
 	// message queue for communicating with the output worker thread
 	private ConcurrentLinkedQueue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<VNCConn.OutputEvent>();
-
-	private Paint handleRREPaint;
 
 	private COLORMODEL colorModel;
 
@@ -367,9 +358,6 @@ public class VNCConn {
 
 
 	public VNCConn() {
-		handleRREPaint = new Paint();
-		handleRREPaint.setStyle(Style.FILL);
-
 		if(Utils.DEBUG()) Log.d(TAG, this + " constructed!");
 	}
 
