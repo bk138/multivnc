@@ -131,8 +131,14 @@ public class EditBookmarkActivity extends Activity {
 		}
 		checkboxKeepPassword.setChecked(bookmark.getKeepPassword());
 		usernameText.setText(bookmark.getUserName());
-		
-		COLORMODEL cm = COLORMODEL.valueOf(bookmark.getColorModel());
+
+		COLORMODEL cm;
+		try {
+			cm = COLORMODEL.valueOf(bookmark.getColorModel());
+		} catch (IllegalArgumentException e) {
+			// there was a value bookmarked that we don't have anymore in the 1.9+ releases
+			cm = COLORMODEL.C16bit;
+		}
 		COLORMODEL[] colors = {COLORMODEL.C24bit, COLORMODEL.C16bit};
 
 		for (int i=0; i<colors.length; ++i)
