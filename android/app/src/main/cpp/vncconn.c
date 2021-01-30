@@ -375,6 +375,13 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
     if(cl->serverPort < 100)
         cl->serverPort += 5900;
 
+    // use Raw encoding for local connections
+    if (strcmp(cl->serverHost, "localhost") == 0 ||
+        strcmp(cl->serverHost, "127.0.0.1") == 0 ||
+        strcmp(cl->serverHost, "::1") == 0) {
+        cl->appData.encodingsString = "raw";
+    }
+
     if(repeaterId >= 0) {
         cl->destHost = strdup("ID");
         cl->destPort = repeaterId;
