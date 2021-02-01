@@ -578,7 +578,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
-		database = new VncDatabase(this);
+		database = VncDatabase.getInstance(this);
 
 		mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
@@ -624,14 +624,13 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			{
 				Log.d(TAG, "Starting bookmarked connection " + connection.getPort());
 				// read in this bookmarked connection
-				if (connection.Gen_read(database.getReadableDatabase(), connection.getPort()))
-				{
-				}
-				else {
+				ConnectionBean result = database.getConnectionDao().get(connection.getPort());
+				if (result == null) {
 					Log.e(TAG, "Bookmarked connection " + connection.getPort() + " does not exist!");
 					Utils.showFatalErrorMessage(this, getString(R.string.bookmark_invalid));
 					return;
 				}
+				connection = result;
 			}
 			else // well, not a boomarked connection
 			{
@@ -944,7 +943,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			sendSpecialKeyAgain();
 			return true;
 		case R.id.itemSaveBookmark:
-			connection.save(database.getWritableDatabase());
+			database.getConnectionDao().save(connection);
 			Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.itemAbout:
@@ -979,20 +978,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 	private void sendSpecialKeyAgain() {
 		if (lastSentKey == null) {
-			ArrayList<MetaKeyBean> keys = new ArrayList<MetaKeyBean>();
-			Cursor c = database.getReadableDatabase().rawQuery(
-					MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2}",
-							MetaKeyBean.GEN_TABLE_NAME,
-							MetaKeyBean.GEN_FIELD__ID, connection
-									.getLastMetaKeyId()),
-					MetaKeyDialog.EMPTY_ARGS);
-			MetaKeyBean.Gen_populateFromCursor(c, keys, MetaKeyBean.NEW);
-			c.close();
-			if (keys.size() > 0) {
-				lastSentKey = keys.get(0);
-			} else {
-				lastSentKey = null;
-			}
+			lastSentKey = database.getMetaKeyDao().get(connection.getLastMetaKeyId());
 		}
 		vncCanvas.sendMetaKey(lastSentKey);
 	}
@@ -1010,7 +996,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 				inputHandler.shutdown();
 				vncCanvas.vncConn.shutdown();
 				vncCanvas.onDestroy();
-				database.close();
 			}
 			catch(NullPointerException e) {
 			}

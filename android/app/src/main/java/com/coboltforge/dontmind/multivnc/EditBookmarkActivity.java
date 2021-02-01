@@ -9,7 +9,6 @@ package com.coboltforge.dontmind.multivnc;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -57,7 +56,7 @@ public class EditBookmarkActivity extends Activity {
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
 		colorSpinner.setAdapter(colorSpinnerAdapter);
 		
-		database = new VncDatabase(this);
+		database = VncDatabase.getInstance(this);
 
 		// default return value
 		setResult(RESULT_CANCELED);
@@ -66,7 +65,8 @@ public class EditBookmarkActivity extends Activity {
 		// read connection from DB
 		Intent intent = getIntent();
 		long connID = intent.getLongExtra(Constants.CONNECTION, 0);
-		if (bookmark.Gen_read(database.getReadableDatabase(), connID))
+		bookmark = database.getConnectionDao().get(connID);
+		if (bookmark != null)
 		{
 			Log.d(TAG, "Successfully read connection " + connID + " from database");
 
@@ -100,13 +100,7 @@ public class EditBookmarkActivity extends Activity {
 		});
 		
 	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		database.close();
-	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -122,7 +116,7 @@ public class EditBookmarkActivity extends Activity {
 	}
 	
 	private void updateViewsFromBookmark() {
-	
+
 		bookmarkNameText.setText(bookmark.getNickname());
 		ipText.setText(bookmark.getAddress());
 		portText.setText(Integer.toString(bookmark.getPort()));
@@ -153,7 +147,7 @@ public class EditBookmarkActivity extends Activity {
 	
 	
 	private void updateBookmarkFromViews() {
-	
+
 		bookmark.setAddress(ipText.getText().toString());
 		try
 		{
@@ -175,7 +169,7 @@ public class EditBookmarkActivity extends Activity {
 			bookmark.setUseRepeater(true);
 		}
 		else
-		{			
+		{
 			bookmark.setUseRepeater(false);
 		}
 	}
@@ -183,18 +177,11 @@ public class EditBookmarkActivity extends Activity {
 	
 	
 	private void saveBookmark(ConnectionBean conn) 	{
-		SQLiteDatabase db = database.getWritableDatabase();
-		db.beginTransaction();
 		try {
-			Log.d(TAG, "Saving bookmark for conn " + conn.get_Id());
-			conn.save(db);
-			db.setTransactionSuccessful();
+			database.getConnectionDao().save(conn);
 		}
 		catch(Exception e) {
 			Log.e(TAG, "Error saving bookmark: " + e.getMessage());
-		}
-		finally {
-			db.endTransaction();
 		}
 	}
 }

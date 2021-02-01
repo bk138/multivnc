@@ -4,88 +4,125 @@
 package com.coboltforge.dontmind.multivnc;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
 /**
- * @author Michael A. MacDonald
- *
+ * Note: Version before migration to Room = 12
  */
-class VncDatabase extends SQLiteOpenHelper {
-	static final int DBV_0_2_X = 9;
-	static final int DBV_0_2_4 = 10;
-	static final int DBV_0_4_7 = 11;
-	static final int DBV_0_5_0 = 12;
-	
-	public final static String TAG = VncDatabase.class.toString();
-	
-	VncDatabase(Context context)
-	{
-		super(context,"VncDatabase",null,DBV_0_5_0);
-	}
+@Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class}, version = VncDatabase.VERSION, exportSchema = false)
+abstract class VncDatabase extends RoomDatabase {
 
-	/* (non-Javadoc)
-	 * @see android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
-	 */
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(AbstractConnectionBean.GEN_CREATE);
-		db.execSQL(MetaList.GEN_CREATE);
-		db.execSQL(AbstractMetaKeyBean.GEN_CREATE);
+    public static final int VERSION = 13;
+    public static final String NAME = "VncDatabase";
 
-		db.execSQL("INSERT INTO "+MetaList.GEN_TABLE_NAME+" VALUES ( 1, 'DEFAULT')");
-	}
+    public abstract MetaListDao getMetaListDao();
 
-	@Override
-	public void onOpen(SQLiteDatabase db) {
-		super.onOpen(db);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-			db.disableWriteAheadLogging();
-	}
+    public abstract MetaKeyDao getMetaKeyDao();
 
-	private void defaultUpgrade(SQLiteDatabase db)
-	{
-		Log.i(TAG, "Doing default database upgrade (drop and create tables)");
-		db.execSQL("DROP TABLE IF EXISTS " + AbstractConnectionBean.GEN_TABLE_NAME);
-		db.execSQL("DROP TABLE IF EXISTS " + MetaList.GEN_TABLE_NAME);
-		db.execSQL("DROP TABLE IF EXISTS " + AbstractMetaKeyBean.GEN_TABLE_NAME);
-		onCreate(db);
-	}
+    public abstract ConnectionDao getConnectionDao();
 
-	/* (non-Javadoc)
-	 * @see android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database.sqlite.SQLiteDatabase, int, int)
-	 */
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if (oldVersion < DBV_0_2_X)
-		{
-			defaultUpgrade(db);
-		}
-		else {
-			if (oldVersion == DBV_0_2_X)
-			{
-				Log.i(TAG, "Doing upgrade from 9 to 10");
-				db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " RENAME TO OLD_" +
-						AbstractConnectionBean.GEN_TABLE_NAME);
-				db.execSQL(AbstractConnectionBean.GEN_CREATE);
-				db.execSQL("INSERT INTO " + AbstractConnectionBean.GEN_TABLE_NAME +
-						" SELECT *, 0 FROM OLD_" + AbstractConnectionBean.GEN_TABLE_NAME);
-				db.execSQL("DROP TABLE OLD_" + AbstractConnectionBean.GEN_TABLE_NAME);
-				oldVersion = DBV_0_2_4;
-			}
-			if (oldVersion == DBV_0_2_4)
-			{
-				Log.i(TAG,"Doing upgrade from 10 to 11");
-				db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_USERNAME+" TEXT");
-				db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_SECURECONNECTIONTYPE+" TEXT");
-				oldVersion = DBV_0_4_7;
-			}
-			Log.i(TAG,"Doing upgrade from 11 to 12");
-			db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_SHOWZOOMBUTTONS+" INTEGER DEFAULT 1");
-			db.execSQL("ALTER TABLE " + AbstractConnectionBean.GEN_TABLE_NAME + " ADD COLUMN " +AbstractConnectionBean.GEN_FIELD_DOUBLE_TAP_ACTION+" TEXT");
-		}
-	}
 
+    private static VncDatabase instance = null;
+
+    public static VncDatabase getInstance(Context context) {
+        if (instance == null) {
+            instance = Room.databaseBuilder(context, VncDatabase.class, NAME)
+                    .allowMainThreadQueries()
+                    .addMigrations(MIGRATION_12_13)
+                    .build();
+
+            setupDefaultMetaList(instance);
+        }
+        return instance;
+    }
+
+    private static void setupDefaultMetaList(VncDatabase db) {
+        if (db.getMetaListDao().getAll().isEmpty()) {
+            MetaList l = new MetaList();
+            l.setId(1);
+            l.setName("DEFAULT");
+            db.getMetaListDao().insert(l);
+        }
+    }
+
+
+    //Room treats columns of primitive types as non-nullable but originally
+    //these columns were not created with explicit nullability.
+    //To solve this, ideally, we would simply alter the columns but SQLite
+    //does not support that.
+    //So we need to recreate these tables with correct nullability.
+    private static final Migration MIGRATION_12_13 = new Migration(12, 13) {
+
+        private String CREATE_NEW_CONNECTIONS_TABLE = "CREATE TABLE CONNECTION_BEAN_NEW (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                "NICKNAME TEXT," +
+                "ADDRESS TEXT," +
+                "PORT INTEGER NOT NULL," +
+                "PASSWORD TEXT," +
+                "COLORMODEL TEXT," +
+                "FORCEFULL INTEGER NOT NULL," +
+                "REPEATERID TEXT," +
+                "INPUTMODE TEXT," +
+                "SCALEMODE TEXT," +
+                "USELOCALCURSOR INTEGER NOT NULL," +
+                "KEEPPASSWORD INTEGER NOT NULL," +
+                "FOLLOWMOUSE INTEGER NOT NULL," +
+                "USEREPEATER INTEGER NOT NULL," +
+                "METALISTID INTEGER NOT NULL," +
+                "LAST_META_KEY_ID INTEGER NOT NULL," +
+                "FOLLOWPAN INTEGER NOT NULL DEFAULT 0," +
+                "USERNAME TEXT," +
+                "SECURECONNECTIONTYPE TEXT," +
+                "SHOWZOOMBUTTONS INTEGER  NOT NULL DEFAULT 1," +
+                "DOUBLE_TAP_ACTION TEXT" +
+                ")";
+
+        private String CREATE_NEW_KEY_TABLE = "CREATE TABLE META_KEY_NEW (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                "METALISTID INTEGER NOT NULL," +
+                "KEYDESC TEXT," +
+                "METAFLAGS INTEGER NOT NULL," +
+                "MOUSECLICK INTEGER NOT NULL," +
+                "MOUSEBUTTONS INTEGER NOT NULL," +
+                "KEYSYM INTEGER NOT NULL," +
+                "SHORTCUT TEXT" +
+                ")";
+
+        private String CREATE_NEW_LIST_TABLE = "CREATE TABLE META_LIST_NEW (" +
+                "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                "NAME TEXT" +
+                ")";
+
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Log.i("VncDatabase", "Migrating to Room [12 -> 13]");
+
+            //Create new
+            database.execSQL(CREATE_NEW_CONNECTIONS_TABLE);
+            database.execSQL(CREATE_NEW_KEY_TABLE);
+            database.execSQL(CREATE_NEW_LIST_TABLE);
+
+            //Copy over data
+            database.execSQL("INSERT INTO CONNECTION_BEAN_NEW SELECT * FROM CONNECTION_BEAN");
+            database.execSQL("INSERT INTO META_KEY_NEW SELECT * FROM META_KEY");
+            database.execSQL("INSERT INTO META_LIST_NEW SELECT * FROM META_LIST");
+
+            //Remove old
+            database.execSQL("DROP TABLE CONNECTION_BEAN");
+            database.execSQL("DROP TABLE META_KEY");
+            database.execSQL("DROP TABLE META_LIST");
+
+            //Rename new
+            database.execSQL("ALTER TABLE CONNECTION_BEAN_NEW RENAME TO CONNECTION_BEAN");
+            database.execSQL("ALTER TABLE META_KEY_NEW RENAME TO META_KEY");
+            database.execSQL("ALTER TABLE META_LIST_NEW RENAME TO META_LIST");
+        }
+    };
 }

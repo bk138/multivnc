@@ -6,15 +6,19 @@ package com.coboltforge.dontmind.multivnc;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.antlersoft.android.dbimpl.NewInstance;
-
 import android.view.KeyEvent;
+
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 /**
  * @author Michael A. MacDonald
  *
  */
-class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean> {
+@Entity(tableName = "META_KEY")
+class MetaKeyBean implements Comparable<MetaKeyBean> {
 	static final ArrayList<MetaKeyBase> allKeys;
 	static final String[] allKeysNames;
 	static final HashMap<Integer,MetaKeyBase> keysByKeyCode;
@@ -25,9 +29,7 @@ class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean>
 	static final MetaKeyBean keyArrowRight;
 	static final MetaKeyBean keyArrowUp;
 	static final MetaKeyBean keyArrowDown;
-	
-	static final NewInstance<MetaKeyBean> NEW;
-	
+
 	static {
 		allKeys = new ArrayList<MetaKeyBase>();
 
@@ -103,29 +105,46 @@ class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean>
 			else
 				keysByKeySym.put(b.keySym,b);
 		}
-		NEW = new NewInstance<MetaKeyBean>() {
 
-				/* (non-Javadoc)
-				 * @see com.antlersoft.android.dbimpl.NewInstance#get()
-				 */
-				@Override
-				public MetaKeyBean get() {
-					return new MetaKeyBean();
-				}
-			};
 		keyCtrlAltDel = new MetaKeyBean(0,VNCConn.CTRL_MASK|VNCConn.ALT_MASK,keysByKeyCode.get(KeyEvent.KEYCODE_DEL));
 		keyArrowLeft = new MetaKeyBean(0,0,keysByKeySym.get(0xFF51));
 		keyArrowUp = new MetaKeyBean(0,0,keysByKeySym.get(0xFF52));
 		keyArrowRight = new MetaKeyBean(0,0,keysByKeySym.get(0xFF53));
 		keyArrowDown = new MetaKeyBean(0,0,keysByKeySym.get(0xFF54));
 	}
-	
+
+	@Ignore
 	private boolean _regenDesc;
-	
+
+	@PrimaryKey(autoGenerate = true)
+	@ColumnInfo(name = "_id")
+	private long id;
+
+	@ColumnInfo(name = "METALISTID")
+	private long metaListId;
+
+	@ColumnInfo(name = "KEYDESC")
+	private String keyDesc;
+
+	@ColumnInfo(name = "METAFLAGS")
+	private int metaFlags;
+
+	@ColumnInfo(name = "MOUSECLICK")
+	private boolean isMouseClick;
+
+	@ColumnInfo(name = "MOUSEBUTTONS")
+	private int mouseButtons;
+
+	@ColumnInfo(name = "KEYSYM")
+	private int keySym;
+
+	@ColumnInfo(name = "SHORTCUT")
+	private String shortcut;
+
 	MetaKeyBean()
 	{
 	}
-	
+
 	MetaKeyBean(MetaKeyBean toCopy)
 	{
 		_regenDesc = true;
@@ -145,10 +164,51 @@ class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean>
 		_regenDesc = true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractMetaKeyBean#getKeyDesc()
-	 */
-	@Override
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public long getMetaListId() {
+		return metaListId;
+	}
+
+	public void setMetaListId(long metaListId) {
+		this.metaListId = metaListId;
+	}
+
+	public int getMetaFlags() {
+		return metaFlags;
+	}
+
+	public boolean isMouseClick() {
+		return isMouseClick;
+	}
+
+	public void setMouseClick(boolean mouseClick) {
+		isMouseClick = mouseClick;
+	}
+
+	public int getMouseButtons() {
+		return mouseButtons;
+	}
+
+	public int getKeySym() {
+		return keySym;
+	}
+
+	public String getShortcut() {
+		return shortcut;
+	}
+
+	public void setShortcut(String shortcut) {
+		this.shortcut = shortcut;
+	}
+
 	public String getKeyDesc() {
 		if (_regenDesc)
 		{
@@ -192,53 +252,37 @@ class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean>
 				}
 			}
 		}
-		return super.getKeyDesc();
+		return keyDesc;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractMetaKeyBean#setKeyDesc(java.lang.String)
-	 */
-	@Override
 	public void setKeyDesc(String arg_keyDesc) {
-		super.setKeyDesc(arg_keyDesc);
+		keyDesc = arg_keyDesc;
 		_regenDesc = false;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractMetaKeyBean#setKeySym(int)
-	 */
-	@Override
 	public void setKeySym(int arg_keySym) {
-		if (arg_keySym!=getKeySym() || isMouseClick())
+		if (arg_keySym != keySym || isMouseClick)
 		{
-			setMouseClick(false);
+			isMouseClick = false;
 			_regenDesc=true;
-			super.setKeySym(arg_keySym);
+			keySym = arg_keySym;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractMetaKeyBean#setMetaFlags(int)
-	 */
-	@Override
 	public void setMetaFlags(int arg_metaFlags) {
-		if (arg_metaFlags != getMetaFlags())
+		if (arg_metaFlags != metaFlags)
 		{
 			_regenDesc = true;
-			super.setMetaFlags(arg_metaFlags);
+			metaFlags = arg_metaFlags;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.coboltforge.dontmind.multivnc.AbstractMetaKeyBean#setMouseButtons(int)
-	 */
-	@Override
 	public void setMouseButtons(int arg_mouseButtons) {
-		if (arg_mouseButtons!=getMouseButtons() || ! isMouseClick())
+		if (arg_mouseButtons != mouseButtons || !isMouseClick)
 		{
-			setMouseClick(true);
+			isMouseClick = true;
 			_regenDesc = true;
-			super.setMouseButtons(arg_mouseButtons);
+			mouseButtons = arg_mouseButtons;
 		}
 	}
 	
@@ -254,9 +298,6 @@ class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean>
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof MetaKeyBean)
@@ -265,9 +306,7 @@ class MetaKeyBean extends AbstractMetaKeyBean implements Comparable<MetaKeyBean>
 		}
 		return false;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
+
 	@Override
 	public int compareTo(MetaKeyBean another) {
 		return getKeyDesc().compareTo(another.getKeyDesc());

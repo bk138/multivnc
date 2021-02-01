@@ -7,7 +7,10 @@ package com.coboltforge.dontmind.multivnc;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -45,7 +48,7 @@ public class ImportExportActivity extends Activity {
 	private EditText _textSaveUrl;
 	private Button mButtonExport;
 	private Button mButtonImport;
-	private VncDatabase mDatabase;
+	private DbOpener dbOpener;
 
 	@SuppressLint("StaticFieldLeak") // this is not long-running
 	private class ImportFromURLAsyncTask extends AsyncTask<String, Void, Exception> {
@@ -57,7 +60,7 @@ public class ImportExportActivity extends Activity {
 				connection.connect();
 				Reader reader = new InputStreamReader(connection.getInputStream());
 				SqliteElement.importXmlStreamToDb(
-						mDatabase.getWritableDatabase(),
+						dbOpener.getWritableDatabase(),
 						reader,
 						ReplaceStrategy.REPLACE_EXISTING);
 				return null;
@@ -93,7 +96,7 @@ public class ImportExportActivity extends Activity {
 		_textLoadUrl = findViewById(R.id.textImportUrl);
 		_textSaveUrl = findViewById(R.id.textExportPath);
 
-		mDatabase = new VncDatabase(this);
+		dbOpener = new DbOpener(this);
 
 		File f;
 		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -126,7 +129,7 @@ public class ImportExportActivity extends Activity {
 				try {
 					File f = new File(_textSaveUrl.getText().toString());
 					Writer writer = new OutputStreamWriter(new FileOutputStream(f, false));
-					SqliteElement.exportDbAsXmlToStream(mDatabase.getReadableDatabase(), writer);
+					SqliteElement.exportDbAsXmlToStream(dbOpener.getReadableDatabase(), writer);
 					writer.close();
 					finish();
 					Log.d(TAG, "export successful!");
@@ -154,6 +157,12 @@ public class ImportExportActivity extends Activity {
 			}
 
 		});
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		dbOpener.close();
 	}
 
 	@SuppressLint("NewApi")
@@ -197,4 +206,24 @@ public class ImportExportActivity extends Activity {
 		Utils.showErrorMessage(this, msg + ": <br/><br/>" + t.getMessage());
 	}
 
+	/**
+	 * Room does not provide us access to SQLiteOpenHelper which is required by
+	 * XML importer. So we implement one here with essential features only.
+	 */
+	static class DbOpener extends SQLiteOpenHelper{
+
+		DbOpener(Context context){
+			super(context, VncDatabase.NAME,null, VncDatabase.VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			//Nothing to do because creation is handled by VncDatabase
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			//Nothing to do because migration is handled by VncDatabase
+		}
+	}
 }

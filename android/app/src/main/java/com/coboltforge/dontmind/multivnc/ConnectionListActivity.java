@@ -42,27 +42,16 @@ public class ConnectionListActivity extends ListActivity {
 
         setContentView(R.layout.connection_list);
 
-        database = new VncDatabase(this);
-
-        // Query for all people contacts using the Contacts.People convenience class.
-        // Put a managed wrapper around the retrieved cursor so we don't have to worry about
-        // requerying or closing it as the activity changes state.
-        Cursor mCursor = database.getReadableDatabase().query(ConnectionBean.GEN_TABLE_NAME, new String[] {		
-        		ConnectionBean.GEN_FIELD__ID,
-        		ConnectionBean.GEN_FIELD_NICKNAME,
-        		ConnectionBean.GEN_FIELD_USERNAME,
-        		ConnectionBean.GEN_FIELD_ADDRESS,
-        		ConnectionBean.GEN_FIELD_PORT,
-        		ConnectionBean.GEN_FIELD_REPEATERID },
-        		ConnectionBean.GEN_FIELD_KEEPPASSWORD + " <> 0", null, null, null, ConnectionBean.GEN_FIELD_NICKNAME);
-        startManagingCursor(mCursor);
+        database = VncDatabase.getInstance(this);
+        Cursor cursor = database.getConnectionDao().getAllWithPassword();
+        startManagingCursor(cursor);
 
         // Now create a new list adapter bound to the cursor. 
         // SimpleListAdapter is designed for binding to a Cursor.
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(
                 this, // Context.
                 R.layout.connection_list_item,
-                mCursor,                                    // Pass in the cursor to bind to.
+                cursor,                                    // Pass in the cursor to bind to.
                 new String[] {
                 		ConnectionBean.GEN_FIELD_NICKNAME,
                 		ConnectionBean.GEN_FIELD_ADDRESS,
@@ -84,9 +73,8 @@ public class ConnectionListActivity extends ListActivity {
 	 */
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		ConnectionBean connection = new ConnectionBean();
-		if (connection.Gen_read(database.getReadableDatabase(), id))
-		{
+        ConnectionBean connection = database.getConnectionDao().get(id);
+        if (connection != null) {
             // create shortcut if requested
             ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher);
 
@@ -94,7 +82,7 @@ public class ConnectionListActivity extends ListActivity {
             
             Intent launchIntent = new Intent(this,VncCanvasActivity.class);
             Uri.Builder builder = new Uri.Builder();
-            builder.authority(Constants.CONNECTION + ":" + connection.get_Id());
+            builder.authority(Constants.CONNECTION + ":" + connection.getId());
             builder.scheme("vnc");
             launchIntent.setData(builder.build());
             
@@ -109,14 +97,4 @@ public class ConnectionListActivity extends ListActivity {
 		
 		finish();
 	}
-
-	/* (non-Javadoc)
-	 * @see android.app.Activity#onDestroy()
-	 */
-	@Override
-	protected void onDestroy() {
-		database.close();
-		super.onDestroy();
-	}
-    
 }

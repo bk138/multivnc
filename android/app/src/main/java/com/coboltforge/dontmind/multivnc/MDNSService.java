@@ -226,7 +226,7 @@ public class MDNSService extends Service {
 						@Override
 						public void serviceResolved(ServiceEvent ev) {
 							ConnectionBean c = new ConnectionBean();
-							c.set_Id(0); // new!
+							c.setId(0); // new!
 							c.setNickname(ev.getName());
 							c.setAddress(ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim());
 							c.setPort(ev.getInfo().getPort());

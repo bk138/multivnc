@@ -3,23 +3,16 @@
  */
 package com.coboltforge.dontmind.multivnc;
 
-import java.text.MessageFormat;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map.Entry;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -28,7 +21,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -48,13 +40,11 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 	Spinner _spinnerKeySelect;
 
 	VncDatabase _database;
-	static ArrayList<MetaList> _lists;
-	ArrayList<MetaKeyBean> _keysInList;
+	static List<MetaList> _lists;
+	ArrayList<MetaKeyBean> _keysInList = new ArrayList<>();
 	long _listId;
 	VncCanvasActivity _canvasActivity;
 	MetaKeyBean _currentKeyBean;
-
-	static final String[] EMPTY_ARGS = new String[0];
 
 	ConnectionBean _connection;
 
@@ -85,13 +75,10 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 
 		_database = _canvasActivity.database;
 		if (_lists == null) {
-			_lists = new ArrayList<MetaList>();
-			MetaList.getAll(_database.getReadableDatabase(), MetaList.GEN_TABLE_NAME, _lists, MetaList.GEN_NEW);
+			_lists = _database.getMetaListDao().getAll();
 		}
 		_spinnerKeySelect.setAdapter(new ArrayAdapter<String>(getOwnerActivity(), android.R.layout.simple_spinner_item, MetaKeyBean.allKeysNames));
 		_spinnerKeySelect.setSelection(0);
-
-		setListSpinner();
 
 		_checkShift.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.SHIFT_MASK));
 		_checkAlt.setOnCheckedChangeListener(new MetaCheckListener(VNCConn.ALT_MASK));
@@ -240,20 +227,19 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 	void sendCurrentKey()
 	{
 		int index = Collections.binarySearch(_keysInList, _currentKeyBean);
-		SQLiteDatabase db = _database.getWritableDatabase();
 		if (index < 0)
 		{
 			int insertionPoint = -(index + 1);
-			_currentKeyBean.Gen_insert(db);
+			_database.getMetaKeyDao().insert(_currentKeyBean);
 			_keysInList.add(insertionPoint,_currentKeyBean);
-			_connection.setLastMetaKeyId(_currentKeyBean.get_Id());
+			_connection.setLastMetaKeyId(_currentKeyBean.getId());
 		}
 		else
 		{
 			MetaKeyBean bean = _keysInList.get(index);
-			_connection.setLastMetaKeyId(bean.get_Id());
+			_connection.setLastMetaKeyId(bean.getId());
 		}
-		_connection.Gen_update(db);
+		_database.getConnectionDao().update(_connection);
 		_canvasActivity.lastSentKey = _currentKeyBean;
 		_canvasActivity.vncCanvas.sendMetaKey(_currentKeyBean);
 		Log.d(TAG, "sendCurrentKey: sent " + _currentKeyBean.getKeyDesc());
@@ -266,23 +252,11 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 			for (int i=0; i<_lists.size(); ++i)
 			{
 				MetaList list = _lists.get(i);
-				if (list.get_Id()==listId)
+				if (list.getId() ==listId)
 				{
-					_keysInList = new ArrayList<MetaKeyBean>();
-					try {
-						Cursor c = _database.getReadableDatabase().rawQuery(
-								MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2} ORDER BY KEYDESC",
-										MetaKeyBean.GEN_TABLE_NAME,
-										MetaKeyBean.GEN_FIELD_METALISTID,
-										listId),
-								EMPTY_ARGS);
-						MetaKeyBean.Gen_populateFromCursor(
-								c,
-								_keysInList,
-								MetaKeyBean.NEW);
-						c.close();
-					} catch (Exception e) {
-					}
+					_keysInList.clear();
+					_keysInList.addAll(_database.getMetaKeyDao().getByMetaList(listId));
+
 					ArrayList<String> keys = new ArrayList<String>(_keysInList.size());
 					int selectedOffset = 0;
 					long lastSelectedKeyId = _canvasActivity.getConnection().getLastMetaKeyId();
@@ -290,7 +264,7 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 					{
 						MetaKeyBean key = _keysInList.get(j);
 						keys.add( key.getKeyDesc());
-						if (lastSelectedKeyId==key.get_Id())
+						if (lastSelectedKeyId==key.getId())
 						{
 							selectedOffset = j;
 						}
@@ -342,15 +316,6 @@ class MetaKeyDialog extends Dialog implements ConnectionSettable {
 		}
 	}
 
-	void setListSpinner()
-	{
-		ArrayList<String> listNames = new ArrayList<String>(_lists.size());
-		for (int i=0; i<_lists.size(); ++i)
-		{
-			MetaList l = _lists.get(i);
-			listNames.add(l.getName());
-		}
-	}
 
 	/**
 	 * @author Michael A. MacDonald

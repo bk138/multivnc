@@ -31,7 +31,6 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -45,7 +44,6 @@ import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -58,7 +56,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 import java.util.Hashtable;
 
@@ -199,7 +197,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 			}
 		});
 
-		database = new VncDatabase(this);
+		database = VncDatabase.getInstance(this);
 
 
 		final SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
@@ -309,8 +307,6 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 		super.onDestroy();
 
-		database.close();
-
 		unbindFromMDNSService();
 	}
 
@@ -373,14 +369,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 
 	void updateBookmarkView() {
-		ArrayList<ConnectionBean> bookmarked_connections=new ArrayList<ConnectionBean>();
-		try {
-			ConnectionBean.getAll(database.getReadableDatabase(), ConnectionBean.GEN_TABLE_NAME, bookmarked_connections, ConnectionBean.newInstance);
-		}
-		catch(android.database.sqlite.SQLiteException e) {
-			Toast.makeText(this, getString(R.string.database_error_open), Toast.LENGTH_LONG).show();
-			return;
-		}
+		List<ConnectionBean> bookmarked_connections = database.getConnectionDao().getAll();
 
 		Collections.sort(bookmarked_connections);
 
@@ -448,7 +437,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 					    		   anew with each call to this function
 					    		 */
 					    		conn.setNickname("Copy of " + conn.getNickname());
-					    		conn.set_Id(0); // this saves a new one in the DB!
+					    		conn.setId(0); // this saves a new one in the DB!
 								saveBookmark(conn);
 								// update
 								updateBookmarkView();
@@ -460,9 +449,9 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 								.setCancelable(false)
 								.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
-										Log.d(TAG, "Deleting bookmark " + conn.get_Id());
+										Log.d(TAG, "Deleting bookmark " + conn.getId());
 										// delete from DB
-										conn.Gen_delete(database.getWritableDatabase());
+										database.getConnectionDao().delete(conn);
 										// update
 										updateBookmarkView();
 									}
@@ -477,9 +466,9 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 					    		break;
 
 					    	case 2: // edit
-								Log.d(TAG, "Editing bookmark " + conn.get_Id());
+								Log.d(TAG, "Editing bookmark " + conn.getId());
 					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
-					    		intent.putExtra(Constants.CONNECTION, conn.get_Id());
+					    		intent.putExtra(Constants.CONNECTION, conn.getId());
 					    		startActivity(intent);
 					    		break;
 
@@ -505,18 +494,12 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 
 
 	private void saveBookmark(ConnectionBean conn) 	{
-		SQLiteDatabase db = database.getWritableDatabase();
-		db.beginTransaction();
 		try {
 			Log.d(TAG, "Saving bookmark for conn " + conn.toString());
-			conn.save(db);
-			db.setTransactionSuccessful();
+			database.getConnectionDao().save(conn);
 		}
 		catch(Exception e) {
 			Log.e(TAG, "Error saving bookmark: " + e.getMessage());
-		}
-		finally {
-			db.endTransaction();
 		}
 	}
 
@@ -530,7 +513,7 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 		if(conn.getAddress().length() == 0)
 			return null;
 
-		conn.set_Id(0); // is new!!
+		conn.setId(0); // is new!!
 
 		try {
 			conn.setPort(Integer.parseInt(portText.getText().toString().trim()));
@@ -657,11 +640,11 @@ public class MainMenuActivity extends AppCompatActivity implements IMDNS, Lifecy
 								.setCancelable(false)
 								.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog, int id) {
-										Log.d(TAG, "Bookmarking connection " + c.get_Id());
+										Log.d(TAG, "Bookmarking connection " + c.getId());
 										// save bookmark
 										saveBookmark(c);
 										// set as 'new' again. makes this ConnectionBean saveable again
-										c.set_Id(0);
+										c.setId(0);
 										// and update view
 										updateBookmarkView();
 									}
