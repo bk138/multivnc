@@ -1,5 +1,19 @@
 # Version 1.9.x:
 
+1.9.8
+
+- Made connections to localhost simply use Raw encoding.
+- Added screen content resizing on software keyboard opening so keyboard does not obscure screen
+  contents thanks to Gaurav Ujjwal.
+- Added SIMD support for faster Tight decoding thanks to Gaurav Ujjwal.
+- Added Triple-T metadata for F-Droid thanks to Gaurav Ujjwal.
+- Added Catalan and Galego translation thanks to Suso Comesaña.
+- Improved Japanese translation thanks to Masato Nagasawa.
+- Improved Spanish translation thanks to Suso Comesaña.
+- Fixed D-Pad focus handling and navigation in the main menu.
+- Fixed connection failure when entered server address contained whitespace.
+- Fixed crash when importing legacy bookmarks.
+
 1.9.7
 
 - Updated Chinese translation.
