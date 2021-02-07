@@ -32,6 +32,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.res.Configuration;
 import android.app.ProgressDialog;
+import android.os.Build;
 import android.text.ClipboardManager;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -70,6 +71,15 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	public class MightyInputHandler extends AbstractGestureInputHandler {
 
 		private static final String TAG = "TouchPadInputHandler";
+
+		/*
+		 * Samsung S Pen support
+		 */
+		private final int SAMSUNG_SPEN_ACTION_MOVE = 213;
+		private final int SAMSUNG_SPEN_ACTION_UP = 212;
+		private final int SAMSUNG_SPEN_ACTION_DOWN = 211;
+		private final String SAMSUNG_MANUFACTURER_NAME = "samsung";
+
 
 		/**
 		 * In drag mode (entered with long press) you process mouse events
@@ -329,12 +339,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 				e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
-				// set ACTION according to stylus ACTION (is working on Samsung Galaxy Tab S4) and activate rightButton
-				boolean rightButton = false;
-				if(e.getAction() >= 211 && e.getAction() <= 213){
-					e.setAction(e.getAction()-211);
-					rightButton = true;
-				}
+				// modify MotionEvent to support Samsung S Pen Event and activate rightButton accordingly
+				boolean rightButton = spenActionConvert(e);
 
 				vncCanvas.processPointerEvent(e, true, rightButton);
 				vncCanvas.panToMouse();
@@ -396,6 +402,31 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			return super.onTouchEvent(e);
 		}
 
+		/**
+		 * Modify MotionEvent so that Samsung S Pen Actions are handled as normal Action; returns true when it's a Samsung S Pen Action
+		 * @param e
+		 * @return
+		 */
+		private boolean spenActionConvert(MotionEvent e) {
+			if((e.getToolType(0) == MotionEvent.TOOL_TYPE_STYLUS) &&
+					Build.MANUFACTURER.equals(SAMSUNG_MANUFACTURER_NAME)){
+
+				switch(e.getAction()){
+					case SAMSUNG_SPEN_ACTION_DOWN:
+						e.setAction(MotionEvent.ACTION_DOWN);
+						return true;
+					case SAMSUNG_SPEN_ACTION_UP:
+						e.setAction(MotionEvent.ACTION_UP);
+						return true;
+					case SAMSUNG_SPEN_ACTION_MOVE:
+						e.setAction(MotionEvent.ACTION_MOVE);
+						return true;
+					default:
+						return false;
+				}
+			}
+			return false;
+		}
 
 
 		@Override
