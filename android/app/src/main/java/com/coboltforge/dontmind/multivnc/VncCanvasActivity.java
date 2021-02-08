@@ -604,7 +604,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
-		database = new VncDatabase(this);
+		database = VncDatabase.getInstance(this);
 
 		mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
@@ -642,33 +642,32 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			// http://code.google.com/p/android/issues/detail?id=9952
 			if(! connection.parseHostPort(data.getHost())) {
 				// no colons in getHost()
-				connection.setPort(data.getPort());
-				connection.setAddress(data.getHost());
+				connection.port = data.getPort();
+				connection.address = data.getHost();
 			}
 
-			if (connection.getAddress().equals(Constants.CONNECTION)) // this is a bookmarked connection
+			if (connection.address.equals(Constants.CONNECTION)) // this is a bookmarked connection
 			{
-				Log.d(TAG, "Starting bookmarked connection " + connection.getPort());
+				Log.d(TAG, "Starting bookmarked connection " + connection.port);
 				// read in this bookmarked connection
-				if (connection.Gen_read(database.getReadableDatabase(), connection.getPort()))
-				{
-				}
-				else {
-					Log.e(TAG, "Bookmarked connection " + connection.getPort() + " does not exist!");
+				ConnectionBean result = database.getConnectionDao().get(connection.port);
+				if (result == null) {
+					Log.e(TAG, "Bookmarked connection " + connection.port + " does not exist!");
 					Utils.showFatalErrorMessage(this, getString(R.string.bookmark_invalid));
 					return;
 				}
+				connection = result;
 			}
 			else // well, not a boomarked connection
 			{
-			    connection.setNickname(connection.getAddress());
-			    List<String> path = data.getPathSegments();
+				connection.nickname = connection.address;
+				List<String> path = data.getPathSegments();
 			    if (path.size() >= 1) {
-			        connection.setColorModel(path.get(0));
-			    }
+					connection.colorModel = path.get(0);
+				}
 			    if (path.size() >= 2) {
-			        connection.setPassword(path.get(1));
-			    }
+					connection.password = path.get(1);
+				}
 			}
 		}
 		// Uri == null
@@ -680,13 +679,13 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		  	    connection.Gen_populate((ContentValues) extras
 				  	.getParcelable(Constants.CONNECTION));
 		    }
-		    if (connection.getPort() == 0)
-			    connection.setPort(5900);
+			if (connection.port == 0)
+				connection.port = 5900;
 
 			Log.d(TAG, "Got raw intent " + connection.toString());
 
 			// Parse a HOST:PORT entry
-			connection.parseHostPort(connection.getAddress());
+			connection.parseHostPort(connection.address);
 		}
 
 
@@ -970,7 +969,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			sendSpecialKeyAgain();
 			return true;
 		case R.id.itemSaveBookmark:
-			connection.save(database.getWritableDatabase());
+			database.getConnectionDao().save(connection);
 			Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.itemAbout:
@@ -1005,20 +1004,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 	private void sendSpecialKeyAgain() {
 		if (lastSentKey == null) {
-			ArrayList<MetaKeyBean> keys = new ArrayList<MetaKeyBean>();
-			Cursor c = database.getReadableDatabase().rawQuery(
-					MessageFormat.format("SELECT * FROM {0} WHERE {1} = {2}",
-							MetaKeyBean.GEN_TABLE_NAME,
-							MetaKeyBean.GEN_FIELD__ID, connection
-									.getLastMetaKeyId()),
-					MetaKeyDialog.EMPTY_ARGS);
-			MetaKeyBean.Gen_populateFromCursor(c, keys, MetaKeyBean.NEW);
-			c.close();
-			if (keys.size() > 0) {
-				lastSentKey = keys.get(0);
-			} else {
-				lastSentKey = null;
-			}
+			lastSentKey = database.getMetaKeyDao().get(connection.lastMetaKeyId);
 		}
 		vncCanvas.sendMetaKey(lastSentKey);
 	}
@@ -1037,7 +1023,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 				inputHandler.shutdown();
 				vncCanvas.vncConn.shutdown();
 				vncCanvas.onDestroy();
-				database.close();
 			}
 			catch(NullPointerException e) {
 			}
@@ -1177,7 +1162,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 				}
 				COLORMODEL cm = COLORMODEL.values()[item];
 				vncCanvas.vncConn.setColorModel(cm);
-				connection.setColorModel(cm.nameString());
+				connection.colorModel = cm.nameString();
 				Toast.makeText(VncCanvasActivity.this,
 						"Updating Color Model to " + cm.toString(),
 						Toast.LENGTH_SHORT).show();

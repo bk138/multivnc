@@ -7,7 +7,10 @@ package com.coboltforge.dontmind.multivnc;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,11 +23,12 @@ import com.antlersoft.android.contentxml.SqliteElement;
 import com.antlersoft.android.contentxml.SqliteElement.ReplaceStrategy;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -44,7 +48,7 @@ public class ImportExportActivity extends Activity {
 	private EditText _textSaveUrl;
 	private Button mButtonExport;
 	private Button mButtonImport;
-	private VncDatabase mDatabase;
+	private DbOpener dbOpener;
 
 	@SuppressLint("StaticFieldLeak") // this is not long-running
 	private class ImportFromURLAsyncTask extends AsyncTask<String, Void, Exception> {
@@ -54,19 +58,11 @@ public class ImportExportActivity extends Activity {
 			try {
 				URLConnection connection = new URL(urls[0]).openConnection();
 				connection.connect();
-				if(urls[0].endsWith(".xml")) {
-					Reader reader = new InputStreamReader(connection.getInputStream());
-					SqliteElement.importXmlStreamToDb(
-							mDatabase.getWritableDatabase(),
-							reader,
-							ReplaceStrategy.REPLACE_EXISTING);
-				} else {
-					mDatabase.close(); // Close any open database object
-					FileOutputStream dst = new FileOutputStream(mDatabase.getWritableDatabase().getPath());
-					Utils.copy(connection.getInputStream(), dst);
-					connection.getInputStream().close();
-					dst.close();
-				}
+				Reader reader = new InputStreamReader(connection.getInputStream());
+				SqliteElement.importXmlStreamToDb(
+						dbOpener.getWritableDatabase(),
+						reader,
+						ReplaceStrategy.REPLACE_EXISTING);
 				return null;
 			} catch (Exception e) {
 				return e;
@@ -100,7 +96,7 @@ public class ImportExportActivity extends Activity {
 		_textLoadUrl = findViewById(R.id.textImportUrl);
 		_textSaveUrl = findViewById(R.id.textExportPath);
 
-		mDatabase = new VncDatabase(this);
+		dbOpener = new DbOpener(this);
 
 		File f;
 		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -112,7 +108,7 @@ public class ImportExportActivity extends Activity {
 			f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 		}
 
-		f = new File(f, "MultiVNC-Export.sqlite");
+		f = new File(f, "MultiVNC-Export.xml");
 
 		_textSaveUrl.setText(f.getAbsolutePath());
 		try {
@@ -132,19 +128,17 @@ public class ImportExportActivity extends Activity {
 
 				try {
 					File f = new File(_textSaveUrl.getText().toString());
-
-					FileInputStream src = new FileInputStream(mDatabase.getReadableDatabase().getPath());
-					FileOutputStream dst = new FileOutputStream(f);
-					Utils.copy(src, dst);
-					src.close();
-					dst.close();
-
+					Writer writer = new OutputStreamWriter(new FileOutputStream(f, false));
+					SqliteElement.exportDbAsXmlToStream(dbOpener.getReadableDatabase(), writer);
+					writer.close();
 					finish();
 					Log.d(TAG, "export successful!");
 				}
 				catch (IOException ioe)
 				{
 					errorNotify("I/O Exception exporting config", ioe);
+				} catch (SAXException e) {
+					errorNotify("XML Exception exporting config", e);
 				}
 			}
 
@@ -163,6 +157,12 @@ public class ImportExportActivity extends Activity {
 			}
 
 		});
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		dbOpener.close();
 	}
 
 	@SuppressLint("NewApi")
@@ -206,4 +206,24 @@ public class ImportExportActivity extends Activity {
 		Utils.showErrorMessage(this, msg + ": <br/><br/>" + t.getMessage());
 	}
 
+	/**
+	 * Room does not provide us access to SQLiteOpenHelper which is required by
+	 * XML importer. So we implement one here with essential features only.
+	 */
+	static class DbOpener extends SQLiteOpenHelper{
+
+		DbOpener(Context context){
+			super(context, VncDatabase.NAME,null, VncDatabase.VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			//Nothing to do because creation is handled by VncDatabase
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			//Nothing to do because migration is handled by VncDatabase
+		}
+	}
 }

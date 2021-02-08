@@ -9,7 +9,6 @@ package com.coboltforge.dontmind.multivnc;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -57,7 +56,7 @@ public class EditBookmarkActivity extends Activity {
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
 		colorSpinner.setAdapter(colorSpinnerAdapter);
 		
-		database = new VncDatabase(this);
+		database = VncDatabase.getInstance(this);
 
 		// default return value
 		setResult(RESULT_CANCELED);
@@ -66,7 +65,8 @@ public class EditBookmarkActivity extends Activity {
 		// read connection from DB
 		Intent intent = getIntent();
 		long connID = intent.getLongExtra(Constants.CONNECTION, 0);
-		if (bookmark.Gen_read(database.getReadableDatabase(), connID))
+		bookmark = database.getConnectionDao().get(connID);
+		if (bookmark != null)
 		{
 			Log.d(TAG, "Successfully read connection " + connID + " from database");
 
@@ -100,13 +100,7 @@ public class EditBookmarkActivity extends Activity {
 		});
 		
 	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		database.close();
-	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -122,19 +116,19 @@ public class EditBookmarkActivity extends Activity {
 	}
 	
 	private void updateViewsFromBookmark() {
-	
-		bookmarkNameText.setText(bookmark.getNickname());
-		ipText.setText(bookmark.getAddress());
-		portText.setText(Integer.toString(bookmark.getPort()));
-		if (bookmark.getKeepPassword() || bookmark.getPassword().length()>0) {
-			passwordText.setText(bookmark.getPassword());
+
+		bookmarkNameText.setText(bookmark.nickname);
+		ipText.setText(bookmark.address);
+		portText.setText(Integer.toString(bookmark.port));
+		if (bookmark.keepPassword || bookmark.password.length()>0) {
+			passwordText.setText(bookmark.password);
 		}
-		checkboxKeepPassword.setChecked(bookmark.getKeepPassword());
-		usernameText.setText(bookmark.getUserName());
+		checkboxKeepPassword.setChecked(bookmark.keepPassword);
+		usernameText.setText(bookmark.userName);
 
 		COLORMODEL cm;
 		try {
-			cm = COLORMODEL.valueOf(bookmark.getColorModel());
+			cm = COLORMODEL.valueOf(bookmark.colorModel);
 		} catch (IllegalArgumentException e) {
 			// there was a value bookmarked that we don't have anymore in the 1.9+ releases
 			cm = COLORMODEL.C16bit;
@@ -147,54 +141,48 @@ public class EditBookmarkActivity extends Activity {
 				break;
 			}
 
-		if(bookmark.getUseRepeater())
-			repeaterText.setText(bookmark.getRepeaterId());
+		if(bookmark.useRepeater)
+			repeaterText.setText(bookmark.repeaterId);
 	}
 	
 	
 	private void updateBookmarkFromViews() {
-	
-		bookmark.setAddress(ipText.getText().toString());
+
+		bookmark.address = ipText.getText().toString();
 		try
 		{
-			bookmark.setPort(Integer.parseInt(portText.getText().toString()));
+			bookmark.port = Integer.parseInt(portText.getText().toString());
 		}
 		catch (NumberFormatException nfe)
 		{
 			
 		}
-		bookmark.setNickname(bookmarkNameText.getText().toString());
-		bookmark.setUserName(usernameText.getText().toString());
-		bookmark.setPassword(passwordText.getText().toString());
-		bookmark.setKeepPassword(checkboxKeepPassword.isChecked());
-		bookmark.setUseLocalCursor(true); // always enable
-		bookmark.setColorModel(((COLORMODEL)colorSpinner.getSelectedItem()).nameString());
+		bookmark.nickname = bookmarkNameText.getText().toString();
+		bookmark.userName = usernameText.getText().toString();
+		bookmark.password = passwordText.getText().toString();
+		bookmark.keepPassword = checkboxKeepPassword.isChecked();
+		bookmark.useLocalCursor = true; // always enable
+		bookmark.colorModel = ((COLORMODEL)colorSpinner.getSelectedItem()).nameString();
 		if (repeaterText.getText().length() > 0)
 		{
-			bookmark.setRepeaterId(repeaterText.getText().toString());
-			bookmark.setUseRepeater(true);
+			bookmark.repeaterId = repeaterText.getText().toString();
+			bookmark.useRepeater = true;
 		}
 		else
-		{			
-			bookmark.setUseRepeater(false);
+		{
+			bookmark.useRepeater = false;
 		}
 	}
 	
 	
 	
 	private void saveBookmark(ConnectionBean conn) 	{
-		SQLiteDatabase db = database.getWritableDatabase();
-		db.beginTransaction();
 		try {
-			Log.d(TAG, "Saving bookmark for conn " + conn.get_Id());
-			conn.save(db);
-			db.setTransactionSuccessful();
+			Log.d(TAG, "Saving bookmark for conn " + conn.id);
+			database.getConnectionDao().save(conn);
 		}
 		catch(Exception e) {
 			Log.e(TAG, "Error saving bookmark: " + e.getMessage());
-		}
-		finally {
-			db.endTransaction();
 		}
 	}
 }
