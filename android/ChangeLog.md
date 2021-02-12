@@ -1,5 +1,10 @@
 # Version 1.9.x:
 
+1.9.9
+
+- Added support for handling Samsung SPen button thanks to Frischid.
+- Updated internal database handling to modern API thanks to Gaurav Ujjwal.
+
 1.9.8
 
 - Made connections to localhost simply use Raw encoding.
