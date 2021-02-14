@@ -83,4 +83,6 @@
         Якщо Ви хочете дізнатися, що нового, відвідайте <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">журнал змін</a> онлайн.
     ]]>
 </string>
+    <string name="connected_to">Під’єднано до %1$s</string>
+    <string name="host_and">%1$s і </string>
 </resources>

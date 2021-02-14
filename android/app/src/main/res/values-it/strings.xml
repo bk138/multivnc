@@ -81,4 +81,6 @@
        Se vuoi sapere quali modifiche sono state apportate con questa versione, puoi dare un\'occhiata online lanciare il <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">registro delle modifiche disponibili (in inglese)</a>.
     ]]>
 </string>
+    <string name="connected_to">Collegato a %1$s</string>
+    <string name="host_and">%1$s e </string>
 </resources>

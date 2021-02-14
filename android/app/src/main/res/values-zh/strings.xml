@@ -80,4 +80,6 @@
 <string name="pleaserate">如果您喜欢MultiVNC，为什么不点击爱心来表达喜爱呢？</string>
 <string name="changelog_dialog_title">新功能…</string>
 <string name="changelog_dialog_text"><![CDATA[         如果您想了解新功能，请在线访问<a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">          变更记录</a> 。     ]]></string>
+    <string name="connected_to">已连接到%1$s</string>
+    <string name="host_and">%1$s和</string>
 </resources>

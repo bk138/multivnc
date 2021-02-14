@@ -83,4 +83,6 @@
         verf&uuml;gbare <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">&Auml;nderungsprotokoll (in Englisch)</a> werfen.
     ]]>
 </string>
+    <string name="connected_to">Verbunden mit %1$s</string>
+    <string name="host_and">%1$s und </string>
 </resources>

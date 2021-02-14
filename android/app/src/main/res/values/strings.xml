@@ -85,4 +85,6 @@
         Change Log</a>.
     ]]>
 </string>
+    <string name="connected_to">Connected to %1$s</string>
+    <string name="host_and">%1$s and </string>
 </resources>

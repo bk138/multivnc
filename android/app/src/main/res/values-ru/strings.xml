@@ -81,4 +81,6 @@
     Список свежих изменений доступен <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">по ссылке</а> онлайн.
     ]]>
 </string>
+    <string name="connected_to">Подключено к %1$s</string>
+    <string name="host_and">%1$s и </string>
 </resources>

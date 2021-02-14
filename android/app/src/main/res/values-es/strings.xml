@@ -85,4 +85,6 @@
         en Línea</a>.
     ]]>
 </string>
+    <string name="connected_to">Conectado a %1$s</string>
+    <string name="host_and">%1$s y </string>
 </resources>
