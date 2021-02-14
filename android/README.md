@@ -16,7 +16,7 @@ the `android` directory.
 
 * `vnc://host:port`
 
-### I/O Architecture of the Java Version
+### I/O Architecture
 
 * MainMenuActivity
   * launches VncCanvasActivity
@@ -28,32 +28,24 @@ the `android` directory.
   * creates a new VNCConn, connects it with the VncCanvas and sets it up from a ConnectionBean
 
 * VNCConn
-  * encapsulates RfbProto
+  * encapsulates the native rfbClient, allows querying info from it as well as triggering actions
   * facilitates threaded input/output
-  * contains one of the framebuffer abstractions and writes to its pixel array and requests
-    framebuffer updates using its provided method
   
 * InputHandler
-  * gets and sets scaling from/on VncCanvas
-  * sets render modes on VncCanvas 
-  * sends touch events to VncCanvas
+  * gets scaling from VncCanvas
+  * sends pointer events (from touch, gestures, mouse, stylus) to VncCanvas
   
 * VncCanvas
-  * receives touch events from system, pipes them to InputHandler
+  * receives touch/motion events from system, pipes them to InputHandler
   * receives pointer events from InputHandler, pipes them to VNCConn
   * receives key events from VncCanvasActivity, pipes them to VNCConn
-  * draws a VNCConn's framebuffer
-    * if framebuffer a LargeBitmapData: creates texture from Java Bitmap
-    * if framebuffer a FullBufferBitmapData: creates texture from raw buffer data
+  * draws a VNCConn's rfbClients's framebuffer
+    * OpenGL setup and drawing is done in managed code
+    * framebuffer data is bound to texture by native code
   * contains some UI as well (Toast and Dialog)
   
 * Framebuffer Abstractions
-  * LargeBitmapData 
-    * is there because of Java memory allocation constraints
-    * contains a Bitmap that is smaller than the actual framebuffer
-  * FullBufferBitmapData 
-    * contains the whole framebuffer as an int[]
-  * both request framebuffer updates via RfbProto 
+  * none, framebuffer completely resides in native part
   
    
 
