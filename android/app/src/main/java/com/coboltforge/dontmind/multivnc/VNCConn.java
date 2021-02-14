@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -157,6 +158,8 @@ public class VNCConn {
 
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread started!");
 
+			Context appContext = canvas.getContext().getApplicationContext();
+
 			try {
 
 				/*
@@ -188,6 +191,9 @@ public class VNCConn {
 				}
 				colorModel = pendingColorModel;
 				unlockFramebuffer();
+
+				// register connection
+				VNCConnService.register(appContext, VNCConn.this);
 
 				canvas.handler.post(new Runnable() {
 					public void run() {
@@ -255,6 +261,9 @@ public class VNCConn {
 			lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
 			rfbShutdown();
 			unlockFramebuffer();
+
+			// deregister connection
+			VNCConnService.deregister(appContext, VNCConn.this);
 
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread done!");
 		}
