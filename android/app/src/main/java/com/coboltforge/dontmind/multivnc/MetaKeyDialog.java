@@ -28,7 +28,7 @@ import android.widget.TextView;
  * @author Michael A. MacDonald
  *
  */
-class MetaKeyDialog extends Dialog implements ConnectionSettable {
+class MetaKeyDialog extends Dialog {
 
 	private final static String TAG = "MetaKeyDialog";
 

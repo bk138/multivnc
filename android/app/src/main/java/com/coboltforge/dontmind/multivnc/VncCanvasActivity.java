@@ -371,8 +371,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		super.onPrepareDialog(id, dialog);
-		if (dialog instanceof ConnectionSettable)
-			((ConnectionSettable) dialog).setConnection(connection);
+		if (dialog instanceof MetaKeyDialog)
+			((MetaKeyDialog) dialog).setConnection(connection);
 	}
 
 
