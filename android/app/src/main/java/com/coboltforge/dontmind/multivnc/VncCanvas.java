@@ -30,7 +30,6 @@
 
 package com.coboltforge.dontmind.multivnc;
 
-import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -41,12 +40,8 @@ import javax.microedition.khronos.opengles.GL11Ext;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
 import android.os.Handler;
-import android.text.InputType;
-import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -58,9 +53,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.ImageView.ScaleType;
-
-import static android.content.Context.MODE_PRIVATE;
 
 
 public class VncCanvas extends GLSurfaceView {
@@ -89,7 +81,7 @@ public class VncCanvas extends GLSurfaceView {
 
 	public Handler handler = new Handler();
 
-	private VncCanvasActivity.MightyInputHandler inputHandler;
+	private MightyInputHandler inputHandler;
 
 	private VNCGLRenderer glRenderer;
 
@@ -307,7 +299,7 @@ public class VncCanvas extends GLSurfaceView {
 	/**
 	 * Create a view showing a VNC connection
 	 */
-	void initializeVncCanvas(VncCanvasActivity a, VncCanvasActivity.MightyInputHandler inputHandler, VNCConn conn) {
+	void initializeVncCanvas(VncCanvasActivity a, MightyInputHandler inputHandler, VNCConn conn) {
 		activity = a;
 		this.inputHandler = inputHandler;
 		vncConn = conn;
