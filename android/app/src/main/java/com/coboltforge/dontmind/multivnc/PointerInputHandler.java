@@ -11,9 +11,22 @@ import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
 
-public class MightyInputHandler extends GestureDetector.SimpleOnGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
+/**
+ * Handles pointer input from:
+ *   * touchscreen
+ *   * stylus
+ *   * physical mouse
+ * and uses this for:
+ *   * scaling
+ *   * two-finger fling
+ *   * pointer movement
+ *   * click
+ *   * drag
+ * detection and handover of events to VncCanvasActivity and VncCanvas.
+ */
+public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
 
-    private static final String TAG = "TouchPadInputHandler";
+    private static final String TAG = "PointerInputHandler";
 
     private final VncCanvasActivity vncCanvasActivity;
     protected GestureDetector gestures;
@@ -50,7 +63,7 @@ public class MightyInputHandler extends GestureDetector.SimpleOnGestureListener 
     private final int TWO_FINGER_FLING_UNITS = 1000;
     private final float TWO_FINGER_FLING_THRESHOLD = 1000;
 
-    MightyInputHandler(VncCanvasActivity vncCanvasActivity) {
+    PointerInputHandler(VncCanvasActivity vncCanvasActivity) {
         this.vncCanvasActivity = vncCanvasActivity;
         gestures= new GestureDetector(vncCanvasActivity, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
         gestures.setOnDoubleTapListener(this);

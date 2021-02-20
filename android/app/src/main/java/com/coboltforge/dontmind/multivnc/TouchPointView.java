@@ -39,7 +39,7 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 
 	private BitmapDrawable background;
 
-	private MightyInputHandler inputHandler;
+	private PointerInputHandler inputHandler;
 
 	public TouchPointView(final Context context, AttributeSet attrs)
 	{
@@ -147,7 +147,7 @@ public class TouchPointView extends SurfaceView implements SurfaceHolder.Callbac
 	}
 
 
-	public void setInputHandler(MightyInputHandler inputHandler) {
+	public void setInputHandler(PointerInputHandler inputHandler) {
 		this.inputHandler = inputHandler;
 	}
 

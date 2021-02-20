@@ -69,7 +69,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 	ZoomControls zoomer;
 	TextView zoomLevel;
-	MightyInputHandler inputHandler;
+	PointerInputHandler inputHandler;
 
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
@@ -139,7 +139,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
 
-		inputHandler = new MightyInputHandler(this);
+		inputHandler = new PointerInputHandler(this);
 		inputHandler.init();
 
 		/*
