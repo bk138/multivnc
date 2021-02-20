@@ -45,6 +45,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.InputDevice;
@@ -52,6 +53,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -69,9 +71,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
 
-	public class MightyInputHandler extends AbstractGestureInputHandler {
+	public class MightyInputHandler extends GestureDetector.SimpleOnGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
 
 		private static final String TAG = "TouchPadInputHandler";
+
+		protected GestureDetector gestures;
+		protected ScaleGestureDetector scaleGestures;
+		private VncCanvasActivity activity;
+
+		float xInitialFocus;
+		float yInitialFocus;
+		boolean inScaling;
 
 		/*
 		 * Samsung S Pen support
@@ -101,7 +111,12 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		private final float TWO_FINGER_FLING_THRESHOLD = 1000;
 
 		MightyInputHandler() {
-			super(VncCanvasActivity.this);
+			activity = VncCanvasActivity.this;
+			gestures= new GestureDetector(activity, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
+			gestures.setOnDoubleTapListener(this);
+			scaleGestures = new ScaleGestureDetector(activity, this);
+			scaleGestures.setQuickScaleEnabled(false);
+
 			Log.d(TAG, "MightyInputHandler " + this +  " created!");
 		}
 
@@ -121,6 +136,57 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			Log.d(TAG, "MightyInputHandler " + this +  " shutdown!");
 		}
 
+
+		protected boolean isTouchEvent(MotionEvent event) {
+			return event.getSource() == InputDevice.SOURCE_TOUCHSCREEN ||
+					event.getSource() == InputDevice.SOURCE_TOUCHPAD;
+		}
+
+
+		@Override
+		public boolean onScale(ScaleGestureDetector detector) {
+			boolean consumed = true;
+			float fx = detector.getFocusX();
+			float fy = detector.getFocusY();
+
+			if (Math.abs(1.0 - detector.getScaleFactor()) < 0.01)
+				consumed = false;
+
+			//`inScaling` is used to disable multi-finger scroll/fling gestures while scaling.
+			//But instead of setting it in `onScaleBegin()`, we do it here after some checks.
+			//This is a work around for some devices which triggers scaling very early which
+			//disables fling gestures.
+			if (!inScaling) {
+				double xfs = fx - xInitialFocus;
+				double yfs = fy - yInitialFocus;
+				double fs = Math.sqrt(xfs * xfs + yfs * yfs);
+				if (fs * 2 < Math.abs(detector.getCurrentSpan() - detector.getPreviousSpan())) {
+					inScaling = true;
+				}
+			}
+
+			if (consumed && inScaling) {
+				if (activity.vncCanvas != null && activity.vncCanvas.scaling != null)
+					activity.vncCanvas.scaling.adjust(detector.getScaleFactor(), fx, fy);
+			}
+
+			return consumed;
+		}
+
+		@Override
+		public boolean onScaleBegin(ScaleGestureDetector detector) {
+			xInitialFocus = detector.getFocusX();
+			yInitialFocus = detector.getFocusY();
+			inScaling = false;
+			//Log.i(TAG,"scale begin ("+xInitialFocus+","+yInitialFocus+")");
+			return true;
+		}
+
+		@Override
+		public void onScaleEnd(ScaleGestureDetector detector) {
+			//Log.i(TAG,"scale end");
+			inScaling = false;
+		}
 
 		/**
 		 * scale down delta when it is small. This will allow finer control
@@ -329,12 +395,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			return false;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see com.coboltforge.dontmind.multivnc.AbstractGestureInputHandler#onTouchEvent(android.view.MotionEvent)
-		 */
-		@Override
+
 		public boolean onTouchEvent(MotionEvent e) {
 			if (isTouchEvent(e) == false) { // physical input device
 
@@ -377,7 +438,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 					remoteMouseStayPut(e);
 					vncCanvas.processPointerEvent(e, false);
-					return super.onTouchEvent(e); // important! otherwise the gesture detector gets confused!
+					scaleGestures.onTouchEvent(e);
+					return gestures.onTouchEvent(e); // important! otherwise the gesture detector gets confused!
 				}
 				e.setLocation(newRemoteX, newRemoteY);
 
@@ -400,7 +462,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			if(Utils.DEBUG())
 				Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
 
-			return super.onTouchEvent(e);
+			scaleGestures.onTouchEvent(e);
+			return gestures.onTouchEvent(e);
 		}
 
 		/**
@@ -429,8 +492,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			return false;
 		}
 
-
-		@Override
 		public boolean onGenericMotionEvent(MotionEvent e) {
 			int action = MotionEvent.ACTION_MASK;
 			boolean button = false;

@@ -89,7 +89,7 @@ public class VncCanvas extends GLSurfaceView {
 
 	public Handler handler = new Handler();
 
-	private AbstractGestureInputHandler inputHandler;
+	private VncCanvasActivity.MightyInputHandler inputHandler;
 
 	private VNCGLRenderer glRenderer;
 
@@ -307,7 +307,7 @@ public class VncCanvas extends GLSurfaceView {
 	/**
 	 * Create a view showing a VNC connection
 	 */
-	void initializeVncCanvas(VncCanvasActivity a, AbstractGestureInputHandler inputHandler, VNCConn conn) {
+	void initializeVncCanvas(VncCanvasActivity a, VncCanvasActivity.MightyInputHandler inputHandler, VNCConn conn) {
 		activity = a;
 		this.inputHandler = inputHandler;
 		vncConn = conn;
