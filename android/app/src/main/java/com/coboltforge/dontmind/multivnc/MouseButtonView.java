@@ -3,14 +3,14 @@ package com.coboltforge.dontmind.multivnc;
 /*
  * Views for virtual mouse buttons.
  *
- * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
+ * Copyright © 2011-2021 Christian Beier <info@christianbeier.net>
  */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
@@ -21,35 +21,18 @@ public class MouseButtonView extends View {
 
 	private final static String TAG = "MouseButtonView";
 	private int buttonId;
-	Drawable dfltBackground;
+	Drawable defaultBackground;
 	private VncCanvas canvas;
-	protected GestureDetector gestureDetector;
 	private float dragX, dragY;
 	boolean drag_started = false; // workaround buggy touch screens
 	private int pointerOneId = -1;
 	private int pointerTwoId = -1;
 
 
-	class MouseButtonGestureListener extends GestureDetector.SimpleOnGestureListener{
-		@Override
-		public void onLongPress(MotionEvent ev) {
-
-			if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " longpress");
-
-			// maybe implement a button lock here later
-			/*
-			  performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
-			 */
-		}
-	}
-
-
 	public MouseButtonView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setSoundEffectsEnabled(true);
-		dfltBackground = getBackground();
-		gestureDetector = new GestureDetector(context, new MouseButtonGestureListener());
+		defaultBackground = getBackground();
 	}
 
 	// we need an init method since objects are instantiated by the layout inflater
@@ -61,6 +44,7 @@ public class MouseButtonView extends View {
 	}
 
 
+	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent e)
 	{
@@ -188,9 +172,6 @@ public class MouseButtonView extends View {
 				}
 		}
 
-		// check for gestures here
-		gestureDetector.onTouchEvent(e);
-
 		// we have to return true to get the ACTION_UP event
 		return true;
 	}
@@ -219,7 +200,7 @@ public class MouseButtonView extends View {
 		}
 		else // ACTION_UP
 		{
-			setBackgroundDrawable(dfltBackground);
+			setBackground(defaultBackground);
 		}
 
 		canvas.setOverridePointerMask(pointerMask);
