@@ -1,5 +1,12 @@
 # Version 1.9.x:
 
+1.9.10
+
+- Fixed connection being terminated when the app was in the background for a longer time.
+- Fixed usage over SSH tunnels by not making connections to localhost always use Raw encoding.
+- Fixed sending of key combos with modifier keys.
+- Fixed jerky cursor movement in high zoom levels.
+
 1.9.9
 
 - Added support for handling Samsung SPen button thanks to Frischid.
