@@ -1218,43 +1218,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		dialog.show();
 	}
 
-	float panTouchX, panTouchY;
-
-	/**
-	 * Pan based on touch motions
-	 *
-	 * @param event
-	 */
-	private boolean pan(MotionEvent event) {
-		float curX = event.getX();
-		float curY = event.getY();
-		int dX = (int) (panTouchX - curX);
-		int dY = (int) (panTouchY - curY);
-
-		return vncCanvas.pan(dX, dY);
-	}
-
-
-
-	boolean touchPan(MotionEvent event) {
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			panTouchX = event.getX();
-			panTouchY = event.getY();
-			break;
-		case MotionEvent.ACTION_MOVE:
-			pan(event);
-			panTouchX = event.getX();
-			panTouchY = event.getY();
-			break;
-		case MotionEvent.ACTION_UP:
-			pan(event);
-			break;
-		}
-		return true;
-	}
-
-
 	static final long ZOOM_HIDE_DELAY_MS = 2500;
 	Runnable hideZoomInstance = () -> zoomer.hide();
 
