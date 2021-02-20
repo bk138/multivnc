@@ -148,7 +148,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
      * Scale up delta when delta is big. This allows fast mouse movement when
      * user is flinging.
      */
-    private float fineCtrlScale(float delta) {
+    public static float fineCtrlScale(float delta) {
         float sign = (delta>0) ? 1 : -1;
         delta = Math.abs(delta);
         if (delta>=1 && delta <=3) {

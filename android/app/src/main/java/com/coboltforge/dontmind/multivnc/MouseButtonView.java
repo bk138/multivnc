@@ -111,8 +111,8 @@ public class MouseButtonView extends View {
 					float deltaY = (pointerTwoY - dragY);
 					dragX = pointerTwoX;
 					dragY = pointerTwoY;
-					deltaX = fineCtrlScale(deltaX);
-					deltaY = fineCtrlScale(deltaY);
+					deltaX = PointerInputHandler.fineCtrlScale(deltaX);
+					deltaY = PointerInputHandler.fineCtrlScale(deltaY);
 
 					// compute the absolute new mouse pos on the remote site.
 					float newRemoteX = canvas.mouseX + deltaX;
@@ -225,33 +225,6 @@ public class MouseButtonView extends View {
 		canvas.setOverridePointerMask(pointerMask);
 
 		canvas.vncConn.sendPointerEvent(canvas.mouseX, canvas.mouseY, e.getMetaState(), pointerMask);
-	}
-
-
-
-	/**
-	 * scale down delta when it is small. This will allow finer control
-	 * when user is making a small movement on touch screen.
-	 * Scale up delta when delta is big. This allows fast mouse movement when
-	 * user is flinging.
-	 * @param deltaX
-	 * @return
-	 */
-	private float fineCtrlScale(float delta) {
-		float sign = (delta>0) ? 1 : -1;
-		delta = Math.abs(delta);
-		if (delta>=1 && delta <=3) {
-			delta = 1;
-		}else if (delta <= 10) {
-			delta *= 0.34;
-		} else if (delta <= 30 ) {
-			delta *= delta/30;
-		} else if (delta <= 90) {
-			delta *=  (delta/30);
-		} else {
-			delta *= 3.0;
-		}
-		return sign * delta;
 	}
 
 }
