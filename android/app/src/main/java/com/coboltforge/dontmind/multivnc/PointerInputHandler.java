@@ -24,6 +24,7 @@ import android.view.View;
  *   * drag
  * detection and handover of events to VncCanvasActivity and VncCanvas.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
 
     private static final String TAG = "PointerInputHandler";
@@ -84,7 +85,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             twoFingerFlingVelocityTracker.recycle();
             twoFingerFlingVelocityTracker = null;
         }
-        catch (NullPointerException e) {
+        catch (NullPointerException ignored) {
         }
         Log.d(TAG, "MightyInputHandler " + this +  " shutdown!");
     }
@@ -146,8 +147,6 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
      * when user is making a small movement on touch screen.
      * Scale up delta when delta is big. This allows fast mouse movement when
      * user is flinging.
-     * @param delta
-     * @return
      */
     private float fineCtrlScale(float delta) {
         float sign = (delta>0) ? 1 : -1;
@@ -197,16 +196,10 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         }
     }
 
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.view.GestureDetector.SimpleOnGestureListener#onLongPress(android.view.MotionEvent)
-     */
     @Override
     public void onLongPress(MotionEvent e) {
 
-        if (isTouchEvent(e) == false)
+        if (!isTouchEvent(e))
             return;
 
         if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
@@ -224,20 +217,14 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             dragModeButtonDown = true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.view.GestureDetector.SimpleOnGestureListener#onScroll(android.view.MotionEvent,
-     *      android.view.MotionEvent, float, float)
-     */
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2,
             float distanceX, float distanceY) {
 
-        if (isTouchEvent(e1) == false)
+        if (!isTouchEvent(e1))
             return false;
 
-        if (isTouchEvent(e2) == false)
+        if (!isTouchEvent(e2))
             return false;
 
         if (e2.getPointerCount() > 1)
@@ -267,7 +254,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             }
 
             // gesture end
-            if(twoFingerFlingDetected == false) // not yet detected in this sequence (we only want ONE event per sequence!)
+            if(!twoFingerFlingDetected) // not yet detected in this sequence (we only want ONE event per sequence!)
             {
                 // update our velocity tracker
                 twoFingerFlingVelocityTracker.addMovement(e2);
@@ -350,7 +337,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
 
     public boolean onTouchEvent(MotionEvent e) {
-        if (isTouchEvent(e) == false) { // physical input device
+        if (!isTouchEvent(e)) { // physical input device
 
             e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
@@ -396,7 +383,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             }
             e.setLocation(newRemoteX, newRemoteY);
 
-            boolean status = false;
+            boolean status;
             if(dragModeButtonDown) {
                 if(!dragModeButton2insteadof1) // button 1 down
                     status = vncCanvasActivity.vncCanvas.processPointerEvent(e, true, false);
@@ -421,8 +408,6 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
     /**
      * Modify MotionEvent so that Samsung S Pen Actions are handled as normal Action; returns true when it's a Samsung S Pen Action
-     * @param e
-     * @return
      */
     private boolean spenActionConvert(MotionEvent e) {
         if((e.getToolType(0) == MotionEvent.TOOL_TYPE_STYLUS) &&
@@ -479,7 +464,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
             if (action != MotionEvent.ACTION_MASK) {
                 e.setAction(action);
-                if (button == false) {
+                if (!button) {
                     vncCanvasActivity.vncCanvas.processPointerEvent(e, false);
                 }
                 else {
@@ -510,21 +495,19 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     /**
      * Modify the event so that it does not move the mouse on the
      * remote server.
-     * @param e
      */
     private void remoteMouseStayPut(MotionEvent e) {
         e.setLocation(vncCanvasActivity.vncCanvas.mouseX, vncCanvasActivity.vncCanvas.mouseY);
 
     }
-    /*
-     * (non-Javadoc)
-     * confirmed single tap: do a left mouse down and up click on remote without moving the mouse.
-     * @see android.view.GestureDetector.SimpleOnGestureListener#onSingleTapConfirmed(android.view.MotionEvent)
+
+    /**
+     * Do a left mouse down and up click on remote without moving the mouse.
      */
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
 
-        if (isTouchEvent(e) == false)
+        if (!isTouchEvent(e))
             return false;
 
         // disable if virtual mouse buttons are in use
@@ -541,15 +524,13 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         return vncCanvasActivity.vncCanvas.processPointerEvent(e, false, multiTouch|| vncCanvasActivity.vncCanvas.cameraButtonDown);
     }
 
-    /*
-     * (non-Javadoc)
-     * double tap: do right mouse down and up click on remote without moving the mouse.
-     * @see android.view.GestureDetector.SimpleOnGestureListener#onDoubleTap(android.view.MotionEvent)
+    /**
+     * Do right mouse down and up click on remote without moving the mouse.
      */
     @Override
     public boolean onDoubleTap(MotionEvent e) {
 
-        if (isTouchEvent(e) == false)
+        if (!isTouchEvent(e))
             return false;
 
         // disable if virtual mouse buttons are in use
@@ -568,16 +549,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     }
 
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.view.GestureDetector.SimpleOnGestureListener#onDown(android.view.MotionEvent)
-     */
     @Override
     public boolean onDown(MotionEvent e) {
-        if (isTouchEvent(e) == false)
-            return false;
-
-        return true;
+        return isTouchEvent(e);
     }
 }
