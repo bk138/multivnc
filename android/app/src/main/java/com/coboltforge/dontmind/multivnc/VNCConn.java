@@ -332,8 +332,32 @@ public class VNCConn {
 			if (rfbClient != 0) {
 
 			   try {
+
+				   if((evt.metaState & VNCConn.SHIFT_MASK) != 0) {
+					   if(Utils.DEBUG()) Log.d(TAG, "sending key Shift" + (evt.down?" down":" up"));
+					   rfbSendKeyEvent(0xffe1, evt.down);
+				   }
+				   if((evt.metaState & VNCConn.CTRL_MASK) != 0) {
+					   if(Utils.DEBUG()) Log.d(TAG, "sending key Ctrl" + (evt.down?" down":" up"));
+					   rfbSendKeyEvent(0xffe3, evt.down);
+				   }
+				   if((evt.metaState & VNCConn.ALT_MASK) != 0) {
+					   if(Utils.DEBUG()) Log.d(TAG, "sending key Alt" + (evt.down?" down":" up"));
+					   rfbSendKeyEvent(0xffe9, evt.down);
+				   }
+				   if((evt.metaState & VNCConn.SUPER_MASK) != 0) {
+					   if(Utils.DEBUG()) Log.d(TAG, "sending key Super" + (evt.down?" down":" up"));
+					   rfbSendKeyEvent(0xffeb, evt.down);
+				   }
+				   if((evt.metaState & VNCConn.META_MASK) != 0) {
+					   if(Utils.DEBUG()) Log.d(TAG, "sending key Meta" + (evt.down?" down":" up"));
+					   rfbSendKeyEvent(0xffe7, evt.down);
+				   }
+
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
-				   return rfbSendKeyEvent(evt.keyCode, evt.down);
+				   rfbSendKeyEvent(evt.keyCode, evt.down);
+
+				   return true;
 				} catch (Exception e) {
 					return false;
 				}
