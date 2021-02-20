@@ -107,8 +107,8 @@ public class MouseButtonView extends View {
 					}
 
 					// compute the relative movement offset on the remote screen.
-					float deltaX = (pointerTwoX - dragX) * canvas.getScale();
-					float deltaY = (pointerTwoY - dragY) * canvas.getScale();
+					float deltaX = (pointerTwoX - dragX);
+					float deltaY = (pointerTwoY - dragY);
 					dragX = pointerTwoX;
 					dragY = pointerTwoY;
 					deltaX = fineCtrlScale(deltaX);

@@ -304,8 +304,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         else
         {
             // compute the relative movement offset on the remote screen.
-            float deltaX = -distanceX * vncCanvasActivity.vncCanvas.getScale();
-            float deltaY = -distanceY * vncCanvasActivity.vncCanvas.getScale();
+            float deltaX = -distanceX;
+            float deltaY = -distanceY;
             deltaX = fineCtrlScale(deltaX);
             deltaY = fineCtrlScale(deltaY);
 
@@ -355,8 +355,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             if(Utils.DEBUG()) Log.d(TAG, "Input: touch dragMode");
 
             // compute the relative movement offset on the remote screen.
-            float deltaX = (e.getX() - dragX) * vncCanvasActivity.vncCanvas.getScale();
-            float deltaY = (e.getY() - dragY) * vncCanvasActivity.vncCanvas.getScale();
+            float deltaX = (e.getX() - dragX);
+            float deltaY = (e.getY() - dragY);
             dragX = e.getX();
             dragY = e.getY();
             deltaX = fineCtrlScale(deltaX);
