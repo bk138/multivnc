@@ -63,7 +63,7 @@ import java.util.Hashtable;
 
 
 
-public class MainMenuActivity extends AppCompatActivity implements IMDNS, LifecycleObserver {
+public class MainMenuActivity extends AppCompatActivity implements MDNSService.OnEventListener, LifecycleObserver {
 
 	private static final String TAG = "MainMenuActivity";
 

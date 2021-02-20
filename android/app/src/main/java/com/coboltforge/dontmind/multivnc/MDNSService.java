@@ -37,9 +37,12 @@ public class MDNSService extends Service {
 
 	private MDNSWorkerThread workerThread = new MDNSWorkerThread();
 
-	private IMDNS callback;
+	private OnEventListener callback;
 
-
+	public interface OnEventListener {
+		public void onMDNSstartupCompleted(boolean wasSuccessful);
+		public void onMDNSnotify(final String conn_name, final ConnectionBean conn, final Hashtable<String,ConnectionBean> connectionTable);
+	}
 
 	/**
 	 * Class for clients to access. Because we know this service always runs in
@@ -125,7 +128,7 @@ public class MDNSService extends Service {
 	}
 
 	// NB: this is called from the worker thread!!
-	public void registerCallback(IMDNS c) {
+	public void registerCallback(OnEventListener c) {
 		callback = c;
 	}
 
