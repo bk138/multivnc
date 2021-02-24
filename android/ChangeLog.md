@@ -1,5 +1,9 @@
 # Version 1.9.x:
 
+1.9.11
+
+- Fixed Triple-T metadata.
+
 1.9.10
 
 - Fixed connection being terminated when the app was in the background for a longer time.
