@@ -1,10 +1,12 @@
 package com.coboltforge.dontmind.multivnc
 
-import android.content.ContentValues
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity(tableName = "CONNECTION_BEAN")
 data class ConnectionBean(
         @JvmField
@@ -92,7 +94,7 @@ data class ConnectionBean(
         @ColumnInfo(name = "DOUBLE_TAP_ACTION")
         var doubleTapAction: String? = null
 
-) : Comparable<ConnectionBean> {
+) : Comparable<ConnectionBean>, Parcelable {
 
     override fun toString(): String {
         return "$id $nickname: $address, port $port"
@@ -139,86 +141,11 @@ data class ConnectionBean(
         return false
     }
 
-
-    /**********************************************************************************************
-     * Serialization helpers
-     * These are used to parcel ConnectionBean through Intents.
-     *********************************************************************************************/
-
     companion object {
-        const val GEN_FIELD__ID = "_id"
+        //These are used by ConnectionListActivity
         const val GEN_FIELD_NICKNAME = "NICKNAME"
         const val GEN_FIELD_ADDRESS = "ADDRESS"
         const val GEN_FIELD_PORT = "PORT"
-        const val GEN_FIELD_PASSWORD = "PASSWORD"
-        const val GEN_FIELD_COLORMODEL = "COLORMODEL"
-        const val GEN_FIELD_FORCEFULL = "FORCEFULL"
         const val GEN_FIELD_REPEATERID = "REPEATERID"
-        const val GEN_FIELD_INPUTMODE = "INPUTMODE"
-        const val GEN_FIELD_SCALEMODE = "SCALEMODE"
-        const val GEN_FIELD_USELOCALCURSOR = "USELOCALCURSOR"
-        const val GEN_FIELD_KEEPPASSWORD = "KEEPPASSWORD"
-        const val GEN_FIELD_FOLLOWMOUSE = "FOLLOWMOUSE"
-        const val GEN_FIELD_USEREPEATER = "USEREPEATER"
-        const val GEN_FIELD_METALISTID = "METALISTID"
-        const val GEN_FIELD_LAST_META_KEY_ID = "LAST_META_KEY_ID"
-        const val GEN_FIELD_FOLLOWPAN = "FOLLOWPAN"
-        const val GEN_FIELD_USERNAME = "USERNAME"
-        const val GEN_FIELD_SECURECONNECTIONTYPE = "SECURECONNECTIONTYPE"
-        const val GEN_FIELD_SHOWZOOMBUTTONS = "SHOWZOOMBUTTONS"
-        const val GEN_FIELD_DOUBLE_TAP_ACTION = "DOUBLE_TAP_ACTION"
-    }
-
-    fun Gen_getValues(): ContentValues {
-        val values = ContentValues()
-        values.put(GEN_FIELD__ID, java.lang.Long.toString(id))
-        values.put(GEN_FIELD_NICKNAME, nickname)
-        values.put(GEN_FIELD_ADDRESS, address)
-        values.put(GEN_FIELD_PORT, Integer.toString(port))
-        values.put(GEN_FIELD_PASSWORD, password)
-        values.put(GEN_FIELD_COLORMODEL, colorModel)
-        values.put(GEN_FIELD_FORCEFULL, java.lang.Long.toString(forceFull))
-        values.put(GEN_FIELD_REPEATERID, repeaterId)
-        values.put(GEN_FIELD_INPUTMODE, inputMode)
-        values.put(GEN_FIELD_SCALEMODE, scalemode)
-        values.put(GEN_FIELD_USELOCALCURSOR, if (useLocalCursor) "1" else "0")
-        values.put(GEN_FIELD_KEEPPASSWORD, if (keepPassword) "1" else "0")
-        values.put(GEN_FIELD_FOLLOWMOUSE, if (followMouse) "1" else "0")
-        values.put(GEN_FIELD_USEREPEATER, if (useRepeater) "1" else "0")
-        values.put(GEN_FIELD_METALISTID, java.lang.Long.toString(metaListId))
-        values.put(GEN_FIELD_LAST_META_KEY_ID, java.lang.Long.toString(lastMetaKeyId))
-        values.put(GEN_FIELD_FOLLOWPAN, if (followPan) "1" else "0")
-        values.put(GEN_FIELD_USERNAME, userName)
-        values.put(GEN_FIELD_SECURECONNECTIONTYPE, secureConnectionType)
-        values.put(GEN_FIELD_SHOWZOOMBUTTONS, if (showZoomButtons) "1" else "0")
-        values.put(GEN_FIELD_DOUBLE_TAP_ACTION, doubleTapAction)
-        return values
-    }
-
-    /**
-     * Populate one instance from a ContentValues
-     */
-    fun Gen_populate(values: ContentValues) {
-        id = values.getAsLong(GEN_FIELD__ID)
-        nickname = values.getAsString(GEN_FIELD_NICKNAME)
-        address = values.getAsString(GEN_FIELD_ADDRESS)
-        port = values.getAsInteger(GEN_FIELD_PORT)
-        password = values.getAsString(GEN_FIELD_PASSWORD)
-        colorModel = values.getAsString(GEN_FIELD_COLORMODEL)
-        forceFull = values.getAsLong(GEN_FIELD_FORCEFULL)
-        repeaterId = values.getAsString(GEN_FIELD_REPEATERID)
-        inputMode = values.getAsString(GEN_FIELD_INPUTMODE)
-        scalemode = values.getAsString(GEN_FIELD_SCALEMODE)
-        useLocalCursor = values.getAsInteger(GEN_FIELD_USELOCALCURSOR) != 0
-        keepPassword = values.getAsInteger(GEN_FIELD_KEEPPASSWORD) != 0
-        followMouse = values.getAsInteger(GEN_FIELD_FOLLOWMOUSE) != 0
-        useRepeater = values.getAsInteger(GEN_FIELD_USEREPEATER) != 0
-        metaListId = values.getAsLong(GEN_FIELD_METALISTID)
-        lastMetaKeyId = values.getAsLong(GEN_FIELD_LAST_META_KEY_ID)
-        followPan = values.getAsInteger(GEN_FIELD_FOLLOWPAN) != 0
-        userName = values.getAsString(GEN_FIELD_USERNAME)
-        secureConnectionType = values.getAsString(GEN_FIELD_SECURECONNECTIONTYPE)
-        showZoomButtons = values.getAsInteger(GEN_FIELD_SHOWZOOMBUTTONS) != 0
-        doubleTapAction = values.getAsString(GEN_FIELD_DOUBLE_TAP_ACTION)
     }
 }

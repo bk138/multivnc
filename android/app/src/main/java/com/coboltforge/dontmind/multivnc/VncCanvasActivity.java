@@ -206,8 +206,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		    Bundle extras = i.getExtras();
 
 		    if (extras != null) {
-		  	    connection.Gen_populate((ContentValues) extras
-				  	.getParcelable(Constants.CONNECTION));
+		  	    connection = extras.getParcelable(Constants.CONNECTION);
 		    }
 			if (connection.port == 0)
 				connection.port = 5900;
