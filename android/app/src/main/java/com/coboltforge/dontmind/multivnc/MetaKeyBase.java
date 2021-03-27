@@ -7,7 +7,7 @@ package com.coboltforge.dontmind.multivnc;
  * @author Michael A. MacDonald
  *
  */
-class MetaKeyBase implements Comparable<MetaKeyBase> {
+public class MetaKeyBase implements Comparable<MetaKeyBase> {
 	int keySym;
 	int mouseButtons;
 	int keyEvent;
