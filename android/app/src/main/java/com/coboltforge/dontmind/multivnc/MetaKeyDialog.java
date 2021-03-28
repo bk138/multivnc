@@ -230,7 +230,7 @@ class MetaKeyDialog extends Dialog {
 		if (index < 0)
 		{
 			int insertionPoint = -(index + 1);
-			_database.getMetaKeyDao().insert(_currentKeyBean);
+			_currentKeyBean.id = _database.getMetaKeyDao().insert(_currentKeyBean);
 			_keysInList.add(insertionPoint,_currentKeyBean);
 			_connection.lastMetaKeyId = _currentKeyBean.id;
 		}
