@@ -23,11 +23,9 @@ import com.antlersoft.android.contentxml.SqliteElement;
 import com.antlersoft.android.contentxml.SqliteElement.ReplaceStrategy;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.Writer;
 
 import java.net.MalformedURLException;
@@ -49,6 +47,7 @@ public class ImportExportActivity extends Activity {
 	private Button mButtonExport;
 	private Button mButtonImport;
 	private DbOpener dbOpener;
+	private VncDatabase vncDatabase;
 
 	@SuppressLint("StaticFieldLeak") // this is not long-running
 	private class ImportFromURLAsyncTask extends AsyncTask<String, Void, Exception> {
@@ -58,11 +57,16 @@ public class ImportExportActivity extends Activity {
 			try {
 				URLConnection connection = new URL(urls[0]).openConnection();
 				connection.connect();
-				Reader reader = new InputStreamReader(connection.getInputStream());
-				SqliteElement.importXmlStreamToDb(
-						dbOpener.getWritableDatabase(),
-						reader,
-						ReplaceStrategy.REPLACE_EXISTING);
+				InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+
+				if (urls[0].endsWith(".xml")) {
+					SqliteElement.importXmlStreamToDb(
+							dbOpener.getWritableDatabase(),
+							reader,
+							ReplaceStrategy.REPLACE_EXISTING);
+				} else {
+					ImportExport.INSTANCE.importDatabase(vncDatabase, reader);
+				}
 				return null;
 			} catch (Exception e) {
 				return e;
@@ -97,6 +101,7 @@ public class ImportExportActivity extends Activity {
 		_textSaveUrl = findViewById(R.id.textExportPath);
 
 		dbOpener = new DbOpener(this);
+		vncDatabase = VncDatabase.getInstance(this);
 
 		File f;
 		if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -108,7 +113,7 @@ public class ImportExportActivity extends Activity {
 			f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 		}
 
-		f = new File(f, "MultiVNC-Export.xml");
+		f = new File(f, "MultiVNC-Export.json");
 
 		_textSaveUrl.setText(f.getAbsolutePath());
 		try {
@@ -127,9 +132,10 @@ public class ImportExportActivity extends Activity {
 					return;
 
 				try {
-					File f = new File(_textSaveUrl.getText().toString());
-					Writer writer = new OutputStreamWriter(new FileOutputStream(f, false));
-					SqliteElement.exportDbAsXmlToStream(dbOpener.getReadableDatabase(), writer);
+					Writer writer = new FileWriter(_textSaveUrl.getText().toString());
+
+					ImportExport.INSTANCE.exportDatabase(vncDatabase, writer);
+
 					writer.close();
 					finish();
 					Log.d(TAG, "export successful!");
@@ -137,8 +143,6 @@ public class ImportExportActivity extends Activity {
 				catch (IOException ioe)
 				{
 					errorNotify("I/O Exception exporting config", ioe);
-				} catch (SAXException e) {
-					errorNotify("XML Exception exporting config", e);
 				}
 			}
 
