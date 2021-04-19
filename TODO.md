@@ -31,7 +31,6 @@
    
 # Android version:
 
-* port to libvncclient
 - unified mode of operation (?)
 
   
