@@ -47,13 +47,15 @@ class VNCConnService : Service() {
         fun deregister(ctx: Context, conn: VNCConn) {
             // using GlobalScope here as this is a short fire-and-forget
             GlobalScope.launch(Dispatchers.Main) {
-                mConnectionList.remove(conn)
-                // tell service to update
-                val intent = Intent(ctx, VNCConnService::class.java)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    ctx.startForegroundService(intent)
-                else
-                    ctx.startService(intent)
+                if(mConnectionList.isNotEmpty()) { // calling startForegroundService() without Service.startForeground() crashes by OS intention
+                    mConnectionList.remove(conn)
+                    // tell service to update
+                    val intent = Intent(ctx, VNCConnService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        ctx.startForegroundService(intent)
+                    else
+                        ctx.startService(intent)
+                }
             }
         }
     }
