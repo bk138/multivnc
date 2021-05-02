@@ -1,6 +1,7 @@
 language: cpp
 dist: bionic
 sudo: required
+osx_image: xcode11
 
 os:
   - linux
@@ -16,7 +17,7 @@ before_install:
     mkdir -p ${TRAVIS_BUILD_DIR}/deps/cmake && travis_retry wget --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${TRAVIS_BUILD_DIR}/deps/cmake
     export PATH=${TRAVIS_BUILD_DIR}/deps/cmake/bin:${PATH}
     fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; brew install wxmac; brew reinstall libffi; brew upgrade cmake; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wxmac; brew reinstall libffi; fi
 
 
 # Build steps
