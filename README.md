@@ -51,6 +51,7 @@ These are automatically built from the current master branch and contain cutting
 
   * [MultiVNC for MacOS prerelease](https://multivnc-mac.surge.sh/MultiVNC-prerelease.dmg)
   * [MultiVNC (64bit) for Debian prerelease](https://multivnc-linux.surge.sh/multivnc-prerelease.deb)
+  * [MultiVNC for Ubuntu prerelease](https://code.launchpad.net/~alkisg/+recipe/multivnc-daily) thanks to Alkis Georgopoulos.
 
 ## Releases
 
