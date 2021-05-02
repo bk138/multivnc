@@ -49,8 +49,8 @@ For features that are planned, but not completed yet, look at the
 
 These are automatically built from the current master branch and contain cutting edge features and bug fixes.
 
-  * [MultiVNC for MacOS prerelease](https://multivnc-mac.surge.sh/MultiVNC-prerelease.dmg)
-  * [MultiVNC (64bit) for Debian prerelease](https://multivnc-linux.surge.sh/multivnc-prerelease.deb)
+  * [MultiVNC for MacOS prerelease](http://multivnc-mac.surge.sh/MultiVNC-prerelease.dmg)
+  * [MultiVNC (64bit) for Debian/Ubuntu prerelease, built on Ubuntu 18.04](http://multivnc-linux.surge.sh/multivnc-prerelease.deb)
 
 ## Releases
 
