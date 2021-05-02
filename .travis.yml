@@ -1,5 +1,5 @@
 language: cpp
-dist: focal
+dist: bionic
 sudo: required
 
 os:
