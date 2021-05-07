@@ -95,7 +95,7 @@ class VNCConnService : Service() {
             // assemble notification text
             var hosts = ""
             if (mConnectionList.size == 1) {
-                hosts = mConnectionList[0].connSettings.nickname
+                hosts = mConnectionList[0].connSettings.nickname ?: ""
             } else {
                 for (conn in mConnectionList) {
                     hosts += getString(R.string.host_and, conn.connSettings.nickname)

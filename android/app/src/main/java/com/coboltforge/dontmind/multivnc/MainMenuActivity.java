@@ -160,7 +160,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 					return;
 				Log.d(TAG, "Starting NEW connection " + conn.toString());
 				Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-				intent.putExtra(Constants.CONNECTION,conn.Gen_getValues());
+				intent.putExtra(Constants.CONNECTION,conn);
 				startActivity(intent);
 			}
 		});
@@ -410,7 +410,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 				public void onClick(View view) {
 					Log.d(TAG, "Starting bookmarked connection " + conn.toString());
 					Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-					intent.putExtra(Constants.CONNECTION , conn.Gen_getValues());
+					intent.putExtra(Constants.CONNECTION , conn);
 					startActivity(intent);
 				}
 			});
@@ -625,7 +625,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 							public void onClick(View view) {
 								Log.d(TAG, "Starting discovered connection " + c.toString());
 								Intent intent = new Intent(MainMenuActivity.this, VncCanvasActivity.class);
-								intent.putExtra(Constants.CONNECTION , c.Gen_getValues());
+								intent.putExtra(Constants.CONNECTION , c);
 								startActivity(intent);
 							}
 						});
