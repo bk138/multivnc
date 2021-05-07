@@ -276,6 +276,34 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
     return credential;
 }
 
+MallocFrameBufferProc defaultMallocFramebuffer;
+/**
+ * This basically is just a thin wrapper around the libraries built-in framebuffer resizing that
+ * conveys width/height changes up to the managed VNCConn.
+ * @param client
+ * @return
+ */
+static rfbBool onNewFBSize(rfbClient *client)
+{
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onNewFBSize failed due to client NULL");
+        return FALSE;
+    }
+
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onNewFBSize failed due to env NULL");
+        return FALSE;
+    }
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onNewFramebufferSize", "(II)V");
+    (*env)->CallVoidMethod(env, obj, mid, client->width, client->height);
+
+    return defaultMallocFramebuffer(client);
+}
 
 /**
  * Allocates and sets up the VNCConn's rfbClient.
@@ -326,6 +354,11 @@ static jboolean setupClient(JNIEnv *env, jobject obj, jint bytesPerPixel) {
     cl->GotXCutText = onGotCutText;
     cl->GetPassword = onGetPassword;
     cl->GetCredential = onGetCredential;
+    defaultMallocFramebuffer = cl->MallocFrameBuffer; // save default one
+    cl->MallocFrameBuffer = onNewFBSize; // set new one
+
+    // set flags
+    cl->canHandleNewFBSize = TRUE;
 
     setRfbClient(env, obj, cl);
 
