@@ -37,3 +37,5 @@ modules:
     sources:
       - type: dir
         path: ..
+    cleanup:
+      - /lib/debug
