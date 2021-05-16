@@ -12,10 +12,22 @@ modules:
     rm-configure: true
     config-opts:
       - --with-gtk=3
+      - --enable-debug=no
+      - --enable-aui=no
+      - --enable-html=no
+      - --enable-mediactrl=no
+      - --enable-propgrid=no
+      - --enable-ribbon=no
+      - --enable-richtext=no
+      - --enable-stc=no
+      - --enable-xrc=no
     cleanup:
       - /bin
+      - /include
+      - /lib/debug
       - /lib/wx
       - /share/bakefile
+      - /share/aclocal
     sources:
       - type: archive
         url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5/wxWidgets-3.0.5.tar.bz2
