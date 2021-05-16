@@ -38,9 +38,9 @@
 #define K_SHOWSEAMLESS _T("ShowSeamless")
 #define V_SHOWSEAMLESS EDGE_NONE
 #define K_SIZE_X _T("SizeX")
-#define V_SIZE_X 800
+#define V_SIZE_X 1024
 #define K_SIZE_Y _T("SizeY")
-#define V_SIZE_Y 600
+#define V_SIZE_Y 768
 
 // connection settings
 #define K_MULTICAST wxT("MulticastVNC")
