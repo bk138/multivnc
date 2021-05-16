@@ -110,7 +110,9 @@ bool MultiVNCApp::OnInit()
 #endif
 
 #if wxCHECK_VERSION(3, 1, 1)
-  wxStandardPaths::Get().SetFileLayout(wxStandardPaths::FileLayout_XDG);
+  // use XDG layout if running as flatpak or there is no old-style config file already
+  if(wxGetEnv("FLATPAK_ID", NULL) || !wxFile::Exists(wxFileName::GetHomeDir() + wxFileName::GetPathSeparator() + ".multivnc"))
+      wxStandardPaths::Get().SetFileLayout(wxStandardPaths::FileLayout_XDG);
 #endif
 
   // greetings to anyone who made it...
