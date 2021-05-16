@@ -28,7 +28,7 @@ if(UNIX AND NOT APPLE)
     install(FILES src/net.christianbeier.MultiVNC.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
     install(FILES README.md TODO.md AUTHORS ChangeLog NEWS DESTINATION ${CMAKE_INSTALL_DOCDIR})
     install(FILES src/gui/res/multivnc.xpm DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps)
-    install(FILES src/gui/res/multivnc.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
+    install(FILES src/gui/res/net.christianbeier.MultiVNC.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 endif(UNIX AND NOT APPLE)
 
 if(APPLE)
