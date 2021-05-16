@@ -784,13 +784,13 @@ void VNCConn::thread_textchat(rfbClient* cl, int value, char *text)
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID); 
   switch(value)
     {
-    case rfbTextChatOpen:
+    case (int)rfbTextChatOpen:
       wxLogDebug(wxT("VNCConn %p: got textchat open\n"), conn);
       break;
-    case rfbTextChatClose:
+    case (int)rfbTextChatClose:
       wxLogDebug(wxT("VNCConn %p: got textchat close\n"), conn);
       break;
-    case rfbTextChatFinished:
+    case (int)rfbTextChatFinished:
       wxLogDebug(wxT("VNCConn %p: got textchat finish\n"), conn);
       break;
     default:
