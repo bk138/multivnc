@@ -28,3 +28,7 @@ CMakeScripts
 Makefile
 *.cmake
 compile_commands.json
+
+# Flatpak artifacts
+.flatpak-builder
+flatpak/build-dir/
