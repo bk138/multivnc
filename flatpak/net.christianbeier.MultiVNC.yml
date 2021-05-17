@@ -1,17 +1,19 @@
 id: net.christianbeier.MultiVNC
-runtime: org.freedesktop.Platform
-runtime-version: '20.08'
-sdk: org.freedesktop.Sdk
+runtime: org.gnome.Platform # using GNOME since it contains libsecret already built
+runtime-version: '3.38'
+sdk: org.gnome.Sdk
 command: multivnc
 finish-args:
   - --share=ipc
   - --socket=x11
   - --share=network
+  - --talk-name=org.freedesktop.secrets
 modules:
   - name: wxwidgets
     rm-configure: true
     config-opts:
       - --with-gtk=3
+      - --enable-secretstore
       - --enable-debug=no
       - --enable-aui=no
       - --enable-html=no
