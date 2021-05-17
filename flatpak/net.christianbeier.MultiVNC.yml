@@ -8,6 +8,7 @@ finish-args:
   - --socket=x11
   - --share=network
   - --talk-name=org.freedesktop.secrets
+  - --filesystem=host # for saving screenshots and logs
 modules:
   - name: wxwidgets
     rm-configure: true
