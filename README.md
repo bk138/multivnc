@@ -77,26 +77,17 @@ After cloning the repo, do
    git submodule update
 ```
 
-To compile:
+To build:
 
 ```
    mkdir build
    cd build
    cmake ..
    cmake --build .
+   cpack
 ```
 
-And cross fingers...
-
-
-To install:
-* `make install` as root
-* or copy binary wherever you like to
-
-
-
-That's pretty much it, have fun!
-
+Depending on which OS you are on, you end up with a .deb, .dmg or .exe you can install.
 
 # MulticastVNC notes
 
