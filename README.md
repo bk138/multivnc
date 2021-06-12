@@ -40,7 +40,7 @@ The mobile Android version sports:
   and [F-Droid](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/).
 
 For features that are planned, but not completed yet, look at the
-[TODO](TODO.md) file.
+[open feature requests](https://github.com/bk138/multivnc/issues?q=is%3Aissue+is%3Aopen+label%3Afeature-request).
 
 
 # How to get prebuilt packages
