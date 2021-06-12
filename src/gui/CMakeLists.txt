@@ -54,6 +54,7 @@ else()
   FIND_PACKAGE(PkgConfig)
   PKG_CHECK_MODULES(GTK3 gtk+-3.0)
   include_directories(${GTK3_INCLUDE_DIRS})
+  target_link_directories(MultiVNCgui INTERFACE ${GTK3_LIBRARY_DIRS})
   target_link_libraries(MultiVNCgui ${GTK3_LIBRARIES})
 endif()
 
