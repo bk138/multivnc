@@ -52,8 +52,9 @@ if(wxWidgets_LIBRARIES MATCHES "gtk2")
 else()
   message(STATUS "Detected wxWidgets using GTK3, building internals with that")
   FIND_PACKAGE(PkgConfig)
-  PKG_CHECK_MODULES(GTK3 IMPORTED_TARGET gtk+-3.0)
-  target_link_libraries(MultiVNCgui PkgConfig::GTK3)
+  PKG_CHECK_MODULES(GTK3 gtk+-3.0)
+  include_directories(${GTK3_INCLUDE_DIRS})
+  target_link_libraries(MultiVNCgui ${GTK3_LIBRARIES})
 endif()
 
 
