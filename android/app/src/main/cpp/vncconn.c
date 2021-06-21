@@ -382,6 +382,72 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
     }
 }
 
+void parseHostEncodingString(rfbClient *client, const char *cHost, const char *cHostEncodingString)
+{
+    const char *encStr = cHostEncodingString;
+    int encStrLen;
+    do {
+        const char *nextEncStr = strchr(encStr, ' ');
+        if (nextEncStr) {
+            encStrLen = nextEncStr - encStr;
+            nextEncStr++;
+        } else {
+            encStrLen = strlen(encStr);
+        }
+
+      if (strncasecmp(encStr,"quality0",encStrLen) == 0) {
+        client->appData.qualityLevel = 0;
+      } else if (strncasecmp(encStr,"quality1",encStrLen) == 0) {
+        client->appData.qualityLevel = 1;
+      } else if (strncasecmp(encStr,"quality2",encStrLen) == 0) {
+        client->appData.qualityLevel = 2;
+      } else if (strncasecmp(encStr,"quality3",encStrLen) == 0) {
+        client->appData.qualityLevel = 3;
+      } else if (strncasecmp(encStr,"quality4",encStrLen) == 0) {
+        client->appData.qualityLevel = 4;
+      } else if (strncasecmp(encStr,"quality5",encStrLen) == 0) {
+        client->appData.qualityLevel = 5;
+      } else if (strncasecmp(encStr,"quality6",encStrLen) == 0) {
+        client->appData.qualityLevel = 6;
+      } else if (strncasecmp(encStr,"quality7",encStrLen) == 0) {
+        client->appData.qualityLevel = 7;
+      } else if (strncasecmp(encStr,"quality8",encStrLen) == 0) {
+        client->appData.qualityLevel = 8;
+      } else if (strncasecmp(encStr,"quality9",encStrLen) == 0) {
+        client->appData.qualityLevel = 9;
+      } else if (strncasecmp(encStr,"compress0",encStrLen) == 0) {
+        client->appData.compressLevel = 0;
+      } else if (strncasecmp(encStr,"compress1",encStrLen) == 0) {
+        client->appData.compressLevel = 1;
+      } else if (strncasecmp(encStr,"compress2",encStrLen) == 0) {
+        client->appData.compressLevel = 2;
+      } else if (strncasecmp(encStr,"compress3",encStrLen) == 0) {
+        client->appData.compressLevel = 3;
+      } else if (strncasecmp(encStr,"compress4",encStrLen) == 0) {
+        client->appData.compressLevel = 4;
+      } else if (strncasecmp(encStr,"compress5",encStrLen) == 0) {
+        client->appData.compressLevel = 5;
+      } else if (strncasecmp(encStr,"compress6",encStrLen) == 0) {
+        client->appData.compressLevel = 6;
+      } else if (strncasecmp(encStr,"compress7",encStrLen) == 0) {
+        client->appData.compressLevel = 7;
+      } else if (strncasecmp(encStr,"compress8",encStrLen) == 0) {
+        client->appData.compressLevel = 8;
+      } else if (strncasecmp(encStr,"compress9",encStrLen) == 0) {
+        client->appData.compressLevel = 9;
+      }
+
+        encStr = nextEncStr;
+    } while (encStr);
+
+    client->appData.encodingsString = strdup(cHostEncodingString + 1);
+
+    const int hostLen = cHostEncodingString - cHost;
+    client->serverHost = malloc(hostLen + 1);
+    strncpy(client->serverHost, cHost, hostLen);
+    client->serverHost[hostLen] = '\0';
+}
+
 JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port, jint repeaterId, jint bytesPerPixel) {
     log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit()");
 
@@ -399,7 +465,15 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
 
     const char *cHost = (*env)->GetStringUTFChars(env, host, NULL);
     if(cHost) {
-        cl->serverHost = strdup(cHost);
+        // encoding option
+        const char *cHostEncodingString = strrchr(cHost, '#');
+        if (NULL != cHostEncodingString) {
+            parseHostEncodingString(cl, cHost, cHostEncodingString);
+        }
+        else {
+            cl->serverHost = strdup(cHost);
+        }
+
         (*env)->ReleaseStringUTFChars(env, host, cHost);
     }
 
