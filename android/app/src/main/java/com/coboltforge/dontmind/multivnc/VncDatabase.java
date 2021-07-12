@@ -17,7 +17,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
  * Note: Version before migration to Room = 12
  */
 @Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class}, version = VncDatabase.VERSION, exportSchema = false)
-abstract class VncDatabase extends RoomDatabase {
+public abstract class VncDatabase extends RoomDatabase {
 
     public static final int VERSION = 13;
     public static final String NAME = "VncDatabase";

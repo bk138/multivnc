@@ -5,10 +5,12 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 import java.util.*
 
+@Serializable
 @Entity(tableName = "META_KEY")
-internal data class MetaKeyBean(
+data class MetaKeyBean(
         @JvmField
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "_id")
