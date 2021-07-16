@@ -29,7 +29,7 @@ The desktop version stands out with additional features such as:
 * Simple, loggable statistics 
 * Supports server framebuffer resize.
 
-The mobile Android version sports:
+The mobile Android version supports:
 
 * Virtual mouse button controls with haptic feedback.
 * Two-finger swipe gesture recognition.
