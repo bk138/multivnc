@@ -54,8 +54,3 @@ deploy:
   project: build/package
   on:
     condition: $TRAVIS_OS_NAME = linux
-    
-cache:
-  directories:
-  - $HOME/.gradle/caches/
-  - $HOME/.gradle/wrapper/
