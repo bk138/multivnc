@@ -1,4 +1,4 @@
-MultiVNC 0.6 -
+# MultiVNC 0.6 -
 	* The portable edition is now truly portable as it saves its
  	  preferences into a file under Windows now, not using the
 	  registry.
@@ -7,7 +7,7 @@ MultiVNC 0.6 -
 	* Optional OpenSSL support (instead of GnuTLS)
 	* MultiVNC can now listen on an IPv6 connection.
 
-MultiVNC 0.5 - "Bag o' stuff"
+# MultiVNC 0.5 - "Bag o' stuff" - 2011-05-07
 	* MulticastVNC now supports the Ultra encoding and features
 	  a freely sizeable receive buffer in addition to the 
 	  OS-dependent socket receive buffer.
@@ -25,7 +25,7 @@ MultiVNC 0.5 - "Bag o' stuff"
           unresponsive under high multicast loads.
 	* Fixed not being able to enter IPv6 addresses.
 
-MultiVNC 0.4.1 - "Fix me up"
+# MultiVNC 0.4.1 - "Fix me up" - 2010-11-09
         * Changed default MulticastVNC receive buffer size to 5120 KB
           to play it safe.
         * Shared windows are now view-only on Linux clients. Having 
@@ -37,7 +37,7 @@ MultiVNC 0.4.1 - "Fix me up"
         * Fixed crash on startup when toolbar was disabled.
         * Fixed Windows build. MultiVNC 0.4 was unusable.
 
-MultiVNC 0.4 - "One for the road"
+# MultiVNC 0.4 - "One for the road" - 2010-10-27
         * MultiVNC can now connect to IPv6 servers!
         * MulticastVNC now incorporates a NACK mechanism which makes
           multicasting a lot more reliable: Lost packets are 
@@ -47,7 +47,7 @@ MultiVNC 0.4 - "One for the road"
         * Fixed bug where changing edge connector settings would
           crash MultiVNC.
 
-MultiVNC 0.3 - "Collab me!"
+# MultiVNC 0.3 - "Collab me!" - 2010-07-05
 	* Implemented window sharing: You can now beam one of your 
           windows to the remote side. Works on UNIX and Windows.
         * Implemented Edge Connector: You can now tell MultiVNC that
@@ -69,7 +69,7 @@ MultiVNC 0.3 - "Collab me!"
           due to unnecessary DNS lookups.
 
 
-MultiVNC 0.2 - "The real thing"
+# MultiVNC 0.2 - "The real thing" - 2010-02-15
 	* MulticastVNC incorporated! You can now connect to a
  	  MulticastVNC enabled server, e.g. based on libvncserver.
 	* Listen mode (Reverse VNC) implemented. Via tabs it is
@@ -84,7 +84,7 @@ MultiVNC 0.2 - "The real thing"
           take 100% CPU.
 
 
-MultiVNC 0.1 - "In the beginning"
+# MultiVNC 0.1 - "In the beginning" - 2009-10-12
 	* a usable tight-enabled vncviewer with the following special
 	  features:
 	* supports server framebuffer resize
