@@ -1,5 +1,12 @@
 # AndroidMultiVNC
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/)
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
+
 ## Building the Android Version
 
 To prepare the source tree, do the following in the root of the repository:
