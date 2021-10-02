@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
 
         <!-- app branding color for the app bar -->
         <item name="colorPrimary">@color/ui_primary</item>
@@ -9,11 +9,12 @@
         <!-- theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">@color/ui_primary</item>
 
-        <item name="android:windowBackground">@color/ui_background</item>
-        <item name="android:textColorPrimary">@color/ui_text</item>
-
         <!-- make all buttons coloured -->
-        <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
+        <item name="android:buttonStyle">@style/App.Button</item>
+    </style>
+
+    <style name="App.Button" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
 </resources>

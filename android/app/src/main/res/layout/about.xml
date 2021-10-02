@@ -47,6 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dip"
                 android:text="@string/pleaserate"
+				android:textColor="?android:textColorSecondary"
                 android:drawableTop="@drawable/ic_heart"
                 android:background="@android:color/transparent"
                 />
