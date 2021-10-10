@@ -31,6 +31,10 @@ data class ConnectionBean(
         var password: String? = "",
 
         @JvmField
+        @ColumnInfo(name = "ENCODINGSSTRING")
+        var encodingsString: String? = "tight zrle ultra copyrect hextile zlib corre rre raw",
+
+        @JvmField
         @ColumnInfo(name = "COLORMODEL")
         var colorModel: String? = COLORMODEL.C24bit.nameString(),
 

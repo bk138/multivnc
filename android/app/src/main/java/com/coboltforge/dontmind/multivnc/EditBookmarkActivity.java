@@ -8,7 +8,9 @@ package com.coboltforge.dontmind.multivnc;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -20,11 +22,14 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
+import java.util.Arrays;
+import java.util.List;
 
 public class EditBookmarkActivity extends Activity {
 	
 	private static final String TAG = "EditBookmarkActivity";
+	private final String[] ENCODING_NAMES = {"Tight", "ZRLE", "Ultra", "Copyrect", "Hextile", "Zlib", "CoRRE", "RRE"};
+	private final String[] ENCODING_VALUES = {"tight", "zrle", "ultra", "copyrect", "hextile", "zlib", "corre", "rre"};
 	private VncDatabase database;
 	private ConnectionBean bookmark = new ConnectionBean();
 
@@ -37,7 +42,9 @@ public class EditBookmarkActivity extends Activity {
 	private CheckBox checkboxKeepPassword;
 	private TextView repeaterText;
 	private Spinner colorSpinner;
-
+	private Button encodingButton;
+	private boolean[] encodingChecks = new boolean[ENCODING_NAMES.length];
+	private boolean[] encodingChecksEdit = new boolean[ENCODING_NAMES.length];
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +62,45 @@ public class EditBookmarkActivity extends Activity {
 		COLORMODEL[] models = {COLORMODEL.C24bit, COLORMODEL.C16bit};
 		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
 		colorSpinner.setAdapter(colorSpinnerAdapter);
+
+		AlertDialog.Builder encodingBuilder = new AlertDialog.Builder(this);
+		encodingBuilder.setTitle(R.string.encoding_caption)
+				.setMultiChoiceItems(ENCODING_NAMES, encodingChecksEdit, new DialogInterface.OnMultiChoiceClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which, boolean isChecked)
+					{
+						encodingChecksEdit[which] = isChecked;
+					}
+				})
+				.setPositiveButton(R.string.encoding_ok, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						for (int i = 0; i < ENCODING_VALUES.length; ++i)
+						{
+							encodingChecks[i] = encodingChecksEdit[i];
+						}
+					}
+				})
+				.setNegativeButton(R.string.encoding_cancel, new DialogInterface.OnClickListener()
+				{
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						for (int i = 0; i < ENCODING_VALUES.length; ++i)
+						{
+							encodingChecksEdit[i] = encodingChecks[i];
+						}
+					}
+				});
+		encodingButton = (Button)findViewById(R.id.buttonEncoding);
+		encodingButton.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v) {
+				encodingBuilder.show();
+			}
+		});
 		
 		database = VncDatabase.getInstance(this);
 
@@ -143,8 +189,13 @@ public class EditBookmarkActivity extends Activity {
 
 		if(bookmark.useRepeater)
 			repeaterText.setText(bookmark.repeaterId);
+		List<String> encodingValues = Arrays.asList(bookmark.encodingsString.split(" "));
+		for (int i = 0; i < ENCODING_VALUES.length; ++i)
+		{
+			encodingChecksEdit[i] = encodingChecks[i] = encodingValues.contains(ENCODING_VALUES[i]);
+		}
 	}
-	
+
 	
 	private void updateBookmarkFromViews() {
 
@@ -172,6 +223,12 @@ public class EditBookmarkActivity extends Activity {
 		{
 			bookmark.useRepeater = false;
 		}
+		bookmark.encodingsString = "";
+		for (int i = 0; i < ENCODING_VALUES.length; ++i)
+		{
+			if (encodingChecks[i]) bookmark.encodingsString += ENCODING_VALUES[i] + " ";
+		}
+		bookmark.encodingsString += "raw";
 	}
 	
 	

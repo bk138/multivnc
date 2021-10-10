@@ -185,7 +185,7 @@ public class VNCConn {
 
 				int repeaterId = (connSettings.useRepeater && connSettings.repeaterId != null && connSettings.repeaterId.length() > 0) ? Integer.parseInt(connSettings.repeaterId) : -1;
 				lockFramebuffer();
-				if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp())) {
+				if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp(), connSettings.encodingsString)) {
 					unlockFramebuffer();
 					throw new Exception(); //TODO add some error reoprting here
 				}
@@ -378,7 +378,7 @@ public class VNCConn {
     }
 
 
-	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel);
+	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel, String encodingsString);
 	private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);

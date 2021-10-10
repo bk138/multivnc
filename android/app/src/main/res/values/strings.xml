@@ -87,4 +87,8 @@
 </string>
     <string name="connected_to">Connected to %1$s</string>
     <string name="host_and">%1$s and </string>
+
+    <string name="encoding_caption">Preferred Encoding</string>
+    <string name="encoding_ok">OK</string>
+    <string name="encoding_cancel">Cancel</string>
 </resources>
