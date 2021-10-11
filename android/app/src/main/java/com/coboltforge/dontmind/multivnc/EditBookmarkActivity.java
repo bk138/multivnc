@@ -28,8 +28,8 @@ import java.util.List;
 public class EditBookmarkActivity extends Activity {
 	
 	private static final String TAG = "EditBookmarkActivity";
-	private final String[] ENCODING_NAMES = {"Tight", "ZRLE", "Ultra", "Copyrect", "Hextile", "Zlib", "CoRRE", "RRE"};
-	private final String[] ENCODING_VALUES = {"tight", "zrle", "ultra", "copyrect", "hextile", "zlib", "corre", "rre"};
+	private final String[] ENCODING_NAMES = {"Tight", "ZRLE", "Ultra", "Copyrect", "Hextile", "Zlib", "CoRRE", "RRE", "TRLE", "ZYWRLE"};
+	private final String[] ENCODING_VALUES = {"tight", "zrle", "ultra", "copyrect", "hextile", "zlib", "corre", "rre", "trle", "zywrle"};
 	private VncDatabase database;
 	private ConnectionBean bookmark = new ConnectionBean();
 

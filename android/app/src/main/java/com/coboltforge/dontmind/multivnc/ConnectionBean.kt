@@ -32,7 +32,7 @@ data class ConnectionBean(
 
         @JvmField
         @ColumnInfo(name = "ENCODINGSSTRING")
-        var encodingsString: String? = "tight zrle ultra copyrect hextile zlib corre rre raw",
+        var encodingsString: String? = "tight zrle ultra copyrect hextile zlib corre rre trle zywrle raw",
 
         @JvmField
         @ColumnInfo(name = "COMPRESSMODEL")
