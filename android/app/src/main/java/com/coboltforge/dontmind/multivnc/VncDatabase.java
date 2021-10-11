@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 @Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class}, version = VncDatabase.VERSION, exportSchema = false)
 abstract class VncDatabase extends RoomDatabase {
 
-    public static final int VERSION = 13;
+    public static final int VERSION = 14;
     public static final String NAME = "VncDatabase";
 
     public abstract MetaListDao getMetaListDao();
@@ -36,6 +36,7 @@ abstract class VncDatabase extends RoomDatabase {
             instance = Room.databaseBuilder(context, VncDatabase.class, NAME)
                     .allowMainThreadQueries()
                     .addMigrations(MIGRATION_12_13)
+                    .addMigrations(MIGRATION_13_14)
                     .build();
 
             setupDefaultMetaList(instance);
@@ -123,6 +124,15 @@ abstract class VncDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE CONNECTION_BEAN_NEW RENAME TO CONNECTION_BEAN");
             database.execSQL("ALTER TABLE META_KEY_NEW RENAME TO META_KEY");
             database.execSQL("ALTER TABLE META_LIST_NEW RENAME TO META_LIST");
+        }
+    };
+
+    private static final Migration MIGRATION_13_14 = new Migration(13, 14) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD ENCODINGSSTRING TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD COMPRESSMODEL TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD QUALITYMODEL TEXT");
         }
     };
 }

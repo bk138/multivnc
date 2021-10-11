@@ -31,4 +31,14 @@ public enum COLORMODEL {
 			return "";
 		}
 	}
+
+	public static COLORMODEL getTypeByValue(String str) {
+		for (COLORMODEL v : values()) {
+			if (v.nameString().equals(str)) {
+				return v;
+			}
+		}
+
+		return C24bit;
+	}
 }

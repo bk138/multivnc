@@ -91,4 +91,8 @@
     <string name="encoding_caption">Preferred Encoding</string>
     <string name="encoding_ok">OK</string>
     <string name="encoding_cancel">Cancel</string>
+
+    <string name="compress_caption">Compress Level</string>
+
+    <string name="quality_caption">Quality Level</string>
 </resources>

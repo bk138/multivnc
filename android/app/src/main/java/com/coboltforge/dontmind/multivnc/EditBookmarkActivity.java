@@ -45,6 +45,8 @@ public class EditBookmarkActivity extends Activity {
 	private Button encodingButton;
 	private boolean[] encodingChecks = new boolean[ENCODING_NAMES.length];
 	private boolean[] encodingChecksEdit = new boolean[ENCODING_NAMES.length];
+	private Spinner compressSpinner;
+	private Spinner qualitySpinner;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -101,6 +103,14 @@ public class EditBookmarkActivity extends Activity {
 				encodingBuilder.show();
 			}
 		});
+
+		compressSpinner = (Spinner)findViewById(R.id.spinnerCompress);
+		ArrayAdapter<COMPRESSMODEL> compressSpinnerAdapter = new ArrayAdapter<COMPRESSMODEL>(this, android.R.layout.simple_spinner_item, COMPRESSMODEL.values());
+		compressSpinner.setAdapter(compressSpinnerAdapter);
+
+		qualitySpinner = (Spinner)findViewById(R.id.spinnerQuality);
+		ArrayAdapter<QUALITYMODEL> qualitySpinnerAdapter = new ArrayAdapter<QUALITYMODEL>(this, android.R.layout.simple_spinner_item, QUALITYMODEL.values());
+		qualitySpinner.setAdapter(qualitySpinnerAdapter);
 		
 		database = VncDatabase.getInstance(this);
 
@@ -160,7 +170,15 @@ public class EditBookmarkActivity extends Activity {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
-	
+
+	private <T extends Enum<T>> void setSpinnerByEnum(Spinner spinner, T[] values, T value) {
+		for (int i=0; i<values.length; ++i)
+			if (values[i] == value) {
+				spinner.setSelection(i);
+				break;
+			}
+	}
+
 	private void updateViewsFromBookmark() {
 
 		bookmarkNameText.setText(bookmark.nickname);
@@ -172,20 +190,9 @@ public class EditBookmarkActivity extends Activity {
 		checkboxKeepPassword.setChecked(bookmark.keepPassword);
 		usernameText.setText(bookmark.userName);
 
-		COLORMODEL cm;
-		try {
-			cm = COLORMODEL.valueOf(bookmark.colorModel);
-		} catch (IllegalArgumentException e) {
-			// there was a value bookmarked that we don't have anymore in the 1.9+ releases
-			cm = COLORMODEL.C16bit;
-		}
-		COLORMODEL[] colors = {COLORMODEL.C24bit, COLORMODEL.C16bit};
-
-		for (int i=0; i<colors.length; ++i)
-			if (colors[i] == cm) {
-				colorSpinner.setSelection(i);
-				break;
-			}
+		setSpinnerByEnum(colorSpinner, COLORMODEL.values(), COLORMODEL.valueOf(bookmark.colorModel));
+		setSpinnerByEnum(compressSpinner, COMPRESSMODEL.values(), COMPRESSMODEL.valueOf(bookmark.compressModel));
+		setSpinnerByEnum(qualitySpinner, QUALITYMODEL.values(), QUALITYMODEL.valueOf(bookmark.qualityModel));
 
 		if(bookmark.useRepeater)
 			repeaterText.setText(bookmark.repeaterId);
@@ -214,6 +221,8 @@ public class EditBookmarkActivity extends Activity {
 		bookmark.keepPassword = checkboxKeepPassword.isChecked();
 		bookmark.useLocalCursor = true; // always enable
 		bookmark.colorModel = ((COLORMODEL)colorSpinner.getSelectedItem()).nameString();
+		bookmark.compressModel = ((COMPRESSMODEL)compressSpinner.getSelectedItem()).nameString();
+		bookmark.qualityModel = ((QUALITYMODEL)qualitySpinner.getSelectedItem()).nameString();
 		if (repeaterText.getText().length() > 0)
 		{
 			bookmark.repeaterId = repeaterText.getText().toString();

@@ -382,7 +382,7 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
     }
 }
 
-JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port, jint repeaterId, jint bytesPerPixel, jstring encodingsString) {
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port, jint repeaterId, jint bytesPerPixel, jstring encodingsString, jboolean enableCompress, jboolean enableJPEG, jint compressLevel, jint qualityLevel) {
     log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit()");
 
     if(!getRfbClient(env, obj))
@@ -418,6 +418,11 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
         cl->appData.encodingsString = strdup(cEncodingsString);
         (*env)->ReleaseStringUTFChars(env, encodingsString, cEncodingsString);
     }
+
+    cl->appData.compressLevel = compressLevel;
+
+    cl->appData.enableJPEG = enableJPEG;
+    cl->appData.qualityLevel = qualityLevel;
 
     log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() about to connect to '%s', port %d, repeaterId %d\n", cl->serverHost, cl->serverPort, cl->destPort);
 

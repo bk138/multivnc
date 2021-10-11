@@ -35,6 +35,14 @@ data class ConnectionBean(
         var encodingsString: String? = "tight zrle ultra copyrect hextile zlib corre rre raw",
 
         @JvmField
+        @ColumnInfo(name = "COMPRESSMODEL")
+        var compressModel: String? = COMPRESSMODEL.L0.nameString(),
+
+        @JvmField
+        @ColumnInfo(name = "QUALITYMODEL")
+        var qualityModel: String? = QUALITYMODEL.L5.nameString(),
+
+        @JvmField
         @ColumnInfo(name = "COLORMODEL")
         var colorModel: String? = COLORMODEL.C24bit.nameString(),
 
