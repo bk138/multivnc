@@ -14,23 +14,23 @@
 
 # Version 1.9.x:
 
-1.9.11
+## 1.9.11
 
 - Fixed Triple-T metadata.
 
-1.9.10
+## 1.9.10
 
 - Fixed connection being terminated when the app was in the background for a longer time.
 - Fixed usage over SSH tunnels by not making connections to localhost always use Raw encoding.
 - Fixed sending of key combos with modifier keys.
 - Fixed jerky cursor movement in high zoom levels.
 
-1.9.9
+## 1.9.9
 
 - Added support for handling Samsung SPen button thanks to Frischid.
 - Updated internal database handling to modern API thanks to Gaurav Ujjwal.
 
-1.9.8
+## 1.9.8
 
 - Made connections to localhost simply use Raw encoding.
 - Added screen content resizing on software keyboard opening so keyboard does not obscure screen
@@ -44,12 +44,12 @@
 - Fixed connection failure when entered server address contained whitespace.
 - Fixed crash when importing legacy bookmarks.
 
-1.9.7
+## 1.9.7
 
 - Updated Chinese translation.
 - Added Spanish and Japanese translations.
 
-1.9.6
+## 1.9.6
 
 - Added Ukrainian translation thanks to Sergiy Stupar.
 - Removed legacy Java RFB engine, all things VNC are now native. 🎉
@@ -57,7 +57,7 @@
 - Added functionality to auto-open soft keyboard for credentials dialog.
 - Changed Import/Export to use native format, keeping the possibility for legacy XML import.
 
-1.9.5
+## 1.9.5
 
 - Made native connections the default, removed chooser dialog.
 - Added links to GitHub issues and ChangeLog in About.
@@ -65,27 +65,27 @@
 - Improved russian translation thanks to Alexandr Kondratev.
 - Added Chinese (machine) translation.
 
-1.9.4
+## 1.9.4
 
 - Reworked UltraVNC-repeater connection functionality to be more user-friendly.
 - Fixed right mouse/touchpad button handling for more devices.
 
-1.9.3
+## 1.9.3
 
 - Fixed an ANR that occurred when a native connection setup timed out.
 - Added colour mode selection for native connections.
 - Added functionality to keep screen on when remote screen is shown.
 
-1.9.2
+## 1.9.2
 
 - Fixed native connections not working with IPv6.
 
-1.9.1
+## 1.9.1
 
 - Added functionality to not ask for frambuffer updates in native-connection touchpad mode.
 - Worked around crash in Zeroconf scanner on Android 9.
 
-1.9.0
+## 1.9.0
 
 - The first MultiVNC for Android to sport a native backend implementation that supports TightVNC
   and TurboVNC, Apple Remote Desktop and Vino's AnonTLS authentication. In the 1.9.x builds this
@@ -96,68 +96,68 @@
 
 # Version 1.8.x:
 
-1.8.12
+## 1.8.12
 
 - Added dialog notifying about beta test program.
 - Worked around crash in Zeroconf scanner on Android 9.
 
-1.8.11
+## 1.8.11
 
 - The whole screen scaling user experience is now way smoother thanks to Gaurav Ujjwal.
 - The online help text was updated.
 - MultiVNC now requires Android 5 in order to make better use of vector drawables.
 
-1.8.10
+## 1.8.10
 
 - Added support for external mouse's scroll wheels.
 - MultiVNC now completely uses vector images.
 
-1.8.9
+## 1.8.9
 
 - VNC activity is now rotatable thanks to work done by Gaurav Ujjwal.
 - Added ability to make key combos with 'Super' key.
 - Turned more icons into vector icons.
 - Fixed some possible crashes.
 
-1.8.8
+## 1.8.8
 
 - Now hides navigation bar per default, resulting in more usable screen space.
 - Fixed hamburger menu not opening on some Samsung devices.
 
-1.8.7
+## 1.8.7
 
 - Fixed possible crash in import/export activity.
 
-1.8.6
+## 1.8.6
 
 - Added ability to connect to MacOS servers.
 - Fixed bookmarks sometimes not having a name.
 
-1.8.5
+## 1.8.5
 
 - Handle right-mouse-button-clicks from USB-OTG mice the right way.
 
-1.8.4
+## 1.8.4
 
 - Fix erronous auto-bookmarking of connections started via vnc:// scheme.
 - Fix some keyboards not accepting input.
 - Fix resending of sent special key combo.
 
-1.8.3
+## 1.8.3
 
 - Main menu layout improved on small tablet devices.
 - Fixed two possible crashes.
 
-1.8.2
+## 1.8.2
 
 - Some UI fixes for Android Kitkat.
 
-1.8.1
+## 1.8.1
 
 - More adaptations for tablets.
 - Fixed two possible crashes.
 
-1.8.0
+## 1.8.0
 
 - Updated UI to use Material Design.
 - Made remote desktop view use more screen real estate.
@@ -166,51 +166,51 @@
 
 # Version 1.7.x:
 
-1.7.10
+## 1.7.10
 
 - Fixed a possible race condition and subsequent crash on app start.
 
-1.7.9
+## 1.7.9
 
 - Fixed a possible crash.
 - Added Russian translation.
 
-1.7.8
+## 1.7.8
 
 - Added Italian translation.
 
-1.7.7
+## 1.7.7
 
 - Fixed possible crash on ChromeBox.
 
-1.7.6
+## 1.7.6
 
 - Inform user when there are no bookmarks to create shortcuts with.
 - Fixed possible crash when importing settings.
 
-1.7.5
+## 1.7.5
 
 - Fixed possible crash when closing the app.
 
-1.7.4
+## 1.7.4
 
 - Fixed possible crash in cursor handling.
 
-1.7.3
+## 1.7.3
 
 - Some updates to the server discovery module.
 - Fixed minor issues in german translation.
 
-1.7.2
+## 1.7.2
 
 - Fixed another possible crash.
 - Added german translation.
 
-1.7.1
+## 1.7.1
 
 - Fix crash on connection initialisation.
 
-1.7.0
+## 1.7.0
 
 - Updated the UI theming to use the default look on the respective Android version.
 - Made the import/export UI more usable.
@@ -219,26 +219,26 @@
 
 # Version 1.6.x:
 
-1.6.4
+## 1.6.4
 
 - Fix immediate crash upon connecting on some devices.
 
-1.6.3
+## 1.6.3
 
 - Fix hidden menu items on some devices.
 - Fix Zeroconf/Bonjour/mDNS VNC server discovery on Android 4.2 devices.
 
-1.6.2
+## 1.6.2
 
 - Hide Actionbar when there is a hardware menu button.
 - Removed broken hungarian translation.
 
-1.6.1
+## 1.6.1
 
 - Fixed ANR that could sometimes occur when connection broke.
 - Fixed crash in discovered servers list.
 
-1.6.0
+## 1.6.0
 
 - Added support for hardware keyboards and mice. Kudos to Kevin Pansky.
 - Added copy&paste function to and from Android clipboard.
@@ -247,15 +247,15 @@
 
 # Version 1.5.x:
 
-1.5.2
+## 1.5.2
 
 - Hopefully fix crash on dialog dismissal.
 
-1.5.1
+## 1.5.1
 
 - Prevent ActionBar from stealing keyboard focus.
 
-1.5.0
+## 1.5.0
 
 - Full IPv6 support on Honeycomb and newer!
 - Added help screen.
@@ -269,47 +269,47 @@
 
 # Version 1.4.x:
 
-1.4.10
+## 1.4.10
 
 - Added button to be able to rate the app.
 
-1.4.9
+## 1.4.9
 
 - Fix crash introduced by the 1.4.8 fix.
 
-1.4.8
+## 1.4.8
 
 - Fix an ANR error when pausing the app.
 
-1.4.7
+## 1.4.7
 
 - Fix hang after password entry. Should also work with bookmarks now.
 
-1.4.6
+## 1.4.6
 
 - Add menu item to toggle pointer highlighting.
 
-1.4.5
+## 1.4.5
 
 - Fix the 1.4.4 fix.
 
-1.4.4
+## 1.4.4
 
 - Fix crash on startup on Honeycomb or newer devices.
 
-1.4.3
+## 1.4.3
 
 - Hopefully fixed keyboard disappearing bug.
 
-1.4.2
+## 1.4.2
 
 - Fixed crash on mouse button press.
 
-1.4.1
+## 1.4.1
 
 - Fixed app not starting on Honeycomb devices.
 
-1.4.0
+## 1.4.0
 
 - ICS and Tablet Support!
 - Added password prompt. Shown when no password was given but one is required.
