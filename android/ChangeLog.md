@@ -1,3 +1,17 @@
+# Version 2.0.x:
+
+## 2.0.0
+
+### ⚡ Features
+
+- Added handling of remote framebuffer resizes.
+
+### 🛠  Fixes
+
+- Fixed crash on entering wrong password
+- Fixed last key-combo not being remembered (#132)
+- Fixed import/export on Android 11.
+
 # Version 1.9.x:
 
 1.9.11
