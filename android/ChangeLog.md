@@ -2,6 +2,28 @@
 
 ## 2.0.0
 
+Version 2.0.0 is the culmination of the 1.9.x series and marks the completion of
+exchanging the previous Java-based RFB engine with a fully native one based on
+[LibVNCClient](https://github.com/LibVNC/libvncserver). Here's why:
+
+It's more feature-rich: the native backend now supports Apple Remote Desktop
+servers (i.e. all Macs), UltraVNC's MSLogon security type (Microsoft Windows)
+and Vino's AnonTLS authentication (GNOME's remote desktop server).
+
+It's faster: with LibVNCClient, MultiVNC can now finally make use of Tight VNC
+encoding, a lossy JPEG encoding which drastically reduces needed throughput capacity.
+Also, the now-native JPEG decoding can make use of [libjpeg-turbo](https://www.libjpeg-turbo.org/),
+a JPEG image codec that uses SIMD instructions to accelerate JPEG decompression.
+
+Big thanks go out to [Gaurav Ujjwal](https://github.com/gujjwal00) who contributed
+a lot of very good UI improvements as well as under-the-hood changes. You might want
+to check out his excellent [AVNC VNC client for Android](https://github.com/gujjwal00/avnc). 
+Thanks also to Alexandr Kondratev, Sergiy Stupar, Suso Comesaña, ferrumcccp,
+nagasawa and Frischid for contributing code and translations.
+
+Besides these big changes compared to versions 1.8.x, 2.0.0 brings the following
+changes on top of 1.9.11:
+
 ### ⚡ Features
 
 - Added handling of remote framebuffer resizes.
