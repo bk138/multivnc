@@ -1,3 +1,6 @@
+
+# MultiVNC
+
 [![Build Status](https://app.travis-ci.com/bk138/multivnc.svg?branch=master)](https://app.travis-ci.com/bk138/multivnc)
 [![Help making this possible](https://img.shields.io/badge/liberapay-donate-yellow.png)](https://liberapay.com/bk138/donate)
 [![Become a patron](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bk138)
@@ -10,9 +13,9 @@ uses [wxWidgets](https://www.wxwidgets.org/) and runs on Unix, Mac OS X and
 Windows. There also is an [Android version](/android/).
 
 
-# MultiVNC for Android
+## MultiVNC for Android
 
-## Features
+### Features
 
 * Support for most VNC encodings including Tight.
 * TLS support, i.e. AnonTLS and VeNCrypt.
@@ -26,7 +29,7 @@ Windows. There also is an [Android version](/android/).
 * Hardware-accelerated OpenGL drawing and zooming.
 * Copy&paste to and from Android.
 
-## How to get it
+### How to get it
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
      alt="Get it on F-Droid"
@@ -35,13 +38,13 @@ Windows. There also is an [Android version](/android/).
      alt="Get it on Google Play"
      height="80">](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
 
-## How to build
+### How to build
 
 See the [Android version's README](android/README.md).
 
-# MultiVNC for Desktop
+## MultiVNC for Desktop
 
-## Features
+### Features
 
 * Support for most encodings including Tight.
 * Discovery of VNC servers advertising themselves via ZeroConf. 
@@ -59,23 +62,23 @@ See the [Android version's README](android/README.md).
 * Simple, loggable statistics 
 * Supports server framebuffer resize.
 
-## How to get it
+### How to get it
 
-### Prereleases
+#### Prereleases
 
 These are automatically built from the current master branch and contain cutting edge features and bug fixes.
 
   * [MultiVNC for MacOS prerelease](http://multivnc-mac.surge.sh/MultiVNC-prerelease.dmg)
   * [MultiVNC (64bit) for Debian/Ubuntu prerelease, built on Ubuntu 18.04](http://multivnc-linux.surge.sh/multivnc-prerelease.deb)
 
-### Releases
+#### Releases
 
   * [MultiVNC 0.5 (64bit) for Debian](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-1_amd64.deb/download)
   * [MultiVNC 0.5 (64bit) for Fedora/Redhat](https://sourceforge.net/projects/multivnc/files/0.5/multivnc-0.5-2.x86_64.rpm/download)
   * [MultiVNC 0.5 (32bit) for Microsoft Windows](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-win32-setup.exe/download)
 
 
-## How to build
+### How to build
 
 The prerequisites:
 
@@ -103,7 +106,7 @@ To build:
 
 Depending on which OS you are on, you end up with a .deb, .dmg or .exe you can install.
 
-# MulticastVNC notes
+## MulticastVNC notes
 
 You can get a modified libvncserver/libvncclient at
 https://github.com/LibVNC/libvncserver/tree/multicastvnc -
