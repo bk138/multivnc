@@ -35,12 +35,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -272,15 +274,11 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 				editor.putInt("lastVersionCode", versionCode);
 				editor.commit();
 
-				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-				dialog.setTitle(getString(R.string.changelog_dialog_title));
-				dialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
-
-				WebView wv = new WebView(getApplicationContext());
-				wv.loadData(getString(R.string.changelog_dialog_text), "text/html", "utf-8");
-				dialog.setView(wv);
-
-				dialog.setPositiveButton(getString(android.R.string.ok), new OnClickListener() {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(getString(R.string.changelog_dialog_title));
+				builder.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
+				builder.setMessage(Html.fromHtml(getString(R.string.changelog_dialog_text)));
+				builder.setPositiveButton(getString(android.R.string.ok), new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						try{
@@ -291,8 +289,10 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 					}
 				});
 
+				AlertDialog dialog = builder.create();
 				dialog.show();
-
+				TextView msgTxt = (TextView) dialog.findViewById(android.R.id.message);
+				msgTxt.setMovementMethod(LinkMovementMethod.getInstance());
 			}
 		} catch (NameNotFoundException e) {
 			Log.w(TAG, "Unable to get version code. Will not show changelog", e);
