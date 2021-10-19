@@ -78,7 +78,7 @@
 <string name="changelog_dialog_title">"Что нового…"</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-    Список свежих изменений доступен <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">по ссылке</а> онлайн.
+    Список свежих изменений доступен <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">по ссылке</а> онлайн.
     ]]>
 </string>
     <string name="connected_to">Подключено к %1$s</string>

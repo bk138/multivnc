@@ -81,7 +81,7 @@
 <string name="changelog_dialog_title">¿Qué hai de novo...?</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-        Se quere saber que hai de novo, por favor visite <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">Rexistro de cambios
+        Se quere saber que hai de novo, por favor visite <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">Rexistro de cambios
         en Línea</a>.
     ]]>
 </string>

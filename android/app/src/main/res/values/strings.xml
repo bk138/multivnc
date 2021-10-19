@@ -81,7 +81,7 @@
 <string name="changelog_dialog_title">What\'s new…</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-        If you\'d like to know what\'s new, please visit the <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">online
+        If you\'d like to know what\'s new, please visit the <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">online
         Change Log</a>.
     ]]>
 </string>

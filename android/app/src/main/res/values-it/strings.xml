@@ -78,7 +78,7 @@
 <string name="changelog_dialog_title">"Cosa c'è di nuovo…"</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-       Se vuoi sapere quali modifiche sono state apportate con questa versione, puoi dare un\'occhiata online lanciare il <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">registro delle modifiche disponibili (in inglese)</a>.
+       Se vuoi sapere quali modifiche sono state apportate con questa versione, puoi dare un\'occhiata online lanciare il <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">registro delle modifiche disponibili (in inglese)</a>.
     ]]>
 </string>
     <string name="connected_to">Collegato a %1$s</string>

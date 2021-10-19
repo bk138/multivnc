@@ -80,7 +80,7 @@
 <string name="changelog_dialog_text">
 <![CDATA[
         Wenn Sie wissen m&ouml;chten, welche &Auml;nderungen mit dieser Version neu hinzugekommen sind, k&ouml;nnen Sie einen Blick in das online
-        verf&uuml;gbare <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">&Auml;nderungsprotokoll (in Englisch)</a> werfen.
+        verf&uuml;gbare <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">&Auml;nderungsprotokoll (in Englisch)</a> werfen.
     ]]>
 </string>
     <string name="connected_to">Verbunden mit %1$s</string>
