@@ -27,6 +27,7 @@ Windows. There also is an [Android version](/android/).
 * Two-finger swipe gesture recognition.
 * A super fast touchpad mode for local use.
 * Hardware-accelerated OpenGL drawing and zooming.
+* Supports server framebuffer resize.
 * Copy&paste to and from Android.
 
 ### How to get it
@@ -47,6 +48,7 @@ See the [Android version's README](android/README.md).
 ### Features
 
 * Support for most encodings including Tight.
+* TLS support, i.e. AnonTLS and VeNCrypt.
 * Discovery of VNC servers advertising themselves via ZeroConf. 
 * Bookmarks.
 * MulticastVNC ;-) 
