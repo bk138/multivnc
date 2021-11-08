@@ -21,11 +21,9 @@
 <string name="toggle_keyboard">启用/禁用键盘</string>
 
 <string name="export_settings">导出</string>
-<string name="export_settings_path">导出到文件</string>
 <string name="database_error_open">打开数据库时出错！</string>
-<string name="import_export_settings">导入/导出</string>
+<string name="import_export_settings">设置导入/导出</string>
 <string name="import_settings">导入</string>
-<string name="import_settings_file_url">从文件或URL导入</string>
     <string name="import_error_url">网址不正确：</string>
     <string name="import_error_io">读取配置时I/O错误</string>
     <string name="import_error_xml">读取配置时XML或格式错误</string>

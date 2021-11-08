@@ -21,11 +21,9 @@
 <string name="toggle_keyboard">Mudar o teclado</string>
 
 <string name="export_settings">Exportar</string>
-<string name="export_settings_path">Exportar a un arquivo</string>
 <string name="database_error_open">Erro ao abrir a base de datos!</string>
-<string name="import_export_settings">Importar/Exportar</string>
+<string name="import_export_settings">Importar/Exportar Configuración</string>
 <string name="import_settings">Importar</string>
-<string name="import_settings_file_url">Importar dende un arquivo ou URL</string>
     <string name="import_error_url">Deuse una URL incorrecta:</string>
     <string name="import_error_io">Configuración da lectura de erros de I/O</string>
     <string name="import_error_xml">Configuración da lectura de erros de formato XML</string>

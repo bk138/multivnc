@@ -21,11 +21,9 @@
 <string name="toggle_keyboard">Canviar el teclat</string>
 
 <string name="export_settings">Exportar</string>
-<string name="export_settings_path">Exportar a un arxiu</string>
 <string name="database_error_open">¡Error en obrir la base de dades!</string>
-<string name="import_export_settings">Importar/Exportar</string>
+<string name="import_export_settings">Importar/Exportar Configuració</string>
 <string name="import_settings">Importar</string>
-<string name="import_settings_file_url">Importar des d\'un arxiu o URL</string>
     <string name="import_error_url">S\'ha donat una URL incorrecta:</string>
     <string name="import_error_io">Configuració de la lectura d\'errors d\'I/O</string>
     <string name="import_error_xml">Configuració de la lectura d\'errors de format o XML</string>

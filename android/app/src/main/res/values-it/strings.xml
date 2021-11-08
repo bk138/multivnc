@@ -19,11 +19,9 @@
 <string name="toggle_keyboard">"Attiva / disattiva la tastiera"</string>
 
 <string name="export_settings">"Esportare"</string>
-<string name="export_settings_path">"Esporta nel file"</string>
 <string name="database_error_open">"Errore durante l'apertura del database!"</string>
-<string name="import_export_settings">"Import / Export"</string>
+<string name="import_export_settings">Impostazioni Importa/Esporta</string>
 <string name="import_settings">"Importare"</string>
-<string name="import_settings_file_url">"Importa da file o URL"</string>
     <string name="import_error_url">"URL improprio dato:"</string>
     <string name="import_error_io">"Errore di I / O durante la lettura della configurazione"</string>
     <string name="import_error_xml">"Configurazione della lettura dell'errore XML o di formato"</string>

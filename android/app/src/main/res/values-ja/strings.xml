@@ -22,11 +22,9 @@
 <string name="toggle_keyboard">キーボードの切り替え</string>
 
 <string name="export_settings">書き出す</string>
-<string name="export_settings_path">ファイルにエクスポート</string>
 <string name="database_error_open">データベースを開くときにエラーが発生しました！</string>
-<string name="import_export_settings">インポート・エクスポート</string>
+<string name="import_export_settings">設定インポート/エクスポート</string>
 <string name="import_settings">インポート</string>
-<string name="import_settings_file_url">ファイルまたはURLからインポート</string>
     <string name="import_error_url">与えられた不適切なURL：</string>
     <string name="import_error_io">I /Oエラー読み取り構成</string>
     <string name="import_error_xml">XMLまたはフォーマットエラー読み取り構成</string>

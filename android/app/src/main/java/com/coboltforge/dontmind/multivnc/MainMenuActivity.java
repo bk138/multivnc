@@ -349,7 +349,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 			}
 			break;
 		case R.id.itemImportExport :
-			startActivity(new Intent(this, ImportExportActivity.class));
+			new ImportExportDialog().show(getSupportFragmentManager(), "importexport");
 			break;
 		case R.id.itemOpenDoc :
 			Intent intent = new Intent (this, AboutActivity.class);

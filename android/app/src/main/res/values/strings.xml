@@ -21,11 +21,9 @@
 <string name="toggle_keyboard">Toggle Keyboard</string>
 
 <string name="export_settings">Export</string>
-<string name="export_settings_path">Export to file</string>
 <string name="database_error_open">Error opening database!</string>
-<string name="import_export_settings">Import/Export</string>
+<string name="import_export_settings">Settings Import/Export</string>
 <string name="import_settings">Import</string>
-<string name="import_settings_file_url">Import from file or URL</string>
     <string name="import_error_url">Improper URL given:</string>
     <string name="import_error_io">I/O error reading configuration</string>
     <string name="import_error_xml">XML or format error reading configuration</string>

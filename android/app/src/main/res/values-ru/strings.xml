@@ -19,11 +19,9 @@
 <string name="toggle_keyboard">"Переключить клавиатуру"</string>
 
 <string name="export_settings">"экспорт"</string>
-<string name="export_settings_path">"Экспорт в файл"</string>
 <string name="database_error_open">"Ошибка открытия базы данных!"</string>
-<string name="import_export_settings">"Импорт Экспорт"</string>
+<string name="import_export_settings">"Настройки Импорт / Экспорт"</string>
 <string name="import_settings">"Импорт"</string>
-<string name="import_settings_file_url">"Импорт из файла или URL"</string>
     <string name="import_error_url">"Указан неправильный URL:"</string>
     <string name="import_error_io">"Конфигурация чтения ошибок ввода / вывода"</string>
     <string name="import_error_xml">"XML или формат ошибки чтения конфигурации"</string>
