@@ -1,5 +1,12 @@
 # Version 2.0.x:
 
+## 2.0.1
+
+### 🛠  Fixes
+
+- Fixed possible crash on connecting to servers that immediately sent a NewFBSize.
+- Fixed a race crash in VNCConnService.
+
 ## 2.0.0
 
 Version 2.0.0 is the culmination of the 1.9.x series and marks the completion of
