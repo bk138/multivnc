@@ -777,7 +777,9 @@ public class VNCConn {
 		Log.d(TAG, "new framebuffer size " + w + " x " + h);
 		// this triggers an update on what the canvas thinks about cursor position.
 		// without this, the pointer highlight is off by some value after framebuffer size change
-		canvas.pan(0, 0);
+		canvas.handler.post(() -> {
+			canvas.pan(0, 0);
+		});
 	}
 
 }
