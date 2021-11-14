@@ -88,8 +88,14 @@ class VNCConnService : Service() {
 
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        // the connection list was updated in the (de)register methods, update UI here only
-        if (mConnectionList.isEmpty()) {
+        // the connection list was updated in the (de)register methods, update UI here only.
+        // stop if connection list got empty from a deregister() call or there is a connection but
+        // its connSettings are null. This happens when:
+        // * VNCConnService registered in VNCConn.ServerToClientThread
+        // * register() Coroutine is dispatched on Main thread
+        // * VNCConn.shutdown() is called for some reason
+        // * register() Coroutine now runs but is actually late to the party and finds a VNCConn emptied by shutdown()
+        if (mConnectionList.isEmpty() || mConnectionList[0].connSettings == null) {
             stopSelf()
         } else {
             // assemble notification text
