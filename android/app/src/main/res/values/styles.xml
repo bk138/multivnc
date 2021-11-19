@@ -9,12 +9,17 @@
         <!-- theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">@color/ui_primary</item>
 
-        <!-- make all buttons coloured -->
+        <!-- make all buttons coloured. buttonbar buttons are the ones used in alert dialogs -->
         <item name="android:buttonStyle">@style/App.Button</item>
+        <item name="android:buttonBarButtonStyle">@style/App.ButtonBarButton</item>
     </style>
 
     <style name="App.Button" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="App.ButtonBarButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/ui_primary</item>
     </style>
 
 </resources>
