@@ -1,5 +1,12 @@
 # Version 2.0.x:
 
+## 2.0.2
+
+### 🛠  Fixes
+
+- Fixed Triple-T changelog to simply point to online ChangeLog.md.
+- Fixed a race crash in VNCConnService, now in a more robust way.
+
 ## 2.0.1
 
 ### 🛠  Fixes
