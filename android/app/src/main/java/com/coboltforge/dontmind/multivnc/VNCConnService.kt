@@ -87,7 +87,7 @@ class VNCConnService : Service() {
     }
 
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // the connection list was updated in the (de)register methods, update UI here only.
         // stop if connection list got empty from a deregister() call or there is a connection but
         // its connSettings are null. This happens when:
