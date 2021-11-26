@@ -1,5 +1,11 @@
 # Version 2.0.x:
 
+## 2.0.3
+
+### 🛠  Fixes
+
+- Fixed the VNCConnService crash in a different way since the cause was actually a different one. (#172)
+
 ## 2.0.2
 
 ### 🛠  Fixes
