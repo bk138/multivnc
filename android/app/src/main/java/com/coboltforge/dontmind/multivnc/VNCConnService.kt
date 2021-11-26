@@ -89,41 +89,36 @@ class VNCConnService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // the connection list was updated in the (de)register methods, update UI here only.
-        if (mConnectionList.isEmpty()) {
-            // stop if connection list got empty from a deregister() call
+        // stop if connection list got empty from a deregister() call or there is a connection but
+        // its connSettings are null. This happens when:
+        // * VNCConnService registered in VNCConn.ServerToClientThread
+        // * register() Coroutine is dispatched on Main thread
+        // * VNCConn.shutdown() is called for some reason
+        // * register() Coroutine now runs but is actually late to the party and finds a VNCConn emptied by shutdown()
+        if (mConnectionList.isEmpty() || mConnectionList[0].connSettings == null) {
             stopSelf()
         } else {
-            try {
-                // assemble notification text
-                var hosts = ""
-                if (mConnectionList.size == 1) {
-                    hosts = mConnectionList[0].connSettings.nickname ?: ""
-                } else {
-                    for (conn in mConnectionList) {
-                        hosts += getString(R.string.host_and, conn.connSettings.nickname)
-                    }
+            // assemble notification text
+            var hosts = ""
+            if (mConnectionList.size == 1) {
+                hosts = mConnectionList[0].connSettings.nickname ?: ""
+            } else {
+                for (conn in mConnectionList) {
+                    hosts += getString(R.string.host_and, conn.connSettings.nickname)
                 }
-                Log.d(TAG, "onStartCommand: notifying with " + getString(R.string.connected_to, hosts))
-                val notificationIntent = Intent(this, VncCanvasActivity::class.java)
-                val pendingIntent = PendingIntent.getActivity(this, 0,
-                        notificationIntent, 0)
-                val notification = NotificationCompat.Builder(this, packageName)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.connected_to, hosts))
-                        .setContentIntent(pendingIntent)
-                        .setOnlyAlertOnce(true)
-                        .build()
-                startForeground(NOTIFICATION_ID, notification)
-            } catch (e: Exception) {
-                // Can throw for instance when:
-                // * VNCConnService registered in VNCConn.ServerToClientThread
-                // * register() Coroutine is dispatched on Main thread
-                // * VNCConn.shutdown() is called for some reason
-                // * register() Coroutine now runs but is actually late to the party and finds a VNCConn emptied by shutdown()
-                // Rather then crashing, do nothing in this case.
-                // The deregister() call will dispatch an emptying of the connection list and trigger a stopSelf().
             }
+            Log.d(TAG, "onStartCommand: notifying with " + getString(R.string.connected_to, hosts))
+            val notificationIntent = Intent(this, VncCanvasActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(this, 0,
+                    notificationIntent, 0)
+            val notification = NotificationCompat.Builder(this, packageName)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.connected_to, hosts))
+                    .setContentIntent(pendingIntent)
+                    .setOnlyAlertOnce(true)
+                    .build()
+            startForeground(NOTIFICATION_ID, notification)
         }
         // stay until explicitly stopped
         return START_STICKY
