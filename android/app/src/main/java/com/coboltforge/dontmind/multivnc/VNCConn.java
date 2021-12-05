@@ -176,8 +176,8 @@ public class VNCConn {
 					connSettings.address = in6.getHostAddress();
 					Log.i(TAG, "Using IPv6");
 
-				} catch (UnknownHostException e) {
-					Log.i(TAG, "Using IPv4: " + e.toString());
+				} catch (UnknownHostException unused) {
+					Log.i(TAG, "Using IPv4");
 				} catch (NullPointerException ne) {
 					Log.e(TAG, ne.toString());
 				}
