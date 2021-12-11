@@ -1,5 +1,13 @@
 # Version 2.0.x:
 
+## 2.0.4
+
+### 🛠  Fixes
+
+- Fixed JSON Import/Export in Release builds thanks to Gaurav Ujjwal.
+- Fixed Import not showing any files with certain file pickers thanks to Gaurav Ujjwal.
+- Fixed crash when copying non-UTF8 characters on the server side, also thanks to Gaurav Ujjwal.
+
 ## 2.0.3
 
 ### 🛠  Fixes
