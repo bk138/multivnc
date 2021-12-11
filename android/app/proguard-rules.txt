@@ -2,4 +2,25 @@
 -keep class com.antlersoft.** { *; }
 
 
+##########################################################################
+# Rules for keeping JSON Serialization code
+# Ref: https://github.com/Kotlin/kotlinx.serialization#android
+##########################################################################
+
+-keepattributes *Annotation*, InnerClasses
+
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+-keep,includedescriptorclasses class com.coboltforge.dontmind.multivnc.**$$serializer { *; }
+-keepclassmembers class com.coboltforge.dontmind.multivnc.** {
+    *** Companion;
+}
+-keepclasseswithmembers class com.coboltforge.dontmind.multivnc.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
 
