@@ -64,9 +64,7 @@ class ImportExportDialog : AppCompatDialogFragment() {
                         // import
                         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
                         intent.addCategory(Intent.CATEGORY_OPENABLE)
-                        val mimeTypes = arrayOf("text/xml", "application/xml", "application/json")
                         intent.type = "*/*"
-                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
                         startActivityForResult(intent, REQUEST_CODE_READ_FILE)
                     }
                     1 -> {
