@@ -11,6 +11,8 @@ package com.coboltforge.dontmind.multivnc;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -369,7 +371,7 @@ public class VNCConn {
 		private boolean sendCutText(String text) {
 			if (rfbClient != 0) {
 				if (Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
-				return rfbSendClientCutText(text);
+				return rfbSendClientCutText(StandardCharsets.ISO_8859_1.encode(text).array());
 			}
 			return false;
 		}
@@ -387,7 +389,7 @@ public class VNCConn {
 	private native int rfbGetFramebufferHeight();
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
 	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
-	private native boolean rfbSendClientCutText(String text);
+	private native boolean rfbSendClientCutText(byte[] bytes);
 
 
 	public VNCConn() {
@@ -719,8 +721,8 @@ public class VNCConn {
 
 	// called from native via worker thread context
 	@Keep
-	private void onGotCutText(String text) {
-		serverCutText = text;
+	private void onGotCutText(byte[] bytes) {
+		serverCutText = StandardCharsets.ISO_8859_1.decode(ByteBuffer.wrap(bytes)).toString();
 		Log.d(TAG, "got server cuttext: " + serverCutText);
 	}
 
