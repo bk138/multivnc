@@ -165,7 +165,7 @@ static void onFramebufferUpdateFinished(rfbClient* client)
     (*env)->CallVoidMethod(env, obj, mid);
 }
 
-static void onGotCutText(rfbClient *client, const char *text, int __unused len)
+static void onGotCutText(rfbClient *client, const char *text, int len)
 {
     if(!client) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutText failed due to client NULL");
@@ -181,9 +181,10 @@ static void onGotCutText(rfbClient *client, const char *text, int __unused len)
     }
 
     jclass cls = (*env)->GetObjectClass(env, obj);
-    jmethodID mid = (*env)->GetMethodID(env, cls, "onGotCutText", "(Ljava/lang/String;)V");
-    jstring jText = (*env)->NewStringUTF(env, text);
-    (*env)->CallVoidMethod(env, obj, mid, jText);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onGotCutText", "([B)V");
+    jbyteArray jBytes = (*env)->NewByteArray(env, len);
+    (*env)->SetByteArrayRegion(env, jBytes, 0, len, (jbyte *) text);
+    (*env)->CallVoidMethod(env, obj, mid, jBytes);
 }
 
 static char *onGetPassword(rfbClient *client)
@@ -529,12 +530,13 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
         return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendClientCutText(JNIEnv *env, jobject obj, jstring text) {
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendClientCutText(JNIEnv *env, jobject obj, jbyteArray bytes) {
     rfbClient *cl = getRfbClient(env, obj);
-    if(cl) {
-        const char *cText = (*env)->GetStringUTFChars(env, text, NULL);
-        jboolean status = SendClientCutText(cl, (char*)cText, (int)strlen(cText));
-        (*env)->ReleaseStringUTFChars(env, text, cText);
+    if (cl) {
+        jbyte *cText = (*env)->GetByteArrayElements(env, bytes, NULL);
+        int cTextLen = (*env)->GetArrayLength(env, bytes);
+        jboolean status = SendClientCutText(cl, (char *) cText, cTextLen);
+        (*env)->ReleaseByteArrayElements(env, bytes, cText, JNI_ABORT);
         return status;
     }
     else
