@@ -15,6 +15,12 @@ If you'd like to put out an incentive for fixing this bug, you can do so at http
 **Which MultiVNC version are you using?**
 <!-- Can be found via 'About'. -->
 
+**Which server are you connecting to?**
+ - VNC server vendor:
+ - VNC server version:
+ - OS version:
+ - OS language:
+
 **Describe the bug**
 <!-- A clear and concise description of what the bug is. -->
 
