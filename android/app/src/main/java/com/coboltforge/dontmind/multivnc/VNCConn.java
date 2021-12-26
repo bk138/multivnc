@@ -584,6 +584,8 @@ public class VNCConn {
 					case KeyEvent.KEYCODE_PAGE_DOWN:    keyCode = 0xff56; break;
 					case KeyEvent.KEYCODE_CTRL_LEFT:    keyCode = 0xffe3; break;
 					case KeyEvent.KEYCODE_CTRL_RIGHT:   keyCode = 0xffe4; break;
+					case KeyEvent.KEYCODE_SHIFT_LEFT:   keyCode = 0xffe1; break;
+					case KeyEvent.KEYCODE_SHIFT_RIGHT:  keyCode = 0xffe2; break;							
 					default:
 						// do keycode -> UTF-8 keysym conversion
 						KeyEvent tmp = new KeyEvent(
