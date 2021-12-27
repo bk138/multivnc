@@ -1,5 +1,11 @@
 # Version 2.0.x:
 
+## 2.0.5
+
+### 🛠  Fixes
+
+- Fixed uppercase letters and symbols not working with some VNC servers thanks to Gaurav Ujjwal.
+
 ## 2.0.4
 
 ### 🛠  Fixes
