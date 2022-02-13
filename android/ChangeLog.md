@@ -1,5 +1,14 @@
 # Version 2.0.x:
 
+## 2.0.6
+
+### 🛠  Fixes
+
+* Fixed connecting to servers running on Fedora 35.
+* Fixed white artifacts showing up on Android 12 when scrolling the remote desktop view.
+* Fixed the home screen widget so that it now displays all kinds of connections, not only the ones
+  with password.
+
 ## 2.0.5
 
 ### 🛠  Fixes
