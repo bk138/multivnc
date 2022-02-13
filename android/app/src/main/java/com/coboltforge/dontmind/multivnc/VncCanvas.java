@@ -427,17 +427,6 @@ public class VncCanvas extends GLSurfaceView {
 
 
 	/**
-	 * Change to Canvas's scroll position to match the absoluteXPosition
-	 */
-	void scrollToAbsolute()
-	{
-		if(Utils.DEBUG()) Log.d(TAG, "scrollToAbsolute() " + absoluteXPosition + ", " + absoluteYPosition);
-		float scale = getScale();
-		scrollTo((int)((absoluteXPosition + ((float)getWidth() - vncConn.getFramebufferWidth()) / 2 ) * scale),
-				(int)((absoluteYPosition + ((float)getHeight() - vncConn.getFramebufferHeight()) / 2 ) * scale));
-	}
-
-	/**
 	 * Make sure mouse is visible on displayable part of screen
 	 */
 	void panToMouse()
@@ -451,7 +440,6 @@ public class VncCanvas extends GLSurfaceView {
 
 		int x = mouseX;
 		int y = mouseY;
-		boolean panned = false;
 		int w = getVisibleWidth();
 		int h = getVisibleHeight();
 		int iw = vncConn.getFramebufferWidth();
@@ -474,7 +462,6 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		if ( newX != absoluteXPosition ) {
 			absoluteXPosition = newX;
-			panned = true;
 		}
 		if (y - newY >= h - 5)
 		{
@@ -490,11 +477,6 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		if ( newY != absoluteYPosition ) {
 			absoluteYPosition = newY;
-			panned = true;
-		}
-		if (panned)
-		{
-			scrollToAbsolute();
 		}
 	}
 
@@ -536,7 +518,6 @@ public class VncCanvas extends GLSurfaceView {
 
 		if (sX != 0.0 || sY != 0.0)
 		{
-			scrollToAbsolute();
 			return true;
 		}
 		return false;
