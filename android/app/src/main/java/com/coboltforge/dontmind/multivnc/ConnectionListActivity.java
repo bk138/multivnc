@@ -43,7 +43,7 @@ public class ConnectionListActivity extends ListActivity {
         setContentView(R.layout.connection_list);
 
         database = VncDatabase.getInstance(this);
-        Cursor cursor = database.getConnectionDao().getAllWithPassword();
+        Cursor cursor = database.getConnectionDao().getAllAsCursor();
         startManagingCursor(cursor);
 
         // Now create a new list adapter bound to the cursor. 
