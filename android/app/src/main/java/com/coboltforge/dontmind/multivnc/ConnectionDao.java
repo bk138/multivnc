@@ -19,8 +19,8 @@ public interface ConnectionDao {
     @Query("SELECT * FROM CONNECTION_BEAN")
     List<ConnectionBean> getAll();
 
-    @Query("SELECT * FROM CONNECTION_BEAN WHERE KEEPPASSWORD <> 0 ORDER BY NICKNAME")
-    Cursor getAllWithPassword();
+    @Query("SELECT * FROM CONNECTION_BEAN ORDER BY NICKNAME")
+    Cursor getAllAsCursor();
 
     @Insert
     long insert(ConnectionBean c);
