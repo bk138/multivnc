@@ -541,7 +541,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	private void toggleKeyboard() {
 		InputMethodManager inputMgr = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		vncCanvas.requestFocus();
-		inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+		// Android 12 changed something in respect to soft input, we have to add a delay to be able to show :-/
+		vncCanvas.postDelayed(() -> inputMgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0), 100);
 	}
 
 	@Override
