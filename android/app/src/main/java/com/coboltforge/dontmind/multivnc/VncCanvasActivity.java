@@ -233,9 +233,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 
 
-
-
-		zoomer.hide();
 		zoomer.setOnZoomInClickListener(new View.OnClickListener() {
 
 			/*
@@ -246,7 +243,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			@Override
 			public void onClick(View v) {
 				try {
-					showZoomer(true);
 					vncCanvas.scaling.zoomIn();
 				}
 				catch(NullPointerException e) {
@@ -264,7 +260,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			@Override
 			public void onClick(View v) {
 				try {
-					showZoomer(true);
 					vncCanvas.scaling.zoomOut();
 				}
 				catch(NullPointerException e) {
@@ -711,17 +706,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	}
 
 	static final long ZOOM_HIDE_DELAY_MS = 2500;
-	Runnable hideZoomInstance = () -> zoomer.hide();
-
-	public void showZoomer(boolean force) {
-		if (force || zoomer.getVisibility() != View.VISIBLE) {
-			zoomer.show();
-
-			//Schedule hiding of zoom controls.
-			vncCanvas.handler.removeCallbacks(hideZoomInstance);
-			vncCanvas.handler.postDelayed(hideZoomInstance, ZOOM_HIDE_DELAY_MS);
-		}
-	}
 
 	Runnable hideZoomLevelInstance = () -> zoomLevel.setVisibility(View.INVISIBLE);
 	public void showZoomLevel()

@@ -204,17 +204,16 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
         if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 
-        vncCanvasActivity.showZoomer(true);
-
-        vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
         dragMode = true;
         dragX = e.getX();
         dragY = e.getY();
 
         // only interpret as button down if virtual mouse buttons are disabled
-        if(vncCanvasActivity.mousebuttons.getVisibility() != View.VISIBLE)
+        if(vncCanvasActivity.mousebuttons.getVisibility() != View.VISIBLE) {
             dragModeButtonDown = true;
+            vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+        }
     }
 
     @Override
@@ -236,7 +235,6 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
             // pan on 3 fingers and more
             if(e2.getPointerCount() > 2) {
-                vncCanvasActivity.showZoomer(false);
                 return vncCanvasActivity.vncCanvas.pan((int) distanceX, (int) distanceY);
             }
 

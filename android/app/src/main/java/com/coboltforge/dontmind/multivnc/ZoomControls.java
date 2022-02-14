@@ -92,19 +92,6 @@ public class ZoomControls extends LinearLayout {
         return true;
     }
     
-    public void show() {
-        setVisibility(VISIBLE);
-
-        //Workaround for buggy GLSurfaceView.
-        //See https://stackoverflow.com/questions/11236336/setvisibilityview-visible-doesnt-always-work-ideas
-        requestLayout();
-    }
-    
-    public void hide() {
-        setVisibility(INVISIBLE);
-    }
-
-    
     public void setIsZoomInEnabled(boolean isEnabled) {
         mZoomIn.setEnabled(isEnabled);
         if(!isEnabled)
