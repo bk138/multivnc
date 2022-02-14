@@ -25,13 +25,6 @@
     	android:visibility="gone"
     />
 
-	<com.coboltforge.dontmind.multivnc.ZoomControls
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/zoomer"
-		android:layout_gravity="center|top"
-		/>
-
 	<TextView
 		android:id="@+id/zoomLevel"
 		android:layout_width="wrap_content"
@@ -61,7 +54,12 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center|bottom">
 
-
+	  <com.coboltforge.dontmind.multivnc.ZoomControls
+	      android:layout_width="wrap_content"
+		  android:layout_height="wrap_content"
+		  android:id="@+id/zoomer"
+		  android:layout_gravity="center|top"
+		  />
 
 	  <LinearLayout
 	      android:id="@+id/virtualmousebuttons"
