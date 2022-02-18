@@ -335,9 +335,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
 
     public boolean onTouchEvent(MotionEvent e) {
-        if (!isTouchEvent(e)) { // physical input device
+        if (e.getSource() == InputDevice.SOURCE_STYLUS) { // pen aka stylus
 
-            if(Utils.DEBUG()) Log.d(TAG, "Input: touch not screen nor pad: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+            if(Utils.DEBUG()) Log.d(TAG, "Input: touch pen: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
 
             e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
