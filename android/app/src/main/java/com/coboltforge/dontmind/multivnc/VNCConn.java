@@ -204,6 +204,9 @@ public class VNCConn {
 					}
 				});
 
+				// update connection with desktop name
+				connSettings.nickname = getDesktopName();
+
 				// start output thread here
 				outputThread = new ClientToServerThread();
 				outputThread.start();
