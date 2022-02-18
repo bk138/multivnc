@@ -1,5 +1,15 @@
 # Version 2.0.x:
 
+## 2.0.7
+
+### 🛠  Fixes
+
+* Fixed keyboard not being toggleable from menu on Android 12.
+* Fixed right mouse button clicks from Bluetooth mice being intertwined with flaky left mouse button
+  clicks.
+* Fixed bookmarks having empty names when saving a connection that was not coming from
+  Zeroconf/Bonjour.
+
 ## 2.0.6
 
 ### 🛠  Fixes
