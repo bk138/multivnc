@@ -342,7 +342,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
             // modify MotionEvent to support Samsung S Pen Event and activate rightButton accordingly
-            boolean rightButton = spenActionConvert(e);
+            // if Samsung S Pen is not present or reports false, check for right mouse button
+            boolean rightButton = spenActionConvert(e) || e.isButtonPressed(MotionEvent.BUTTON_SECONDARY);
 
             vncCanvasActivity.vncCanvas.processPointerEvent(e, true, rightButton);
             vncCanvasActivity.vncCanvas.panToMouse();
