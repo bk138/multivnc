@@ -339,6 +339,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     public boolean onTouchEvent(MotionEvent e) {
         if (!isTouchEvent(e)) { // physical input device
 
+            if(Utils.DEBUG()) Log.d(TAG, "Input: touch not screen nor pad: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+
             e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
             // modify MotionEvent to support Samsung S Pen Event and activate rightButton accordingly
@@ -485,7 +487,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             }
 
         if(Utils.DEBUG())
-            Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+            Log.d(TAG, "Input: generic motion: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
 
         return true;
     }
