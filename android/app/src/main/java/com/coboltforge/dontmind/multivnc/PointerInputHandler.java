@@ -443,7 +443,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
         e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
-            //Translate the event into onTouchEvent type language
+            //Translate the event into processPointerEvent type language
             if (e.getButtonState() != 0) {
                 if ((e.getButtonState() & MotionEvent.BUTTON_PRIMARY) != 0) {
                     button = true;
