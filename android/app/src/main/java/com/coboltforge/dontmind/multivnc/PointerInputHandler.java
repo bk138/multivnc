@@ -487,7 +487,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             }
 
         if(Utils.DEBUG())
-            Log.d(TAG, "Input: generic motion: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+            Log.d(TAG, "Input: generic motion: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction() + " button:" + button + " secondary:" + secondary);
 
         return true;
     }
