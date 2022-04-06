@@ -343,10 +343,11 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
             // modify MotionEvent to support Samsung S Pen Event and activate rightButton accordingly
             // if Samsung S Pen is not present or reports false, check for right mouse button
-            boolean rightButton = spenActionConvert(e) || e.isButtonPressed(MotionEvent.BUTTON_SECONDARY);
+            boolean isSPen = spenActionConvert(e);
+            boolean isRightButton = e.isButtonPressed(MotionEvent.BUTTON_SECONDARY);
 
-            vncCanvasActivity.vncCanvas.processPointerEvent(e, true, rightButton);
-            vncCanvasActivity.vncCanvas.panToMouse();
+            if (isSPen || Build.VERSION.SDK_INT < 23)
+                vncCanvasActivity.vncCanvas.processPointerEvent(e, true, isSPen || isRightButton);
 
             return true;
         }
@@ -432,66 +433,60 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     }
 
     public boolean onGenericMotionEvent(MotionEvent e) {
-        int action = MotionEvent.ACTION_MASK;
-        boolean button = false;
-        boolean secondary = false;
+        if (Utils.DEBUG())
+            Log.d(TAG, "Input: generic motion: " + e);
 
-        if (isTouchEvent(e)) {
+        if (isTouchEvent(e))
             return false;
+
+        vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
+        int x = (int) e.getX();
+        int y = (int) e.getY();
+
+        switch (e.getAction()) {
+            case MotionEvent.ACTION_HOVER_MOVE:
+                vncCanvasActivity.vncCanvas.processMouseEvent(0, false, x, y);
+                break;
+
+            case MotionEvent.ACTION_SCROLL:
+                if (e.getAxisValue(MotionEvent.AXIS_VSCROLL) < 0.0f) {
+                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_DOWN, true, x, y);
+                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_DOWN, false, x, y);
+                } else {
+                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_UP, true, x, y);
+                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_UP, false, x, y);
+                }
+                break;
         }
 
-        e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
+        if (Build.VERSION.SDK_INT >= 23) {
+            int button = androidButtonToVncButton(e.getActionButton());
+            switch (e.getAction()) {
+                case MotionEvent.ACTION_BUTTON_PRESS:
+                    vncCanvasActivity.vncCanvas.processMouseEvent(button, true, x, y);
+                    break;
 
-            //Translate the event into processPointerEvent type language
-            if (e.getButtonState() != 0) {
-                if ((e.getButtonState() & MotionEvent.BUTTON_PRIMARY) != 0) {
-                    button = true;
-                    secondary = false;
-                    action = MotionEvent.ACTION_DOWN;
-                } else if ((e.getButtonState() & MotionEvent.BUTTON_SECONDARY) != 0) {
-                    button = true;
-                    secondary = true;
-                    action = MotionEvent.ACTION_DOWN;
-                }
-                if (e.getAction() == MotionEvent.ACTION_MOVE) {
-                    action = MotionEvent.ACTION_MOVE;
-                }
-            } else if ((e.getActionMasked() == MotionEvent.ACTION_HOVER_MOVE) ||
-                    (e.getActionMasked() == MotionEvent.ACTION_UP)){
-                action = MotionEvent.ACTION_UP;
-                button = false;
-                secondary = false;
+                case MotionEvent.ACTION_BUTTON_RELEASE:
+                    vncCanvasActivity.vncCanvas.processMouseEvent(button, false, x, y);
+                    break;
             }
-
-            if (action != MotionEvent.ACTION_MASK) {
-                e.setAction(action);
-                if (!button) {
-                    vncCanvasActivity.vncCanvas.processPointerEvent(e, false);
-                }
-                else {
-                    vncCanvasActivity.vncCanvas.processPointerEvent(e, true, secondary);
-                }
-                vncCanvasActivity.vncCanvas.panToMouse();
-            }
-
-            if(e.getAction() == MotionEvent.ACTION_SCROLL) {
-                if (e.getAxisValue(MotionEvent.AXIS_VSCROLL) < 0.0f) {
-                    if (Utils.DEBUG()) Log.d(TAG, "Input: scroll down");
-                    vncCanvasActivity.vncCanvas.vncConn.sendPointerEvent(vncCanvasActivity.vncCanvas.mouseX, vncCanvasActivity.vncCanvas.mouseY, e.getMetaState(), VNCConn.MOUSE_BUTTON_SCROLL_DOWN);
-                }
-                else {
-                    if (Utils.DEBUG()) Log.d(TAG, "Input: scroll up");
-                    vncCanvasActivity.vncCanvas.vncConn.sendPointerEvent(vncCanvasActivity.vncCanvas.mouseX, vncCanvasActivity.vncCanvas.mouseY, e.getMetaState(), VNCConn.MOUSE_BUTTON_SCROLL_UP);
-                }
-            }
-
-        if(Utils.DEBUG())
-            Log.d(TAG, "Input: generic motion: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction() + " button:" + button + " secondary:" + secondary);
+        }
 
         return true;
     }
 
-
+    private int androidButtonToVncButton(int androidButton) {
+        switch (androidButton) {
+            case MotionEvent.BUTTON_PRIMARY:
+                return VNCConn.MOUSE_BUTTON_LEFT;
+            case MotionEvent.BUTTON_SECONDARY:
+                return VNCConn.MOUSE_BUTTON_RIGHT;
+            case MotionEvent.BUTTON_TERTIARY:
+                return VNCConn.MOUSE_BUTTON_MIDDLE;
+            default:
+                return 0;
+        }
+    }
 
     /**
      * Modify the event so that it does not move the mouse on the
