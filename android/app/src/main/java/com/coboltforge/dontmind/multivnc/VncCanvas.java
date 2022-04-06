@@ -640,7 +640,7 @@ public class VncCanvas extends GLSurfaceView {
 	 * Convert a motion event to a format suitable for sending over the wire
 	 * @param evt motion event; x and y must already have been converted from screen coordinates
 	 * to remote frame buffer coordinates.
-	 * @param downEvent True if "mouse button" (touch or trackball button) is down when this happens
+	 * @param mouseIsDown True if "mouse button" (touch or trackball button) is down when this happens
 	 * @param useRightButton If true, event is interpreted as happening with right mouse button
 	 * @return true if event was actually sent
 	 */
@@ -676,6 +676,29 @@ public class VncCanvas extends GLSurfaceView {
 		}
 		catch(NullPointerException e) {
 			return false;
+		}
+	}
+
+	/**
+	 * Process given mouse event.
+	 *
+	 * @param button Which button is pressed/released (0 for no button)
+	 * @param isDown True if button is down
+	 * @param x,y    Event position in remote frame buffer coordinates.
+	 */
+	public void processMouseEvent(int button, boolean isDown, int x, int y) {
+		try {
+			if (isDown)
+				pointerMask |= button;
+			else
+				pointerMask &= ~button;
+
+			if (overridePointerMask > 0)
+				vncConn.sendPointerEvent(x, y, 0, overridePointerMask);
+			else
+				vncConn.sendPointerEvent(x, y, 0, pointerMask);
+
+		} catch (NullPointerException ignored) {
 		}
 	}
 
