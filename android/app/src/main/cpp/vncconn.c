@@ -368,6 +368,14 @@ static jboolean setupClient(JNIEnv *env, jobject obj, jint bytesPerPixel) {
     // set flags
     cl->canHandleNewFBSize = TRUE;
 
+    /*
+     * Save pointers to the managed VNCConn and env in the rfbClient for use in the onXYZ callbacks.
+     * In addition to rfbProcessServerMessage(), we have to do this are as some callbacks (namely
+     * related to authentication) are called before rfbProcessServerMessage().
+    */
+    rfbClientSetClientData(cl, VNCCONN_OBJ_ID, obj);
+    rfbClientSetClientData(cl, VNCCONN_ENV_ID, env);
+
     setRfbClient(env, obj, cl);
 
     return JNI_TRUE;
@@ -422,14 +430,6 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
     }
 
     log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() about to connect to '%s', port %d, repeaterId %d\n", cl->serverHost, cl->serverPort, cl->destPort);
-
-    /*
-     * Save pointers to the managed VNCConn and env in the rfbClient for use in the onXYZ callbacks.
-     * In addition to rfbProcessServerMessage(), we have to do this are as some callbacks (namely
-     * related to authentication) are called before rfbProcessServerMessage().
-     */
-    rfbClientSetClientData(cl, VNCCONN_OBJ_ID, obj);
-    rfbClientSetClientData(cl, VNCCONN_ENV_ID, env);
 
     if(!rfbInitClient(cl, 0, NULL)) {
         setRfbClient(env, obj, 0); //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
