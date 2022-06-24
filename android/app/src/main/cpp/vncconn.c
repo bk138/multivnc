@@ -19,6 +19,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <errno.h>
+#include <libssh2.h>
 #include <rfb/rfbclient.h>
 #include "rfb/rfbclient.h"
 
@@ -98,6 +99,12 @@ JNIEXPORT jint JNI_OnLoad(JavaVM __unused * vm, void __unused * reserved) {
 
     rfbClientLog = logcat_info;
     rfbClientErr = logcat_err;
+
+    // not thread safe according to https://www.libssh2.org/libssh2_init.html
+    // so run here once
+    if(libssh2_init(0)) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "libssh2 initialization failed\n");
+    }
 
     return JNI_VERSION_1_6;
 }
