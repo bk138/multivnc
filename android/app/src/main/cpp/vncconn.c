@@ -314,6 +314,39 @@ static rfbBool onNewFBSize(rfbClient *client)
 }
 
 /**
+   Decide whether or not the SSH tunnel setup should continue
+   based on the current host and its fingerprint.
+   Business logic is up to the implementer in a real app, i.e.
+   compare keys, ask user etc...
+   @return -1 if tunnel setup should be aborted
+            0 if tunnel setup should continue
+ */
+static int onSshFingerprintCheck(const char *fingerprint, size_t fingerprint_len,
+                                 const char *host, rfbClient *client)
+{
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onSshFingerprintCheck failed due to client NULL");
+        return -1;
+    }
+
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    if(!env) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onSshFingerprintCheck failed due to env NULL");
+        return -1;
+    }
+
+    jbyteArray jFingerprint = (*env)->NewByteArray(env, (jsize)fingerprint_len);
+    (*env)->SetByteArrayRegion(env, jFingerprint, 0, (jsize)fingerprint_len, (jbyte *) fingerprint);
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onSshFingerprintCheck", "(Ljava/lang/String;[B)I");
+    return  (*env)->CallIntMethod(env, obj, mid, (*env)->NewStringUTF(env, host), jFingerprint);
+}
+
+
+/**
  * Allocates and sets up the VNCConn's rfbClient.
  * @param env
  * @param obj
