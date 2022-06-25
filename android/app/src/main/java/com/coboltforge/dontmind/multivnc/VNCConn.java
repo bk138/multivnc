@@ -789,5 +789,54 @@ public class VNCConn {
 		});
 	}
 
+	// called from native via worker thread context
+	@Keep
+	private int onSshFingerprintCheck(String host, byte[] fingerprint) {
+		// look for host, if not found create entry and return ok
+		SshKnownHost knownHost = VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().get(host);
+		if(knownHost == null) {
+			AtomicBoolean doContinue = new AtomicBoolean();
+			// always using SHA256 in native part, ok to hardocde this here
+			canvas.getSshFingerPrintNewDecision("SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP), doContinue); // this cares for running on the main thread
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+			if(doContinue.get()) {
+				VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, host, fingerprint));
+				return 0;
+			}
+			else {
+				return -1;
+			}
+		}
+
+		// host found, check if fingerprint matches
+	    if(Arrays.equals(knownHost.fingerprint, fingerprint))
+			return 0;
+		else {
+			// not matching, ask user!
+			AtomicBoolean doContinue = new AtomicBoolean();
+			// always using SHA256 in native part, ok to hardocde this here
+			canvas.getSshFingerPrintMismatchDecision("SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP), doContinue); // this cares for running on the main thread
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+			if(doContinue.get())
+				return 0;
+			else {
+				SshKnownHost updatedHost = new SshKnownHost(knownHost.id, host, fingerprint);
+				VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().update(updatedHost);
+				return -1;
+			}
+		}
+	}
 }
 

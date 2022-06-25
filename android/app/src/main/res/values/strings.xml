@@ -85,4 +85,15 @@
 </string>
     <string name="connected_to">Connected to %1$s</string>
     <string name="host_and">%1$s and </string>
+
+    <string name="ssh_key_new_title">Remote SSH host not yet known</string>
+    <string name="ssh_key_new_message">The SSH server\'s fingerprint  &lt;b>%s&lt;/b> is not yet known. Please check that is the correct fingerprint of the SSH server you want to connect to.</string>
+    <string name="ssh_key_new_continue">The fingerprint is valid, continue</string>
+    <string name="ssh_key_new_abort">I am unsure, abort</string>
+    
+    <string name="ssh_key_mismatch_title">Remote SSH host identification has changed!</string>
+    <string name="ssh_key_mismatch_message">The fingerprint &lt;b>%s&lt;/b> of the SSH server does not match the already known one. This either means someone is impersonating the correct SSH server (man-in-the-middle attack) or that the correct server\'s host key was changed. Please contact the SSH server\'s administrator to verify the correct key. Do you want to continue or abort the SSH connection setup?</string>
+    <string name="ssh_key_mismatch_continue">I\'m confident this is legit, continue</string>
+    <string name="ssh_key_mismatch_abort">I\'ll double-check the correct SSH server fingerprint, abort</string>
+
 </resources>

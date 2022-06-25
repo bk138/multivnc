@@ -16,10 +16,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 /**
  * Note: Version before migration to Room = 12
  */
-@Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class}, version = VncDatabase.VERSION, exportSchema = false)
+@Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class, SshKnownHost.class}, version = VncDatabase.VERSION, exportSchema = false)
 public abstract class VncDatabase extends RoomDatabase {
 
-    public static final int VERSION = 13;
+    public static final int VERSION = 14;
     public static final String NAME = "VncDatabase";
 
     public abstract MetaListDao getMetaListDao();
@@ -27,6 +27,8 @@ public abstract class VncDatabase extends RoomDatabase {
     public abstract MetaKeyDao getMetaKeyDao();
 
     public abstract ConnectionDao getConnectionDao();
+
+    public abstract SshKnownHostDao getSshKnownHostDao();
 
 
     private static VncDatabase instance = null;
@@ -36,6 +38,7 @@ public abstract class VncDatabase extends RoomDatabase {
             instance = Room.databaseBuilder(context, VncDatabase.class, NAME)
                     .allowMainThreadQueries()
                     .addMigrations(MIGRATION_12_13)
+                    .addMigrations(MIGRATION_13_14)
                     .build();
 
             setupDefaultMetaList(instance);
@@ -123,6 +126,21 @@ public abstract class VncDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE CONNECTION_BEAN_NEW RENAME TO CONNECTION_BEAN");
             database.execSQL("ALTER TABLE META_KEY_NEW RENAME TO META_KEY");
             database.execSQL("ALTER TABLE META_LIST_NEW RENAME TO META_LIST");
+        }
+    };
+
+    // this simply adds a SSH_KNOWN_HOST table
+    private static final Migration MIGRATION_13_14 = new Migration(13, 14) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Log.i("VncDatabase", "Migrating to Room [13 -> 14]");
+
+            //Create new
+            database.execSQL("CREATE TABLE SSH_KNOWN_HOST (" +
+                             "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                             "HOST TEXT NOT NULL," +
+                             "FINGERPRINT BLOB NOT NULL" +
+                             ")");
         }
     };
 }

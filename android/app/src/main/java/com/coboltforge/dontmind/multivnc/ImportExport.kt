@@ -15,14 +15,15 @@ object ImportExport {
     /**
      * Current version of [Container].
      */
-    private const val VERSION = 1
+    private const val VERSION = 2
 
     @Serializable
     private data class Container(
             val version: Int,
             val connections: List<ConnectionBean>,
             val metaKeys: List<MetaKeyBean>,
-            val metaLists: List<MetaList>
+            val metaLists: List<MetaList>,
+            val sshKnownHosts: List<SshKnownHost>
     )
 
     private val serializer = Json {
@@ -39,7 +40,8 @@ object ImportExport {
                 VERSION,
                 db.connectionDao.all,
                 db.metaKeyDao.all,
-                db.metaListDao.all
+                db.metaListDao.all,
+                db.sshKnownHostDao.all
         )
 
         val json = serializer.encodeToString(container)
@@ -74,6 +76,13 @@ object ImportExport {
                     db.metaListDao.insert(it)
                 else
                     db.metaListDao.update(it)
+            }
+
+            container.sshKnownHosts.forEach {
+                if (db.sshKnownHostDao.get(it.id) == null)
+                    db.sshKnownHostDao.insert(it)
+                else
+                    db.sshKnownHostDao.update(it)
             }
         }
     }
