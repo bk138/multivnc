@@ -348,6 +348,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
             if (isSPen || Build.VERSION.SDK_INT < 23)
                 vncCanvasActivity.vncCanvas.processPointerEvent(e, true, isSPen || isRightButton);
+            else if (e.getActionMasked() == MotionEvent.ACTION_MOVE)
+                vncCanvasActivity.vncCanvas.processMouseEvent(0, true, (int) e.getX(), (int) e.getY());
 
             return true;
         }
