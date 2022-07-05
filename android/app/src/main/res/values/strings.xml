@@ -42,7 +42,17 @@
 <string name="port_caption">Port</string>
 <string name="repeater_caption">ID On Repeater</string>
 <string name="repeater_hint">Server ID when connecting to an UltraVNC-repeater</string>
-<string name="save_as_copy">Save as Copy</string>
+    <string name="ssh_caption">SSH Tunneling</string>
+    <string name="ssh_host_hint">SSH Server</string>
+    <string name="ssh_username_hint">SSH Username</string>
+    <string name="ssh_password">Password</string>
+    <string name="ssh_privkey">Private Key</string>
+    <string name="ssh_password_hint">SSH Password</string>
+    <string name="ssh_privkey_import">Import Key</string>
+    <string name="ssh_privkey_import_success">Successfully imported SSH private key.</string>
+    <string name="ssh_privkey_import_fail">Failed importing SSH private key.</string>
+    <string name="ssh_privkey_password_hint">Key Password</string>
+    <string name="save_as_copy">Save as Copy</string>
     <string name="credentials_needed_title">Credentials Needed…</string>
 <!-- Send selected metakey -->
 <string name="send_button">Send</string>
