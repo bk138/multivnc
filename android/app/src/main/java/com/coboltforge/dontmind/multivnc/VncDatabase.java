@@ -135,6 +135,13 @@ public abstract class VncDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             Log.i("VncDatabase", "Migrating to Room [13 -> 14]");
 
+            // add new columns to CONNECTION_BEAN
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_HOST TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_USERNAME TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PASSWORD TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PRIVKEY BLOB");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PRIVKEY_PASSWORD TEXT");
+
             //Create new
             database.execSQL("CREATE TABLE SSH_KNOWN_HOST (" +
                              "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +

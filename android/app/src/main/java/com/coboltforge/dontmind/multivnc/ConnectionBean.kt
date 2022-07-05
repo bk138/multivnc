@@ -94,7 +94,27 @@ data class ConnectionBean(
 
         @JvmField
         @ColumnInfo(name = "DOUBLE_TAP_ACTION")
-        var doubleTapAction: String? = null
+        var doubleTapAction: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_HOST")
+        var sshHost: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_USERNAME")
+        var sshUsername: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_PASSWORD")
+        var sshPassword: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_PRIVKEY")
+        var sshPrivkey: ByteArray? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_PRIVKEY_PASSWORD")
+        var sshPrivkeyPassword: String? = null,
 
 ) : Comparable<ConnectionBean>, Parcelable {
 
