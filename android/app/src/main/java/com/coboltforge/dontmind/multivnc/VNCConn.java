@@ -190,7 +190,13 @@ public class VNCConn {
 
 				int repeaterId = (connSettings.useRepeater && connSettings.repeaterId != null && connSettings.repeaterId.length() > 0) ? Integer.parseInt(connSettings.repeaterId) : -1;
 				lockFramebuffer();
-				if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp())) {
+				if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp(),
+						connSettings.sshHost,
+						connSettings.sshUsername,
+						connSettings.sshPassword,
+						connSettings.sshPrivkey,
+						connSettings.sshPrivkeyPassword
+				)) {
 					unlockFramebuffer();
 					throw new Exception(); //TODO add some error reoprting here
 				}
@@ -386,7 +392,12 @@ public class VNCConn {
     }
 
 
-	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel);
+	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel,
+								   String ssh_host,
+								   String ssh_user,
+								   String ssh_password,
+								   byte[] ssh_priv_key,
+								   String ssh_priv_key_password);
 	private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);
