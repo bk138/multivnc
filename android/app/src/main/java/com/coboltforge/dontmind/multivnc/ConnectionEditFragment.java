@@ -288,6 +288,10 @@ public class ConnectionEditFragment extends Fragment {
             return;
 
         view.findViewById(R.id.name_row).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.encoding_row).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.color_mode_row).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.compression_level_row).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.quality_level_row).setVisibility(View.VISIBLE);
 
         bookmarkNameText.setText(conn.nickname);
         ipText.setText(conn.address);
