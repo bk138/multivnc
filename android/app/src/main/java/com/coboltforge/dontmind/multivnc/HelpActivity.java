@@ -9,7 +9,7 @@ public class HelpActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.help);
+		setContentView(R.layout.help_activity);
 		WebView wv = findViewById(R.id.helpwebView);
 		wv.loadUrl("file:///android_asset/help.html");
 

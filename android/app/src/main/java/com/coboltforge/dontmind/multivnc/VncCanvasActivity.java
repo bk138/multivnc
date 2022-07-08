@@ -29,7 +29,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.text.ClipboardManager;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -126,7 +125,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			contentView.setPadding(0, 0, 0, paddingBottom); //Update bottom
 		});
 
-		setContentView(R.layout.canvas);
+		setContentView(R.layout.canvas_activity);
 
 		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
 		zoomer = (ZoomControls) findViewById(R.id.zoomer);
@@ -445,7 +444,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			vncCanvas.showConnectionInfo();
 			return true;
 		case R.id.itemSpecialKeys:
-			showDialog(R.layout.metakey);
+			showDialog(R.layout.metakey_dialog);
 			return true;
 		case R.id.itemColorMode:
 			selectColorModel();
