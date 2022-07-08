@@ -20,11 +20,9 @@
 <string name="toggle_keyboard">Переключити клавіатуру</string>
 
 <string name="export_settings">Експортувати</string>
-<string name="export_settings_path">Експортувати у файл</string>
 <string name="database_error_open">Помилка відкриття бази даних!</string>
-<string name="import_export_settings">Імпорт/Експорт</string>
+<string name="import_export_settings">Налаштування Імпорт/Експорт</string>
 <string name="import_settings">Імпортувати</string>
-<string name="import_settings_file_url">Імпортувати з файлу чи URL-адреси</string>
     <string name="import_error_url">Вказано неправильну URL-адресу:</string>
     <string name="import_error_io">Помилка I/O під час читання кофігурації</string>
     <string name="import_error_xml">Формат XML імпортованої кофігурації недійсний</string>
@@ -80,7 +78,7 @@
 <string name="changelog_dialog_title">Що нового…</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-        Якщо Ви хочете дізнатися, що нового, відвідайте <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">журнал змін</a> онлайн.
+        Якщо Ви хочете дізнатися, що нового, відвідайте <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">журнал змін</a> онлайн.
     ]]>
 </string>
     <string name="connected_to">Під’єднано до %1$s</string>

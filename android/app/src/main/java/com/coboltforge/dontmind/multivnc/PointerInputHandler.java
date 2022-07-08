@@ -204,17 +204,16 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
         if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 
-        vncCanvasActivity.showZoomer(true);
-
-        vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
         dragMode = true;
         dragX = e.getX();
         dragY = e.getY();
 
         // only interpret as button down if virtual mouse buttons are disabled
-        if(vncCanvasActivity.mousebuttons.getVisibility() != View.VISIBLE)
+        if(vncCanvasActivity.mousebuttons.getVisibility() != View.VISIBLE) {
             dragModeButtonDown = true;
+            vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+        }
     }
 
     @Override
@@ -236,7 +235,6 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
             // pan on 3 fingers and more
             if(e2.getPointerCount() > 2) {
-                vncCanvasActivity.showZoomer(false);
                 return vncCanvasActivity.vncCanvas.pan((int) distanceX, (int) distanceY);
             }
 
@@ -339,10 +337,13 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     public boolean onTouchEvent(MotionEvent e) {
         if (!isTouchEvent(e)) { // physical input device
 
+            if(Utils.DEBUG()) Log.d(TAG, "Input: touch not screen nor pad: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+
             e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
             // modify MotionEvent to support Samsung S Pen Event and activate rightButton accordingly
-            boolean rightButton = spenActionConvert(e);
+            // if Samsung S Pen is not present or reports false, check for right mouse button
+            boolean rightButton = spenActionConvert(e) || e.isButtonPressed(MotionEvent.BUTTON_SECONDARY);
 
             vncCanvasActivity.vncCanvas.processPointerEvent(e, true, rightButton);
             vncCanvasActivity.vncCanvas.panToMouse();
@@ -441,7 +442,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
         e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
-            //Translate the event into onTouchEvent type language
+            //Translate the event into processPointerEvent type language
             if (e.getButtonState() != 0) {
                 if ((e.getButtonState() & MotionEvent.BUTTON_PRIMARY) != 0) {
                     button = true;
@@ -485,7 +486,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             }
 
         if(Utils.DEBUG())
-            Log.d(TAG, "Input: touch normal: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
+            Log.d(TAG, "Input: generic motion: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction() + " button:" + button + " secondary:" + secondary);
 
         return true;
     }

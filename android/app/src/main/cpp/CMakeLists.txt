@@ -40,6 +40,21 @@ include_directories(
         ${libssl_src_DIR}/include
 )
 
+# build libssh2
+set(BUILD_SHARED_LIBS OFF)
+set(libssh2_src_DIR ../../../../../libssh2)
+set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
+# adds a source subdir with specifying a build output dir
+add_subdirectory(${libssh2_src_DIR} ${libssh2_build_DIR})
+# set include directories so dependent code can find the headers
+include_directories(
+        ${libssh2_src_DIR}/include
+)
+# set link directories as libssh2.a appears in ./src subdir of libssh2 build dir
+link_directories(
+        ${libssh2_build_DIR}/src
+)
+
 # build LibVNCClient
 set(BUILD_SHARED_LIBS OFF)
 set(libvnc_src_DIR ../../../../../libvncserver)
@@ -56,6 +71,7 @@ include_directories(
 add_library(vncconn SHARED vncconn.c)
 target_link_libraries(vncconn
     log
+    ssh2
     vncclient)
 
 # build VNCCanvas

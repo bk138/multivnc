@@ -2,18 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
     package="com.coboltforge.dontmind.multivnc" android:installLocation="auto"
-    android:versionCode="79" android:versionName="1.9.11">
+	>
 
 	<uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 
     <application android:icon="@drawable/ic_launcher" android:label="MultiVNC" android:hardwareAccelerated="true"
-		 android:requestLegacyExternalStorage="true"
 		 android:theme="@style/AppTheme"
 		>
 
@@ -48,11 +46,6 @@
             android:label="@string/editbookmark_title"
             >
        	</activity>
-
-		<activity android:name="ImportExportActivity"
-			android:label="@string/import_export_settings"
-			>
-		</activity>
 
         <activity android:name="AboutActivity"
              android:label="@string/about"

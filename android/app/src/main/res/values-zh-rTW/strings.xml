@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="address_caption">位址</string>
+    <string name="alt_check">Alt</string>
+    <string name="super_check">Super</string>
+    <string name="app_name" translatable="false">MultiVNC</string>
+    <string name="server_found">找到 VNC 伺服器</string>
+    <string name="server_removed">VNC 伺服器已消失</string>
+    <string name="restartMDNS">重新啟動伺服器探索</string>
+    <string name="scale_msg">立即縮放</string>
+<string name="madeby">Android 版 MultiVNC 由 Christian Beier (christianbeier.net) 為您呈獻。\n\n專案首頁位於 https://github.com/bk138/multivnc\n\n如欲報告錯誤或請求新功能，請前往 https://github.com/bk138/multivnc/issues\n\n變更紀錄可參見 https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md</string>
+<string name="colormode_caption">色彩模式</string>
+<string name="color_mode">設定色彩模式</string>
+<string name="connect_button">連線</string>
+<string name="control_check">Ctrl</string>
+<string name="delete_connection">刪除</string>
+<string name="disconnect">中斷連線</string>
+<string name="toggle_framebuffer_update">切換檢視</string>
+<string name="toggle_mouse_buttons">切換滑鼠按鈕</string>
+<string name="toggle_pointer_highlight">切換滑鼠指標醒目提示</string>
+<string name="toggle_keyboard">切換鍵盤</string>
+
+<string name="export_settings">匯出</string>
+<string name="database_error_open">開啟資料庫時發生錯誤！</string>
+<string name="import_export_settings">設定匯入/匯出</string>
+<string name="import_settings">匯入</string>
+    <string name="import_error_url">提供的 URL 不當：</string>
+    <string name="import_error_io">讀取組態設定時發生 I/O 錯誤</string>
+    <string name="import_error_xml">讀取組態設定時發生 XML 或格式錯誤</string>
+
+<string name="info">連線資訊</string>
+<string name="meta_key_title">傳送按鍵組合</string>
+<string name="new_connection">新增連線</string>
+<string name="nickname_caption">加入書籤</string>
+<string name="discovered_servers">探索到的伺服器</string>
+<string name="bookmarks">書籤</string>
+<string name="savebookmark_button">儲存書籤</string>
+<string name="bookmark_saved">書籤已儲存！</string>
+<string name="bookmark_invalid">這不再是有效的書籤！</string>
+<string name="password_caption">密碼</string>
+<string name="keep_password_button">保存</string>
+<string name="port_caption">連接埠</string>
+<string name="repeater_caption">中繼器上的 ID</string>
+<string name="repeater_hint">連線到 UltraVNC 中繼器時使用的伺服器 ID</string>
+<string name="save_as_copy">另存副本</string>
+    <string name="credentials_needed_title">需要認證…</string>
+<!-- Send selected metakey -->
+<string name="send_button">傳送</string>
+<string name="send_key_again">再次傳送按鍵組合</string>
+<string name="shift_check">Shift</string>
+<string name="shortcut_label">VNC 連線捷徑</string>
+    <string name="shortcut_no_entries">未有任何書籤</string>
+<string name="special_keys">按鍵組合</string>
+<string name="username_caption">使用者名稱</string>
+<string name="username_hint">用於 Windows/Mac 驗證</string>
+<string name="editbookmark_title">編輯書籤</string>
+<string name="enterbookmarkname">請輸入書籤名稱…</string>
+<string name="bookmark_save_question">您要將此伺服器加入書籤嗎？</string>
+<string name="bookmark_delete_question">您確定要刪除此書籤嗎？</string>
+<string name="disconnect_question">您確定要中斷連線嗎？</string>
+<string name="about">關於</string>
+<string name="help">說明</string>
+<string name="edit">編輯</string>
+    <string name="save">儲存</string>
+
+    <string name="utils_title_error">錯誤！</string>
+
+<string name="support_dialog_title">請支持 MultiVNC</string>
+<string name="support_dialog_text">若您喜歡 MultiVNC，何不考慮支持開發？坐言起行很簡單，您可為此應用程式評個分或捐個款。謝謝！</string>
+
+<string name="support_dialog_yes">好，馬上去！</string>
+<string name="support_dialog_no">稍後再說。</string>
+<string name="support_dialog_neveragain">不要再詢問！</string>
+
+<string name="firstrun_help_dialog_title">要顯示說明嗎？</string>
+<string name="firstrun_help_dialog_text">您似乎是第一次使用 MultiVNC。您要閱讀應用程式使用指南嗎？篇幅尚不太長，卻算是應有盡有...</string>
+
+<string name="pleaserate">若您喜歡 MultiVNC，何不點按一個心、派送一點愛？</string>
+<string name="changelog_dialog_title">版本更新…</string>
+<string name="changelog_dialog_text">
+<![CDATA[
+        如欲知道此版本有何更新，請造訪<a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">線上
+        變更紀錄</a>。
+    ]]>
+</string>
+    <string name="connected_to">已連線到 %1$s</string>
+    <string name="host_and">%1$s 和 </string>
+</resources>

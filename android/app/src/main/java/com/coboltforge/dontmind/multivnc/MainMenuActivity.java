@@ -21,6 +21,7 @@
 
 package com.coboltforge.dontmind.multivnc;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,22 +32,28 @@ import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,16 +63,24 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Collections;
 import java.util.Hashtable;
-
-
+import java.util.Objects;
 
 
 public class MainMenuActivity extends AppCompatActivity implements MDNSService.OnEventListener, LifecycleObserver {
 
 	private static final String TAG = "MainMenuActivity";
+	private static final int REQUEST_CODE_SSH_PRIVKEY_IMPORT = 11;
 
 	private EditText ipText;
 	private EditText portText;
@@ -78,6 +93,12 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 	private VncDatabase database;
 	private EditText textUsername;
 	private CheckBox checkboxKeepPassword;
+	private EditText sshHostText;
+	private EditText sshUsernameText;
+	private EditText sshPasswordText;
+	private Button sshPrivkeyImportButton;
+	private byte[] sshPrivkey;
+	private EditText sshPrivkeyPasswordText;
 
 	// service discovery stuff
 	private MDNSService boundMDNSService;
@@ -150,6 +171,45 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
 
 		repeaterText = (TextView)findViewById(R.id.textRepeaterId);
+
+		sshHostText = findViewById(R.id.ssh_host_input);
+		sshUsernameText = findViewById(R.id.ssh_username_input);
+		sshPasswordText = findViewById(R.id.ssh_password_input);
+		sshPrivkeyImportButton = findViewById(R.id.ssh_privkey_import_button);
+		sshPrivkeyPasswordText = findViewById(R.id.ssh_privkey_password_input);
+		SwitchMaterial sshSwitch = findViewById(R.id.ssh_switch);
+		sshSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+			// set visibility
+			findViewById(R.id.ssh_row).setVisibility(isChecked ? View.VISIBLE : View.GONE);
+			// and clear contents if disabled again
+			if(!isChecked) {
+				sshHostText.setText("");
+				sshUsernameText.setText("");
+				sshPasswordText.setText("");
+				sshPrivkeyPasswordText.setText("");
+			}
+		});
+		RadioGroup sshCredentialsRadioGroup = findViewById(R.id.ssh_credentials_radiogroup);
+		sshCredentialsRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			if(checkedId == R.id.ssh_password_radiobutton) {
+				sshPasswordText.setVisibility(View.VISIBLE);
+				sshPrivkeyImportButton.setVisibility(View.GONE);
+				sshPrivkeyPasswordText.setVisibility(View.GONE);
+				sshPrivkeyPasswordText.setText("");
+				sshPrivkey = null;
+			} else {
+				sshPasswordText.setVisibility(View.GONE);
+				sshPasswordText.setText("");
+				sshPrivkeyImportButton.setVisibility(View.VISIBLE);
+				sshPrivkeyPasswordText.setVisibility(View.VISIBLE);
+			}
+		});
+		sshPrivkeyImportButton.setOnClickListener(v -> {
+			Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+			intent.addCategory(Intent.CATEGORY_OPENABLE);
+			intent.setType("*/*");
+			startActivityForResult(intent, REQUEST_CODE_SSH_PRIVKEY_IMPORT);
+		});
 
 		Button goButton = (Button) findViewById(R.id.buttonGO);
 		goButton.setOnClickListener(new View.OnClickListener() {
@@ -272,15 +332,11 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 				editor.putInt("lastVersionCode", versionCode);
 				editor.commit();
 
-				AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-				dialog.setTitle(getString(R.string.changelog_dialog_title));
-				dialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
-
-				WebView wv = new WebView(getApplicationContext());
-				wv.loadData(getString(R.string.changelog_dialog_text), "text/html", "utf-8");
-				dialog.setView(wv);
-
-				dialog.setPositiveButton(getString(android.R.string.ok), new OnClickListener() {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(getString(R.string.changelog_dialog_title));
+				builder.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
+				builder.setMessage(Html.fromHtml(getString(R.string.changelog_dialog_text)));
+				builder.setPositiveButton(getString(android.R.string.ok), new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						try{
@@ -291,8 +347,10 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 					}
 				});
 
+				AlertDialog dialog = builder.create();
 				dialog.show();
-
+				TextView msgTxt = (TextView) dialog.findViewById(android.R.id.message);
+				msgTxt.setMovementMethod(LinkMovementMethod.getInstance());
 			}
 		} catch (NameNotFoundException e) {
 			Log.w(TAG, "Unable to get version code. Will not show changelog", e);
@@ -349,7 +407,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 			}
 			break;
 		case R.id.itemImportExport :
-			startActivity(new Intent(this, ImportExportActivity.class));
+			new ImportExportDialog().show(getSupportFragmentManager(), "importexport");
 			break;
 		case R.id.itemOpenDoc :
 			Intent intent = new Intent (this, AboutActivity.class);
@@ -365,6 +423,34 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 	protected void onStart() {
 		super.onStart();
 		updateBookmarkView();
+	}
+
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == REQUEST_CODE_SSH_PRIVKEY_IMPORT && resultCode == Activity.RESULT_OK) {
+			if (data != null) {
+				Uri uri = data.getData();
+				try {
+					ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+					InputStream inputStream = getContentResolver().openInputStream(uri);
+					int bufferSize = 4096;
+					byte[] buffer = new byte[bufferSize];
+					int len;
+					while ((len = inputStream.read(buffer)) != -1) {
+						byteBuffer.write(buffer, 0, len);
+					}
+					sshPrivkey = byteBuffer.toByteArray();
+					Toast.makeText(this, R.string.ssh_privkey_import_success, Toast.LENGTH_LONG).show();
+				} catch(Exception e) {
+					Toast.makeText(this, R.string.ssh_privkey_import_fail, Toast.LENGTH_LONG).show();
+				}
+
+			}
+
+		}
 	}
 
 
@@ -534,6 +620,20 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		{
 			conn.useRepeater = false;
 		}
+
+		conn.sshHost = sshHostText.getText().toString().trim();
+		if(conn.sshHost.isEmpty())
+			conn.sshHost = null;
+		conn.sshUsername = sshUsernameText.getText().toString().trim();
+		if(conn.sshUsername.isEmpty())
+			conn.sshUsername = null;
+		conn.sshPassword = sshPasswordText.getText().toString().trim();
+		if(conn.sshPassword.isEmpty())
+			conn.sshPassword = null;
+		conn.sshPrivkey = sshPrivkey;
+		conn.sshPrivkeyPassword = sshPrivkeyPasswordText.getText().toString().trim();
+		if(conn.sshPrivkeyPassword.isEmpty())
+			conn.sshPrivkeyPassword = null;
 
 		return conn;
 	}

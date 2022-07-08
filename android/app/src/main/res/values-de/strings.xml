@@ -19,11 +19,9 @@
 <string name="toggle_keyboard">"Tastatur umschalten"</string>
 
 <string name="export_settings">"Exportieren"</string>
-<string name="export_settings_path">"In Datei exportieren"</string>
 <string name="database_error_open">"Fehler beim Öffnen der Datenbank!"</string>
-<string name="import_export_settings">"Importieren/Exportieren"</string>
+<string name="import_export_settings">Einstellungen Importieren/Exportieren</string>
 <string name="import_settings">"Importieren"</string>
-<string name="import_settings_file_url">"Importieren aus Datei oder URL"</string>
     <string name="import_error_url">Ungültige URL:</string>
     <string name="import_error_io">Ein-/Ausgabe-Fehler beim Importieren der Konfiguration</string>
     <string name="import_error_xml">Das XML-Format der zu importierenden Konfiguration ist ungültig</string>
@@ -80,7 +78,7 @@
 <string name="changelog_dialog_text">
 <![CDATA[
         Wenn Sie wissen m&ouml;chten, welche &Auml;nderungen mit dieser Version neu hinzugekommen sind, k&ouml;nnen Sie einen Blick in das online
-        verf&uuml;gbare <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">&Auml;nderungsprotokoll (in Englisch)</a> werfen.
+        verf&uuml;gbare <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">&Auml;nderungsprotokoll (in Englisch)</a> werfen.
     ]]>
 </string>
     <string name="connected_to">Verbunden mit %1$s</string>

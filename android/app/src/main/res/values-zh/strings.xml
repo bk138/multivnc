@@ -21,11 +21,9 @@
 <string name="toggle_keyboard">启用/禁用键盘</string>
 
 <string name="export_settings">导出</string>
-<string name="export_settings_path">导出到文件</string>
 <string name="database_error_open">打开数据库时出错！</string>
-<string name="import_export_settings">导入/导出</string>
+<string name="import_export_settings">设置导入/导出</string>
 <string name="import_settings">导入</string>
-<string name="import_settings_file_url">从文件或URL导入</string>
     <string name="import_error_url">网址不正确：</string>
     <string name="import_error_io">读取配置时I/O错误</string>
     <string name="import_error_xml">读取配置时XML或格式错误</string>
@@ -79,7 +77,7 @@
 
 <string name="pleaserate">如果您喜欢MultiVNC，为什么不点击爱心来表达喜爱呢？</string>
 <string name="changelog_dialog_title">新功能…</string>
-<string name="changelog_dialog_text"><![CDATA[         如果您想了解新功能，请在线访问<a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">          变更记录</a> 。     ]]></string>
+<string name="changelog_dialog_text"><![CDATA[         如果您想了解新功能，请在线访问<a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">          变更记录</a> 。     ]]></string>
     <string name="connected_to">已连接到%1$s</string>
     <string name="host_and">%1$s和</string>
 </resources>

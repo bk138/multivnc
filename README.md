@@ -1,21 +1,56 @@
+
+# MultiVNC
+
 [![Build Status](https://app.travis-ci.com/bk138/multivnc.svg?branch=master)](https://app.travis-ci.com/bk138/multivnc)
 [![Help making this possible](https://img.shields.io/badge/liberapay-donate-yellow.png)](https://liberapay.com/bk138/donate)
 [![Become a patron](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bk138)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.png)](https://www.paypal.com/donate/?hosted_button_id=HKRTWKNKBKPKN)
 [![Gitter](https://badges.gitter.im/multivnc/community.svg)](https://gitter.im/multivnc/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-MultiVNC is a cross-platform Multicast-enabled VNC viewer using
-wxWidgets and libvncclient. It runs on Unix, Mac OS X and Windows.
-There also is an [Android version](/android/).
+MultiVNC is a cross-platform Multicast-enabled VNC viewer based on
+[LibVNCClient](https://github.com/LibVNC/libvncserver). The desktop version
+uses [wxWidgets](https://www.wxwidgets.org/) and runs on Unix, Mac OS X and
+Windows. There also is an [Android version](/android/).
 
-Both the desktop and the mobile version feature:
+
+## MultiVNC for Android
+
+### Features
+
+* Support for most VNC encodings including Tight.
+* TLS support, i.e. AnonTLS and VeNCrypt.
+* UltraVNC Repeater support.
+* Discovery of VNC servers advertising themselves via ZeroConf.
+* Bookmarking of connections.
+* Import and export of saved connections.
+* Virtual mouse button controls with haptic feedback.
+* Two-finger swipe gesture recognition.
+* A super fast touchpad mode for local use.
+* Hardware-accelerated OpenGL drawing and zooming.
+* Supports server framebuffer resize.
+* Copy&paste to and from Android.
+
+### How to get it
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/)
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
+
+### How to build
+
+See the [Android version's README](android/README.md).
+
+## MultiVNC for Desktop
+
+### Features
 
 * Support for most encodings including Tight.
+* TLS support, i.e. AnonTLS and VeNCrypt.
 * Discovery of VNC servers advertising themselves via ZeroConf. 
 * Bookmarks.
-
-The desktop version stands out with additional features such as:
-
 * MulticastVNC ;-) 
 * Several connections with one viewer using tabs.
 * Listen mode (Reverse VNC). Via tabs it's possible to listen 
@@ -29,39 +64,23 @@ The desktop version stands out with additional features such as:
 * Simple, loggable statistics 
 * Supports server framebuffer resize.
 
-The mobile Android version sports:
+### How to get it
 
-* Virtual mouse button controls with haptic feedback.
-* Two-finger swipe gesture recognition.
-* A super fast touchpad mode for local use.
-* Hardware-accelerated OpenGL drawing and zooming.
-* Copy&paste to and from Android.
-* Availability from both [Google Play](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
-  and [F-Droid](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/).
-
-For features that are planned, but not completed yet, look at the
-[open feature requests](https://github.com/bk138/multivnc/issues?q=is%3Aissue+is%3Aopen+label%3Afeature-request).
-
-
-# How to get prebuilt packages
-
-## Prereleases
+#### Prereleases
 
 These are automatically built from the current master branch and contain cutting edge features and bug fixes.
 
   * [MultiVNC for MacOS prerelease](http://multivnc-mac.surge.sh/MultiVNC-prerelease.dmg)
   * [MultiVNC (64bit) for Debian/Ubuntu prerelease, built on Ubuntu 18.04](http://multivnc-linux.surge.sh/multivnc-prerelease.deb)
 
-## Releases
+#### Releases
 
-  * MultiVNC for Android is available from [Google Play](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
-    and [F-Droid](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/).
   * [MultiVNC 0.5 (64bit) for Debian](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-1_amd64.deb/download)
   * [MultiVNC 0.5 (64bit) for Fedora/Redhat](https://sourceforge.net/projects/multivnc/files/0.5/multivnc-0.5-2.x86_64.rpm/download)
   * [MultiVNC 0.5 (32bit) for Microsoft Windows](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-win32-setup.exe/download)
 
 
-# How to compile the desktop wxWidgets version from source
+### How to build
 
 The prerequisites:
 
@@ -89,7 +108,7 @@ To build:
 
 Depending on which OS you are on, you end up with a .deb, .dmg or .exe you can install.
 
-# MulticastVNC notes
+## MulticastVNC notes
 
 You can get a modified libvncserver/libvncclient at
 https://github.com/LibVNC/libvncserver/tree/multicastvnc -

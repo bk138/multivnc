@@ -21,11 +21,9 @@
 <string name="toggle_keyboard">Cambiar el teclado</string>
 
 <string name="export_settings">Exportar</string>
-<string name="export_settings_path">Exportar a un archivo</string>
 <string name="database_error_open">¡Error al abrir la base de datos!</string>
-<string name="import_export_settings">Importar/Exportar</string>
+<string name="import_export_settings">Importar/Exportar Configuración</string>
 <string name="import_settings">Importar</string>
-<string name="import_settings_file_url">Importar desde un archivo o URL</string>
     <string name="import_error_url">Se ha dado una URL incorrecta:</string>
     <string name="import_error_io">Configuración de la lectura de errores de I/O</string>
     <string name="import_error_xml">Configuración de la lectura de errores de formato XML</string>
@@ -81,7 +79,7 @@
 <string name="changelog_dialog_title">¿Qué hay de nuevo...?</string>
 <string name="changelog_dialog_text">
 <![CDATA[
-        Si quiere saber qué hay de nuevo, por favor visite <a href="https://raw.githubusercontent.com/bk138/multivnc/master/android/ChangeLog.md">Registro de cambios
+        Si quiere saber qué hay de nuevo, por favor visite <a href="https://github.com/bk138/multivnc/blob/master/android/ChangeLog.md">Registro de cambios
         en Línea</a>.
     ]]>
 </string>

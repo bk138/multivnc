@@ -130,6 +130,100 @@
                 android:hint="@string/repeater_hint"
                 android:singleLine="true" />
         </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_gravity="right|center_vertical"
+                android:paddingRight="10dip"
+                android:text="@string/ssh_caption"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/ssh_switch"
+                    android:layout_weight="1"
+                    android:text="" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/ssh_row"
+            android:visibility="gone">
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/ssh_host_input"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/ssh_host_hint"
+                    android:singleLine="true" />
+
+                <EditText
+                    android:id="@+id/ssh_username_input"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/ssh_username_hint"
+                    android:singleLine="true" />
+
+                <RadioGroup
+                    android:id="@+id/ssh_credentials_radiogroup"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <RadioButton
+                        android:id="@+id/ssh_password_radiobutton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="@string/ssh_password"
+                        />
+                    <RadioButton
+                        android:id="@+id/ssh_privkey_radiobutton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="false"
+                        android:text="@string/ssh_privkey"
+                        />
+                </RadioGroup>
+
+
+                <EditText
+                    android:id="@+id/ssh_password_input"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/ssh_password_hint"
+                    android:inputType="textPassword"
+                    android:singleLine="true" />
+
+                <Button
+                    android:id="@+id/ssh_privkey_import_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:text="@string/ssh_privkey_import"/>
+
+                <EditText
+                    android:id="@+id/ssh_privkey_password_input"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:hint="@string/ssh_privkey_password_hint"
+                    android:inputType="textPassword"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+        </TableRow>
+
     </TableLayout>
     <!--
 			<TextView

@@ -39,7 +39,6 @@ class ZoomScaling {
 
 		//Refresh Canvas
 		activity.vncCanvas.reDraw();
-		activity.vncCanvas.scrollToAbsolute();
 		activity.vncCanvas.pan(0, 0);
 
 		//Notify user

@@ -16,8 +16,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 /**
  * Note: Version before migration to Room = 12
  */
-@Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class}, version = VncDatabase.VERSION, exportSchema = false)
-abstract class VncDatabase extends RoomDatabase {
+@Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class, SshKnownHost.class}, version = VncDatabase.VERSION, exportSchema = false)
+public abstract class VncDatabase extends RoomDatabase {
 
     public static final int VERSION = 14;
     public static final String NAME = "VncDatabase";
@@ -27,6 +27,8 @@ abstract class VncDatabase extends RoomDatabase {
     public abstract MetaKeyDao getMetaKeyDao();
 
     public abstract ConnectionDao getConnectionDao();
+
+    public abstract SshKnownHostDao getSshKnownHostDao();
 
 
     private static VncDatabase instance = null;
@@ -127,12 +129,28 @@ abstract class VncDatabase extends RoomDatabase {
         }
     };
 
+    // this simply adds a SSH_KNOWN_HOST table
     private static final Migration MIGRATION_13_14 = new Migration(13, 14) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Log.i("VncDatabase", "Migrating to Room [13 -> 14]");
+
+            // add new columns to CONNECTION_BEAN
             database.execSQL("ALTER TABLE CONNECTION_BEAN ADD ENCODINGSSTRING TEXT");
             database.execSQL("ALTER TABLE CONNECTION_BEAN ADD COMPRESSMODEL TEXT");
             database.execSQL("ALTER TABLE CONNECTION_BEAN ADD QUALITYMODEL TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_HOST TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_USERNAME TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PASSWORD TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PRIVKEY BLOB");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PRIVKEY_PASSWORD TEXT");
+
+            //Create new
+            database.execSQL("CREATE TABLE SSH_KNOWN_HOST (" +
+                             "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                             "HOST TEXT NOT NULL," +
+                             "FINGERPRINT BLOB NOT NULL" +
+                             ")");
         }
     };
 }

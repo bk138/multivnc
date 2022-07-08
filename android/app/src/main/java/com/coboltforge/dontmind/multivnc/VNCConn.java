@@ -11,12 +11,17 @@ package com.coboltforge.dontmind.multivnc;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import androidx.annotation.Keep;
@@ -176,8 +181,8 @@ public class VNCConn {
 					connSettings.address = in6.getHostAddress();
 					Log.i(TAG, "Using IPv6");
 
-				} catch (UnknownHostException e) {
-					Log.i(TAG, "Using IPv4: " + e.toString());
+				} catch (UnknownHostException unused) {
+					Log.i(TAG, "Using IPv4");
 				} catch (NullPointerException ne) {
 					Log.e(TAG, ne.toString());
 				}
@@ -185,20 +190,22 @@ public class VNCConn {
 
 				int repeaterId = (connSettings.useRepeater && connSettings.repeaterId != null && connSettings.repeaterId.length() > 0) ? Integer.parseInt(connSettings.repeaterId) : -1;
 				lockFramebuffer();
+
 				final COMPRESSMODEL compressModel = COMPRESSMODEL.valueOf(connSettings.compressModel);
 				final QUALITYMODEL qualityModel = QUALITYMODEL.valueOf(connSettings.qualityModel);
 				final boolean enableCompress = COMPRESSMODEL.None != compressModel;
 				final boolean enableJPEG = QUALITYMODEL.None != qualityModel;
-				if (!rfbInit(
-						connSettings.address,
-						connSettings.port,
-						repeaterId,
-						pendingColorModel.bpp(),
-						connSettings.encodingsString,
+        if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp(),
+	          connSettings.encodingsString,
 						enableCompress,
 						enableJPEG,
 						COMPRESSMODEL.valueOf(connSettings.compressModel).toParameter(),
-						QUALITYMODEL.valueOf(connSettings.qualityModel).toParameter()
+						QUALITYMODEL.valueOf(connSettings.qualityModel).toParameter(),     
+						connSettings.sshHost,
+						connSettings.sshUsername,
+						connSettings.sshPassword,
+						connSettings.sshPrivkey,
+						connSettings.sshPrivkeyPassword
 				)) {
 					unlockFramebuffer();
 					throw new Exception(); //TODO add some error reoprting here
@@ -215,6 +222,9 @@ public class VNCConn {
 						pd.setMessage("Downloading first frame.\nPlease wait...");
 					}
 				});
+
+				// update connection with desktop name
+				connSettings.nickname = getDesktopName();
 
 				// start output thread here
 				outputThread = new ClientToServerThread();
@@ -383,7 +393,7 @@ public class VNCConn {
 		private boolean sendCutText(String text) {
 			if (rfbClient != 0) {
 				if (Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
-				return rfbSendClientCutText(text);
+				return rfbSendClientCutText(StandardCharsets.ISO_8859_1.encode(text).array());
 			}
 			return false;
 		}
@@ -392,8 +402,15 @@ public class VNCConn {
     }
 
 
-	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel, String encodingsString, boolean hasCompress, boolean enableJPEG, int compressLevel, int qualityLevel);
-	private native void rfbShutdown();
+	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel,
+                   String encodingsString, boolean hasCompress, boolean enableJPEG, int compressLevel, int qualityLevel,
+								   String ssh_host,
+								   String ssh_user,
+								   String ssh_password,
+								   byte[] ssh_priv_key,
+								   String ssh_priv_key_password);
+
+  private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);
 	private native String rfbGetDesktopName();
@@ -401,7 +418,7 @@ public class VNCConn {
 	private native int rfbGetFramebufferHeight();
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
 	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
-	private native boolean rfbSendClientCutText(String text);
+	private native boolean rfbSendClientCutText(byte[] bytes);
 
 
 	public VNCConn() {
@@ -591,6 +608,8 @@ public class VNCConn {
 					case KeyEvent.KEYCODE_PAGE_DOWN:    keyCode = 0xff56; break;
 					case KeyEvent.KEYCODE_CTRL_LEFT:    keyCode = 0xffe3; break;
 					case KeyEvent.KEYCODE_CTRL_RIGHT:   keyCode = 0xffe4; break;
+					case KeyEvent.KEYCODE_SHIFT_LEFT:   keyCode = 0xffe1; break;
+					case KeyEvent.KEYCODE_SHIFT_RIGHT:  keyCode = 0xffe2; break;							
 					default:
 						// do keycode -> UTF-8 keysym conversion
 						KeyEvent tmp = new KeyEvent(
@@ -728,8 +747,8 @@ public class VNCConn {
 
 	// called from native via worker thread context
 	@Keep
-	private void onGotCutText(String text) {
-		serverCutText = text;
+	private void onGotCutText(byte[] bytes) {
+		serverCutText = StandardCharsets.ISO_8859_1.decode(ByteBuffer.wrap(bytes)).toString();
 		Log.d(TAG, "got server cuttext: " + serverCutText);
 	}
 
@@ -786,8 +805,59 @@ public class VNCConn {
 		Log.d(TAG, "new framebuffer size " + w + " x " + h);
 		// this triggers an update on what the canvas thinks about cursor position.
 		// without this, the pointer highlight is off by some value after framebuffer size change
-		canvas.pan(0, 0);
+		canvas.handler.post(() -> {
+			canvas.pan(0, 0);
+		});
 	}
 
+	// called from native via worker thread context
+	@Keep
+	private int onSshFingerprintCheck(String host, byte[] fingerprint) {
+		// look for host, if not found create entry and return ok
+		SshKnownHost knownHost = VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().get(host);
+		if(knownHost == null) {
+			AtomicBoolean doContinue = new AtomicBoolean();
+			// always using SHA256 in native part, ok to hardocde this here
+			canvas.getSshFingerPrintNewDecision("SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP), doContinue); // this cares for running on the main thread
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+			if(doContinue.get()) {
+				VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, host, fingerprint));
+				return 0;
+			}
+			else {
+				return -1;
+			}
+		}
+
+		// host found, check if fingerprint matches
+	    if(Arrays.equals(knownHost.fingerprint, fingerprint))
+			return 0;
+		else {
+			// not matching, ask user!
+			AtomicBoolean doContinue = new AtomicBoolean();
+			// always using SHA256 in native part, ok to hardocde this here
+			canvas.getSshFingerPrintMismatchDecision("SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP), doContinue); // this cares for running on the main thread
+			synchronized (VNCConn.this) {
+				try {
+					VNCConn.this.wait();  // wait for user input to finish
+				} catch (InterruptedException e) {
+					//unused
+				}
+			}
+			if(doContinue.get())
+				return 0;
+			else {
+				SshKnownHost updatedHost = new SshKnownHost(knownHost.id, host, fingerprint);
+				VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().update(updatedHost);
+				return -1;
+			}
+		}
+	}
 }
 
