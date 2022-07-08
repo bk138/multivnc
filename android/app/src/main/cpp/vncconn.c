@@ -756,12 +756,19 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
     }
 }
 
+
 JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbInit(JNIEnv *env, jobject obj, jstring host, jint port, jint repeaterId, jint bytesPerPixel,
+                                                                                  jstring encodingsString,
+                                                                                  jboolean enableCompress,
+                                                                                  jboolean enableJPEG,
+                                                                                  jint compressLevel,
+                                                                                  jint qualityLevel
                                                                                   jstring ssh_host,
                                                                                   jstring ssh_user,
                                                                                   jstring ssh_password,
                                                                                   jbyteArray ssh_priv_key,
                                                                                   jstring ssh_priv_key_password) {
+
     if(!getRfbClient(env, obj))
         setupClient(env, obj, bytesPerPixel);
 
@@ -779,6 +786,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
      * as the Get*() methods fail on a null reference.
      */
     const char *cHost = host ? (*env)->GetStringUTFChars(env, host, NULL) : NULL;
+    const char *cEncodingsString = encodingsString ? (*env)->GetStringUTFChars(env, encodingsString, NULL) : NULL;
     const char *cSshHost = ssh_host ? (*env)->GetStringUTFChars(env, ssh_host, NULL) : NULL;
     const char *cSshUser = ssh_user ? (*env)->GetStringUTFChars(env, ssh_user, NULL) : NULL;
     const char *cSshPassword = ssh_password ? (*env)->GetStringUTFChars(env, ssh_password, NULL) : NULL;
@@ -816,10 +824,21 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
         if(cl->serverPort < 100)
             cl->serverPort += 5900;
     }
+    
+    if(cEncodingsString) // strdup(NULL) is UB
+        cl->appData.encodingsString = strdup(cEncodingsString);
+        
+    cl->appData.compressLevel = compressLevel;
+
+    cl->appData.enableJPEG = enableJPEG;
+    cl->appData.qualityLevel = qualityLevel;        
+
 
     // release all handles to managed strings again
     if (cHost)
         (*env)->ReleaseStringUTFChars(env, host, cHost);
+    if(cEncodingsString)
+        (*env)->ReleaseStringUTFChars(env, encodingsString, cEncodingsString);
     if (cSshHost)
         (*env)->ReleaseStringUTFChars(env, ssh_host, cSshHost);
     if(cSshUser)
@@ -836,6 +855,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
         cl->destHost = strdup("ID");
         cl->destPort = repeaterId;
     }
+
 
     // check if ssh connection was wanted and succeeded
     if(is_ssh_connection && !rfbClientGetClientData(cl, VNCCONN_SSH_ID)) {

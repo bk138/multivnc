@@ -190,7 +190,17 @@ public class VNCConn {
 
 				int repeaterId = (connSettings.useRepeater && connSettings.repeaterId != null && connSettings.repeaterId.length() > 0) ? Integer.parseInt(connSettings.repeaterId) : -1;
 				lockFramebuffer();
-				if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp(),
+
+				final COMPRESSMODEL compressModel = COMPRESSMODEL.valueOf(connSettings.compressModel);
+				final QUALITYMODEL qualityModel = QUALITYMODEL.valueOf(connSettings.qualityModel);
+				final boolean enableCompress = COMPRESSMODEL.None != compressModel;
+				final boolean enableJPEG = QUALITYMODEL.None != qualityModel;
+        if (!rfbInit(connSettings.address, connSettings.port, repeaterId, pendingColorModel.bpp(),
+	          connSettings.encodingsString,
+						enableCompress,
+						enableJPEG,
+						COMPRESSMODEL.valueOf(connSettings.compressModel).toParameter(),
+						QUALITYMODEL.valueOf(connSettings.qualityModel).toParameter(),     
 						connSettings.sshHost,
 						connSettings.sshUsername,
 						connSettings.sshPassword,
@@ -393,12 +403,14 @@ public class VNCConn {
 
 
 	private native boolean rfbInit(String host, int port, int repeaterId, int bytesPerPixel,
+                   String encodingsString, boolean hasCompress, boolean enableJPEG, int compressLevel, int qualityLevel,
 								   String ssh_host,
 								   String ssh_user,
 								   String ssh_password,
 								   byte[] ssh_priv_key,
 								   String ssh_priv_key_password);
-	private native void rfbShutdown();
+
+  private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);
 	private native String rfbGetDesktopName();
@@ -428,12 +440,7 @@ public class VNCConn {
 		Log.d(TAG, "initializing");
 
 		connSettings = bean;
-		try {
-			this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
-		}
-		catch(IllegalArgumentException e) {
-			this.pendingColorModel = COLORMODEL.C24bit;
-		}
+		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
 		// Startup the RFB thread with a nifty progess dialog
 		final ProgressDialog pd = new ProgressDialog(canvas.getContext());

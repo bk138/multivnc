@@ -83,4 +83,11 @@
 <!--          https://asrt.gluege.boerde.de             -->
     <string name="connected_to">%1$sに接続</string>
     <string name="host_and">%1$sと</string>
+
+    <string name="encoding_caption">優先するエンコーディング</string>
+    <string name="encoding_ok">OK</string>
+    <string name="encoding_cancel">キャンセル</string>
+
+    <string name="compress_caption">圧縮レベル</string>
+    <string name="quality_caption">画質レベル</string>
 </resources>
