@@ -762,7 +762,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
                                                                                   jboolean enableCompress,
                                                                                   jboolean enableJPEG,
                                                                                   jint compressLevel,
-                                                                                  jint qualityLevel
+                                                                                  jint qualityLevel,
                                                                                   jstring ssh_host,
                                                                                   jstring ssh_user,
                                                                                   jstring ssh_password,
