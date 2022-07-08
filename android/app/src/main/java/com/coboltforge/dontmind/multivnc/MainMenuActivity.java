@@ -438,7 +438,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 
 					    	case 2: // edit
 								Log.d(TAG, "Editing bookmark " + conn.id);
-					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
+					    		Intent intent = new Intent(MainMenuActivity.this, ConnectionEditActivity.class);
 					    		intent.putExtra(Constants.CONNECTION, conn.id);
 					    		startActivity(intent);
 					    		break;

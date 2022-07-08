@@ -25,7 +25,7 @@ import android.widget.TextView;
 import java.util.Arrays;
 import java.util.List;
 
-public class EditBookmarkActivity extends Activity {
+public class ConnectionEditActivity extends Activity {
 	
 	private static final String TAG = "EditBookmarkActivity";
 	private final String[] ENCODING_NAMES = {"Tight", "ZRLE", "Ultra", "Copyrect", "Hextile", "Zlib", "CoRRE", "RRE", "TRLE", "ZYWRLE"};
@@ -52,7 +52,7 @@ public class EditBookmarkActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.editbookmarks);
+		setContentView(R.layout.connection_edit_activity);
 		bookmarkNameText = (EditText) findViewById(R.id.textNicknameBookmark);
 		ipText = (EditText) findViewById(R.id.textIPBookmark);
 		portText = (EditText) findViewById(R.id.textPORTBookmark);

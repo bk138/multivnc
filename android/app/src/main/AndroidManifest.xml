@@ -42,7 +42,7 @@
         	</intent-filter>
         </activity>
 
-        <activity android:name="EditBookmarkActivity"
+        <activity android:name=".ConnectionEditActivity"
             android:label="@string/editbookmark_title"
             >
        	</activity>
