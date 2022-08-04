@@ -1,5 +1,11 @@
 # Version 2.0.x:
 
+## 2.0.9
+
+### 🛠  Fixes
+
+* Actually use the new call introduced in v2.0.8.
+
 ## 2.0.8
 
 ### 🛠  Fixes
