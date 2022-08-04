@@ -1,5 +1,11 @@
 # Version 2.0.x:
 
+## 2.0.8
+
+### 🛠  Fixes
+
+* Fixed app crashes on Android >= 11 caused by [Android 11 behavior changes](https://developer.android.com/about/versions/11/behavior-changes-all#fdsan).
+
 ## 2.0.7
 
 ### 🛠  Fixes
