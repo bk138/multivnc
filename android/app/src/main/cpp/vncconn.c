@@ -370,7 +370,7 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
     rfbClient *cl = getRfbClient(env, obj);
     if(cl) {
         log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbShutdown() closing connection");
-        close(cl->sock);
+        rfbCloseSocket(cl->sock);
 
         if(cl->frameBuffer) {
             free(cl->frameBuffer);
