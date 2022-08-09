@@ -1,5 +1,11 @@
 # Version 2.0.x:
 
+## 2.0.10
+
+### 🛠  Fixes
+
+* Fix ExtendedDesktopSize handling for older UltraVNC servers.
+
 ## 2.0.9
 
 ### 🛠  Fixes
