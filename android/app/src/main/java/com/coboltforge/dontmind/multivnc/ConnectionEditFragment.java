@@ -54,8 +54,10 @@ public class ConnectionEditFragment extends Fragment {
     private Spinner qualitySpinner;
     private EditText textUsername;
     private CheckBox checkboxKeepPassword;
+    SwitchMaterial sshSwitch;
     private EditText sshHostText;
     private EditText sshUsernameText;
+    RadioGroup sshCredentialsRadioGroup;
     private EditText sshPasswordText;
     private Button sshPrivkeyImportButton;
     private byte[] sshPrivkey;
@@ -144,7 +146,7 @@ public class ConnectionEditFragment extends Fragment {
         sshPasswordText = view.findViewById(R.id.ssh_password_input);
         sshPrivkeyImportButton = view.findViewById(R.id.ssh_privkey_import_button);
         sshPrivkeyPasswordText = view.findViewById(R.id.ssh_privkey_password_input);
-        SwitchMaterial sshSwitch = view.findViewById(R.id.ssh_switch);
+        sshSwitch = view.findViewById(R.id.ssh_switch);
         sshSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             // set visibility
             view.findViewById(R.id.ssh_row).setVisibility(isChecked ? View.VISIBLE : View.GONE);
@@ -154,9 +156,10 @@ public class ConnectionEditFragment extends Fragment {
                 sshUsernameText.setText("");
                 sshPasswordText.setText("");
                 sshPrivkeyPasswordText.setText("");
+                sshPrivkeyImportButton.setText(R.string.ssh_privkey_import);
             }
         });
-        RadioGroup sshCredentialsRadioGroup = view.findViewById(R.id.ssh_credentials_radiogroup);
+        sshCredentialsRadioGroup = view.findViewById(R.id.ssh_credentials_radiogroup);
         sshCredentialsRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if(checkedId == R.id.ssh_password_radiobutton) {
                 sshPasswordText.setVisibility(View.VISIBLE);
@@ -167,6 +170,7 @@ public class ConnectionEditFragment extends Fragment {
             } else {
                 sshPasswordText.setVisibility(View.GONE);
                 sshPasswordText.setText("");
+                sshPrivkeyImportButton.setText(R.string.ssh_privkey_import);
                 sshPrivkeyImportButton.setVisibility(View.VISIBLE);
                 sshPrivkeyPasswordText.setVisibility(View.VISIBLE);
             }
@@ -312,6 +316,19 @@ public class ConnectionEditFragment extends Fragment {
         for (int i = 0; i < ENCODING_VALUES.length; ++i)
         {
             encodingChecksEdit[i] = encodingChecks[i] = encodingValues.contains(ENCODING_VALUES[i]);
+        }
+
+        sshSwitch.setChecked(conn.sshHost != null);
+        sshHostText.setText(conn.sshHost);
+        sshUsernameText.setText(conn.sshUsername);
+        if(conn.sshPrivkey != null) {
+            sshCredentialsRadioGroup.check(R.id.ssh_privkey_radiobutton);
+            sshPrivkeyPasswordText.setText(conn.sshPrivkeyPassword);
+            sshPrivkeyImportButton.setText(R.string.ssh_privkey_import_other);
+        }
+        if(conn.sshPassword != null) {
+            sshCredentialsRadioGroup.check(R.id.ssh_password_radiobutton);
+            sshPasswordText.setText(conn.sshPassword);
         }
     }
 

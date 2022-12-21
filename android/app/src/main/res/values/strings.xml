@@ -49,6 +49,7 @@
     <string name="ssh_privkey">Private Key</string>
     <string name="ssh_password_hint">SSH Password</string>
     <string name="ssh_privkey_import">Import Key</string>
+    <string name="ssh_privkey_import_other">Overwrite Key</string>
     <string name="ssh_privkey_import_success">Successfully imported SSH private key.</string>
     <string name="ssh_privkey_import_fail">Failed importing SSH private key.</string>
     <string name="ssh_privkey_password_hint">Key Password</string>
