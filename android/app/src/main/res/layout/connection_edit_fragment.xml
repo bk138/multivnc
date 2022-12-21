@@ -252,6 +252,7 @@
                     android:layout_weight="1"
                     android:checked="true"
                     android:text="@string/ssh_password"
+                    android:singleLine="true"
                     />
                 <RadioButton
                     android:id="@+id/ssh_privkey_radiobutton"
@@ -260,6 +261,7 @@
                     android:layout_weight="1"
                     android:checked="false"
                     android:text="@string/ssh_privkey"
+                    android:singleLine="true"
                     />
             </RadioGroup>
 
