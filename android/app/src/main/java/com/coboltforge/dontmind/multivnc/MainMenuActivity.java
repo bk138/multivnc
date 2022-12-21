@@ -31,12 +31,14 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,6 +55,8 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Collections;
 import java.util.Hashtable;
@@ -148,10 +152,18 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 					return;
 
 				final EditText input = new EditText(MainMenuActivity.this);
+				TextInputLayout inputLayout = new TextInputLayout(MainMenuActivity.this);
+				inputLayout.setPadding(
+						(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, Resources.getSystem().getDisplayMetrics()),
+					0,
+						(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, Resources.getSystem().getDisplayMetrics()),
+						0
+				);
+				inputLayout.addView(input);
 
 				new AlertDialog.Builder(MainMenuActivity.this)
 				.setMessage(getString(R.string.enterbookmarkname))
-				.setView(input)
+				.setView(inputLayout)
 				.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String name = input.getText().toString();
