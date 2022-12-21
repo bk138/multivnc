@@ -28,6 +28,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.res.Resources;
 import android.text.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,6 +39,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.KeyEvent;
@@ -47,6 +49,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +57,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputLayout;
 
 @SuppressWarnings("deprecation")
 public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
@@ -492,8 +496,32 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			sendSpecialKeyAgain();
 			return true;
 		case R.id.itemSaveBookmark:
-			database.getConnectionDao().save(connection);
-			Toast.makeText(this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
+			final String defaultName = connection.address + ":" + connection.port;
+
+			final EditText input = new EditText(this);
+			input.setHint(defaultName);
+			TextInputLayout inputLayout = new TextInputLayout(this);
+			inputLayout.setPadding(
+					(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, Resources.getSystem().getDisplayMetrics()),
+					0,
+					(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, Resources.getSystem().getDisplayMetrics()),
+					0
+			);
+			inputLayout.addView(input);
+
+			new AlertDialog.Builder(this)
+					.setMessage(getString(R.string.enterbookmarkname))
+					.setView(inputLayout)
+					.setPositiveButton(getString(android.R.string.ok), (dialog, whichButton) -> {
+						String name = input.getText().toString();
+						if(name.length() == 0)
+							name = defaultName;
+						connection.nickname = name;
+						database.getConnectionDao().save(connection);
+						Toast.makeText(VncCanvasActivity.this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
+					}).setNegativeButton(getString(android.R.string.cancel), (dialog, whichButton) -> {
+						// Do nothing.
+					}).show();
 			return true;
 		case R.id.itemAbout:
 			Intent intent = new Intent (this, AboutActivity.class);
