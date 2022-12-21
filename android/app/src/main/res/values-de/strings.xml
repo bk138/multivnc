@@ -40,6 +40,17 @@
 <string name="port_caption">"Port"</string>
 <string name="repeater_caption">"ID am Repeater"</string>
 <string name="repeater_hint">"Server-ID bei Verbindung zu einem UltraVNC-Repeater"</string>
+    <string name="ssh_caption">SSH-Tunnel</string>
+    <string name="ssh_host_hint">SSH-Server</string>
+    <string name="ssh_username_hint">SSH-Username</string>
+    <string name="ssh_password">Passwort</string>
+    <string name="ssh_privkey">Privater Schlüssel</string>
+    <string name="ssh_password_hint">SSH-Passwort</string>
+    <string name="ssh_privkey_import">Schlüssel importieren</string>
+    <string name="ssh_privkey_import_other">Schlüssel überschreiben</string>
+    <string name="ssh_privkey_import_success">Der private SSH-Schlüssel wurde erfolgreich importiert.</string>
+    <string name="ssh_privkey_import_fail">Importieren des privaten SSH-Schlüssels fehlgeschlagen.</string>
+    <string name="ssh_privkey_password_hint">Schlüssel-Passwort</string>
 <string name="save_as_copy">"Als Kopie speichern"</string>
     <string name="credentials_needed_title">Anmeldeinformationen erforderlich…</string>
     <!-- Send selected metakey -->
@@ -83,4 +94,17 @@
 </string>
     <string name="connected_to">Verbunden mit %1$s</string>
     <string name="host_and">%1$s und </string>
+    <string name="ssh_key_new_title">Entfernter SSH-Host noch nicht bekannt.</string>
+    <string name="encoding_caption">Bevorzugte Kodierung</string>
+    <string name="encoding_ok">OK</string>
+    <string name="encoding_cancel">Abbrechen</string>
+    <string name="compress_caption">Komprimierung</string>
+    <string name="quality_caption">Qualitätsstufe</string>
+    <string name="ssh_key_new_continue">Der Fingerabdruck des SSH-Servers &lt;b>%s&lt;/b> ist noch nicht bekannt. Bitte überprüfen Sie, ob es sich um den richtigen Fingerabdruck des SSH-Servers handelt, mit dem Sie sich verbinden möchten.</string>
+    <string name="ssh_key_new_abort">Ich bin unsicher, abbrechen</string>
+    <string name="ssh_key_mismatch_title">Die Identifikation des entfernten SSH-Hosts hat sich geändert!</string>
+    <string name="ssh_key_mismatch_message">Der Fingerabdruck &lt;b>%s&lt;/b> des SSH-Servers stimmt nicht mit dem bereits bekannten überein. Dies bedeutet entweder, dass sich jemand als der richtige SSH-Server ausgibt (Man-in-the-Middle-Angriff) oder dass der Hostschlüssel des richtigen Servers geändert wurde. Bitte wenden Sie sich an den Administrator des SSH-Servers, um den richtigen Schlüssel zu überprüfen. Möchten Sie den Aufbau der SSH-Verbindung fortsetzen oder abbrechen?</string>
+    <string name="ssh_key_mismatch_continue">Ich bin zuversichtlich, dass das legitim ist, weiter</string>
+    <string name="ssh_key_mismatch_abort">Ich überprüfe den korrekten Fingerabdruck des SSH-Servers, abbrechen</string>
+    <string name="ssh_key_new_message">Der Fingerabdruck des SSH-Servers &lt;b>%s&lt;/b> ist noch nicht bekannt. Bitte überprüfen Sie, ob es sich um den richtigen Fingerabdruck des SSH-Servers handelt, mit dem Sie sich verbinden möchten.</string>
 </resources>
