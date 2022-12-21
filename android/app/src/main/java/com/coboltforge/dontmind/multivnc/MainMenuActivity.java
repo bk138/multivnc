@@ -151,7 +151,10 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 				if(conn == null)
 					return;
 
+				final String defaultName = conn.address + ":" + conn.port;
+
 				final EditText input = new EditText(MainMenuActivity.this);
+				input.setHint(defaultName);
 				TextInputLayout inputLayout = new TextInputLayout(MainMenuActivity.this);
 				inputLayout.setPadding(
 						(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, Resources.getSystem().getDisplayMetrics()),
@@ -168,7 +171,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String name = input.getText().toString();
 						if(name.length() == 0)
-							name = conn.address + ":" + conn.port;
+							name = defaultName;
 						conn.nickname = name;
 						saveBookmark(conn);
 						updateBookmarkView();
