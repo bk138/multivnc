@@ -53,7 +53,6 @@ public class ConnectionEditFragment extends Fragment {
     private Spinner compressSpinner;
     private Spinner qualitySpinner;
     private EditText textUsername;
-    private CheckBox checkboxKeepPassword;
     SwitchMaterial sshSwitch;
     private EditText sshHostText;
     private EditText sshUsernameText;
@@ -136,8 +135,6 @@ public class ConnectionEditFragment extends Fragment {
         qualitySpinner = (Spinner)view.findViewById(R.id.spinnerQuality);
         ArrayAdapter<QUALITYMODEL> qualitySpinnerAdapter = new ArrayAdapter<QUALITYMODEL>(requireContext(), android.R.layout.simple_spinner_item, QUALITYMODEL.values());
         qualitySpinner.setAdapter(qualitySpinnerAdapter);
-
-        checkboxKeepPassword = (CheckBox)view.findViewById(R.id.checkboxKeepPassword);
 
         repeaterText = (TextView)view.findViewById(R.id.textRepeaterId);
 
@@ -235,7 +232,6 @@ public class ConnectionEditFragment extends Fragment {
         }
         conn.userName = textUsername.getText().toString().trim();
         conn.password = passwordText.getText().toString().trim();
-        conn.keepPassword = checkboxKeepPassword.isChecked();
         conn.useLocalCursor = true; // always enable
         conn.colorModel = ((COLORMODEL)colorSpinner.getSelectedItem()).nameString();
         conn.compressModel = ((COMPRESSMODEL)compressSpinner.getSelectedItem()).nameString();
@@ -300,10 +296,9 @@ public class ConnectionEditFragment extends Fragment {
         bookmarkNameText.setText(conn.nickname);
         ipText.setText(conn.address);
         portText.setText(Integer.toString(conn.port));
-        if (conn.keepPassword || conn.password.length()>0) {
+        if (conn.password != null || conn.password.length()>0) {
             passwordText.setText(conn.password);
         }
-        checkboxKeepPassword.setChecked(conn.keepPassword);
         textUsername.setText(conn.userName);
 
         setSpinnerByEnum(colorSpinner, COLORMODEL.values(), COLORMODEL.valueOf(conn.colorModel));
