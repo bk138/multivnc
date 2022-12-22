@@ -95,7 +95,7 @@
     ]]>
 </string>
     <string name="connected_to">Connectat a %1$s</string>
-    <string name="host_and">%1$s i</string>
+    <string name="host_and">%1$s i </string>
     <string name="encrypted">xifrat</string>
     <string name="unencrypted">sense xifrar</string>
 
