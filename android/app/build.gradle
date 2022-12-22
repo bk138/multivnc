@@ -10,8 +10,8 @@ android {
         applicationId "com.coboltforge.dontmind.multivnc"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 92
-        versionName "2.0.10"
+        versionCode 93
+        versionName "2.1.0"
         externalNativeBuild {
             cmake {
                 // exclude the other LibVNCServer targets
