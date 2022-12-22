@@ -985,3 +985,11 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
     else
         return JNI_FALSE;
 }
+
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIsEncrypted(JNIEnv *env, jobject obj) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if (cl)
+        return cl->tlsSession != NULL || rfbClientGetClientData(cl, VNCCONN_SSH_ID) != NULL;
+    else
+        return JNI_FALSE;
+}
