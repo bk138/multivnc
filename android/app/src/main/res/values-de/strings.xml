@@ -94,6 +94,8 @@
 </string>
     <string name="connected_to">Verbunden mit %1$s</string>
     <string name="host_and">%1$s und </string>
+    <string name="encrypted">verschlüsselt</string>
+    <string name="unencrypted">unverschlüsselt</string>
     <string name="ssh_key_new_title">Entfernter SSH-Host noch nicht bekannt.</string>
     <string name="encoding_caption">Bevorzugte Kodierung</string>
     <string name="encoding_ok">OK</string>
