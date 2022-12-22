@@ -19,6 +19,7 @@ Windows. There also is an [Android version](/android/).
 
 * Support for most VNC encodings including Tight.
 * TLS support, i.e. AnonTLS and VeNCrypt.
+* Support for SSH-Tunnelling with password- and privkey-based authentication.
 * UltraVNC Repeater support.
 * Discovery of VNC servers advertising themselves via ZeroConf.
 * Bookmarking of connections.
