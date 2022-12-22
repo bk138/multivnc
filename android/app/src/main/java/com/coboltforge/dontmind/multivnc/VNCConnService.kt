@@ -111,7 +111,7 @@ class VNCConnService : Service() {
             Log.d(TAG, "onStartCommand: notifying with " + getString(R.string.connected_to, hosts))
             val notificationIntent = Intent(this, VncCanvasActivity::class.java)
             val pendingIntent = PendingIntent.getActivity(this, 0,
-                    notificationIntent, 0)
+                    notificationIntent, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
             val notification = NotificationCompat.Builder(this, packageName)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentTitle(getString(R.string.app_name))
