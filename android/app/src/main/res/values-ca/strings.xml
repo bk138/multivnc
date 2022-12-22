@@ -42,7 +42,18 @@
 <string name="port_caption">Port</string>
 <string name="repeater_caption">ID en el repetidor</string>
 <string name="repeater_hint">Identificació del servidor quan es connecta a un repetidor UltraVNC</string>
-<string name="save_as_copy">Guardar com a còpia</string>
+    <string name="ssh_caption">Túneles SSH</string>
+    <string name="ssh_host_hint">Servidor SSH</string>
+    <string name="ssh_username_hint">Nom d\'usuari SSH</string>
+    <string name="ssh_password">Contrasenya</string>
+    <string name="ssh_privkey">Clau privada</string>
+    <string name="ssh_password_hint">Contrasenya SSH</string>
+    <string name="ssh_privkey_import">Importa la clau</string>
+    <string name="ssh_privkey_import_other">Sobreescriure la clau</string>
+    <string name="ssh_privkey_import_success">S\'ha importat correctament la clau privada SSH.</string>
+    <string name="ssh_privkey_import_fail">No s\'ha pogut importar la clau privada SSH.</string>
+    <string name="ssh_privkey_password_hint">Contrasenya clau</string>
+    <string name="save_as_copy">Guardar com a còpia</string>
     <string name="credentials_needed_title">Es necessiten credencials...</string>
 <!-- Send selected metakey -->
 <string name="send_button">Enviar</string>
@@ -84,5 +95,23 @@
     ]]>
 </string>
     <string name="connected_to">Connectat a %1$s</string>
-    <string name="host_and">%1$s i </string>
+    <string name="host_and">%1$s i</string>
+    <string name="encrypted">xifrat</string>
+    <string name="unencrypted">sense xifrar</string>
+
+    <string name="encoding_caption">Codificació preferida</string>
+    <string name="encoding_ok">D\'acord</string>
+    <string name="encoding_cancel">Cancel · lar</string>
+    <string name="compress_caption">Nivell de compressió</string>
+    <string name="quality_caption">Nivell de qualitat</string>
+
+    <string name="ssh_key_new_title">L\'amfitrió SSH remot encara no es coneix</string>
+    <string name="ssh_key_new_message">L\'empremta digital &lt;b&gt;%s&lt;/b&gt; del servidor SSH encara no es coneix. Si us plau, comproveu que és l\'empremta digital correcta del servidor SSH al qual voleu connectar-vos.</string>
+    <string name="ssh_key_new_continue">L\'empremta digital és vàlida, continua</string>
+    <string name="ssh_key_new_abort">No estic segur, avorta</string>
+
+    <string name="ssh_key_mismatch_title">La identificació de l\'amfitrió SSH remot ha canviat!</string>
+    <string name="ssh_key_mismatch_message">L\'empremta digital &lt;b&gt;%s&lt;/b&gt; del servidor SSH no coincideix amb la ja coneguda. Això significa que algú està suplantant la identitat del servidor SSH correcte (atac man-in-the-middle) o que s\'ha canviat la clau d\'amfitrió del servidor correcte. Poseu-vos en contacte amb l\'administrador del servidor SSH per verificar la clau correcta. Voleu continuar o avortar la configuració de la connexió SSH?</string>
+    <string name="ssh_key_mismatch_continue">Estic segur que això és legítim, continua</string>
+    <string name="ssh_key_mismatch_abort">Comprovaré l\'empremta correcta del servidor SSH, avortaré</string>
 </resources>
