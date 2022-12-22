@@ -42,8 +42,18 @@
 <string name="port_caption">Puerto</string>
 <string name="repeater_caption">ID en el repetidor</string>
 <string name="repeater_hint">Identificación del servidor cuando se conecta a un repetidor UltraVNC</string>
-<string name="save_as_copy">Guardar como copia</string>
-    <string name="credentials_needed_title">Se necesitan credenciales...</string>
+    <string name="ssh_caption">Tunelización SSH</string>
+    <string name="ssh_host_hint">Servidor SSH</string>
+    <string name="ssh_username_hint">Nombre de usuario SSH</string>
+    <string name="ssh_password">Clave</string>
+    <string name="ssh_privkey">Llave privada</string>
+    <string name="ssh_password_hint">Contraseña SSH</string>
+    <string name="ssh_privkey_import">Clave de importación</string>
+    <string name="ssh_privkey_import_other">Sobrescribir clave</string>
+    <string name="ssh_privkey_import_success">Clave privada SSH importada con éxito.</string>
+    <string name="ssh_privkey_import_fail">No se pudo importar la clave privada SSH.</string>
+    <string name="ssh_privkey_password_hint">Contraseña clave</string>
+    <string name="credentials_needed_title">Se necesitan credenciales…</string>
 <!-- Send selected metakey -->
 <string name="send_button">Enviar</string>
 <string name="send_key_again">Envíar la combinación de teclas de nuevo</string>
@@ -85,4 +95,22 @@
 </string>
     <string name="connected_to">Conectado a %1$s</string>
     <string name="host_and">%1$s y </string>
+    <string name="encrypted">encriptado</string>
+    <string name="unencrypted">sin cifrar</string>
+
+    <string name="encoding_caption">Codificación preferida</string>
+    <string name="encoding_ok">DE ACUERDO</string>
+    <string name="encoding_cancel">Cancelar</string>
+    <string name="compress_caption">Nivel de compresión</string>
+    <string name="quality_caption">Nivel de calidad</string>
+
+    <string name="ssh_key_new_title">Host SSH remoto aún no conocido</string>
+    <string name="ssh_key_new_message">La huella digital del servidor SSH &lt;b&gt;%s&lt;/b&gt; aún no se conoce. Verifique que sea la huella digital correcta del servidor SSH al que desea conectarse.</string>
+    <string name="ssh_key_new_continue">La huella dactilar es válida, continuar</string>
+    <string name="ssh_key_new_abort">No estoy seguro, cancelar</string>
+
+    <string name="ssh_key_mismatch_title">¡La identificación del host SSH remoto ha cambiado!</string>
+    <string name="ssh_key_mismatch_message">La huella dactilar &lt;b&gt;%s&lt;/b&gt; del servidor SSH no coincide con la ya conocida. Esto significa que alguien se está haciendo pasar por el servidor SSH correcto (ataque de intermediario) o que se cambió la clave de host del servidor correcto. Póngase en contacto con el administrador del servidor SSH para verificar la clave correcta. ¿Desea continuar o cancelar la configuración de la conexión SSH?</string>
+    <string name="ssh_key_mismatch_continue">Estoy seguro de que esto es legítimo, continuar</string>
+    <string name="ssh_key_mismatch_abort">Verificaré dos veces la huella digital correcta del servidor SSH, cancelaré</string>
 </resources>
