@@ -40,6 +40,17 @@
 <string name="port_caption">"Port"</string>
 <string name="repeater_caption">"ID sul ripetitore"</string>
 <string name="repeater_hint">"ID server quando ci si collega a un ripetitore UltraVNC"</string>
+    <string name="ssh_caption">Tunneling SSH</string>
+    <string name="ssh_host_hint">Server SSH</string>
+    <string name="ssh_username_hint">Nome utente SSH</string>
+    <string name="ssh_password">Parola d\'ordine</string>
+    <string name="ssh_privkey">Chiave privata</string>
+    <string name="ssh_password_hint">Password SSH</string>
+    <string name="ssh_privkey_import">Chiave di importazione</string>
+    <string name="ssh_privkey_import_other">Sovrascrivi chiave</string>
+    <string name="ssh_privkey_import_success">Chiave privata SSH importata correttamente.</string>
+    <string name="ssh_privkey_import_fail">Impossibile importare la chiave privata SSH.</string>
+    <string name="ssh_privkey_password_hint">Chiave d\'ordine</string>
 <string name="save_as_copy">"Salva come copia"</string>
     <string name="credentials_needed_title">Credenziali necessarie…</string>
 <!-- Send selected metakey -->
@@ -81,4 +92,22 @@
 </string>
     <string name="connected_to">Collegato a %1$s</string>
     <string name="host_and">%1$s e </string>
+    <string name="encrypted">crittografato</string>
+    <string name="unencrypted">non crittografato</string>
+
+    <string name="encoding_caption">Codifica preferita</string>
+    <string name="encoding_ok">OK</string>
+    <string name="encoding_cancel">Annulla</string>
+    <string name="compress_caption">Comprimi livello</string>
+    <string name="quality_caption">Livello di qualità</string>
+
+    <string name="ssh_key_new_title">Host SSH remoto non ancora noto</string>
+    <string name="ssh_key_new_message">L\'impronta digitale &lt;b&gt;%s&lt;/b&gt; del server SSH non è ancora nota. Verifica che sia l\'impronta digitale corretta del server SSH a cui desideri connetterti.</string>
+    <string name="ssh_key_new_continue">L\'impronta digitale è valida, continua</string>
+    <string name="ssh_key_new_abort">Non sono sicuro, abortisci</string>
+
+    <string name="ssh_key_mismatch_title">L\'identificazione dell\'host SSH remoto è cambiata!</string>
+    <string name="ssh_key_mismatch_message">L\'impronta digitale &lt;b&gt;%s&lt;/b&gt; del server SSH non corrisponde a quella già nota. Ciò significa che qualcuno sta impersonando il server SSH corretto (attacco man-in-the-middle) o che la chiave host del server corretto è stata modificata. Si prega di contattare l\'amministratore del server SSH per verificare la chiave corretta. Vuoi continuare o interrompere la configurazione della connessione SSH?</string>
+    <string name="ssh_key_mismatch_continue">Sono fiducioso che sia legittimo, continua</string>
+    <string name="ssh_key_mismatch_abort">Ricontrollerò l\'impronta digitale del server SSH corretta, abortisco</string>
 </resources>
