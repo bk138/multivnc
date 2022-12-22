@@ -42,6 +42,17 @@
 <string name="port_caption">Porto</string>
 <string name="repeater_caption">ID no repetidor</string>
 <string name="repeater_hint">Identificación do servidor cando se conecta a un repetidor UltraVNC</string>
+    <string name="ssh_caption">Túneles SSH</string>
+    <string name="ssh_host_hint">Servidor SSH</string>
+    <string name="ssh_username_hint">Nome de usuario SSH</string>
+    <string name="ssh_password">Contrasinal</string>
+    <string name="ssh_privkey">Chave privada</string>
+    <string name="ssh_password_hint">Contrasinal SSH</string>
+    <string name="ssh_privkey_import">Importar clave</string>
+    <string name="ssh_privkey_import_other">Chave de sobrescritura</string>
+    <string name="ssh_privkey_import_success">A clave privada SSH importouse correctamente.</string>
+    <string name="ssh_privkey_import_fail">Produciuse un erro ao importar a clave privada SSH.</string>
+    <string name="ssh_privkey_password_hint">Contrasinal clave</string>
 <string name="save_as_copy">Gardar como copia</string>
     <string name="credentials_needed_title">Necesítanse credenciais...</string>
 <!-- Send selected metakey -->
@@ -85,4 +96,22 @@
 </string>
     <string name="connected_to">Conectado a %1$s</string>
     <string name="host_and">%1$s e </string>
+    <string name="encrypted">cifrado</string>
+    <string name="unencrypted">sen cifrar</string>
+
+    <string name="encoding_caption">Codificación preferida</string>
+    <string name="encoding_ok">Ok</string>
+    <string name="encoding_cancel">Cancelar</string>
+    <string name="compress_caption">Nivel de compresión</string>
+    <string name="quality_caption">Nivel de calidade</string>
+
+    <string name="ssh_key_new_title">Aínda non se coñece o host SSH remoto</string>
+    <string name="ssh_key_new_message">Aínda non se coñece a pegada dixital &lt;b&gt;%s&lt;/b&gt; do servidor SSH. Comprobe que é a pegada dixital correcta do servidor SSH ao que quere conectarse.</string>
+    <string name="ssh_key_new_continue">A impresión dixital é válida, continúa</string>
+    <string name="ssh_key_new_abort">Non estou seguro, aborta</string>
+
+    <string name="ssh_key_mismatch_title">A identificación do host SSH remoto cambiou!</string>
+    <string name="ssh_key_mismatch_message">A pegada dixital &lt;b&gt;%s&lt;/b&gt; do servidor SSH non coincide coa xa coñecida. Isto significa que alguén está suplantando o servidor SSH correcto (ataque home-in-the-middle) ou que se cambiou a clave de host do servidor correcto. Póñase en contacto co administrador do servidor SSH para verificar a clave correcta. Queres continuar ou abortar a configuración da conexión SSH?</string>
+    <string name="ssh_key_mismatch_continue">Confío en que isto é lexítimo, continúa</string>
+    <string name="ssh_key_mismatch_abort">Comprobarei dúas veces a pegada dixital correcta do servidor SSH, abortarei</string>
 </resources>

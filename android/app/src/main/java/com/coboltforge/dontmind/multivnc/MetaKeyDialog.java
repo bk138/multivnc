@@ -64,7 +64,7 @@ class MetaKeyDialog extends Dialog {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.metakey);
+		setContentView(R.layout.metakey_dialog);
 		setTitle(R.string.meta_key_title);
 		_checkShift = (CheckBox)findViewById(R.id.checkboxShift);
 		_checkCtrl = (CheckBox)findViewById(R.id.checkboxCtrl);

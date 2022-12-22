@@ -42,6 +42,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -590,9 +591,9 @@ public class VncCanvas extends GLSurfaceView {
 
 
 	public void showConnectionInfo() {
-		String msg = "";
 		try {
-			msg = vncConn.getDesktopName();
+			String msg = vncConn.getDesktopName();
+			msg += "(" + (vncConn.isEncrypted() ? activity.getString(R.string.encrypted) : activity.getString(R.string.unencrypted)) + ")";
 			int idx = vncConn.getDesktopName().indexOf("(");
 			if (idx > -1) {
 				// Breakup actual desktop name from IP addresses for improved
@@ -608,10 +609,10 @@ public class VncCanvas extends GLSurfaceView {
 				msg += ", " + vncConn.getEncoding() + " encoding, " + vncConn.getColorModel().toString();
 			else
 				msg += ", " + vncConn.getColorModel().toString();
+			Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
 		}
-		catch(NullPointerException e) {
+		catch(Exception ignored) {
 		}
-		Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
 	}
 
 
@@ -862,6 +863,57 @@ public class VncCanvas extends GLSurfaceView {
 
 	}
 
+	public void getSshFingerPrintNewDecision(String fingerprint, final AtomicBoolean doContinue) {
+		// this method is probably called from the vnc thread
+		post(() -> {
+			AlertDialog dialog = new AlertDialog.Builder(getContext())
+					.setTitle(R.string.ssh_key_new_title)
+					.setMessage(Html.fromHtml(getContext().getString(R.string.ssh_key_new_message, fingerprint)))
+					.setCancelable(false)
+					.setPositiveButton(R.string.ssh_key_new_continue, (dialog12, whichButton) -> {
+						doContinue.set(true);
+						synchronized (vncConn) {
+							vncConn.notify();
+						}
+					})
+					.setNegativeButton(R.string.ssh_key_new_abort, (dialog1, whichButton) -> {
+						doContinue.set(false);
+						synchronized (vncConn) {
+							vncConn.notify();
+						}
+					})
+					.create();
+
+			dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+			dialog.show();
+		});
+	}
+
+	public void getSshFingerPrintMismatchDecision(String fingerprint, final AtomicBoolean doContinue) {
+		// this method is probably called from the vnc thread
+		post(() -> {
+			AlertDialog dialog = new AlertDialog.Builder(getContext())
+					.setTitle(R.string.ssh_key_mismatch_title)
+					.setMessage(getContext().getString(R.string.ssh_key_mismatch_message, fingerprint))
+					.setCancelable(false)
+					.setPositiveButton(R.string.ssh_key_mismatch_continue, (dialog12, whichButton) -> {
+						doContinue.set(true);
+						synchronized (vncConn) {
+							vncConn.notify();
+						}
+					})
+					.setNegativeButton(R.string.ssh_key_mismatch_abort, (dialog1, whichButton) -> {
+						doContinue.set(false);
+						synchronized (vncConn) {
+							vncConn.notify();
+						}
+					})
+					.create();
+
+			dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+			dialog.show();
+		});
+	}
 
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {

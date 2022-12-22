@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:scrollbars="vertical" >
+
+    <!-- this is focusable to start with view focus here! -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:padding="10dip" >
+
+        <androidx.fragment.app.FragmentContainerView
+            android:name="com.coboltforge.dontmind.multivnc.ConnectionEditFragment"
+            android:id="@+id/connectionEditFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/buttonCancelBookmark"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:layout_weight="1"
+                android:text="@android:string/cancel"/>
+
+            <Button
+                android:id="@+id/buttonSaveBookmark"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:layout_weight="1"
+                android:text="@string/save"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

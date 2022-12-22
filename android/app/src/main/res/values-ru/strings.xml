@@ -40,6 +40,17 @@
 <string name="port_caption">"Порт"</string>
 <string name="repeater_caption">"ID на ретрансляторе"</string>
 <string name="repeater_hint">"ID сервера при подключении к UltraVNC-ретранслятору"</string>
+    <string name="ssh_caption">Тунелювання SSH</string>
+    <string name="ssh_host_hint">Сервер SSH</string>
+    <string name="ssh_username_hint">Ім\'я користувача SSH</string>
+    <string name="ssh_password">Пароль</string>
+    <string name="ssh_privkey">Приватний ключ</string>
+    <string name="ssh_password_hint">Пароль SSH</string>
+    <string name="ssh_privkey_import">Ключ імпорту</string>
+    <string name="ssh_privkey_import_other">Перезаписати ключ</string>
+    <string name="ssh_privkey_import_success">Приватний ключ SSH успішно імпортовано.</string>
+    <string name="ssh_privkey_import_fail">Не вдалося імпортувати закритий ключ SSH.</string>
+    <string name="ssh_privkey_password_hint">Пароль ключа</string>
 <string name="save_as_copy">"Сохранить как копию"</string>
     <string name="credentials_needed_title">необходимы учетные данные…</string>
     <!-- Send selected metakey -->
@@ -81,4 +92,22 @@
 </string>
     <string name="connected_to">Подключено к %1$s</string>
     <string name="host_and">%1$s и </string>
+    <string name="encrypted">зашифрований</string>
+    <string name="unencrypted">незашифрований</string>
+
+    <string name="encoding_caption">Бажане кодування</string>
+    <string name="encoding_ok">гаразд</string>
+    <string name="encoding_cancel">Скасувати</string>
+    <string name="compress_caption">Рівень стиснення</string>
+    <string name="quality_caption">Рівень якості</string>
+
+    <string name="ssh_key_new_title">Віддалений хост SSH ще не відомий</string>
+    <string name="ssh_key_new_message">Відбиток пальця сервера SSH &lt;b&gt;%s&lt;/b&gt; ще не відомий. Перевірте, чи є правильний відбиток SSH-сервера, до якого ви хочете підключитися.</string>
+    <string name="ssh_key_new_continue">Відбиток пальця дійсний, продовжуйте</string>
+    <string name="ssh_key_new_abort">Я не впевнений, переривайте</string>
+
+    <string name="ssh_key_mismatch_title">Ідентифікація віддаленого хоста SSH змінена!</string>
+    <string name="ssh_key_mismatch_message">Відбиток &lt;b&gt;%s&lt;/b&gt; SSH-сервера не збігається з уже відомим. Це означає, що хтось видає себе за правильний SSH-сервер (атака «людина посередині») або що правильний ключ хоста сервера було змінено. Зверніться до адміністратора SSH-сервера, щоб перевірити правильний ключ. Бажаєте продовжити чи припинити налаштування з’єднання SSH?</string>
+    <string name="ssh_key_mismatch_continue">Я впевнений, що це законно, продовжуйте</string>
+    <string name="ssh_key_mismatch_abort">Я ще раз перевірю правильний відбиток сервера SSH, перерву</string>
 </resources>

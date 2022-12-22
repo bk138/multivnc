@@ -40,7 +40,7 @@ public class ConnectionListActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.connection_list);
+        setContentView(R.layout.connection_list_activity);
 
         database = VncDatabase.getInstance(this);
         Cursor cursor = database.getConnectionDao().getAllAsCursor();

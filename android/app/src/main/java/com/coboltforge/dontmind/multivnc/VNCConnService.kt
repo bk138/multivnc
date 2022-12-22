@@ -102,9 +102,10 @@ class VNCConnService : Service() {
             var hosts = ""
             if (mConnectionList.size == 1) {
                 hosts = mConnectionList[0].connSettings.nickname ?: ""
+                hosts += "(" + (if (mConnectionList[0].isEncrypted) getString(R.string.encrypted) else getString(R.string.unencrypted)) + ")"
             } else {
                 for (conn in mConnectionList) {
-                    hosts += getString(R.string.host_and, conn.connSettings.nickname)
+                    hosts += getString(R.string.host_and, conn.connSettings.nickname + "(" + (if (mConnectionList[0].isEncrypted) getString(R.string.encrypted) else getString(R.string.unencrypted)) + ")")
                 }
             }
             Log.d(TAG, "onStartCommand: notifying with " + getString(R.string.connected_to, hosts))

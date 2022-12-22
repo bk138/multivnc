@@ -33,6 +33,18 @@ data class ConnectionBean(
         var password: String? = "",
 
         @JvmField
+        @ColumnInfo(name = "ENCODINGSSTRING")
+        var encodingsString: String? = "tight zrle ultra copyrect hextile zlib corre rre trle zywrle raw",
+
+        @JvmField
+        @ColumnInfo(name = "COMPRESSMODEL")
+        var compressModel: String? = COMPRESSMODEL.L0.nameString(),
+
+        @JvmField
+        @ColumnInfo(name = "QUALITYMODEL")
+        var qualityModel: String? = QUALITYMODEL.L5.nameString(),
+
+        @JvmField
         @ColumnInfo(name = "COLORMODEL")
         var colorModel: String? = COLORMODEL.C24bit.nameString(),
 
@@ -94,7 +106,27 @@ data class ConnectionBean(
 
         @JvmField
         @ColumnInfo(name = "DOUBLE_TAP_ACTION")
-        var doubleTapAction: String? = null
+        var doubleTapAction: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_HOST")
+        var sshHost: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_USERNAME")
+        var sshUsername: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_PASSWORD")
+        var sshPassword: String? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_PRIVKEY")
+        var sshPrivkey: ByteArray? = null,
+
+        @JvmField
+        @ColumnInfo(name = "SSH_PRIVKEY_PASSWORD")
+        var sshPrivkeyPassword: String? = null,
 
 ) : Comparable<ConnectionBean>, Parcelable {
 

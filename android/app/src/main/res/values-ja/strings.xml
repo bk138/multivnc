@@ -43,6 +43,17 @@
 <string name="port_caption">ポート</string>
 <string name="repeater_caption">リピーターのID</string>
 <string name="repeater_hint">UltraVNCリピーターに接続するときのサーバーID</string>
+    <string name="ssh_caption">SSH トンネリング</string>
+    <string name="ssh_host_hint">SSHサーバー</string>
+    <string name="ssh_username_hint">SSH ユーザー名</string>
+    <string name="ssh_password">パスワード</string>
+    <string name="ssh_privkey">秘密鍵</string>
+    <string name="ssh_password_hint">SSH パスワード</string>
+    <string name="ssh_privkey_import">キーのインポート</string>
+    <string name="ssh_privkey_import_other">キーの上書き</string>
+    <string name="ssh_privkey_import_success">SSH 秘密鍵が正常にインポートされました。</string>
+    <string name="ssh_privkey_import_fail">SSH 秘密鍵のインポートに失敗しました。</string>
+    <string name="ssh_privkey_password_hint">キーパスワード</string>
 <string name="save_as_copy">コピーとして保存</string>
     <string name="credentials_needed_title">必要な資格情報…</string>
 
@@ -83,4 +94,19 @@
 <!--          https://asrt.gluege.boerde.de             -->
     <string name="connected_to">%1$sに接続</string>
     <string name="host_and">%1$sと</string>
+    <string name="encrypted">暗号化された</string>
+    <string name="unencrypted">暗号化されていない</string>
+    <string name="encoding_caption">優先するエンコーディング</string>
+    <string name="encoding_ok">OK</string>
+    <string name="encoding_cancel">キャンセル</string>
+    <string name="compress_caption">圧縮レベル</string>
+    <string name="quality_caption">画質レベル</string>
+    <string name="ssh_key_new_title">リモート SSH ホストがまだ不明</string>
+    <string name="ssh_key_new_message">SSH サーバーのフィンガープリント &lt;b&gt;%s&lt;/b&gt; はまだ不明です。接続先の SSH サーバーの正しいフィンガープリントであることを確認してください。</string>
+    <string name="ssh_key_new_continue">指紋は有効です。続行します</string>
+    <string name="ssh_key_new_abort">よくわかりません、中止します</string>
+    <string name="ssh_key_mismatch_title">リモート SSH ホスト ID が変更されました!</string>
+    <string name="ssh_key_mismatch_message">SSH サーバーのフィンガープリント &lt;b&gt;%s&lt;/b&gt; は既知のものと一致しません。これは、誰かが正しい SSH サーバーになりすましている (中間者攻撃) か、正しいサーバーのホスト キーが変更されたことを意味します。 SSH サーバーの管理者に連絡して、正しいキーを確認してください。 SSH 接続のセットアップを続行しますか、それとも中止しますか?</string>
+    <string name="ssh_key_mismatch_continue">これは合法であると確信しています。続行してください</string>
+    <string name="ssh_key_mismatch_abort">正しい SSH サーバーのフィンガープリントを再確認し、中止します</string>
 </resources>

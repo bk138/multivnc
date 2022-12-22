@@ -25,61 +25,52 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
-import java.util.List;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.Collections;
 import java.util.Hashtable;
-
-
+import java.util.List;
 
 
 public class MainMenuActivity extends AppCompatActivity implements MDNSService.OnEventListener, LifecycleObserver {
 
 	private static final String TAG = "MainMenuActivity";
 
-	private EditText ipText;
-	private EditText portText;
-	private EditText passwordText;
-	private TextView repeaterText;
-	private Spinner colorSpinner;
 	private LinearLayout serverlist;
 	private LinearLayout bookmarkslist;
 
 	private VncDatabase database;
-	private EditText textUsername;
-	private CheckBox checkboxKeepPassword;
 
 	// service discovery stuff
 	private MDNSService boundMDNSService;
@@ -123,7 +114,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.mainmenu_activity);
 
 		// update appstart cound
 		Utils.updateAppStartCount(this);
@@ -133,31 +124,15 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		// and (re-)bind to MDNS service
 		bindToMDNSService(new Intent(this, MDNSService.class));
 
-		ipText = (EditText) findViewById(R.id.textIP);
-		portText = (EditText) findViewById(R.id.textPORT);
-		passwordText = (EditText) findViewById(R.id.textPASSWORD);
-		textUsername = (EditText) findViewById(R.id.textUsername);
-
 		serverlist = (LinearLayout) findViewById(R.id.discovered_servers_list);
 		bookmarkslist = (LinearLayout) findViewById(R.id.bookmarks_list);
-
-
-		colorSpinner = (Spinner)findViewById(R.id.spinnerColorMode);
-		COLORMODEL[] models = {COLORMODEL.C24bit, COLORMODEL.C16bit};
-
-		ArrayAdapter<COLORMODEL> colorSpinnerAdapter = new ArrayAdapter<COLORMODEL>(this, android.R.layout.simple_spinner_item, models);
-		colorSpinner.setAdapter(colorSpinnerAdapter);
-		//colorSpinner.setSelection(0);
-
-		checkboxKeepPassword = (CheckBox)findViewById(R.id.checkboxKeepPassword);
-
-		repeaterText = (TextView)findViewById(R.id.textRepeaterId);
 
 		Button goButton = (Button) findViewById(R.id.buttonGO);
 		goButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				ConnectionBean conn = makeNewConnFromView();
+				ConnectionEditFragment editor = (ConnectionEditFragment) getSupportFragmentManager().findFragmentById(R.id.connectionEditFragment);
+				ConnectionBean conn = editor != null ? editor.getConnection() : null;
 				if(conn == null)
 					return;
 				Log.d(TAG, "Starting NEW connection " + conn.toString());
@@ -171,21 +146,32 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		saveBookmarkButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
-				final ConnectionBean conn = makeNewConnFromView();
+				ConnectionEditFragment editor = (ConnectionEditFragment) getSupportFragmentManager().findFragmentById(R.id.connectionEditFragment);
+				final ConnectionBean conn = editor != null ? editor.getConnection() : null;
 				if(conn == null)
 					return;
 
+				final String defaultName = conn.address + ":" + conn.port;
+
 				final EditText input = new EditText(MainMenuActivity.this);
+				input.setHint(defaultName);
+				TextInputLayout inputLayout = new TextInputLayout(MainMenuActivity.this);
+				inputLayout.setPadding(
+						(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, Resources.getSystem().getDisplayMetrics()),
+					0,
+						(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, Resources.getSystem().getDisplayMetrics()),
+						0
+				);
+				inputLayout.addView(input);
 
 				new AlertDialog.Builder(MainMenuActivity.this)
 				.setMessage(getString(R.string.enterbookmarkname))
-				.setView(input)
+				.setView(inputLayout)
 				.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String name = input.getText().toString();
 						if(name.length() == 0)
-							name = conn.address + ":" + conn.port;
+							name = defaultName;
 						conn.nickname = name;
 						saveBookmark(conn);
 						updateBookmarkView();
@@ -467,7 +453,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 
 					    	case 2: // edit
 								Log.d(TAG, "Editing bookmark " + conn.id);
-					    		Intent intent = new Intent(MainMenuActivity.this, EditBookmarkActivity.class);
+					    		Intent intent = new Intent(MainMenuActivity.this, ConnectionEditActivity.class);
 					    		intent.putExtra(Constants.CONNECTION, conn.id);
 					    		startActivity(intent);
 					    		break;
@@ -502,42 +488,6 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 			Log.e(TAG, "Error saving bookmark: " + e.getMessage());
 		}
 	}
-
-
-	private ConnectionBean makeNewConnFromView() {
-
-		ConnectionBean conn = new ConnectionBean();
-
-		conn.address = ipText.getText().toString().trim();
-
-		if(conn.address.length() == 0)
-			return null;
-
-		conn.id = 0; // is new!!
-
-		try {
-			conn.port = Integer.parseInt(portText.getText().toString().trim());
-		}
-		catch (NumberFormatException nfe) {
-		}
-		conn.userName = textUsername.getText().toString().trim();
-		conn.password = passwordText.getText().toString().trim();
-		conn.keepPassword = checkboxKeepPassword.isChecked();
-		conn.useLocalCursor = true; // always enable
-		conn.colorModel = ((COLORMODEL)colorSpinner.getSelectedItem()).nameString();
-		if (repeaterText.getText().length() > 0)
-		{
-			conn.repeaterId = repeaterText.getText().toString().trim();
-			conn.useRepeater = true;
-		}
-		else
-		{
-			conn.useRepeater = false;
-		}
-
-		return conn;
-	}
-
 
 
 

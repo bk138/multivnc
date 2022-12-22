@@ -42,6 +42,17 @@
 <string name="port_caption">連接埠</string>
 <string name="repeater_caption">中繼器上的 ID</string>
 <string name="repeater_hint">連線到 UltraVNC 中繼器時使用的伺服器 ID</string>
+    <string name="ssh_caption">SSH 隧道</string>
+    <string name="ssh_host_hint">SSH 服务器</string>
+    <string name="ssh_username_hint">SSH 用户名</string>
+    <string name="ssh_password">密码</string>
+    <string name="ssh_privkey">私钥</string>
+    <string name="ssh_password_hint">SSH密码</string>
+    <string name="ssh_privkey_import">导入密钥</string>
+    <string name="ssh_privkey_import_other">覆盖密钥</string>
+    <string name="ssh_privkey_import_success">成功导入 SSH 私钥。</string>
+    <string name="ssh_privkey_import_fail">导入 SSH 私钥失败。</string>
+    <string name="ssh_privkey_password_hint">密钥密码</string>
 <string name="save_as_copy">另存副本</string>
     <string name="credentials_needed_title">需要認證…</string>
 <!-- Send selected metakey -->
@@ -85,4 +96,22 @@
 </string>
     <string name="connected_to">已連線到 %1$s</string>
     <string name="host_and">%1$s 和 </string>
+    <string name="encrypted">加密的</string>
+    <string name="unencrypted">未加密</string>
+
+    <string name="encoding_caption">首选编码</string>
+    <string name="encoding_ok">好的</string>
+    <string name="encoding_cancel">取消</string>
+    <string name="compress_caption">压缩级别</string>
+    <string name="quality_caption">质量等级</string>
+
+    <string name="ssh_key_new_title">远程 SSH 主机未知</string>
+    <string name="ssh_key_new_message">SSH 服务器的指纹 &lt;b&gt;%s&lt;/b&gt; 尚不清楚。请检查您要连接的 SSH 服务器的指纹是否正确。</string>
+    <string name="ssh_key_new_continue">指纹有效，继续</string>
+    <string name="ssh_key_new_abort">我不确定，中止</string>
+
+    <string name="ssh_key_mismatch_title">远程 SSH 主机标识已更改！</string>
+    <string name="ssh_key_mismatch_message">SSH 服务器的指纹 &lt;b&gt;%s&lt;/b&gt; 与已知指纹不匹配。这要么意味着有人在冒充正确的 SSH 服务器（中间人攻击），要么意味着更改了正确服务器的主机密钥。请联系 SSH 服务器的管理员以验证正确的密钥。您要继续还是中止 SSH 连接设置？</string>
+    <string name="ssh_key_mismatch_continue">我相信这是合法的，继续</string>
+    <string name="ssh_key_mismatch_abort">我会仔细检查正确的 SSH 服务器指纹，中止</string>
 </resources>
