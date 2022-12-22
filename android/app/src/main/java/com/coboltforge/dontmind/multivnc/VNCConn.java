@@ -419,6 +419,7 @@ public class VNCConn {
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
 	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
 	private native boolean rfbSendClientCutText(byte[] bytes);
+	private native boolean rfbIsEncrypted();
 
 
 	public VNCConn() {
@@ -711,6 +712,8 @@ public class VNCConn {
 	public String getCutText() {
 		return serverCutText;
 	}
+
+	public boolean isEncrypted() { return rfbIsEncrypted(); }
 
 	public void lockFramebuffer() {
 		bitmapDataPixelsLock.lock();
