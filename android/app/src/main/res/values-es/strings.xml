@@ -53,6 +53,7 @@
     <string name="ssh_privkey_import_success">Clave privada SSH importada con éxito.</string>
     <string name="ssh_privkey_import_fail">No se pudo importar la clave privada SSH.</string>
     <string name="ssh_privkey_password_hint">Contraseña clave</string>
+    <string name="save_as_copy">Guardar como copia</string>
     <string name="credentials_needed_title">Se necesitan credenciales…</string>
 <!-- Send selected metakey -->
 <string name="send_button">Enviar</string>
