@@ -591,9 +591,9 @@ public class VncCanvas extends GLSurfaceView {
 
 
 	public void showConnectionInfo() {
-		String msg = "";
 		try {
-			msg = vncConn.getDesktopName();
+			String msg = vncConn.getDesktopName();
+			msg += "(" + (vncConn.isEncrypted() ? activity.getString(R.string.encrypted) : activity.getString(R.string.unencrypted)) + ")";
 			int idx = vncConn.getDesktopName().indexOf("(");
 			if (idx > -1) {
 				// Breakup actual desktop name from IP addresses for improved
@@ -609,10 +609,10 @@ public class VncCanvas extends GLSurfaceView {
 				msg += ", " + vncConn.getEncoding() + " encoding, " + vncConn.getColorModel().toString();
 			else
 				msg += ", " + vncConn.getColorModel().toString();
+			Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
 		}
-		catch(NullPointerException e) {
+		catch(Exception ignored) {
 		}
-		Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
 	}
 
 
