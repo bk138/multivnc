@@ -1,5 +1,6 @@
 package com.coboltforge.dontmind.multivnc;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -77,6 +78,9 @@ public class ConnectionEditFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onViewCreated");
 
+        /*
+            get all the views and wire up the logic
+         */
         bookmarkNameText = (EditText) view.findViewById(R.id.textNicknameBookmark);
         ipText = (EditText) view.findViewById(R.id.textIP);
         portText = (EditText) view.findViewById(R.id.textPORT);
@@ -179,7 +183,20 @@ public class ConnectionEditFragment extends Fragment {
             startActivityForResult(intent, REQUEST_CODE_SSH_PRIVKEY_IMPORT);
         });
 
-        // if we're editing a previously saved Connection, update UI accordingly
+        /*
+            update relevant UI parts from ConnectionBean
+         */
+        portText.setText(String.valueOf(conn.port));
+        // update encodings buttons here in every case as getConnection() reads from the UI, not conn
+        List<String> encodingValues = Arrays.asList(conn.encodingsString.split(" "));
+        for (int i = 0; i < ENCODING_VALUES.length; ++i)
+        {
+            encodingChecksEdit[i] = encodingChecks[i] = encodingValues.contains(ENCODING_VALUES[i]);
+        }
+
+        /*
+           finally, if we're editing a previously saved Connection, update and show some more UI
+         */
         updateViewsIfBookmarkedConnection(view);
     }
 
@@ -307,11 +324,6 @@ public class ConnectionEditFragment extends Fragment {
 
         if(conn.useRepeater)
             repeaterText.setText(conn.repeaterId);
-        List<String> encodingValues = Arrays.asList(conn.encodingsString.split(" "));
-        for (int i = 0; i < ENCODING_VALUES.length; ++i)
-        {
-            encodingChecksEdit[i] = encodingChecks[i] = encodingValues.contains(ENCODING_VALUES[i]);
-        }
 
         sshSwitch.setChecked(conn.sshHost != null);
         sshHostText.setText(conn.sshHost);

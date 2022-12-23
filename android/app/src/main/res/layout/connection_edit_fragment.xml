@@ -55,8 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="number"
-            android:singleLine="true"
-            android:text="5900" />
+            android:singleLine="true"/>
     </TableRow>
 
 
