@@ -34,15 +34,15 @@ data class ConnectionBean(
 
         @JvmField
         @ColumnInfo(name = "ENCODINGSSTRING")
-        var encodingsString: String? = "tight zrle ultra copyrect hextile zlib corre rre trle zywrle raw",
+        var encodingsString: String = "tight zrle ultra copyrect hextile zlib corre rre trle zywrle raw",
 
         @JvmField
         @ColumnInfo(name = "COMPRESSMODEL")
-        var compressModel: String? = COMPRESSMODEL.L0.nameString(),
+        var compressModel: String = COMPRESSMODEL.L0.nameString(),
 
         @JvmField
         @ColumnInfo(name = "QUALITYMODEL")
-        var qualityModel: String? = QUALITYMODEL.L5.nameString(),
+        var qualityModel: String = QUALITYMODEL.L5.nameString(),
 
         @JvmField
         @ColumnInfo(name = "COLORMODEL")
