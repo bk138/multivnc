@@ -136,9 +136,9 @@ public abstract class VncDatabase extends RoomDatabase {
             Log.i("VncDatabase", "Migrating to Room [13 -> 14]");
 
             // add new columns to CONNECTION_BEAN
-            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD ENCODINGSSTRING TEXT");
-            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD COMPRESSMODEL TEXT");
-            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD QUALITYMODEL TEXT");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD ENCODINGSSTRING TEXT NOT NULL DEFAULT 'tight zrle ultra copyrect hextile zlib corre rre trle zywrle raw'");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD COMPRESSMODEL TEXT NOT NULL DEFAULT 'L0'");
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD QUALITYMODEL TEXT NOT NULL DEFAULT 'L5'");
             database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_HOST TEXT");
             database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_USERNAME TEXT");
             database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PASSWORD TEXT");
