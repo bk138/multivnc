@@ -23,7 +23,8 @@ object ImportExport {
             val connections: List<ConnectionBean>,
             val metaKeys: List<MetaKeyBean>,
             val metaLists: List<MetaList>,
-            val sshKnownHosts: List<SshKnownHost>
+            // added with version 2, not available in earlier versions so mark as optional
+            val sshKnownHosts: List<SshKnownHost>? = null
     )
 
     private val serializer = Json {
@@ -78,7 +79,7 @@ object ImportExport {
                     db.metaListDao.update(it)
             }
 
-            container.sshKnownHosts.forEach {
+            container.sshKnownHosts?.forEach {
                 if (db.sshKnownHostDao.get(it.id) == null)
                     db.sshKnownHostDao.insert(it)
                 else
