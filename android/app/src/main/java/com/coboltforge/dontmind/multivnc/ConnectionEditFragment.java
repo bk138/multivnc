@@ -193,6 +193,10 @@ public class ConnectionEditFragment extends Fragment {
         {
             encodingChecksEdit[i] = encodingChecks[i] = encodingValues.contains(ENCODING_VALUES[i]);
         }
+        setSpinnerByEnum(colorSpinner, COLORMODEL.values(), COLORMODEL.valueOf(conn.colorModel));
+        setSpinnerByEnum(compressSpinner, COMPRESSMODEL.values(), COMPRESSMODEL.valueOf(conn.compressModel));
+        setSpinnerByEnum(qualitySpinner, QUALITYMODEL.values(), QUALITYMODEL.valueOf(conn.qualityModel));
+
 
         /*
            finally, if we're editing a previously saved Connection, update and show some more UI
@@ -317,10 +321,6 @@ public class ConnectionEditFragment extends Fragment {
             passwordText.setText(conn.password);
         }
         textUsername.setText(conn.userName);
-
-        setSpinnerByEnum(colorSpinner, COLORMODEL.values(), COLORMODEL.valueOf(conn.colorModel));
-        setSpinnerByEnum(compressSpinner, COMPRESSMODEL.values(), COMPRESSMODEL.valueOf(conn.compressModel));
-        setSpinnerByEnum(qualitySpinner, QUALITYMODEL.values(), QUALITYMODEL.valueOf(conn.qualityModel));
 
         if(conn.useRepeater)
             repeaterText.setText(conn.repeaterId);
