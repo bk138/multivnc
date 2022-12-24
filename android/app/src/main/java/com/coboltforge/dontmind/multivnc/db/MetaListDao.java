@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.db;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -8,7 +8,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-interface MetaListDao {
+public interface MetaListDao {
 
     @Query("SELECT * FROM META_LIST WHERE _id = :id")
     MetaList get(long id);

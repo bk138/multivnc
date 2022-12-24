@@ -56,6 +56,9 @@ import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
+import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
+import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
+import com.coboltforge.dontmind.multivnc.db.VncDatabase;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 

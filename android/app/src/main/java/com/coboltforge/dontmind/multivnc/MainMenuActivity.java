@@ -56,6 +56,8 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
+import com.coboltforge.dontmind.multivnc.db.VncDatabase;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Collections;

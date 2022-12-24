@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.db;
 
 import androidx.room.Dao;
 import androidx.room.Insert;

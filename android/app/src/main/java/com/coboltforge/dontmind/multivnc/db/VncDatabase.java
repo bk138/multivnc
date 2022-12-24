@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2009 Michael A. MacDonald
  */
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.db;
 
 import android.content.Context;
 import android.util.Log;

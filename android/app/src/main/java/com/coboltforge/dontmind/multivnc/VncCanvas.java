@@ -55,6 +55,9 @@ import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
+import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
+
 
 public class VncCanvas extends GLSurfaceView {
 	static {

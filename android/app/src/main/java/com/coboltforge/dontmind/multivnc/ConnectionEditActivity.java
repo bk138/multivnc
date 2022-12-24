@@ -5,6 +5,9 @@ import android.util.Log;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
+import com.coboltforge.dontmind.multivnc.db.VncDatabase;
+
 import java.util.Objects;
 
 /**

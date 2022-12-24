@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.db;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -8,7 +8,7 @@ import androidx.room.Update;
 import java.util.List;
 
 @Dao
-interface SshKnownHostDao {
+public interface SshKnownHostDao {
 
     @Query("SELECT * FROM SSH_KNOWN_HOST WHERE _id = :id")
     SshKnownHost get(long id);

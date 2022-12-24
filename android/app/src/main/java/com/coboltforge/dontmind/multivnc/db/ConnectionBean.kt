@@ -1,9 +1,12 @@
-package com.coboltforge.dontmind.multivnc
+package com.coboltforge.dontmind.multivnc.db
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.coboltforge.dontmind.multivnc.COLORMODEL
+import com.coboltforge.dontmind.multivnc.COMPRESSMODEL
+import com.coboltforge.dontmind.multivnc.QUALITYMODEL
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -11,124 +14,124 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(tableName = "CONNECTION_BEAN")
 data class ConnectionBean(
-        @JvmField
+    @JvmField
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "_id")
         var id: Long = 0,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "NICKNAME")
         var nickname: String? = "",
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "ADDRESS")
         var address: String? = "",
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "PORT")
         var port: Int = 5900,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "PASSWORD")
         var password: String? = "",
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "ENCODINGSSTRING")
         var encodingsString: String = "tight zrle ultra copyrect hextile zlib corre rre trle zywrle raw",
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "COMPRESSMODEL")
         var compressModel: String = COMPRESSMODEL.L0.nameString(),
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "QUALITYMODEL")
         var qualityModel: String = QUALITYMODEL.L5.nameString(),
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "COLORMODEL")
         var colorModel: String? = COLORMODEL.C24bit.nameString(),
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "FORCEFULL")
         var forceFull: Long = 0,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "REPEATERID")
         var repeaterId: String? = "",
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "INPUTMODE")
         var inputMode: String? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SCALEMODE")
         var scalemode: String? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "USELOCALCURSOR")
         var useLocalCursor: Boolean = false,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "KEEPPASSWORD")
         var keepPassword: Boolean = true,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "FOLLOWMOUSE")
         var followMouse: Boolean = true,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "USEREPEATER")
         var useRepeater: Boolean = false,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "METALISTID")
         var metaListId: Long = 1,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "LAST_META_KEY_ID")
         var lastMetaKeyId: Long = 0,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "FOLLOWPAN", defaultValue = "0")
         var followPan: Boolean = false,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "USERNAME")
         var userName: String? = "",
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SECURECONNECTIONTYPE")
         var secureConnectionType: String? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SHOWZOOMBUTTONS", defaultValue = "1")
         var showZoomButtons: Boolean = false,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "DOUBLE_TAP_ACTION")
         var doubleTapAction: String? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SSH_HOST")
         var sshHost: String? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SSH_USERNAME")
         var sshUsername: String? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SSH_PASSWORD")
         var sshPassword: String? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SSH_PRIVKEY")
         var sshPrivkey: ByteArray? = null,
 
-        @JvmField
+    @JvmField
         @ColumnInfo(name = "SSH_PRIVKEY_PASSWORD")
         var sshPrivkeyPassword: String? = null,
 
-) : Comparable<ConnectionBean>, Parcelable {
+    ) : Comparable<ConnectionBean>, Parcelable {
 
     override fun toString(): String {
         return "$id $nickname: $address, port $port"

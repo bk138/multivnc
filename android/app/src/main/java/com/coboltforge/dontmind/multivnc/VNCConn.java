@@ -26,6 +26,10 @@ import android.util.Log;
 import android.view.KeyEvent;
 import androidx.annotation.Keep;
 
+import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
+import com.coboltforge.dontmind.multivnc.db.SshKnownHost;
+import com.coboltforge.dontmind.multivnc.db.VncDatabase;
+
 
 public class VNCConn {
 	static {

@@ -5,14 +5,13 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDialogFragment
-import com.coboltforge.dontmind.multivnc.ImportExport.exportDatabase
-import com.coboltforge.dontmind.multivnc.ImportExport.importDatabase
+import com.coboltforge.dontmind.multivnc.db.ImportExport.exportDatabase
+import com.coboltforge.dontmind.multivnc.db.ImportExport.importDatabase
+import com.coboltforge.dontmind.multivnc.db.VncDatabase
 import org.xml.sax.SAXException
 import java.io.IOException
 import java.io.InputStreamReader

@@ -1,10 +1,11 @@
-package com.coboltforge.dontmind.multivnc
+package com.coboltforge.dontmind.multivnc.db
 
 import android.view.KeyEvent
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.coboltforge.dontmind.multivnc.VNCConn
 import kotlinx.serialization.Serializable
 import java.util.*
 

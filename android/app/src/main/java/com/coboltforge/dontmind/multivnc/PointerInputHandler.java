@@ -11,6 +11,8 @@ import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
 
+import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
+
 /**
  * Handles pointer input from:
  *   * touchscreen

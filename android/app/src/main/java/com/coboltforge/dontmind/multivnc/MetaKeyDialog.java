@@ -24,6 +24,12 @@ import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
+import com.coboltforge.dontmind.multivnc.db.MetaKeyBase;
+import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
+import com.coboltforge.dontmind.multivnc.db.MetaList;
+import com.coboltforge.dontmind.multivnc.db.VncDatabase;
+
 /**
  * @author Michael A. MacDonald
  *

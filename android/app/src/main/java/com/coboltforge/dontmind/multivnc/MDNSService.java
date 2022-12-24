@@ -28,6 +28,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
+
 public class MDNSService extends Service {
 
 	private final String TAG = "MDNSService";

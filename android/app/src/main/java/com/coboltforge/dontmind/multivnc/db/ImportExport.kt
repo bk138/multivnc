@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc
+package com.coboltforge.dontmind.multivnc.db
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -19,12 +19,12 @@ object ImportExport {
 
     @Serializable
     private data class Container(
-            val version: Int,
-            val connections: List<ConnectionBean>,
-            val metaKeys: List<MetaKeyBean>,
-            val metaLists: List<MetaList>,
+        val version: Int,
+        val connections: List<ConnectionBean>,
+        val metaKeys: List<MetaKeyBean>,
+        val metaLists: List<MetaList>,
             // added with version 2, not available in earlier versions so mark as optional
-            val sshKnownHosts: List<SshKnownHost>? = null
+        val sshKnownHosts: List<SshKnownHost>? = null
     )
 
     private val serializer = Json {
