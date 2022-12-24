@@ -258,7 +258,7 @@ SshData* ssh_tunnel_open(const char *ssh_host,
     data = calloc(1, sizeof(SshData));
 
     data->client = client;
-    data->remote_desthost = rfb_host; /* resolved by the server */
+    data->remote_desthost = strdup(rfb_host); /* resolved by the server */
     data->remote_destport = rfb_port;
 
     /* Connect to SSH server */
@@ -404,6 +404,9 @@ void ssh_tunnel_close(SshData *data) {
     /* the proxy thread does the internal cleanup as it can be
        ended due to external reasons */
     THREAD_JOIN(data->thread);
+
+    if(data->remote_desthost)
+        free(data->remote_desthost);
 
     free(data);
 
