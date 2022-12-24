@@ -52,10 +52,10 @@ public class ConnectionEditFragment extends Fragment {
     private Spinner compressSpinner;
     private Spinner qualitySpinner;
     private EditText textUsername;
-    SwitchMaterial sshSwitch;
+    private SwitchMaterial sshSwitch;
     private EditText sshHostText;
     private EditText sshUsernameText;
-    RadioGroup sshCredentialsRadioGroup;
+    private RadioGroup sshCredentialsRadioGroup;
     private EditText sshPasswordText;
     private Button sshPrivkeyImportButton;
     private byte[] sshPrivkey;
