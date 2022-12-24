@@ -228,8 +228,9 @@ public class VNCConn {
 					}
 				});
 
-				// update connection with desktop name
-				connSettings.nickname = getDesktopName();
+				// update connection's nickname with desktop name if unset
+				if(connSettings.nickname == null || connSettings.nickname.isEmpty())
+					connSettings.nickname = getDesktopName();
 
 				// start output thread here
 				outputThread = new ClientToServerThread();
