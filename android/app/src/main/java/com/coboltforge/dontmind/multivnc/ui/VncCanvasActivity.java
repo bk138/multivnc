@@ -18,7 +18,7 @@
 //
 // CanvasView is the Activity for showing VNC Desktop.
 //
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import java.util.List;
 
@@ -56,6 +56,11 @@ import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
+import com.coboltforge.dontmind.multivnc.COLORMODEL;
+import com.coboltforge.dontmind.multivnc.Constants;
+import com.coboltforge.dontmind.multivnc.R;
+import com.coboltforge.dontmind.multivnc.Utils;
+import com.coboltforge.dontmind.multivnc.VNCConn;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
@@ -82,7 +87,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	Toast notificationToast;
 	PopupMenu fabMenu;
 
-	ProgressDialog firstFrameWaitDialog;
+	public ProgressDialog firstFrameWaitDialog;
 
 	private SharedPreferences prefs;
 
@@ -341,7 +346,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 	 * Set modes on start to match what is specified in the ConnectionBean;
 	 * color mode (already done), scaling
 	 */
-	void setModes() {
+	public void setModes() {
 		float minScale = vncCanvas.getMinimumScale();
 		vncCanvas.scaling = new ZoomScaling(this, minScale, 4);
 	}

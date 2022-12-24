@@ -7,7 +7,7 @@
 	android:animateLayoutChanges="true"
     >
 
-	<com.coboltforge.dontmind.multivnc.VncCanvas
+	<com.coboltforge.dontmind.multivnc.ui.VncCanvas
     	android:id="@+id/vnc_canvas"
     	android:layout_width="fill_parent"
     	android:layout_height="fill_parent"
@@ -15,9 +15,9 @@
 		android:focusableInTouchMode="true"
 		android:keepScreenOn="true"
     	>
-	</com.coboltforge.dontmind.multivnc.VncCanvas>
+	</com.coboltforge.dontmind.multivnc.ui.VncCanvas>
 
-	<com.coboltforge.dontmind.multivnc.TouchPointView
+	<com.coboltforge.dontmind.multivnc.ui.TouchPointView
     	android:id="@+id/touchpoints"
     	android:layout_width="fill_parent"
     	android:layout_height="fill_parent"
@@ -54,7 +54,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center|bottom">
 
-	  <com.coboltforge.dontmind.multivnc.ZoomControls
+	  <com.coboltforge.dontmind.multivnc.ui.ZoomControls
 	      android:layout_width="wrap_content"
 		  android:layout_height="wrap_content"
 		  android:id="@+id/zoomer"
@@ -66,21 +66,21 @@
 	      android:orientation="horizontal"
 	      android:layout_width="fill_parent"
 	      android:layout_height="70dip">
-	      <com.coboltforge.dontmind.multivnc.MouseButtonView
+	      <com.coboltforge.dontmind.multivnc.ui.MouseButtonView
 	      	  android:id="@+id/mousebutton1"
 	          android:gravity="center_horizontal"
 	          android:background="#997f7f7f"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:layout_weight="1"/>
-	      <com.coboltforge.dontmind.multivnc.MouseButtonView
+	      <com.coboltforge.dontmind.multivnc.ui.MouseButtonView
 	       	  android:id="@+id/mousebutton2"
 	          android:gravity="center_horizontal"
 	          android:background="#bb7f7f7f"
 	          android:layout_width="wrap_content"
 	          android:layout_height="fill_parent"
 	          android:layout_weight="1"/>
-	      <com.coboltforge.dontmind.multivnc.MouseButtonView
+	      <com.coboltforge.dontmind.multivnc.ui.MouseButtonView
 	          android:id="@+id/mousebutton3"
 	          android:gravity="center_horizontal"
 	          android:background="#997f7f7f"

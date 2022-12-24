@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,6 +23,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.coboltforge.dontmind.multivnc.COLORMODEL;
+import com.coboltforge.dontmind.multivnc.COMPRESSMODEL;
+import com.coboltforge.dontmind.multivnc.QUALITYMODEL;
+import com.coboltforge.dontmind.multivnc.R;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 

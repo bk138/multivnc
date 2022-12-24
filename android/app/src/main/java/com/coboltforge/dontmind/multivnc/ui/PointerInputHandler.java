@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import android.os.Build;
 import android.util.Log;
@@ -11,6 +11,8 @@ import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
 
+import com.coboltforge.dontmind.multivnc.Utils;
+import com.coboltforge.dontmind.multivnc.VNCConn;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
 
 /**

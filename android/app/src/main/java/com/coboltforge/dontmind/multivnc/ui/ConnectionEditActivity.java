@@ -1,10 +1,12 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.coboltforge.dontmind.multivnc.Constants;
+import com.coboltforge.dontmind.multivnc.R;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
 

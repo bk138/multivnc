@@ -16,7 +16,7 @@
 		>
 
 		<activity android:label="@string/app_name"
-		          android:name="MainMenuActivity"
+		          android:name=".ui.MainMenuActivity"
 			      android:exported="true"
 		    	  >
 			<intent-filter>
@@ -24,7 +24,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity  android:configChanges="orientation|keyboard|keyboardHidden|screenSize|screenLayout" android:name="VncCanvasActivity" android:launchMode="singleTask"
+		<activity  android:configChanges="orientation|keyboard|keyboardHidden|screenSize|screenLayout" android:name=".ui.VncCanvasActivity" android:launchMode="singleTask"
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
@@ -35,7 +35,7 @@
                 <data android:scheme="vnc" />
             </intent-filter>
 		</activity>
-       <activity android:name=".ConnectionListActivity"
+       <activity android:name=".ui.ConnectionListActivity"
                  android:label="@string/shortcut_label"
 		         android:exported="true"
                  >
@@ -45,17 +45,17 @@
         	</intent-filter>
         </activity>
 
-        <activity android:name=".ConnectionEditActivity"
+        <activity android:name=".ui.ConnectionEditActivity"
             android:label="@string/editbookmark_title"
             >
        	</activity>
 
-        <activity android:name="AboutActivity"
+        <activity android:name=".ui.AboutActivity"
              android:label="@string/about"
              >
 		</activity>
 
-         <activity android:name="HelpActivity"
+         <activity android:name=".ui.HelpActivity"
              android:label="@string/help"
              >
 		</activity>

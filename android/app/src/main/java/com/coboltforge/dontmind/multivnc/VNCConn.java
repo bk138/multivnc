@@ -29,6 +29,7 @@ import androidx.annotation.Keep;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.SshKnownHost;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
+import com.coboltforge.dontmind.multivnc.ui.VncCanvas;
 
 
 public class VNCConn {
@@ -45,7 +46,7 @@ public class VNCConn {
 
 	// the native rfbClient
 	@Keep
-	long rfbClient;
+	public long rfbClient;
 	private ConnectionBean connSettings;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 

@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2009 Michael A. MacDonald
  */
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +24,8 @@ import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.coboltforge.dontmind.multivnc.R;
+import com.coboltforge.dontmind.multivnc.VNCConn;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBase;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;

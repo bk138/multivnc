@@ -16,7 +16,7 @@
  * 
  * Copyright 2009,2010 Michael A. MacDonald
  */
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -28,6 +28,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import com.coboltforge.dontmind.multivnc.Constants;
+import com.coboltforge.dontmind.multivnc.R;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
 

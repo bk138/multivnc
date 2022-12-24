@@ -19,7 +19,7 @@
 // MainMenuActivity is the Activity for setting VNC server IP and port.
 //
 
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -56,6 +56,10 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.coboltforge.dontmind.multivnc.Constants;
+import com.coboltforge.dontmind.multivnc.MDNSService;
+import com.coboltforge.dontmind.multivnc.R;
+import com.coboltforge.dontmind.multivnc.Utils;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
 import com.google.android.material.textfield.TextInputLayout;

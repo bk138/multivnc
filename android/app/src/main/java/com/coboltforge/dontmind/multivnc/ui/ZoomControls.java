@@ -32,7 +32,7 @@
  * USA.
  */
 
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -43,6 +43,8 @@ import android.view.MotionEvent;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ZoomButton;
+
+import com.coboltforge.dontmind.multivnc.R;
 
 /**
  * The {@code ZoomControls} class displays a simple set of controls used for zooming and

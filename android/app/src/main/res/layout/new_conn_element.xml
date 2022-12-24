@@ -10,7 +10,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:name="com.coboltforge.dontmind.multivnc.ConnectionEditFragment"
+        android:name="com.coboltforge.dontmind.multivnc.ui.ConnectionEditFragment"
         android:id="@+id/connectionEditFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

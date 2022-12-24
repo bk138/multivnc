@@ -28,7 +28,7 @@
 // desktop on it.
 //
 
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,6 +55,9 @@ import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.coboltforge.dontmind.multivnc.R;
+import com.coboltforge.dontmind.multivnc.Utils;
+import com.coboltforge.dontmind.multivnc.VNCConn;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
 
@@ -107,7 +110,7 @@ public class VncCanvas extends GLSurfaceView {
 
 
 	// framebuffer coordinates of mouse pointer, Available to activity
-	int mouseX, mouseY;
+	public int mouseX, mouseY;
 
 	/**
 	 * Position of the top left portion of the <i>visible</i> part of the screen, in
@@ -433,7 +436,7 @@ public class VncCanvas extends GLSurfaceView {
 	/**
 	 * Make sure mouse is visible on displayable part of screen
 	 */
-	void panToMouse()
+	public void panToMouse()
 	{
 		try {
 			if (!vncConn.getConnSettings().followMouse)
@@ -490,7 +493,7 @@ public class VncCanvas extends GLSurfaceView {
 	 * @param dY
 	 * @return True if the pan changed the view (did not move view out of bounds); false otherwise
 	 */
-	boolean pan(int dX, int dY) {
+	public boolean pan(int dX, int dY) {
 
 		double scale = getScale();
 
@@ -553,7 +556,7 @@ public class VncCanvas extends GLSurfaceView {
 		return inputHandler.onGenericMotionEvent(event);
 	}
 
-	void reDraw() {
+	public void reDraw() {
 
 		if (repaintsEnabled && vncConn.rfbClient != 0) {
 

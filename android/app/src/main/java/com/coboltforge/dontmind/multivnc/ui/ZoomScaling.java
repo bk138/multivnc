@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2009 Michael A. MacDonald
  */
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 /**
  * @author Michael A. MacDonald

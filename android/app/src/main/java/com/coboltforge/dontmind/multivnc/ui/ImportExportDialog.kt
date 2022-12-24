@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc
+package com.coboltforge.dontmind.multivnc.ui
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDialogFragment
+import com.coboltforge.dontmind.multivnc.R
+import com.coboltforge.dontmind.multivnc.Utils
 import com.coboltforge.dontmind.multivnc.db.ImportExport.exportDatabase
 import com.coboltforge.dontmind.multivnc.db.ImportExport.importDatabase
 import com.coboltforge.dontmind.multivnc.db.VncDatabase

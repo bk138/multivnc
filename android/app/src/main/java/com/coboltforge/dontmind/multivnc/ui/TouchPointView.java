@@ -3,7 +3,7 @@
 	Code is from http://www.rbgrn.net/content/367-source-code-to-multitouch-visible-test.
 	Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
  */
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -25,6 +25,8 @@ import android.view.SurfaceView;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+
+import com.coboltforge.dontmind.multivnc.R;
 
 
 public class TouchPointView extends SurfaceView implements SurfaceHolder.Callback {

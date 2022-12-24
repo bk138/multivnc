@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 /*
  * Views for virtual mouse buttons.
@@ -15,6 +15,9 @@ import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+
+import com.coboltforge.dontmind.multivnc.R;
+import com.coboltforge.dontmind.multivnc.Utils;
 
 
 public class MouseButtonView extends View {

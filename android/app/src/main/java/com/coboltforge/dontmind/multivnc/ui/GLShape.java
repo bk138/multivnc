@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc;
+package com.coboltforge.dontmind.multivnc.ui;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

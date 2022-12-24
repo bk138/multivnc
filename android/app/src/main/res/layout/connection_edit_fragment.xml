@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dip"
-    tools:context=".ConnectionEditFragment">
+    tools:context=".ui.ConnectionEditFragment">
 
     <TableRow
         android:id="@+id/name_row"
