@@ -504,6 +504,14 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			sendSpecialKeyAgain();
 			return true;
 		case R.id.itemSaveBookmark:
+
+			if(connection.id != 0) {
+				// a bookmarked connection. save it right away
+				database.getConnectionDao().save(connection);
+				Toast.makeText(VncCanvasActivity.this, getString(R.string.bookmark_saved), Toast.LENGTH_SHORT).show();
+				return true;
+			}
+
 			final String defaultName = connection.address + ":" + connection.port;
 
 			final EditText input = new EditText(this);
