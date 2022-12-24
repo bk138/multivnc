@@ -95,7 +95,7 @@ class ImportExportDialog : AppCompatDialogFragment() {
                     importDatabase(vncDatabase, reader)
                     Log.d(TAG, "import successful!")
                     Toast.makeText(context, android.R.string.ok, Toast.LENGTH_LONG).show()
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     when (e) {
                         is MalformedURLException -> errorNotify(
                             getString(R.string.import_error_url),
