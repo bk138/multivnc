@@ -37,6 +37,7 @@ public class ConnectionEditFragment extends Fragment {
 
     private static final String TAG = "ConnectionEditFragment";
     private static final int REQUEST_CODE_SSH_PRIVKEY_IMPORT = 11;
+    private static final String EXTRA_CONN = "conn";
 
     private final String[] ENCODING_NAMES = {"Tight", "ZRLE", "Ultra", "Copyrect", "Hextile", "Zlib", "CoRRE", "RRE", "TRLE", "ZYWRLE"};
     private final String[] ENCODING_VALUES = {"tight", "zrle", "ultra", "copyrect", "hextile", "zlib", "corre", "rre", "trle", "zywrle"};
@@ -61,8 +62,8 @@ public class ConnectionEditFragment extends Fragment {
     private byte[] sshPrivkey;
     private EditText sshPrivkeyPasswordText;
 
-    // the represented Connection
-    ConnectionBean conn = new ConnectionBean();
+    // id of the edited connection
+    private long mConnectionId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -184,22 +185,12 @@ public class ConnectionEditFragment extends Fragment {
         /*
             update relevant UI parts from ConnectionBean
          */
-        portText.setText(String.valueOf(conn.port));
-        // update encodings buttons here in every case as getConnection() reads from the UI, not conn
-        List<String> encodingValues = Arrays.asList(conn.encodingsString.split(" "));
-        for (int i = 0; i < ENCODING_VALUES.length; ++i)
-        {
-            encodingChecksEdit[i] = encodingChecks[i] = encodingValues.contains(ENCODING_VALUES[i]);
-        }
-        setSpinnerByEnum(colorSpinner, COLORMODEL.values(), COLORMODEL.valueOf(conn.colorModel));
-        setSpinnerByEnum(compressSpinner, COMPRESSMODEL.values(), COMPRESSMODEL.valueOf(conn.compressModel));
-        setSpinnerByEnum(qualitySpinner, QUALITYMODEL.values(), QUALITYMODEL.valueOf(conn.qualityModel));
-
-
-        /*
-           finally, if we're editing a previously saved Connection, update and show some more UI
-         */
-        updateViewsIfBookmarkedConnection(view);
+        ConnectionBean conn;
+        if(getArguments() != null)
+            conn = getArguments().getParcelable(EXTRA_CONN);
+        else
+            conn = new ConnectionBean();
+        updateViews(view, conn);
     }
 
     @Override
@@ -236,6 +227,10 @@ public class ConnectionEditFragment extends Fragment {
     }
 
     public ConnectionBean getConnection() {
+
+        ConnectionBean conn = new ConnectionBean();
+
+        conn.id = mConnectionId;
 
         conn.address = ipText.getText().toString().trim();
 
@@ -288,8 +283,20 @@ public class ConnectionEditFragment extends Fragment {
         return conn;
     }
 
+    // we have setConnection() here as the fragment gets created via XML
     public void setConnection(ConnectionBean conn) {
-        this.conn = conn;
+
+        mConnectionId = conn.id;
+
+        if(!isStateSaved()) {
+            Log.d(TAG, "setConnection: views not yet created, put conn as argument for onViewCreated");
+            Bundle args = new Bundle();
+            args.putParcelable(EXTRA_CONN, conn);
+            setArguments(args);
+        } else {
+            Log.d(TAG, "setConnection: views already created, updating with new conn");
+            updateViews(getView(), conn);
+        }
     }
 
     private <T extends Enum<T>> void setSpinnerByEnum(Spinner spinner, T[] values, T value) {
@@ -300,9 +307,20 @@ public class ConnectionEditFragment extends Fragment {
             }
     }
 
-    private void updateViewsIfBookmarkedConnection(View view) {
+    private void updateViews(View view, ConnectionBean conn) {
 
-        // if this is a connection that was not bookmarked, don't do anything
+        portText.setText(String.valueOf(conn.port));
+        // update encodings buttons here in every case as getConnection() reads from the UI, not conn
+        List<String> encodingValues = Arrays.asList(conn.encodingsString.split(" "));
+        for (int i = 0; i < ENCODING_VALUES.length; ++i)
+        {
+            encodingChecksEdit[i] = encodingChecks[i] = encodingValues.contains(ENCODING_VALUES[i]);
+        }
+        setSpinnerByEnum(colorSpinner, COLORMODEL.values(), COLORMODEL.valueOf(conn.colorModel));
+        setSpinnerByEnum(compressSpinner, COMPRESSMODEL.values(), COMPRESSMODEL.valueOf(conn.compressModel));
+        setSpinnerByEnum(qualitySpinner, QUALITYMODEL.values(), QUALITYMODEL.valueOf(conn.qualityModel));
+
+        // if this is a connection that was not bookmarked, stop here
         if (conn.id == 0)
             return;
 
