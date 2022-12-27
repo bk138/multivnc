@@ -122,9 +122,6 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.mainmenu_activity);
 
-		// update appstart cound
-		Utils.updateAppStartCount(this);
-
 		// start the MDNS service
 		startMDNSService();
 		// and (re-)bind to MDNS service
@@ -199,7 +196,7 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		/*
 		 * show support dialog on third (and maybe later) runs
 		 */
-		if(Utils.appstarts > 2)
+		if(settings.getInt(Constants.PREFS_KEY_MAIN_MENU_STARTS, 0) > 2)
 		{
 			if(settings.getBoolean(Constants.PREFS_KEY_SUPPORTDLG, true) && savedInstanceState == null)
 			{
@@ -248,7 +245,9 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 				dialog.show();
 			}
 		}
-
+		SharedPreferences.Editor ed = settings.edit();
+		ed.putInt(Constants.PREFS_KEY_MAIN_MENU_STARTS, settings.getInt(Constants.PREFS_KEY_MAIN_MENU_STARTS, 0)+1);
+		ed.apply();
 
 
 		/*
