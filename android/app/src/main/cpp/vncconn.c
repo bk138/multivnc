@@ -299,7 +299,9 @@ SshData* ssh_tunnel_open(const char *ssh_host,
      */
     rc = libssh2_session_handshake(data->session, data->ssh_sock);
     if(rc) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "ssh_tunnel_open: error when starting up SSH session: %d\n", rc);
+        char *error_msg;
+        libssh2_session_last_error(data->session, &error_msg, NULL, 0);
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "ssh_tunnel_open: error when starting up SSH session: %d: %s\n", rc, error_msg);
         goto error;
     }
 
