@@ -316,9 +316,10 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 
 		/*
-		 * ask whether to show help on first run
+		 * ask whether to show help on first connection
 		 */
-		if(Utils.appstarts == 1) {
+		SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, 0);
+		if(settings.getBoolean(Constants.PREFS_KEY_FIRST_CONNECTION, true)) {
 			new AlertDialog.Builder(this)
 			.setMessage(R.string.firstrun_help_dialog_text)
 			.setTitle(R.string.firstrun_help_dialog_title)
@@ -338,6 +339,10 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 				}
 			})
 			.show();
+			// and set this
+			SharedPreferences.Editor ed = settings.edit();
+			ed.putBoolean(Constants.PREFS_KEY_FIRST_CONNECTION, false);
+			ed.apply();
 		}
 
 	}
