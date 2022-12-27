@@ -171,11 +171,10 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
     private void twoFingerFlingNotification(String str)
     {
-        // bzzt!
-        vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
-                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+        // bzzt if user enabled it in System Settings
+        vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
-        // beep!
+        // beep if user enabled it in System Settings
         vncCanvasActivity.vncCanvas.playSoundEffect(SoundEffectConstants.CLICK);
 
         vncCanvasActivity.notificationToast.setText(str);
@@ -215,8 +214,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         // only interpret as button down if virtual mouse buttons are disabled
         if(vncCanvasActivity.mousebuttons.getVisibility() != View.VISIBLE) {
             dragModeButtonDown = true;
-            vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS,
-                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING|HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+            vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         }
     }
 

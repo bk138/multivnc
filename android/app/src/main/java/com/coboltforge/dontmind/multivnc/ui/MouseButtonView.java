@@ -184,15 +184,14 @@ public class MouseButtonView extends View {
 	{
 		if(Utils.DEBUG()) Log.d(TAG, "Input: button " + buttonId + " CLICK");
 
-		// bzzt!
+		// bzzt if user enabled it in System Settings
 		try {
-			performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY,
-					HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING | HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
+			performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 		} catch (Exception ex) {
 			//unused
 		}
 
-		// beep!
+		// beep if user enabled it in System Settings
 		playSoundEffect(SoundEffectConstants.CLICK);
 
 		int pointerMask = 0; // like up
