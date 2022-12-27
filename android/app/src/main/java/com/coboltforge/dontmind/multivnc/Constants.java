@@ -10,7 +10,7 @@ public class Constants {
 	public static final String PREFS_KEY_POINTERHIGHLIGHT = "doPointerHighlight";
 	public static final String PREFS_KEY_MOUSEBUTTONS = "showMouseButtons";
 	public static final String PREFS_KEY_SUPPORTDLG = "showSupportDialog";
-	public static final String PREFS_KEY_APPSTARTS = "appStarts";
+	public static final String PREFS_KEY_MAIN_MENU_STARTS = "appStarts";
 	public static final String PREFS_KEY_FIRST_CONNECTION = "first_connection";
 
 }

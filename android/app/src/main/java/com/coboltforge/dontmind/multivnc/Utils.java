@@ -21,10 +21,6 @@ import android.view.MotionEvent;
 public class Utils {
 
 	private static final String TAG = "Utils";
-	/**
-	 * number of app starts
-	 */
-	public static int appstarts;
 
 	public static void showErrorMessage(Context _context, String message) {
 		showMessage(_context, _context.getString(R.string.utils_title_error), message, 0, android.R.attr.alertDialogIcon, null);
@@ -76,19 +72,6 @@ public class Utils {
 					+ " y:" + e.getY(p)
 					+ " action:" + e.getAction());
 		}
-	}
-
-
-	/**
-	 * get and set number of successful app starts
-	 */
-	public static void updateAppStartCount(Context c) {
-		SharedPreferences settings = c.getSharedPreferences(Constants.PREFSNAME, 0);
-		Utils.appstarts = settings.getInt(Constants.PREFS_KEY_APPSTARTS, 0);
-		Utils.appstarts++;
-		SharedPreferences.Editor ed = settings.edit();
-		ed.putInt(Constants.PREFS_KEY_APPSTARTS, Utils.appstarts);
-		ed.commit();
 	}
 
 
