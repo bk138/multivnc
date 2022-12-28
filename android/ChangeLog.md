@@ -1,3 +1,28 @@
+# Version 2.1.x:
+
+## 2.1.0
+
+This feature release brings a first MVP of SSH-Tunneling, a dark mode, the ability to set
+preferred VNC encodings and quality/compress levels and also some bug fixes.
+
+### ⚡ Features
+
+* Added support for night mode aka a dark theme, thanks to Gaurav Ujjwal.
+* Added Portuguese and Chinese(Taiwan) translations.
+* Improved soft-keyboard access by making keyboard and zoom controls always visible.
+* Improved support for physical mice: middle mouse button support, improved right button support.
+* Added functionality to set preferred VNC encodings, compress and quality levels, thanks to
+  Masato Nagasawa.
+* Added a first MVP of SSH-Tunneling: works with password and priv-key.
+
+### 🛠  Fixes
+
+* Fixed a possible crash when trying to (wrongfully) import very big database exports.
+* Fixed possible crash when showing connection info.
+* Fixed help dialog showing up on 2nd and later connections although the user denied.
+* Fixed the haptic feedback of some on-screen actions not obeying the system settings.
+
+
 # Version 2.0.x:
 
 ## 2.0.10
