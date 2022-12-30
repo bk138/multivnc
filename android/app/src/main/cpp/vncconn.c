@@ -105,7 +105,7 @@ typedef struct
     int ssh_sock;
     int local_listensock;
     int local_listenport;
-    const char *remote_desthost;
+    char *remote_desthost;
     int remote_destport;
 } SshData;
 
