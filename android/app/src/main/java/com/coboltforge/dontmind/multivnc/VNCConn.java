@@ -224,6 +224,8 @@ public class VNCConn {
 				canvas.handler.post(new Runnable() {
 					public void run() {
 						canvas.activity.setTitle(getDesktopName());
+						// actually set scale type with this, otherwise no scaling
+						canvas.activity.setModes();
 						pd.setMessage("Downloading first frame.\nPlease wait...");
 					}
 				});
@@ -236,8 +238,6 @@ public class VNCConn {
 				outputThread = new ClientToServerThread();
 				outputThread.start();
 
-				// actually set scale type with this, otherwise no scaling
-				canvas.activity.setModes();
 				// center pointer
 				canvas.mouseX = getFramebufferWidth() / 2;
 				canvas.mouseY = getFramebufferHeight() / 2;
