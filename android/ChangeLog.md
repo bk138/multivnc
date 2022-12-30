@@ -1,5 +1,12 @@
 # Version 2.1.x:
 
+## 2.1.1
+
+### 🛠  Fixes
+
+* Fixed bug on Android 7 devices where "VNC connection failed! Only the original thread that created
+  a view hierarchy can touch its views." would appear on connection initialisation.
+
 ## 2.1.0
 
 This feature release brings a first MVP of SSH-Tunneling, a dark mode, the ability to set
