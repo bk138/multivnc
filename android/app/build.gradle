@@ -37,6 +37,7 @@ android {
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
+    namespace 'com.coboltforge.dontmind.multivnc'
 }
 
 dependencies {
