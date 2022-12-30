@@ -389,6 +389,8 @@ SshData* ssh_tunnel_open(const char *ssh_host,
         libssh2_session_disconnect(data->session, "Error in SSH tunnel setup");
         libssh2_session_free(data->session);
     }
+    if(data->remote_desthost)
+        free(data->remote_desthost);
 
     rfbCloseSocket(data->local_listensock);
     rfbCloseSocket(data->ssh_sock);
