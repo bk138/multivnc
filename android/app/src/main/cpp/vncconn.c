@@ -256,6 +256,8 @@ SshData* ssh_tunnel_open(const char *ssh_host,
         return NULL;
 
     data = calloc(1, sizeof(SshData));
+    // set the sockets to invalid so we don't close 0 inadvertently
+    data->local_listensock = data->ssh_sock = RFB_INVALID_SOCKET;
 
     data->client = client;
     data->remote_desthost = strdup(rfb_host); /* resolved by the server */
