@@ -1,5 +1,12 @@
 # Version 2.1.x:
 
+## 2.1.2
+
+### 🛠  Fixes
+
+* Fixed a _server_ crash when connecting to UltraVNC that has MSLogonII enabled.
+* Fixed a crash that happened when setting up an SSH tunnel failed for some reason.
+
 ## 2.1.1
 
 ### 🛠  Fixes
