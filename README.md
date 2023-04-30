@@ -1,7 +1,7 @@
 
 # MultiVNC
 
-[![Build Status](https://app.travis-ci.com/bk138/multivnc.svg?branch=master)](https://app.travis-ci.com/bk138/multivnc)
+[![CI](https://github.com/bk138/multivnc/actions/workflows/ci.yml/badge.svg)](https://github.com/bk138/multivnc/actions/workflows/ci.yml)
 [![Help making this possible](https://img.shields.io/badge/liberapay-donate-yellow.png)](https://liberapay.com/bk138/donate)
 [![Become a patron](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bk138)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.png)](https://www.paypal.com/donate/?hosted_button_id=HKRTWKNKBKPKN)
