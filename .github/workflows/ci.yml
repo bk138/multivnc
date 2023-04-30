@@ -1,0 +1,36 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        include:
+          - os: windows-latest
+            windows_cmake_options: "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" # set this extra var for Windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Ubuntu Build Dependencies
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt install libwxgtk3.0-gtk3-dev libgtk2.0-dev libgcrypt20-dev liblzo2-dev
+      - name: Install MacOS Build Dependencies
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          brew install wxmac
+      - name: Install Windows Build Dependencies
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          vcpkg install wxwidgets --triplet=x64-windows
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake ${{ matrix.windows_cmake_options }} ..
+          cmake --build .
