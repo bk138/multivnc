@@ -69,15 +69,6 @@ See the [Android version's README](android/README.md).
 
 ### How to get it
 
-#### Prereleases
-
-These are automatically built from the current master branch and contain cutting edge features and bug fixes.
-
-  * [MultiVNC for MacOS prerelease](http://multivnc-mac.surge.sh/MultiVNC-prerelease.dmg)
-  * [MultiVNC (64bit) for Debian/Ubuntu prerelease, built on Ubuntu 18.04](http://multivnc-linux.surge.sh/multivnc-prerelease.deb)
-
-#### Releases
-
   * [MultiVNC 0.5 (64bit) for Debian](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-1_amd64.deb/download)
   * [MultiVNC 0.5 (64bit) for Fedora/Redhat](https://sourceforge.net/projects/multivnc/files/0.5/multivnc-0.5-2.x86_64.rpm/download)
   * [MultiVNC 0.5 (32bit) for Microsoft Windows](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-win32-setup.exe/download)
