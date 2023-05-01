@@ -3,12 +3,21 @@ cmake_minimum_required(VERSION 3.13)
 project(multivnc
     VERSION 0.6.0)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(CMAKE_GENERATOR MATCHES "Unix Makefiles|Ninja")
+# some LSP servers expect compile_commands.json in the project root
+add_custom_target(
+    multivnc-copy-compile-commands ALL
+    ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+endif(CMAKE_GENERATOR MATCHES "Unix Makefiles|Ninja")
+
 # all the build configuration switches
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 configure_file(config.h.cmake_in config.h)
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(WXSERVDISC_INSTALL OFF CACHE BOOL "Set to OFF to not include wxservdisc artifacts in install")
 add_subdirectory(libwxservdisc/src)
