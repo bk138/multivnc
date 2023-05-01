@@ -18,7 +18,6 @@ Section ""
   SetOutPath $INSTDIR
 
   File src\multivnc.exe
-  File src\mingwm10.dll
   File src\libgpg-error-0.dll
   File contrib\windowshare.exe
   File contrib\VNCHooks.dll
@@ -62,7 +61,6 @@ section "Uninstall"
 
   # now delete installed files
   delete $INSTDIR\multivnc.exe
-  delete $INSTDIR\mingwm10.dll
   delete $INSTDIR\windowshare.exe
   delete $INSTDIR\VNCHooks.dll
   delete $INSTDIR\README-contrib.txt
