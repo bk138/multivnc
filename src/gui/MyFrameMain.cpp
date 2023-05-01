@@ -1726,6 +1726,18 @@ or multicast mode."));
 
 
 
+void MyFrameMain::help_issue_list(wxCommandEvent &e)
+{
+    wxString platform;
+#if defined __LINUX__
+    platform = "linux";
+#elif defined __WINDOWS__
+    platform = "windows";
+#elif defined __APPLE__
+    platform = "mac";
+#endif
+    wxLaunchDefaultBrowser("https://github.com/bk138/multivnc/issues?q=is%3Aissue+is%3Aopen+label%3Aplatform-" + platform);
+}
 
 
 

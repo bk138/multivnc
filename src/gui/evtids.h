@@ -20,6 +20,7 @@ enum
     ID_GRABKEYBOARD,
     ID_INPUT_RECORD,
     ID_INPUT_REPLAY,
+    ID_ISSUE_LIST,
   };
 
 

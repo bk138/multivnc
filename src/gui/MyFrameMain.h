@@ -132,6 +132,7 @@ public:
 
   void help_about(wxCommandEvent &event);
   void help_contents(wxCommandEvent &event);
+  void help_issue_list(wxCommandEvent &event);
 
   // to be called from the App
   bool cmdline_connect(wxString& hostarg);
