@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(WXSERVDISC_INSTALL OFF CACHE BOOL "Set to OFF to not include wxservdisc artifacts in install")
 add_subdirectory(libwxservdisc/src)
 set(LIBVNCSERVER_INSTALL OFF CACHE BOOL "Set to OFF to not include libvncserver artifacts in install")
+set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples")
 add_subdirectory(libvncserver)
 
 add_subdirectory(src)
