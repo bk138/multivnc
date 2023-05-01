@@ -66,7 +66,7 @@ set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/COPYING)
 
 if(UNIX AND NOT APPLE)
     set(CPACK_GENERATOR "DEB")
-    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Christian Beier <dontmind@freeshell.org>")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Christian Beier <multivnc@christianbeier.net>")
     set(CPACK_DEBIAN_PACKAGE_SECTION "net")
     set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Multicast-enabled VNC viewer
  MultiVNC is a cross-platform Multicast-enabled VNC client using wxWidgets
