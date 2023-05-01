@@ -1650,18 +1650,18 @@ int VNCConn::getMaxSocketRecvBufSize()
   int recv_buf_try = 33554432; // 32 MB
   if(setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&recv_buf_try, sizeof(recv_buf_try)) < 0) 
     {
-      close(sock);
+      rfbCloseSocket(sock);
       return -1;
     } 
   int recv_buf_got = -1;
   socklen_t recv_buf_got_len = sizeof(recv_buf_got);
   if(getsockopt(sock, SOL_SOCKET, SO_RCVBUF,(char*)&recv_buf_got, &recv_buf_got_len) <0)
     {
-      close(sock);
+      rfbCloseSocket(sock);
       return -1;
     } 
 
-  close(sock);
+  rfbCloseSocket(sock);
 
   return recv_buf_got/1024;
 }
