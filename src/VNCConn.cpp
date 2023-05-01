@@ -28,7 +28,7 @@
 #include <wx/log.h>
 #include <wx/socket.h>
 #ifdef __WIN32__
-#include <winsock.h>
+#include <winsock2.h>
 #else
 #include <arpa/inet.h>
 #endif
