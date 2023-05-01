@@ -37,7 +37,7 @@ if(APPLE)
     set_source_files_properties(icon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif(APPLE)
 
-add_executable(${executable_name} MACOSX_BUNDLE ${multivnc_SRCS})
+add_executable(${executable_name} WIN32 MACOSX_BUNDLE ${multivnc_SRCS})
 
 target_link_libraries(${executable_name} MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vncclient)
 
