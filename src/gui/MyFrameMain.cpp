@@ -1686,10 +1686,10 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   desc += _("\nBuilt with ") + (wxString() << wxVERSION_STRING) + wxT("\n");
   desc += _("\nSupported Security Types:\n");
   desc += _("VNC Authentication");
-#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
+#if defined LIBVNCSERVER_HAVE_GNUTLS || defined LIBVNCSERVER_HAVE_LIBSSL
   desc += wxT(", Anonymous TLS, VeNCrypt");
 #endif
-#ifdef LIBVNCSERVER_WITH_CLIENT_GCRYPT
+#ifdef LIBVNCSERVER_HAVE_LIBGCRYPT
   desc += wxT(", Apple Remote Desktop");
 #endif
   desc += _("\n\nSupported Encodings:\n");
