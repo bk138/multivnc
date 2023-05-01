@@ -44,7 +44,6 @@ add_library(MultiVNCgui STATIC ${MultiVNCgui_SRCS})
 #
 # dependencies
 #
-message(STATUS "Detected wxWidgets using GTK3, building internals with that")
 FIND_PACKAGE(PkgConfig)
 PKG_CHECK_MODULES(GTK3 gtk+-3.0)
 include_directories(${GTK3_INCLUDE_DIRS})
