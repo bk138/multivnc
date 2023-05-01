@@ -75,10 +75,10 @@ void MyFrameLog::onUpdateTimer(wxTimerEvent& event)
       ++lines_printed;
     }
 
-  if(IsFrozen())
-    Thaw();
-
-  wxEndBusyCursor();
+  if(IsFrozen()) {
+      Thaw();
+      wxEndBusyCursor();
+  }
 }
 
 
