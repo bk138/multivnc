@@ -1503,8 +1503,24 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 
   ShowFullScreen(show_fullscreen, wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
 
-  if(show_fullscreen)
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(6)->Check();
+  if (show_fullscreen) {
+      // tick menu item
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(6)->Check(true);
+      // hide menu
+      frame_main_menubar->Show(false);
+      // hide bookmarks and discovered servers
+      show_bookmarks = show_discovered = false;
+      splitwinlayout();
+  } else {
+      // untick menu item
+      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(6)->Check(false);
+      // show menu
+      frame_main_menubar->Show(true);
+      // restore bookmarks and discovered servers to saved state
+      wxConfigBase::Get()->Read(K_SHOWDISCOVERED, &show_discovered, V_SHOWDISCOVERED);
+      wxConfigBase::Get()->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
+      splitwinlayout();
+  }
 }
 
 
