@@ -36,4 +36,4 @@ jobs:
           cd build
           cmake ${{ matrix.windows_cmake_options }} ..
           cmake --build .
-          cpack -V
+          cpack -V -C Debug
