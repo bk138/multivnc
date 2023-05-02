@@ -53,6 +53,11 @@ fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
     INSTALL(FILES README.md DESTINATION . RENAME Readme.txt)
 endif(APPLE)
 
+if(WIN32)
+  install(TARGETS multivnc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES README.md AUTHORS CHANGELOG.md DESTINATION .)
+endif(WIN32)
+
 
 #
 # packaging directives
