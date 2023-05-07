@@ -73,6 +73,9 @@ See the [Android version's README](android/README.md).
   * [MultiVNC 0.5 (64bit) for Fedora/Redhat](https://sourceforge.net/projects/multivnc/files/0.5/multivnc-0.5-2.x86_64.rpm/download)
   * [MultiVNC 0.5 (32bit) for Microsoft Windows](https://sourceforge.net/projects/multivnc/files/0.5/multivnc_0.5-win32-setup.exe/download)
 
+To get bleeding-edge packages built from the master development branch, navigate to
+[the list of CI runs](https://github.com/bk138/multivnc/actions/workflows/ci.yml),
+select the last successful one and download the wanted artifact.
 
 ### How to build
 
