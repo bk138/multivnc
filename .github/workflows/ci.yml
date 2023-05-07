@@ -37,3 +37,21 @@ jobs:
           cmake ${{ matrix.windows_cmake_options }} ..
           cmake --build .
           cpack -V -C Debug
+      - name: Archive Ubuntu Build Artifacts
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: MultiVNC Debian Package
+          path: build/*.deb
+      - name: Archive MacOS Build Artifacts
+        if: ${{ matrix.os == 'macos-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: MultiVNC MacOS Package
+          path: build/*.dmg
+      - name: Archive Windows Build Artifacts
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: MultiVNC Windows Package
+          path: build/*.exe
