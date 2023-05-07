@@ -106,14 +106,17 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->Enable(wxID_UP, false);
   frame_main_menubar->Enable(wxID_CANCEL, false);
 #ifdef __WXGTK__
-  wxString sessionType;
+  wxString sessionType, flatpakId;
   wxGetEnv("XDG_SESSION_TYPE", &sessionType);
-  frame_main_menubar->EnableTop(frame_main_menubar->FindMenu(wxT("Window Sharing")), sessionType.IsSameAs("x11"));
+  wxGetEnv("FLATPAK_ID", &flatpakId);
+  // don't show for flatpak and wayland
+  if(!flatpakId.IsEmpty() || !sessionType.IsSameAs("x11"))
+     frame_main_menubar->Remove(frame_main_menubar->FindMenu("Window Sharing"));
 #elif defined __WXMSW__
   // always on
 #else
   // always off so far
-  frame_main_menubar->EnableTop(frame_main_menubar->FindMenu(wxT("Window Sharing")), false);
+  frame_main_menubar->Remove(frame_main_menubar->FindMenu("Window Sharing"));
 #endif
   // edge connector
   frame_main_menubar->Enable(ID_SEAMLESS, VNCSeamlessConnector::isSupportedByCurrentPlatform());
