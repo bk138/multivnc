@@ -119,7 +119,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->Remove(frame_main_menubar->FindMenu("Window Sharing"));
 #endif
   // edge connector
-  frame_main_menubar->Enable(ID_SEAMLESS, VNCSeamlessConnector::isSupportedByCurrentPlatform());
+  if(!VNCSeamlessConnector::isSupportedByCurrentPlatform())
+      frame_main_menubar->FindItem(ID_SEAMLESS)->GetMenu()->Delete(ID_SEAMLESS);
 
   // toolbar setup
 #ifdef MULTIVNC_GRABKEYBOARD
