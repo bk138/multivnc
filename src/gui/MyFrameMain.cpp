@@ -87,27 +87,24 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
 
   /*
-    setup menu items for a the frame
-    unfortunately there seems to be a bug in wxMenu::FindItem(str): 
-    it skips '&' characters,  but GTK uses '_' for accelerators and 
-    these are not trimmed...
+    setup menu items for the frame
   */
   // "disconnect"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(false);
+  frame_main_menubar->Enable(wxID_STOP, false);
   // "screenshot"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
+  frame_main_menubar->Enable(wxID_SAVE, false);
   // stats
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(false);
+  frame_main_menubar->Enable(ID_STATS_SAVE, false);
   // record/replay
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(false);
+  frame_main_menubar->Enable(ID_INPUT_RECORD, false);
+  frame_main_menubar->Enable(ID_INPUT_REPLAY, false);
   // bookmarks
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(false);
+  frame_main_menubar->Enable(wxID_ADD, false);
+  frame_main_menubar->Enable(wxID_EDIT, false);
+  frame_main_menubar->Enable(wxID_DELETE, false);
   // window sharing
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+  frame_main_menubar->Enable(wxID_UP, false);
+  frame_main_menubar->Enable(wxID_CANCEL, false);
 #ifdef __WXGTK__
   wxString sessionType;
   wxGetEnv("XDG_SESSION_TYPE", &sessionType);
@@ -119,7 +116,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->EnableTop(frame_main_menubar->FindMenu(wxT("Window Sharing")), false);
 #endif
   // edge connector
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(4)->Enable(VNCSeamlessConnector::isSupportedByCurrentPlatform());
+  frame_main_menubar->Enable(ID_SEAMLESS, VNCSeamlessConnector::isSupportedByCurrentPlatform());
 
   // toolbar setup
 #ifdef MULTIVNC_GRABKEYBOARD
@@ -136,7 +133,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       frame_main_toolbar->EnableTool(ID_INPUT_REPLAY, false);
       frame_main_toolbar->EnableTool(ID_INPUT_RECORD, false);
 
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(0)->Check();
+      frame_main_menubar->Check(ID_TOOLBAR, true);
     }
   else
     {
@@ -150,33 +147,28 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   loadbookmarks();
 
   if(show_discovered)
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(1)->Check();
+    frame_main_menubar->Check(ID_DISCOVERED, true);
   if(show_bookmarks)
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(2)->Check();
+    frame_main_menubar->Check(ID_BOOKMARKS, true);
   if(show_stats)
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(3)->Check();
+    frame_main_menubar->Check(ID_STATISTICS, true);
       
   switch(show_seamless)
     {
     case EDGE_NORTH:
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(0)->Check();
+      frame_main_menubar->Check(ID_SEAMLESS_NORTH, true);
       break;
     case EDGE_EAST:
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(1)->Check();
+      frame_main_menubar->Check(ID_SEAMLESS_EAST, true);
       break;
     case EDGE_WEST:
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(2)->Check();
+      frame_main_menubar->Check(ID_SEAMLESS_WEST, true);
       break;
     case EDGE_SOUTH:
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(3)->Check();
+      frame_main_menubar->Check(ID_SEAMLESS_SOUTH, true);
       break;
     default:
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(4)->Check();
+      frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
     }
 
   // setup clipboard
@@ -333,7 +325,7 @@ void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
   if(index < connections.size()) // found
     {
       frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Replay Input"));
+      frame_main_menubar->SetLabel(ID_INPUT_REPLAY, _("Replay Input"));
       // remove and insert are necessary, otherwise label won't be updated
       size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
       wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_REPLAY);
@@ -342,7 +334,7 @@ void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
 
       // re-enable record buttons
       GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(true);
+      frame_main_menubar->Enable(ID_INPUT_RECORD, true);
 
       wxLogMessage( _("Replay finished!"));
       wxLogStatus(_("Replay finished!"));
@@ -576,11 +568,9 @@ void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
   if(notebook_connections->GetSelection() == (int)index)
     {  
       // this is "share window"
-      frame_main_menubar->GetMenu(frame_main_menubar->
-				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
+      frame_main_menubar->Enable(wxID_UP, true);
       // "stop window share"
-      frame_main_menubar->GetMenu(frame_main_menubar->
-				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+      frame_main_menubar->Enable(wxID_CANCEL, false);
     }
 }
 
@@ -824,19 +814,19 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 
 
   // "end connection"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(true);
+  frame_main_menubar->Enable(wxID_STOP, true);
   // "screenshot"
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(true);
+  frame_main_menubar->Enable(wxID_SAVE, true);
   // stats
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(true);
+  frame_main_menubar->Enable(ID_STATS_SAVE, true);
   // record/replay
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(true);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(true);
+  frame_main_menubar->Enable(ID_INPUT_RECORD, true);
+  frame_main_menubar->Enable(ID_INPUT_REPLAY, true);
   // bookmarks
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(true);
+  frame_main_menubar->Enable(wxID_ADD, true);
   // window sharing
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
-  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+  frame_main_menubar->Enable(wxID_UP, true);
+  frame_main_menubar->Enable(wxID_CANCEL, false);
 
   if(GetToolBar())
     {
@@ -914,19 +904,19 @@ void MyFrameMain::terminate_conn(int which)
   if(connections.size() == 0) // nothing to end
     {
       // "end connection"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(2)->Enable(false);
+      frame_main_menubar->Enable(wxID_STOP, false);
       // "screenshot"
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(5)->Enable(false);
+      frame_main_menubar->Enable(wxID_SAVE, false);
       // stats
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(6)->Enable(false);
+      frame_main_menubar->Enable(ID_STATS_SAVE, false);
       // record/replay
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(false);
+      frame_main_menubar->Enable(ID_INPUT_RECORD, false);
+      frame_main_menubar->Enable(ID_INPUT_REPLAY, false);
       // bookmarks
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(0)->Enable(false);
+      frame_main_menubar->Enable(wxID_ADD, false);
       // window sharing
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+      frame_main_menubar->Enable(wxID_UP, false);
+      frame_main_menubar->Enable(wxID_CANCEL, false);
 
       if(GetToolBar())
 	{
@@ -988,15 +978,15 @@ void MyFrameMain::splitwinlayout()
   // finally if not shown, disable menu items
   if(!show_bookmarks)
     {
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(false);
+	frame_main_menubar->Enable(wxID_EDIT, false);
+	frame_main_menubar->Enable(wxID_DELETE, false);
     }  
   else
     {
       if(list_box_bookmarks->GetSelection() >= 0)
 	{
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(true);
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(true);
+	    frame_main_menubar->Enable(wxID_EDIT, true);
+	    frame_main_menubar->Enable(wxID_DELETE, true);
 	}
     }
 }
@@ -1257,11 +1247,11 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	  if(c->recordUserInputStop(recorded_input))
 	    {
 	      wxLogStatus(_("Stopped recording user input!"));
-	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->SetItemLabel(_("Record Input"));
+	      frame_main_menubar->SetLabel(ID_INPUT_RECORD,_("Record Input"));
 
 	      // re-enable replay buttons
 	      GetToolBar()->EnableTool(ID_INPUT_REPLAY, true);
-	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(true);
+	      frame_main_menubar->Enable(ID_INPUT_REPLAY, true);
 	      
 	      if(recorded_input.IsEmpty())
 		{
@@ -1308,7 +1298,7 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	  if( c->recordUserInputStart()) 
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(stop_png));
-	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->SetItemLabel(_("Stop Recording"));
+	      frame_main_menubar->SetLabel(ID_INPUT_RECORD, _("Stop Recording"));
 	      // remove and insert are necessary, otherwise label won't be updated
 	      size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_RECORD);
 	      wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_RECORD);
@@ -1319,7 +1309,7 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 
 	      // disable replay buttons
 	      GetToolBar()->EnableTool(ID_INPUT_REPLAY, false);
-	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->Enable(false);
+	      frame_main_menubar->Enable(ID_INPUT_REPLAY, false);
 	    }
 	}
 	
@@ -1345,7 +1335,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  c->replayUserInputStop();
 
 	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Replay Input"));
+	  frame_main_menubar->SetLabel(ID_INPUT_REPLAY,_("Replay Input"));
 	  // remove and insert are necessary, otherwise label won't be updated
 	  size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
 	  wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_REPLAY);
@@ -1356,7 +1346,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 
 	  // re-enable record buttons
 	  GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(true);
+	  frame_main_menubar->Enable(ID_INPUT_RECORD, true);
 	}
       else // not replaying
 	{
@@ -1395,7 +1385,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  if(c->replayUserInputStart(recorded_input, shift_was_down))
 	    {
 	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
-	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(8)->SetItemLabel(_("Stop Replaying"));
+	      frame_main_menubar->SetLabel(ID_INPUT_REPLAY, _("Stop Replaying"));
 	      // remove and insert are necessary, otherwise label won't be updated
 	      size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
 	      wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_REPLAY);
@@ -1409,7 +1399,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 
 	      // disable record buttons
 	      GetToolBar()->EnableTool(ID_INPUT_RECORD, false);
-	      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Machine")))->FindItemByPosition(7)->Enable(false);
+	      frame_main_menubar->Enable(ID_INPUT_RECORD, false);
 	    }
 	}
 	
@@ -1505,7 +1495,7 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 
   if (show_fullscreen) {
       // tick menu item
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(6)->Check(true);
+      frame_main_menubar->Check(ID_FULLSCREEN, true);
       // hide menu
       frame_main_menubar->Show(false);
       // hide bookmarks and discovered servers
@@ -1513,7 +1503,7 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
       splitwinlayout();
   } else {
       // untick menu item
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->FindItemByPosition(6)->Check(false);
+      frame_main_menubar->Check(ID_FULLSCREEN, false);
       // show menu
       frame_main_menubar->Show(true);
       // restore bookmarks and discovered servers to saved state
@@ -1528,20 +1518,16 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 
 void MyFrameMain::view_seamless(wxCommandEvent &event)
 {
-  if(frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(0)->IsChecked())
+  if(frame_main_menubar->IsChecked(ID_SEAMLESS_NORTH))
     show_seamless = EDGE_NORTH;
   else if
-    (frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(1)->IsChecked())
+    (frame_main_menubar->IsChecked(ID_SEAMLESS_EAST))
     show_seamless = EDGE_EAST;
   else if 
-    (frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(2)->IsChecked())
+    (frame_main_menubar->IsChecked(ID_SEAMLESS_WEST))
     show_seamless = EDGE_WEST;
   else if
-    (frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-     FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(3)->IsChecked())
+    (frame_main_menubar->IsChecked(ID_SEAMLESS_SOUTH))
     show_seamless = EDGE_SOUTH;
   else
     show_seamless = EDGE_NONE;
@@ -1835,15 +1821,15 @@ void MyFrameMain::listbox_bookmarks_select(wxCommandEvent &event)
 
   if(sel < 0) //nothing selected
     {
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(false);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(false);
+      frame_main_menubar->Enable(wxID_EDIT, false);
+      frame_main_menubar->Enable(wxID_DELETE, false);
       
       return;
     }
   else
     {
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(2)->Enable(true);
-      frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")))->FindItemByPosition(3)->Enable(true);
+      frame_main_menubar->Enable(wxID_EDIT, true);
+      frame_main_menubar->Enable(wxID_DELETE, true);
      
       wxLogStatus(_("Bookmark ") + bookmarks[sel]);
     }
@@ -1877,42 +1863,34 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
   bool isSharing = cb->windowshare_proc ? true : false;
   wxLogDebug(wxT("notebook_connections_pagechanged(): VNCConn %p sharing is %d"), cb->conn, isSharing);
   // this is "share window"
-  frame_main_menubar->GetMenu(frame_main_menubar->
-			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(!isSharing);
+  frame_main_menubar->Enable(wxID_UP, !isSharing);
   // this is "stop share window"
-  frame_main_menubar->GetMenu(frame_main_menubar->
-			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(isSharing);
+  frame_main_menubar->Enable(wxID_CANCEL, isSharing);
 
   if(cb->seamlessconnector) 
     {
       switch(cb->seamlessconnector->getEdge())
 	{
 	case EDGE_NORTH:
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(0)->Check();
+	  frame_main_menubar->Check(ID_SEAMLESS_NORTH, true);
 	  break;
 	case EDGE_EAST:
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(1)->Check();
+	  frame_main_menubar->Check(ID_SEAMLESS_EAST, true);
 	  break;
 	case EDGE_WEST:
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(2)->Check();
+	  frame_main_menubar->Check(ID_SEAMLESS_WEST, true);
 	  break;
 	case EDGE_SOUTH:
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(3)->Check();
+	  frame_main_menubar->Check(ID_SEAMLESS_SOUTH, true);
 	  break;
 	default:
-	  frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-	    FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(4)->Check();
+	  frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
 	}
 
       cb->seamlessconnector->Raise();
     }
   else // no object, i.e. disabled
-    frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("View")))->
-      FindItemByPosition(4)->GetSubMenu()->FindItemByPosition(4)->Check();
+    frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
 }
 
 
@@ -1980,11 +1958,9 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
   SetStatusText(_("Sharing window with ") + cb->conn->getDesktopName());
 		
   // this is "share window"
-  frame_main_menubar->GetMenu(frame_main_menubar->
-			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(false);
+  frame_main_menubar->Enable(wxID_UP, false);
   // this is "stop share window"
-  frame_main_menubar->GetMenu(frame_main_menubar->
-			      FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(true);
+  frame_main_menubar->Enable(wxID_CANCEL, true);
 }
 
 
@@ -2023,11 +1999,9 @@ void MyFrameMain::windowshare_stop(wxCommandEvent &event)
       wxLogStatus(_("Stopped sharing window with ") + cb->conn->getDesktopName());
 
       // this is "share window"
-      frame_main_menubar->GetMenu(frame_main_menubar->
-				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(0)->Enable(true);
+      frame_main_menubar->Enable(wxID_UP, true);
       // this is "stop share window"
-      frame_main_menubar->GetMenu(frame_main_menubar->
-				  FindMenu(wxT("Window Sharing")))->FindItemByPosition(1)->Enable(false);
+      frame_main_menubar->Enable(wxID_CANCEL, false);
     }
   else
     wxLogDebug(wxT("windowshare_stop(): Could not kill %d. Not good."), cb->windowshare_proc_pid);
