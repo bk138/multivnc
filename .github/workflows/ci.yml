@@ -10,9 +10,6 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-        include:
-          - os: windows-latest
-            windows_cmake_options: "-DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" # set this extra var for Windows
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -28,13 +25,17 @@ jobs:
           brew install wxmac
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
-        run: |
-          vcpkg install wxwidgets --triplet=x64-windows
+        uses: johnwason/vcpkg-action@v4
+        id: vcpkg
+        with:
+          pkgs: wxwidgets
+          triplet: x64-windows
+          token: ${{ github.token }}
       - name: Build
         run: |
           mkdir build
           cd build
-          cmake ${{ matrix.windows_cmake_options }} ..
+          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} ..
           cmake --build .
           cpack -V -C Debug
       - name: Archive Ubuntu Build Artifacts
