@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.13)
 project(multivnc
     VERSION 0.6.0)
 
+set(LOCALE_DOMAIN ${CMAKE_PROJECT_NAME})
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(CMAKE_GENERATOR MATCHES "Unix Makefiles|Ninja")
 # some LSP servers expect compile_commands.json in the project root
@@ -26,6 +28,8 @@ set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples"
 add_subdirectory(libvncserver)
 
 add_subdirectory(src)
+
+find_package(Gettext)
 
 
 #
