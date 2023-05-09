@@ -495,7 +495,7 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
 	}
 
       if(index < connections.size())
-	notebook_connections->SetPageText(index, c->getDesktopName() + _(" (Reverse Connection)"));
+	notebook_connections->SetPageText(index, c->getDesktopName() + " " +  _("(Reverse Connection)"));
     }
 }
 
@@ -548,9 +548,9 @@ void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
 
   if(status == 0) 
     {
-      wxString msg = _("Window sharing with ") +
-        cb->conn->getDesktopName() +
-	_(" stopped. Either the other side does not support receiving windows or the window was closed there.");
+      wxString msg = _("Window sharing with") + " " +
+        cb->conn->getDesktopName() + " " +
+	_("stopped. Either the other side does not support receiving windows or the window was closed there.");
       wxLogMessage(msg);
       SetStatusText(msg);
     }
@@ -648,7 +648,7 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 #endif
 
   if(!autosave)
-    filename = wxFileSelector(_("Saving ") + desc +_(" statistics..."), 
+    filename = wxFileSelector(_("Saving") + " " + desc + " " +_("statistics..."), 
 			      wxEmptyString,
 			      filename, 
 			      wxT(".txt"), 
@@ -746,7 +746,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxLogStatus(_("Connecting to ") + service + wxT(" ..."));
+      wxLogStatus(_("Connecting to") + " " + service + wxT(" ..."));
 
       wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
       wxString host = service.Contains("@") ? service.AfterFirst('@') : service;
@@ -1672,9 +1672,13 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   wxIcon icon;
   icon.CopyFromBitmap(bitmapFromMem(about_png));
 
-  wxString desc = _("\nMultiVNC is a cross-platform Multicast-enabled VNC client.\n");
-  desc += _("\nBuilt with ") + (wxString() << wxVERSION_STRING) + wxT("\n");
-  desc += _("\nSupported Security Types:\n");
+  wxString desc = "\n";
+  desc += _("MultiVNC is a cross-platform Multicast-enabled VNC client.");
+  desc += "\n\n";
+  desc += _("Built with") + " " + (wxString() << wxVERSION_STRING);
+  desc += "\n\n";
+  desc += _("Supported Security Types:");
+  desc += "\n";
   desc += _("VNC Authentication");
 #if defined LIBVNCSERVER_HAVE_GNUTLS || defined LIBVNCSERVER_HAVE_LIBSSL
   desc += wxT(", Anonymous TLS, VeNCrypt");
@@ -1682,7 +1686,9 @@ void MyFrameMain::help_about(wxCommandEvent &event)
 #ifdef LIBVNCSERVER_HAVE_LIBGCRYPT
   desc += wxT(", Apple Remote Desktop");
 #endif
-  desc += _("\n\nSupported Encodings:\n");
+  desc += "\n\n";
+  desc += _("Supported Encodings:");
+  desc += "\n";
   desc += wxT("Raw, RRE, coRRE, CopyRect, Hextile, Ultra");
 #ifdef LIBVNCSERVER_HAVE_LIBZ 
   desc += wxT(", UltraZip, Zlib, ZlibHex, ZRLE, ZYWRLE");
@@ -1734,7 +1740,7 @@ void MyFrameMain::help_issue_list(wxCommandEvent &e)
 void MyFrameMain::listbox_services_select(wxCommandEvent &event)
 {
     // intentionally empty
-    wxLogStatus(_("VNC Server ") + list_box_services->GetStringSelection());
+    wxLogStatus(_("VNC Server") + " " + list_box_services->GetStringSelection());
 }
 
 
@@ -1959,7 +1965,7 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
       return;
     }
 
-  SetStatusText(_("Sharing window with ") + cb->conn->getDesktopName());
+  SetStatusText(_("Sharing window with") + " " + cb->conn->getDesktopName());
 		
   // this is "share window"
   frame_main_menubar->Enable(wxID_UP, false);
@@ -2000,7 +2006,7 @@ void MyFrameMain::windowshare_stop(wxCommandEvent &event)
       cb->windowshare_proc = 0; // obj deleted itself because of Detach()!
       cb->windowshare_proc_pid = 0;
       
-      wxLogStatus(_("Stopped sharing window with ") + cb->conn->getDesktopName());
+      wxLogStatus(_("Stopped sharing window with") + " " + cb->conn->getDesktopName());
 
       // this is "share window"
       frame_main_menubar->Enable(wxID_UP, true);

@@ -11,7 +11,7 @@ DialogLogin::DialogLogin(wxFrame *parent, wxWindowID id, const wxString &title )
     wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
  
     wxBoxSizer *hbox1 = new wxBoxSizer(wxHORIZONTAL);
-    m_usernameLabel = new wxStaticText(this, wxID_ANY, _("Username: "), wxDefaultPosition, wxSize(80, -1));
+    m_usernameLabel = new wxStaticText(this, wxID_ANY, _("Username:") + " ", wxDefaultPosition, wxSize(80, -1));
     hbox1->Add(m_usernameLabel, 0);
  
     m_usernameEntry = new wxTextCtrl(this, wxID_ANY);
@@ -19,7 +19,7 @@ DialogLogin::DialogLogin(wxFrame *parent, wxWindowID id, const wxString &title )
     vbox->Add(hbox1, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, 10);
  
     wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
-    m_passwordLabel = new wxStaticText(this, wxID_ANY, _("Password: "), wxDefaultPosition, wxSize(80, -1));
+    m_passwordLabel = new wxStaticText(this, wxID_ANY, _("Password:") + " ", wxDefaultPosition, wxSize(80, -1));
     hbox2->Add(m_passwordLabel, 0);
  
     m_passwordEntry = new wxTextCtrl(this, BUTTON_Login, wxString(""),
