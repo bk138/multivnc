@@ -200,7 +200,7 @@ void MultiVNCApp::genDebugReport(wxDebugReport::Context ctx)
     {
       if (report->Process())
         {
-	  wxMessageBox(_("Report generated in \"") + report->GetCompressedFileName() + _T("\"."), _("Report generated successfully"),
+	  wxMessageBox(_("Report generated in") + " \"" + report->GetCompressedFileName() + _T("\"."), _("Report generated successfully"),
 		       wxICON_INFORMATION | wxOK, NULL);
 	  report->Reset();
 	}
