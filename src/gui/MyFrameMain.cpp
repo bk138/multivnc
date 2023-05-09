@@ -548,9 +548,7 @@ void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
 
   if(status == 0) 
     {
-      wxString msg = _("Window sharing with") + " " +
-        cb->conn->getDesktopName() + " " +
-	_("stopped. Either the other side does not support receiving windows or the window was closed there.");
+      wxString msg = wxString::Format(_("Window sharing with %s stopped. Either the other side does not support receiving windows or the window was closed there."), cb->conn->getDesktopName());
       wxLogMessage(msg);
       SetStatusText(msg);
     }
@@ -1965,7 +1963,7 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
       return;
     }
 
-  SetStatusText(_("Sharing window with") + " " + cb->conn->getDesktopName());
+  SetStatusText(wxString::Format(_("Sharing window with %s"), cb->conn->getDesktopName()));
 		
   // this is "share window"
   frame_main_menubar->Enable(wxID_UP, false);
@@ -2006,7 +2004,7 @@ void MyFrameMain::windowshare_stop(wxCommandEvent &event)
       cb->windowshare_proc = 0; // obj deleted itself because of Detach()!
       cb->windowshare_proc_pid = 0;
       
-      wxLogStatus(_("Stopped sharing window with") + " " + cb->conn->getDesktopName());
+      wxLogStatus(_("Stopped sharing window with %s"), cb->conn->getDesktopName());
 
       // this is "share window"
       frame_main_menubar->Enable(wxID_UP, true);
