@@ -605,7 +605,7 @@ rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
 		pass = conn->getPassword().GetAsString();
 	    else
 #endif
-		pass = wxGetPasswordFromUser(_("Please enter password for user ") + conn->getUserName(),
+		pass = wxGetPasswordFromUser(_("Please enter password for user") + " " + conn->getUserName(),
 						  _("Credentials required..."));
 	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
 	    c->userCredential.username = strdup(conn->getUserName().char_str());
@@ -736,7 +736,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 
   if(listenPort > 0)
     {
-      wxLogStatus(_("Listening on port ") + (wxString() << listenPort) + wxT(" ..."));
+      wxLogStatus(_("Listening on port") + " " + (wxString() << listenPort) + wxT(" ..."));
       if(!c->Listen(listenPort))
 	{
 	  wxLogError(c->getErr());
@@ -1063,7 +1063,7 @@ bool MyFrameMain::loadbookmarks()
       wxString* index_str = new wxString; // pack i into a wxObject, we use wxString here
       *index_str << i;
       bm_menu->Append(id, bookmarknames[i]);
-      bm_menu->SetHelpString(id, wxT("Bookmark ") + host + wxT(":") + port);
+      bm_menu->SetHelpString(id, _("Bookmark") + " " + host + wxT(":") + port);
       Connect(id, wxEVT_COMMAND_MENU_SELECTED, 
 	      wxCommandEventHandler(FrameMain::listbox_bookmarks_dclick), (wxObject*)index_str);
      }
