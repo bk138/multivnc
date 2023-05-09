@@ -646,7 +646,7 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 #endif
 
   if(!autosave)
-    filename = wxFileSelector(_("Saving") + " " + desc + " " +_("statistics..."), 
+    filename = wxFileSelector(wxString::Format(_("Saving %s statistics..."), desc),
 			      wxEmptyString,
 			      filename, 
 			      wxT(".txt"), 
@@ -744,7 +744,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxLogStatus(_("Connecting to") + " " + service + wxT(" ..."));
+      wxLogStatus(_("Connecting to %s..."), service);
 
       wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
       wxString host = service.Contains("@") ? service.AfterFirst('@') : service;
