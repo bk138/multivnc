@@ -1085,7 +1085,7 @@ bool MyFrameMain::loadbookmarks()
 void MyFrameMain::machine_connect(wxCommandEvent &event)
 {
   wxString s = wxGetTextFromUser(_("Enter host to connect to:"),
-				 _("Connect to a specific host"));
+				 _("Connect to a specific host."));
 				
   if(s != wxEmptyString)
     spawn_conn(s);
