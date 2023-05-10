@@ -36,6 +36,9 @@ find_package(Gettext)
 # install directives
 #
 
+GETTEXT_PROCESS_PO_FILES(de ALL PO_FILES po/de.po)
+
+
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
     install(TARGETS multivnc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -43,7 +46,8 @@ if(UNIX AND NOT APPLE)
     install(FILES README.md AUTHORS CHANGELOG.md DESTINATION ${CMAKE_INSTALL_DOCDIR})
     install(FILES src/gui/res/multivnc.xpm DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps)
     install(FILES src/gui/res/net.christianbeier.MultiVNC.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
-endif(UNIX AND NOT APPLE)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/de/LC_MESSAGES/ RENAME ${LOCALE_DOMAIN}.mo)
+  endif(UNIX AND NOT APPLE)
 
 if(APPLE)
     set(APPS ${CMAKE_CURRENT_BINARY_DIR}/src/MultiVNC.app)  # paths to executables
