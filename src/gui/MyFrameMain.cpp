@@ -111,12 +111,12 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   wxGetEnv("FLATPAK_ID", &flatpakId);
   // don't show for flatpak and wayland
   if(!flatpakId.IsEmpty() || !sessionType.IsSameAs("x11"))
-     frame_main_menubar->Remove(frame_main_menubar->FindMenu("Window Sharing"));
+      frame_main_menubar->Remove(frame_main_menubar->FindMenu(_("Window &Sharing")));
 #elif defined __WXMSW__
   // always on
 #else
   // always off so far
-  frame_main_menubar->Remove(frame_main_menubar->FindMenu("Window Sharing"));
+  frame_main_menubar->Remove(frame_main_menubar->FindMenu(_("Window &Sharing")));
 #endif
   // edge connector
   if(!VNCSeamlessConnector::isSupportedByCurrentPlatform())
@@ -1019,7 +1019,7 @@ bool MyFrameMain::loadbookmarks()
 
   // clean up
   bookmarks.Clear();
-  wxMenu* bm_menu = frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(wxT("Bookmarks")));
+  wxMenu* bm_menu = frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(_("Bookmarks")));
   for(int i = bm_menu->GetMenuItemCount()-1; i > 3; --i)
     bm_menu->Destroy(bm_menu->FindItemByPosition(i));
   bm_menu->AppendSeparator();
