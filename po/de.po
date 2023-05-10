@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-10 16:25+0200\n"
-"PO-Revision-Date: 2023-05-10 16:44+0200\n"
+"PO-Revision-Date: 2023-05-10 20:10+0200\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -420,7 +420,7 @@ msgstr "Eingehende Verbindung."
 
 #: ../src/gui/MyFrameMain.cpp:737 ../src/gui/MyFrameMain.cpp:802
 msgid "Listening on port"
-msgstr "Eingehende Verbindung möglich auf Port"
+msgstr "Eingehende Verbindung auf Port"
 
 #: ../src/gui/MyFrameMain.cpp:1358
 msgid "Load recorded input..."
