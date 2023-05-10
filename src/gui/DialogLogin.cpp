@@ -29,10 +29,10 @@ DialogLogin::DialogLogin(wxFrame *parent, wxWindowID id, const wxString &title )
  
     wxBoxSizer *hbox3 = new wxBoxSizer(wxHORIZONTAL);
     m_buttonLogin = new wxButton(this, BUTTON_Login, _("Login"));
-    hbox3->Add(m_buttonLogin);
+    hbox3->Add(m_buttonLogin, 1, wxEXPAND | wxALL);
  
     m_buttonCancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
-    hbox3->Add(m_buttonCancel);
+    hbox3->Add(m_buttonCancel, 1, wxEXPAND | wxALL);
     vbox->Add(hbox3, 0, wxEXPAND | wxALL, 10);
     
     SetSizerAndFit(vbox);
