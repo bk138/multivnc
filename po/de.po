@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-10 16:25+0200\n"
-"PO-Revision-Date: 2023-05-10 20:58+0200\n"
+"PO-Revision-Date: 2023-05-10 21:10+0200\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -477,7 +477,7 @@ msgstr "Kein Lesezeichen mit diesem Namen!"
 
 #: ../src/gui/FrameMain.cpp:63
 msgid "North"
-msgstr "Norden"
+msgstr "Nord"
 
 #: ../src/gui/MyFrameMain.cpp:637 ../src/gui/MyFrameMain.cpp:1260
 msgid "Nothing to save!"
