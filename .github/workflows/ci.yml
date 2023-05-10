@@ -18,7 +18,7 @@ jobs:
       - name: Install Ubuntu Build Dependencies
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
-          sudo apt install libwxgtk3.0-gtk3-dev libgtk-3-dev libgcrypt20-dev liblzo2-dev
+          sudo apt install gettext libwxgtk3.0-gtk3-dev libgtk-3-dev libgcrypt20-dev liblzo2-dev
       - name: Install MacOS Build Dependencies
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
