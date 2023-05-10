@@ -1839,7 +1839,7 @@ void MyFrameMain::listbox_bookmarks_select(wxCommandEvent &event)
       frame_main_menubar->Enable(wxID_EDIT, true);
       frame_main_menubar->Enable(wxID_DELETE, true);
      
-      wxLogStatus(_("Bookmark %s") + bookmarks[sel]);
+      wxLogStatus(_("Bookmark %s"), bookmarks[sel]);
     }
 }
 
