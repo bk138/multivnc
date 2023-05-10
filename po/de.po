@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-10 16:25+0200\n"
-"PO-Revision-Date: 2023-05-10 20:41+0200\n"
+"PO-Revision-Date: 2023-05-10 20:58+0200\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -432,7 +432,7 @@ msgstr "Protokollierung"
 
 #: ../src/gui/DialogLogin.cpp:31
 msgid "Login"
-msgstr "Anmeldung"
+msgstr "Anmelden"
 
 #: ../src/gui/MyFrameMain.cpp:1754
 msgid "Looking up host address..."
