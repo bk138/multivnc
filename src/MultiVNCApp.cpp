@@ -32,6 +32,7 @@
 #include <wx/stdpaths.h>
 #endif
 #include "MultiVNCApp.h"
+#include "DebugReportEmail.h"
 #include "gui/MyFrameMain.h"
 
 
@@ -189,24 +190,15 @@ void MultiVNCApp::OnFatalException()
 
 void MultiVNCApp::genDebugReport(wxDebugReport::Context ctx)
 {
-  wxDebugReportCompress *report = new wxDebugReportCompress;
+  DebugReportEmail report("multivnc@christianbeier.net", "MultiVNC Bug Report");
 
   // add all standard files: currently this means just a minidump and an
   // XML file with system info and stack trace
-  report->AddAll(ctx);
+  report.AddAll(ctx);
 
   // calling Show() is not mandatory, but is more polite
-  if(wxDebugReportPreviewStd().Show(*report))
-    {
-      if (report->Process())
-        {
-	  wxMessageBox(_("Report generated in") + " \"" + report->GetCompressedFileName() + _T("\"."), _("Report generated successfully"),
-		       wxICON_INFORMATION | wxOK, NULL);
-	  report->Reset();
-	}
-    }
-  //else: user cancelled the report
-  delete report;
+  if(wxDebugReportPreviewStd().Show(report))
+      report.Process();
 }
 
 
