@@ -25,6 +25,8 @@ SET(multivnc_SRCS
    MultiVNCApp.h
    VNCConn.cpp
    VNCConn.h
+   DebugReportEmail.cpp
+   DebugReportEmail.h
    dfltcfg.h
 )
 
