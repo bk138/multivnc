@@ -53,19 +53,18 @@ See the [Android version's README](android/README.md).
 * Support for most encodings including Tight.
 * TLS support, i.e. AnonTLS and VeNCrypt.
 * Discovery of VNC servers advertising themselves via ZeroConf. 
-* Bookmarks.
-* MulticastVNC ;-) 
+* Bookmarking of connections.
+* Supports server framebuffer resize.
 * Several connections with one viewer using tabs.
 * Listen mode (Reverse VNC). Via tabs it's possible to listen 
   for and serve multiple incoming connections.
-* Window sharing: You can beam one of your windows to the remote
-  side if they support receiving windows (run a listening viewer).
-* Seamless control of the remote side by moving pointer over the
+* Record and replay of user input macros.
+* Under X11, seamless control of the remote side by moving pointer over the
   (default upper) screen edge. Borrows heavily from x2vnc by
   Fredrik Hübinette <hubbe@hubbe.net>, which in turn was based on
   ideas from x2x and code from vncviewer.
-* Simple, loggable statistics 
-* Supports server framebuffer resize.
+* Simple, loggable statistics.
+* MulticastVNC ;-)
 
 ### How to get it
 
