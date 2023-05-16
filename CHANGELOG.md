@@ -1,11 +1,17 @@
 # MultiVNC 0.6 -
-* The portable edition is now truly portable as it saves its
-  preferences into a file under Windows now, not using the
-  registry.
 * Added record/replay of user input. You can now record a
   VNC session and replay this 'macro' later.
-* Optional OpenSSL support (instead of GnuTLS)
-* MultiVNC can now listen on an IPv6 connection.
+* Added support for entering credentials on login and saving them
+  in bookmarks.
+* Added translation into German.
+* Added flatpak packaging.
+* Added easy emailing of bug reports.
+* Added optional OpenSSL support (instead of GnuTLS).
+* Added ability to listen on IPv6 addresses.
+* Added and fixed Linux, MacOS and Windows continous integration.
+* Fixed the portable edition for Windows: it is now truly
+  portable as it saves its preferences into a file under Windows
+  now, and is not using the registry.
 
 # MultiVNC 0.5 - "Bag o' stuff" - 2011-05-07
 * MulticastVNC now supports the Ultra encoding and features
