@@ -52,7 +52,7 @@
     <release version="0.6.0" date="2023-05-17">
       <description>
 	<p>
-	  Added record/replay of user input macros, login credential saving and a translation into German. Fixed a lot of small paper cut bugs.
+	  Added record/replay of user input macros, login credential saving and translations into German and Spanish. Fixed a lot of small paper cut bugs.
 	</p>
       </description>
     </release>
