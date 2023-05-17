@@ -37,6 +37,7 @@ find_package(Gettext)
 #
 
 GETTEXT_PROCESS_PO_FILES(de ALL PO_FILES po/de.po)
+GETTEXT_PROCESS_PO_FILES(es ALL PO_FILES po/es.po)
 
 
 if(UNIX AND NOT APPLE)
@@ -47,6 +48,7 @@ if(UNIX AND NOT APPLE)
     install(FILES src/gui/res/multivnc.xpm DESTINATION ${CMAKE_INSTALL_DATADIR}/pixmaps)
     install(FILES src/gui/res/net.christianbeier.MultiVNC.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/de/LC_MESSAGES/ RENAME ${LOCALE_DOMAIN}.mo)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/es.gmo DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/es/LC_MESSAGES/ RENAME ${LOCALE_DOMAIN}.mo)
   endif(UNIX AND NOT APPLE)
 
 if(APPLE)
