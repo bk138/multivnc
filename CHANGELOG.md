@@ -1,9 +1,9 @@
-# MultiVNC 0.6 -
+# MultiVNC 0.6.0 - "Back from the dead" - 2023-05-17
 * Added record/replay of user input. You can now record a
   VNC session and replay this 'macro' later.
 * Added support for entering credentials on login and saving them
   in bookmarks.
-* Added translation into German.
+* Added translations into German and Spanish.
 * Added flatpak packaging.
 * Added easy emailing of bug reports.
 * Added optional OpenSSL support (instead of GnuTLS).
