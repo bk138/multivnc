@@ -1702,6 +1702,7 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   info.SetCopyright(wxT(COPYRIGHT));
   info.SetWebSite(wxString(wxT(PACKAGE_URL)));
   info.AddDeveloper("Christian Beier");
+  info.AddDeveloper("Evgeny Zinoviev");
   
   wxAboutBox(info); 
 }
