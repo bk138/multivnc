@@ -1632,7 +1632,7 @@ void VNCConn::clearLog()
 
 
 // get the OS-dependent socket receive buffer size in KByte.
-// max returned value is 32MB, -1 on error
+// max returned value is 32MB, negative values on error
 int VNCConn::getMaxSocketRecvBufSize()
 {
   int sock; 
@@ -1651,14 +1651,14 @@ int VNCConn::getMaxSocketRecvBufSize()
   if(setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&recv_buf_try, sizeof(recv_buf_try)) < 0) 
     {
       rfbCloseSocket(sock);
-      return -1;
+      return -2;
     } 
   int recv_buf_got = -1;
   socklen_t recv_buf_got_len = sizeof(recv_buf_got);
   if(getsockopt(sock, SOL_SOCKET, SO_RCVBUF,(char*)&recv_buf_got, &recv_buf_got_len) <0)
     {
       rfbCloseSocket(sock);
-      return -1;
+      return -3;
     } 
 
   rfbCloseSocket(sock);
