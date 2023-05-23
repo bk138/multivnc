@@ -39,6 +39,8 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
 
   // adopt socket recv buf slider to OS-dependent max
   int os_dependent_max = VNCConn::getMaxSocketRecvBufSize();
+  if(slider_socketrecvbuf->GetValue() > os_dependent_max)
+      slider_socketrecvbuf->SetValue(os_dependent_max); // needed on MacOS at least
   if(slider_socketrecvbuf->GetMax() > os_dependent_max)
     slider_socketrecvbuf->SetRange(slider_socketrecvbuf->GetMin(), os_dependent_max);
 
