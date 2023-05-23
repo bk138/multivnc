@@ -88,6 +88,9 @@ bool MultiVNCApp::OnInit()
   // name is the name of the executable and the vendor name is the same)
   SetVendorName(_T("MultiVNC"));
 
+  // https://forums.wxwidgets.org/viewtopic.php?t=42605
+  SetAppDisplayName("MultiVNC");
+
   // if built as a portable edition, use file config always!
 #ifdef PORTABLE_EDITION
   const char* name = CFGFILE;
