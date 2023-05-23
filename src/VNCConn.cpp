@@ -1648,17 +1648,16 @@ int VNCConn::getMaxSocketRecvBufSize()
 
   // try with some high value and see what we get
   int recv_buf_try = 33554432; // 32 MB
-  if(setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&recv_buf_try, sizeof(recv_buf_try)) < 0) 
-    {
-      rfbCloseSocket(sock);
-      return -2;
-    } 
+  // This is needed on Linux to see what the maximum value is but errors on MacOS, so we
+  // simply treat an error here as non-fatal.
+  setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&recv_buf_try, sizeof(recv_buf_try));
+
   int recv_buf_got = -1;
   socklen_t recv_buf_got_len = sizeof(recv_buf_got);
   if(getsockopt(sock, SOL_SOCKET, SO_RCVBUF,(char*)&recv_buf_got, &recv_buf_got_len) <0)
     {
       rfbCloseSocket(sock);
-      return -3;
+      return -2;
     } 
 
   rfbCloseSocket(sock);
