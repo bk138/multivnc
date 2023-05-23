@@ -62,6 +62,8 @@ fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
    " COMPONENT Runtime)
     INSTALL(TARGETS MultiVNC BUNDLE DESTINATION . COMPONENT Runtime)
     INSTALL(FILES README.md DESTINATION . RENAME Readme.txt)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION MultiVNC.app/Contents/Resources/de.lproj RENAME ${LOCALE_DOMAIN}.mo)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/es.gmo DESTINATION MultiVNC.app/Contents/Resources/es.lproj RENAME ${LOCALE_DOMAIN}.mo)
 endif(APPLE)
 
 if(WIN32)
