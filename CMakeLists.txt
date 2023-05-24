@@ -10,7 +10,6 @@ if(CMAKE_GENERATOR MATCHES "Unix Makefiles|Ninja")
 # some LSP servers expect compile_commands.json in the project root
 add_custom_target(
     multivnc-copy-compile-commands ALL
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sv.gmo DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/sv/LC_MESSAGES/ RENAME ${LOCALE_DOMAIN}.mo)
     ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_BINARY_DIR}/compile_commands.json
         ${CMAKE_CURRENT_SOURCE_DIR}
