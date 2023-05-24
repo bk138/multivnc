@@ -26,6 +26,16 @@ using namespace std;
 #define MULTIVNC_GRABKEYBOARD
 #endif
 
+#if wxCHECK_VERSION(3, 1, 5)
+#ifndef EVT_FULLSCREEN
+// workaround for missing EVT_FULLSCREEN
+#define wxFullScreenEventHandler(func) \
+    wxEVENT_HANDLER_CAST(wxFullScreenEventFunction, func)
+typedef void (wxEvtHandler::*wxFullScreenEventFunction)(wxFullScreenEvent&);
+#define EVT_FULLSCREEN(func) wx__DECLARE_EVT0(wxEVT_FULLSCREEN, wxFullScreenEventHandler(func))
+#endif
+#endif
+
 // map recv of custom events to handler methods
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
@@ -39,6 +49,9 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
   EVT_END_PROCESS (ID_WINDOWSHARE_PROC_END, MyFrameMain::onWindowshareTerminate)
+#if wxCHECK_VERSION(3, 1, 5)
+  EVT_FULLSCREEN (MyFrameMain::onFullScreenChanged)
+#endif
 END_EVENT_TABLE()
 
 
@@ -79,6 +92,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   splitwin_main->SetMinimumPaneSize(160);
   splitwin_left->SetMinimumPaneSize(250);
   SetSize(x, y);
+#if wxCHECK_VERSION(3, 1, 0)
+  EnableFullScreenView();
+#endif
 
   // assign image list to notebook_connections
   notebook_connections->AssignImageList(new wxImageList(24, 24));
@@ -576,6 +592,39 @@ void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
     }
 }
 
+#if wxCHECK_VERSION(3, 1, 5)
+void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
+    wxLogDebug("onFullScreenChanged %d", event.IsFullScreen());
+
+    // update this here as well as it might have been triggered from the WM buttons outside of our control
+    show_fullscreen = event.IsFullScreen();
+#else
+void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
+    wxLogDebug("onFullScreenChanged %d", isFullScreen);
+#endif
+    if (show_fullscreen) {
+	// tick menu item
+	frame_main_menubar->Check(ID_FULLSCREEN, true);
+#ifndef __WXMAC__
+	// hide menu
+	frame_main_menubar->Show(false);
+#endif
+	// hide bookmarks and discovered servers
+	show_bookmarks = show_discovered = false;
+	splitwinlayout();
+    } else {
+	// untick menu item
+	frame_main_menubar->Check(ID_FULLSCREEN, false);
+#ifndef __WXMAC__
+	// show menu
+	frame_main_menubar->Show(true);
+#endif
+	// restore bookmarks and discovered servers to saved state
+	wxConfigBase::Get()->Read(K_SHOWDISCOVERED, &show_discovered, V_SHOWDISCOVERED);
+	wxConfigBase::Get()->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
+	splitwinlayout();
+  }
+}
 
 
 char* MyFrameMain::getpasswd(rfbClient* client)
@@ -1493,26 +1542,24 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 {
   show_fullscreen = ! show_fullscreen;
 
-  ShowFullScreen(show_fullscreen, wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
+  wxLogDebug("view_togglefullscreen %d", show_fullscreen);
 
-  if (show_fullscreen) {
-      // tick menu item
-      frame_main_menubar->Check(ID_FULLSCREEN, true);
-      // hide menu
-      frame_main_menubar->Show(false);
-      // hide bookmarks and discovered servers
-      show_bookmarks = show_discovered = false;
-      splitwinlayout();
-  } else {
-      // untick menu item
-      frame_main_menubar->Check(ID_FULLSCREEN, false);
-      // show menu
-      frame_main_menubar->Show(true);
-      // restore bookmarks and discovered servers to saved state
-      wxConfigBase::Get()->Read(K_SHOWDISCOVERED, &show_discovered, V_SHOWDISCOVERED);
-      wxConfigBase::Get()->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
-      splitwinlayout();
-  }
+#ifdef __WXMAC__
+  ShowFullScreen(show_fullscreen);
+#else
+  ShowFullScreen(show_fullscreen, wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
+#endif
+
+  // according to https://docs.wxwidgets.org/3.2/classwx_full_screen_event.html
+  // the event is not fired when using ShowFullScreen(), so manually do this here
+  // (it is fired on OSX when entering fullscreen via the green button, so we need to
+  // have the extra event handler).
+#if wxCHECK_VERSION(3, 1, 5)
+  wxFullScreenEvent e = wxFullScreenEvent(0, show_fullscreen);
+  onFullScreenChanged(e);
+#else
+  onFullScreenChanged(show_fullscreen);
+#endif
 }
 
 

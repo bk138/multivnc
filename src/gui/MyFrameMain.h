@@ -76,6 +76,11 @@ class MyFrameMain: public FrameMain
   void onVNCConnCuttextNotify(wxCommandEvent& event);
   void onVNCConnBellNotify(wxCommandEvent& event);
   void onSDNotify(wxCommandEvent& event);
+#if wxCHECK_VERSION(3, 1, 5)
+  void onFullScreenChanged(wxFullScreenEvent &event);
+#else
+  void onFullScreenChanged(bool isFullScreen);
+#endif
 
   static char* getpasswd(rfbClient* client);
 
