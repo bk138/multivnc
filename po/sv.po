@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.1.1\n
 
-"msgid "translator-credits"
+msgid "translator-credits"
 msgstr "Åke Engelbrektson <eson@svenskasprakfiler.se>"
 
 #: ../src/gui/FrameMain.cpp:79
