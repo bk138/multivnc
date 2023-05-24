@@ -38,6 +38,7 @@ find_package(Gettext)
 
 GETTEXT_PROCESS_PO_FILES(de ALL PO_FILES po/de.po)
 GETTEXT_PROCESS_PO_FILES(es ALL PO_FILES po/es.po)
+GETTEXT_PROCESS_PO_FILES(sv ALL PO_FILES po/sv.po)
 
 
 if(UNIX AND NOT APPLE)
@@ -50,6 +51,7 @@ if(UNIX AND NOT APPLE)
     install(FILES src/gui/res/net.christianbeier.MultiVNC.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/de/LC_MESSAGES/ RENAME ${LOCALE_DOMAIN}.mo)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/es.gmo DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/es/LC_MESSAGES/ RENAME ${LOCALE_DOMAIN}.mo)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sv.gmo DESTINATION ${CMAKE_INSTALL_DATADIR}/locale/sv/LC_MESSAGES/ RENAME ${LOCALE_DOMAIN}.mo)
   endif(UNIX AND NOT APPLE)
 
 if(APPLE)
@@ -64,6 +66,7 @@ fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
     INSTALL(FILES README.md DESTINATION . RENAME Readme.txt)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION MultiVNC.app/Contents/Resources/de.lproj RENAME ${LOCALE_DOMAIN}.mo)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/es.gmo DESTINATION MultiVNC.app/Contents/Resources/es.lproj RENAME ${LOCALE_DOMAIN}.mo)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sv.gmo DESTINATION MultiVNC.app/Contents/Resources/sv.lproj RENAME ${LOCALE_DOMAIN}.mo)
 endif(APPLE)
 
 if(WIN32)
