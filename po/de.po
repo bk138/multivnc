@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-10 16:25+0200\n"
-"PO-Revision-Date: 2023-05-10 21:10+0200\n"
+"POT-Creation-Date: 2023-05-25 22:40+0200\n"
+"PO-Revision-Date: 2023-05-25 22:45+0200\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -69,11 +69,11 @@ msgstr "&Ein Fenster teilen"
 msgid "&View"
 msgstr "&Ansicht"
 
-#: ../src/gui/MyFrameMain.cpp:498
+#: ../src/gui/MyFrameMain.cpp:514
 msgid "(Reverse Connection)"
 msgstr "(Eingehende Verbindung)"
 
-#: ../src/gui/MyFrameMain.cpp:1578
+#: ../src/gui/MyFrameMain.cpp:1625
 msgid "A bookmark with this name already exists!"
 msgstr "Ein Lesezeichen mit diesem Namen existiert bereits!"
 
@@ -89,26 +89,26 @@ msgstr "Verfügbare VNC-Server"
 msgid "Beam a window to the server."
 msgstr "Ein Fenster auf den Server senden."
 
-#: ../src/gui/MyFrameMain.cpp:1064
+#: ../src/gui/MyFrameMain.cpp:1113
 msgid "Bookmark"
 msgstr "Lesezeichen"
 
-#: ../src/gui/MyFrameMain.cpp:1842
+#: ../src/gui/MyFrameMain.cpp:1890
 #, c-format
 msgid "Bookmark %s"
 msgstr "Lesezeichen %s"
 
 #: ../src/gui/FrameMain.cpp:58 ../src/gui/FrameMain.cpp:154
-#: ../src/gui/MyFrameMain.cpp:1022
+#: ../src/gui/MyFrameMain.cpp:1071
 msgid "Bookmarks"
 msgstr "Lesezeichen"
 
-#: ../src/gui/MyFrameMain.cpp:1676
+#: ../src/gui/MyFrameMain.cpp:1723
 msgid "Built with"
 msgstr "Gebaut mit"
 
-#: ../src/gui/MyFrameMain.cpp:653 ../src/gui/MyFrameMain.cpp:1275
-#: ../src/gui/MyFrameMain.cpp:1362
+#: ../src/gui/MyFrameMain.cpp:702 ../src/gui/MyFrameMain.cpp:1324
+#: ../src/gui/MyFrameMain.cpp:1411
 msgid "CSV files|*.csv"
 msgstr "CSV-Dateien|*.csv"
 
@@ -116,7 +116,7 @@ msgstr "CSV-Dateien|*.csv"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: ../src/gui/MyFrameMain.cpp:1566
+#: ../src/gui/MyFrameMain.cpp:1613
 msgid "Cannot bookmark a reverse connection!"
 msgstr "Für eine eingehende Verbindung kann kein Lesezeichen angelegt werden!"
 
@@ -136,39 +136,40 @@ msgstr "Komprimierungsgrad für die Kodierungen \"Tight\" und \"Zlib\":"
 msgid "Connect"
 msgstr "Verbindung"
 
-#: ../src/gui/FrameMain.cpp:31 ../src/gui/MyFrameMain.cpp:1088
+#: ../src/gui/FrameMain.cpp:31 ../src/gui/FrameMain.cpp:116
+#: ../src/gui/MyFrameMain.cpp:1137
 msgid "Connect to a specific host."
 msgstr "Verbindung zu einem bestimmten Host."
 
-#: ../src/gui/MyFrameMain.cpp:747
+#: ../src/gui/MyFrameMain.cpp:796
 #, c-format
 msgid "Connecting to %s..."
 msgstr "Verbindung zu %s..."
 
-#: ../src/gui/MyFrameMain.cpp:478 ../src/gui/MyFrameMain.cpp:766
+#: ../src/gui/MyFrameMain.cpp:494 ../src/gui/MyFrameMain.cpp:815
 msgid "Connection failed."
 msgstr "Verbindung fehlgeschlagen."
 
-#: ../src/gui/MyFrameMain.cpp:932
+#: ../src/gui/MyFrameMain.cpp:981
 msgid "Connection terminated."
 msgstr "Verbindung abgebrochen."
 
-#: ../src/gui/MyFrameMain.cpp:295
+#: ../src/gui/MyFrameMain.cpp:311
 #, c-format
 msgid "Connection to %s is now multicast."
 msgstr "Verbindung zu %s ist jetzt Multicast."
 
-#: ../src/gui/MyFrameMain.cpp:306
+#: ../src/gui/MyFrameMain.cpp:322
 #, c-format
 msgid "Connection to %s is now unicast."
 msgstr "Verbindung zu %s ist jetzt Unicast."
 
-#: ../src/gui/MyFrameMain.cpp:304
+#: ../src/gui/MyFrameMain.cpp:320
 #, c-format
 msgid "Connection to %s switched to unicast."
 msgstr "Verbindung zu %s auf Unicast umgestellt."
 
-#: ../src/gui/MyFrameMain.cpp:398 ../src/gui/MyFrameMain.cpp:404
+#: ../src/gui/MyFrameMain.cpp:414 ../src/gui/MyFrameMain.cpp:420
 #, c-format
 msgid "Connection to %s:%s terminated."
 msgstr "Verbindung zu %s:%s wurde beendet."
@@ -196,7 +197,7 @@ msgstr ""
 msgid "CopyRect"
 msgstr "CopyRect"
 
-#: ../src/gui/MyFrameMain.cpp:871
+#: ../src/gui/MyFrameMain.cpp:920
 msgid "Could not autosave statistics!"
 msgstr "Die Statistiken konnten nicht automatisch gespeichert werden!"
 
@@ -208,27 +209,27 @@ msgstr "Konnte keinen VNC-Listener-Thread erstellen!"
 msgid "Could not create VNC thread!"
 msgstr "VNC-Thread konnte nicht erstellt werden!"
 
-#: ../src/MultiVNCApp.cpp:108
+#: ../src/MultiVNCApp.cpp:112
 msgid "Could not open config file!"
 msgstr "Konnte die Konfigurationsdatei nicht öffnen!"
 
-#: ../src/gui/MyFrameMain.cpp:1374
+#: ../src/gui/MyFrameMain.cpp:1423
 msgid "Could not open file!"
 msgstr "Datei konnte nicht geöffnet werden!"
 
-#: ../src/gui/MyFrameMain.cpp:560 ../src/gui/MyFrameMain.cpp:561
+#: ../src/gui/MyFrameMain.cpp:576 ../src/gui/MyFrameMain.cpp:577
 msgid "Could not run window share helper."
 msgstr "Der Window Share Helper konnte nicht ausgeführt werden."
 
-#: ../src/MultiVNCApp.cpp:159
+#: ../src/MultiVNCApp.cpp:163
 msgid "Could not save config file!"
 msgstr "Konnte die Konfigurationsdatei nicht speichern!"
 
-#: ../src/gui/MyFrameMain.cpp:665 ../src/gui/MyFrameMain.cpp:1286
+#: ../src/gui/MyFrameMain.cpp:714 ../src/gui/MyFrameMain.cpp:1335
 msgid "Could not save file!"
 msgstr "Datei konnte nicht gespeichert werden!"
 
-#: ../src/gui/MyFrameMain.cpp:1958
+#: ../src/gui/MyFrameMain.cpp:2006
 msgid "Could not share window, external program execution failed."
 msgstr ""
 "Fenster konnte nicht mit Server geteilt werden, externe Programmausführung "
@@ -242,11 +243,11 @@ msgstr "Der VNC-Listener-Thread konnte nicht gestartet werden!"
 msgid "Could not start VNC thread!"
 msgstr "VNC-Thread kann nicht gestartet werden!"
 
-#: ../src/gui/MyFrameMain.cpp:607 ../src/gui/MyFrameMain.cpp:614
+#: ../src/gui/MyFrameMain.cpp:656 ../src/gui/MyFrameMain.cpp:663
 msgid "Credentials required..."
 msgstr "Anmeldedaten erforderlich..."
 
-#: ../src/gui/MyFrameMain.cpp:1129
+#: ../src/gui/MyFrameMain.cpp:1178
 msgid "Detailed VNC Log"
 msgstr "Ausführliches VNC-Protokoll"
 
@@ -270,7 +271,7 @@ msgstr "Ost"
 msgid "Edge Connector"
 msgstr "Edge Connector"
 
-#: ../src/gui/MyFrameMain.cpp:1617
+#: ../src/gui/MyFrameMain.cpp:1664
 msgid "Edit bookmark"
 msgstr "Lesezeichen bearbeiten"
 
@@ -298,29 +299,29 @@ msgstr "Aktivierte VNC-Kodierungen"
 msgid "Encodings"
 msgstr "VNC-Kodierungen"
 
-#: ../src/gui/MyFrameMain.cpp:1570
+#: ../src/gui/MyFrameMain.cpp:1617
 msgid "Enter bookmark name:"
 msgstr "Name des Lesezeichens eingeben:"
 
-#: ../src/gui/MyFrameMain.cpp:1087
+#: ../src/gui/MyFrameMain.cpp:1136
 msgid "Enter host to connect to:"
 msgstr ""
 "Geben Sie den Host ein, mit dem eine Verbindung hergestellt werden soll:"
 
-#: ../src/gui/MyFrameMain.cpp:1926
+#: ../src/gui/MyFrameMain.cpp:1974
 msgid "Enter name of window to share:"
 msgstr "Geben Sie den Namen des freizugebenden Fensters ein:"
 
-#: ../src/gui/MyFrameMain.cpp:583
+#: ../src/gui/MyFrameMain.cpp:632
 msgid "Enter password:"
 msgstr "Passwort eingeben:"
 
-#: ../src/gui/MyFrameMain.cpp:1037
+#: ../src/gui/MyFrameMain.cpp:1086
 #, c-format
 msgid "Error reading hostname of bookmark '%s'!"
 msgstr "Fehler beim Lesen des Hostnamens des Lesezeichens \"%s\"!"
 
-#: ../src/gui/MyFrameMain.cpp:1044
+#: ../src/gui/MyFrameMain.cpp:1093
 #, c-format
 msgid "Error reading port of bookmark '%s'!"
 msgstr "Fehler beim Lesen des Ports des Lesezeichens \"%s\"!"
@@ -329,7 +330,7 @@ msgstr "Fehler beim Lesen des Ports des Lesezeichens \"%s\"!"
 msgid "Exit MultiVNC."
 msgstr "MultiVNC verlassen."
 
-#: ../src/gui/MyFrameMain.cpp:1592
+#: ../src/gui/MyFrameMain.cpp:1639
 msgid "Failed to save credentials to the system secret store."
 msgstr ""
 "Die Anmeldeinformationen konnten nicht im sicheren Speicher des Systems "
@@ -348,7 +349,7 @@ msgstr "Fehler bei der Einrichtung des Framebuffers: falsche BPP!"
 msgid "FastRequest"
 msgstr "FastRequest"
 
-#: ../src/gui/MyFrameMain.cpp:1298
+#: ../src/gui/MyFrameMain.cpp:1347
 msgid ""
 "From now on, all your mouse and keyboard input will be recorded. Click the "
 "stop button to finish recording and save your input."
@@ -365,7 +366,7 @@ msgstr "Vollbild"
 msgid "Fullscreen\tF11"
 msgstr "Vollbild\tF11"
 
-#: ../src/MultiVNCApp.cpp:175
+#: ../src/MultiVNCApp.cpp:179
 msgid "GAAH! Got an unhandled exception! This should not happen."
 msgstr "Unbehandelte Ausnahme erhalten! Dies sollte nicht passieren."
 
@@ -377,7 +378,7 @@ msgstr "Alle Tastatureingaben abfangen"
 msgid "Hextile"
 msgstr "Hextile"
 
-#: ../src/gui/MyFrameMain.cpp:1714
+#: ../src/gui/MyFrameMain.cpp:1762
 msgid ""
 "If there are VNC servers advertising themselves via ZeroConf, you can select "
 "a host in the'Available VNC Servers' list. Otherwise, use the 'Connect' "
@@ -394,7 +395,7 @@ msgstr ""
 "Wenn Sie verbunden sind, zeigt ein blaues oder grünes Symbol auf der "
 "Registerkarte an, ob Sie im Unicast- oder Multicast-Modus arbeiten."
 
-#: ../src/gui/MyFrameMain.cpp:425
+#: ../src/gui/MyFrameMain.cpp:441
 msgid "Incoming Connection."
 msgstr "Eingehende Verbindung."
 
@@ -414,15 +415,15 @@ msgstr "Latenz ms:"
 msgid "Listen"
 msgstr "Eingehende Verbindung"
 
-#: ../src/gui/FrameMain.cpp:33
+#: ../src/gui/FrameMain.cpp:33 ../src/gui/FrameMain.cpp:118
 msgid "Listen for an incoming connection."
 msgstr "Eingehende Verbindung."
 
-#: ../src/gui/MyFrameMain.cpp:737 ../src/gui/MyFrameMain.cpp:802
+#: ../src/gui/MyFrameMain.cpp:786 ../src/gui/MyFrameMain.cpp:851
 msgid "Listening on port"
 msgstr "Eingehende Verbindung auf Port"
 
-#: ../src/gui/MyFrameMain.cpp:1358
+#: ../src/gui/MyFrameMain.cpp:1407
 msgid "Load recorded input..."
 msgstr "Aufgezeichnete Eingaben laden..."
 
@@ -434,7 +435,7 @@ msgstr "Protokollierung"
 msgid "Login"
 msgstr "Anmelden"
 
-#: ../src/gui/MyFrameMain.cpp:1754
+#: ../src/gui/MyFrameMain.cpp:1802
 msgid "Looking up host address..."
 msgstr "Nachschlagen der Host-Adresse..."
 
@@ -450,11 +451,11 @@ msgstr "Einstellungen für verlustbehaftete VNC-Kodierungen"
 msgid "MultiVNC"
 msgstr "MultiVNC"
 
-#: ../src/MultiVNCApp.cpp:183
+#: ../src/MultiVNCApp.cpp:187
 msgid "MultiVNC crashed"
 msgstr "MultiVNC ist abgestürzt"
 
-#: ../src/gui/MyFrameMain.cpp:1674
+#: ../src/gui/MyFrameMain.cpp:1721
 msgid "MultiVNC is a cross-platform Multicast-enabled VNC client."
 msgstr ""
 "MultiVNC ist ein plattformübergreifender, Multicast-fähiger VNC-Client."
@@ -463,15 +464,15 @@ msgstr ""
 msgid "MulticastVNC"
 msgstr "MulticastVNC"
 
-#: ../src/gui/MyFrameMain.cpp:1616
+#: ../src/gui/MyFrameMain.cpp:1663
 msgid "New bookmark name:"
 msgstr "Name des neuen Lesezeichens:"
 
-#: ../src/gui/MyFrameMain.cpp:1612 ../src/gui/MyFrameMain.cpp:1641
+#: ../src/gui/MyFrameMain.cpp:1659 ../src/gui/MyFrameMain.cpp:1688
 msgid "No bookmark selected!"
 msgstr "Kein Lesezeichen ausgewählt!"
 
-#: ../src/gui/MyFrameMain.cpp:1647
+#: ../src/gui/MyFrameMain.cpp:1694
 msgid "No bookmark with this name!"
 msgstr "Kein Lesezeichen mit diesem Namen!"
 
@@ -479,11 +480,11 @@ msgstr "Kein Lesezeichen mit diesem Namen!"
 msgid "North"
 msgstr "Nord"
 
-#: ../src/gui/MyFrameMain.cpp:637 ../src/gui/MyFrameMain.cpp:1260
+#: ../src/gui/MyFrameMain.cpp:686 ../src/gui/MyFrameMain.cpp:1309
 msgid "Nothing to save!"
 msgstr "Nichts zu speichern!"
 
-#: ../src/MultiVNCApp.cpp:183
+#: ../src/MultiVNCApp.cpp:187
 msgid ""
 "Ouch! MultiVNC crashed. This should not happen. Do you want to generate a "
 "bug report?"
@@ -491,11 +492,11 @@ msgstr ""
 "MultiVNC ist abgestürzt. Das sollte nicht passieren. Möchten Sie einen "
 "Fehlerbericht erstellen?"
 
-#: ../src/gui/MyFrameMain.cpp:1194
+#: ../src/gui/MyFrameMain.cpp:1243
 msgid "PNG files|*.png"
 msgstr "PNG-Dateien|*.png"
 
-#: ../src/gui/MyFrameMain.cpp:584
+#: ../src/gui/MyFrameMain.cpp:633
 msgid "Password required!"
 msgstr "Passwort erforderlich!"
 
@@ -503,11 +504,11 @@ msgstr "Passwort erforderlich!"
 msgid "Password:"
 msgstr "Kennwort:"
 
-#: ../src/gui/MyFrameMain.cpp:606
+#: ../src/gui/MyFrameMain.cpp:655
 msgid "Please enter password for user"
 msgstr "Bitte Passwort für Benutzer eingeben"
 
-#: ../src/gui/MyFrameMain.cpp:1142
+#: ../src/gui/MyFrameMain.cpp:1191
 msgid "Preferences"
 msgstr "Einstellungen"
 
@@ -532,39 +533,46 @@ msgid "Receive Buffer Size (kB):"
 msgstr "Größe des Empfangspuffers (kB):"
 
 #: ../src/gui/FrameMain.cpp:45 ../src/gui/FrameMain.cpp:128
-#: ../src/gui/MyFrameMain.cpp:1244 ../src/gui/MyFrameMain.cpp:1252
+#: ../src/gui/MyFrameMain.cpp:1293 ../src/gui/MyFrameMain.cpp:1301
 msgid "Record Input"
 msgstr "Eingaben aufzeichnen"
 
-#: ../src/gui/MyFrameMain.cpp:1310
+#: ../src/gui/FrameMain.cpp:128
+msgid "Record mouse and keyboard input for later replay as a macro."
+msgstr ""
+"Aufzeichnen von Maus- und Tastatureingaben, um sie später als Makro "
+"wiederzugeben."
+
+#: ../src/gui/MyFrameMain.cpp:1359
 msgid "Recording user input..."
 msgstr "Aufzeichnung von Benutzereingaben..."
 
 #: ../src/gui/FrameMain.cpp:47 ../src/gui/FrameMain.cpp:130
-#: ../src/gui/MyFrameMain.cpp:332 ../src/gui/MyFrameMain.cpp:336
-#: ../src/gui/MyFrameMain.cpp:1340 ../src/gui/MyFrameMain.cpp:1344
+#: ../src/gui/MyFrameMain.cpp:348 ../src/gui/MyFrameMain.cpp:352
+#: ../src/gui/MyFrameMain.cpp:1389 ../src/gui/MyFrameMain.cpp:1393
 msgid "Replay Input"
 msgstr "Eingaben abspielen"
 
-#: ../src/gui/MyFrameMain.cpp:343 ../src/gui/MyFrameMain.cpp:344
+#: ../src/gui/FrameMain.cpp:130
+msgid ""
+"Replay a recorded mouse and keyboard input macro. If <Shift> is held down "
+"while clicking this button, the macro is replayed in a loop."
+msgstr ""
+"Abspielen aufgezeichneter Maus- und Tastatureingabemakro. Wenn beim Klicken "
+"auf diese Schaltfläche die Umschalttaste gedrückt gehalten wird, wird das "
+"Makro in einer Schleife abgespielt."
+
+#: ../src/gui/MyFrameMain.cpp:359 ../src/gui/MyFrameMain.cpp:360
 msgid "Replay finished!"
 msgstr "Abspielen aufgezeichneter Eingaben beendet!"
 
-#: ../src/gui/MyFrameMain.cpp:1398
+#: ../src/gui/MyFrameMain.cpp:1447
 msgid "Replaying user input in loop..."
 msgstr "Abspielen aufgezeichneter Eingaben in einer Schleife..."
 
-#: ../src/gui/MyFrameMain.cpp:1400
+#: ../src/gui/MyFrameMain.cpp:1449
 msgid "Replaying user input..."
 msgstr "Apspielen von Benutzereingaben..."
-
-#: ../src/MultiVNCApp.cpp:203
-msgid "Report generated in"
-msgstr "Bericht erstellt in"
-
-#: ../src/MultiVNCApp.cpp:203
-msgid "Report generated successfully"
-msgstr "Bericht erfolgreich erstellt"
 
 #: ../src/gui/FrameMain.cpp:96
 msgid "Request a Feature / Report a Bug"
@@ -582,20 +590,20 @@ msgstr "Statistik speichern..."
 msgid "Save log as..."
 msgstr "Protokoll speichern unter..."
 
-#: ../src/gui/MyFrameMain.cpp:1271
+#: ../src/gui/MyFrameMain.cpp:1320
 msgid "Save recorded input..."
 msgstr "Aufgenommene Eingaben speichern..."
 
-#: ../src/gui/MyFrameMain.cpp:1190
+#: ../src/gui/MyFrameMain.cpp:1239
 msgid "Save screenshot..."
 msgstr "Bildschirmfoto speichern..."
 
-#: ../src/gui/MyFrameMain.cpp:649
+#: ../src/gui/MyFrameMain.cpp:698
 #, c-format
 msgid "Saving %s statistics..."
 msgstr "Speichern der %s-Statistik..."
 
-#: ../src/gui/MyFrameMain.cpp:1571
+#: ../src/gui/MyFrameMain.cpp:1618
 msgid "Saving bookmark"
 msgstr "Lesezeichen speichern"
 
@@ -618,11 +626,11 @@ msgstr ""
 "Wertes kann gegen Paketverluste helfen. Beachten Sie, dass der Maximalwert "
 "betriebssystemabhängig ist."
 
-#: ../src/gui/MyFrameMain.cpp:1926 ../src/gui/MyFrameMain.cpp:1931
+#: ../src/gui/MyFrameMain.cpp:1974 ../src/gui/MyFrameMain.cpp:1979
 msgid "Share a Window"
 msgstr "Ein Fenster teilen"
 
-#: ../src/gui/MyFrameMain.cpp:1966
+#: ../src/gui/MyFrameMain.cpp:2014
 #, c-format
 msgid "Sharing window with %s"
 msgstr "Fenster wird geteilt mit %s"
@@ -655,15 +663,15 @@ msgstr "Statistiken"
 msgid "Status"
 msgstr "Status"
 
-#: ../src/gui/MyFrameMain.cpp:1307 ../src/gui/MyFrameMain.cpp:1394
+#: ../src/gui/MyFrameMain.cpp:1356 ../src/gui/MyFrameMain.cpp:1443
 msgid "Stop"
 msgstr "Stopp"
 
-#: ../src/gui/MyFrameMain.cpp:1303
+#: ../src/gui/MyFrameMain.cpp:1352
 msgid "Stop Recording"
 msgstr "Aufnahme stoppen"
 
-#: ../src/gui/MyFrameMain.cpp:1390
+#: ../src/gui/MyFrameMain.cpp:1439
 msgid "Stop Replaying"
 msgstr "Abspielen stoppen"
 
@@ -671,24 +679,24 @@ msgstr "Abspielen stoppen"
 msgid "Stop Window Sharing."
 msgstr "Teilen des Fenster beenden."
 
-#: ../src/gui/MyFrameMain.cpp:1251
+#: ../src/gui/MyFrameMain.cpp:1300
 msgid "Stopped recording user input!"
 msgstr "Aufzeichnung von Benutzereingaben gestoppt!"
 
-#: ../src/gui/MyFrameMain.cpp:1347
+#: ../src/gui/MyFrameMain.cpp:1396
 msgid "Stopped replaying user input!"
 msgstr "Abspielen der aufgezeichneten Eingaben gestoppt!"
 
-#: ../src/gui/MyFrameMain.cpp:2007
+#: ../src/gui/MyFrameMain.cpp:2055
 #, c-format
 msgid "Stopped sharing window with %s"
 msgstr "Teilen des Fensters mit %s beendet"
 
-#: ../src/gui/MyFrameMain.cpp:1688
+#: ../src/gui/MyFrameMain.cpp:1735
 msgid "Supported Encodings:"
 msgstr "Unterstützte Kodierungen:"
 
-#: ../src/gui/MyFrameMain.cpp:1678
+#: ../src/gui/MyFrameMain.cpp:1725
 msgid "Supported Security Types:"
 msgstr "Unterstützte Sicherheitsarten:"
 
@@ -696,7 +704,11 @@ msgstr "Unterstützte Sicherheitsarten:"
 msgid "Take Screenshot"
 msgstr "Screenshot aufnehmen"
 
-#: ../src/gui/FrameMain.cpp:35
+#: ../src/gui/FrameMain.cpp:125
+msgid "Take a screenshot of the current connection."
+msgstr "Einen Screenshot der aktuellen Verbindung machen."
+
+#: ../src/gui/FrameMain.cpp:35 ../src/gui/FrameMain.cpp:121
 msgid "Terminate connection."
 msgstr "Verbindung beenden."
 
@@ -704,7 +716,7 @@ msgstr "Verbindung beenden."
 msgid "Text files (*.txt)|*.txt"
 msgstr "Textdateien (*.txt)|*.txt"
 
-#: ../src/gui/MyFrameMain.cpp:1930
+#: ../src/gui/MyFrameMain.cpp:1978
 msgid ""
 "The MultiVNC window will be minimized and a cross-shaped cursor will appear. "
 "Use it to select the window you want to share."
@@ -717,13 +729,17 @@ msgstr ""
 msgid "Tight"
 msgstr "Tight"
 
-#: ../src/gui/MyFrameMain.cpp:1808 ../src/gui/MyFrameMain.cpp:1809
+#: ../src/gui/MyFrameMain.cpp:1856 ../src/gui/MyFrameMain.cpp:1857
 msgid "Timeout looking up IP address."
 msgstr "Timeout bei der Suche nach der IP-Adresse."
 
-#: ../src/gui/MyFrameMain.cpp:1769 ../src/gui/MyFrameMain.cpp:1770
+#: ../src/gui/MyFrameMain.cpp:1817 ../src/gui/MyFrameMain.cpp:1818
 msgid "Timeout looking up hostname."
 msgstr "Timeout bei der Suche nach dem Hostnamen."
+
+#: ../src/gui/FrameMain.cpp:133
+msgid "Toggle fullscreen view."
+msgstr "Vollbildansicht umschalten."
 
 #: ../src/gui/FrameMain.cpp:54
 msgid "Toolbar"
@@ -777,11 +793,11 @@ msgstr "Benutzername oder Passwort dürfen nicht leer sein"
 msgid "Username:"
 msgstr "Benutzername:"
 
-#: ../src/gui/MyFrameMain.cpp:1680
+#: ../src/gui/MyFrameMain.cpp:1727
 msgid "VNC Authentication"
 msgstr "VNC-Authentifizierung"
 
-#: ../src/gui/MyFrameMain.cpp:1741
+#: ../src/gui/MyFrameMain.cpp:1789
 msgid "VNC Server"
 msgstr "VNC Server"
 
@@ -793,12 +809,12 @@ msgstr "Warnung!"
 msgid "West"
 msgstr "West"
 
-#: ../src/gui/FrameMain.cpp:92 ../src/gui/MyFrameMain.cpp:114
-#: ../src/gui/MyFrameMain.cpp:119
+#: ../src/gui/FrameMain.cpp:92 ../src/gui/MyFrameMain.cpp:130
+#: ../src/gui/MyFrameMain.cpp:135
 msgid "Window &Sharing"
 msgstr "Fenster &Teilen"
 
-#: ../src/gui/MyFrameMain.cpp:545
+#: ../src/gui/MyFrameMain.cpp:561
 msgid ""
 "Window share helper exited without an associated connection. That should not "
 "happen."
@@ -806,18 +822,18 @@ msgstr ""
 "Der Dienst zum Teilen eines Fenster wurde ohne eine zugehörige Verbindung "
 "beendet. Das sollte nicht passieren."
 
-#: ../src/gui/MyFrameMain.cpp:1957
+#: ../src/gui/MyFrameMain.cpp:2005
 msgid "Window sharing helper execution failed."
 msgstr ""
 "Die Ausführung des Dienstes zum Teilen eines Fensters ist fehlgeschlagen."
 
-#: ../src/gui/MyFrameMain.cpp:557
+#: ../src/gui/MyFrameMain.cpp:573
 msgid "Window sharing stopped. Shared window was closed."
 msgstr ""
 "Das Teilen eines Fensters wurde beendet. Gemeinsames Fenster wurde "
 "geschlossen."
 
-#: ../src/gui/MyFrameMain.cpp:551
+#: ../src/gui/MyFrameMain.cpp:567
 #, c-format
 msgid ""
 "Window sharing with %s stopped. Either the other side does not support "
