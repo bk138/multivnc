@@ -8,4 +8,4 @@ Comment=A multicast enabled VNC viewer
 Terminal=false
 StartupNotify=false
 Categories=Application;Network;
-
+Keywords=remote desktop;vnc;client;viewer;
