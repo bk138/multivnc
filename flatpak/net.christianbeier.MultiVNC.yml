@@ -5,7 +5,7 @@ sdk: org.gnome.Sdk
 command: multivnc
 finish-args:
   - --share=ipc
-  - --socket=x11
+  - --socket=fallback-x11
   - --share=network
   - --talk-name=org.freedesktop.secrets
   - --filesystem=home # for saving screenshots and logs
