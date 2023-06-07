@@ -163,6 +163,7 @@ VNCConn::VNCConn(void* p, char* (*getpassworddfunc)(rfbClient*), rfbCredential* 
   // save the credential and password getters
   this->getpasswordfunc = getpassworddfunc;
   this->getcredentialfunc = getcredentialfunc;
+  require_auth = false;
 }
 
 
