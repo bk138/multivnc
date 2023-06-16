@@ -652,7 +652,7 @@ rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
 		pass = conn->getPassword().GetAsString();
 	    else
 #endif
-		pass = wxGetPasswordFromUser(_("Please enter password for user") + " " + conn->getUserName(),
+		pass = wxGetPasswordFromUser(wxString::Format(_("Please enter password for user '%s'"), conn->getUserName()),
 						  _("Credentials required..."));
 	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
 	    c->userCredential.username = strdup(conn->getUserName().char_str());

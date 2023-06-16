@@ -505,8 +505,8 @@ msgid "Password:"
 msgstr "Kennwort:"
 
 #: ../src/gui/MyFrameMain.cpp:655
-msgid "Please enter password for user"
-msgstr "Bitte Passwort für Benutzer eingeben"
+msgid "Please enter password for user '%s'"
+msgstr "Bitte Passwort für Benutzer '%s' eingeben"
 
 #: ../src/gui/MyFrameMain.cpp:1191
 msgid "Preferences"
