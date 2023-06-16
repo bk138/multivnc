@@ -1635,7 +1635,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
 #if wxUSE_SECRETSTORE
       wxSecretStore store = wxSecretStore::GetDefault();
       if(store.IsOk() && c->getPassword().IsOk()) { //check if destination and source are ok
-	  if(!store.Save("MultiVNC/Bookmarks/" +  c->getUserName() + "@" + c->getServerHost() + ":" + c->getServerPort(), c->getUserName(), c->getPassword())) //FIXME the service should use the user-given bookmark name, but that requires a rework of our internal bookmarking
+	  if(!store.Save("MultiVNC/Bookmarks/" + (c->getUserName().IsEmpty() ? "" : c->getUserName() + "@") + c->getServerHost() + ":" + c->getServerPort(), c->getUserName(), c->getPassword())) //FIXME the service should use the user-given bookmark name, but that requires a rework of our internal bookmarking
 	      wxLogWarning(_("Failed to save credentials to the system secret store."));
       }
 #endif
