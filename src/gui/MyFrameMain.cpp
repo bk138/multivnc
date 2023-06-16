@@ -653,6 +653,7 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
     if (show_fullscreen) {
 	// tick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, true);
+	GetToolBar()->ToggleTool(ID_FULLSCREEN, true);
 #ifndef __WXMAC__
 	// hide menu
 	frame_main_menubar->Show(false);
@@ -663,6 +664,7 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
     } else {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
+	GetToolBar()->ToggleTool(ID_FULLSCREEN, false);
 #ifndef __WXMAC__
 	// show menu
 	frame_main_menubar->Show(true);
