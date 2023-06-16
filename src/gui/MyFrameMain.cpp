@@ -629,9 +629,24 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
 
 char* MyFrameMain::getpasswd(rfbClient* client)
 {
-  wxString s = wxGetPasswordFromUser(_("Enter password:"),
-				     _("Password required!"));
-  return strdup(s.char_str());
+    VNCConn *conn = VNCConn::getVNCConnFromRfbClient(client);
+
+    conn->setRequireAuth(true);
+
+    wxString pass;
+#if wxUSE_SECRETSTORE
+    if(conn->getPassword().IsOk())
+	pass = conn->getPassword().GetAsString();
+    else {
+#endif
+	pass = wxGetPasswordFromUser(_("Enter password:"), _("Password required!"));
+#if wxUSE_SECRETSTORE
+	// for later saving as bookmark
+	conn->setPassword(wxSecretValue(pass));
+    }
+#endif
+
+    return strdup(pass.char_str());
 }
 
 
