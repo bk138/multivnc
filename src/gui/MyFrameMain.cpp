@@ -100,6 +100,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   EnableFullScreenView();
 #endif
 
+  view_1to1 = false;
+
   // assign image list to notebook_connections
   notebook_connections->AssignImageList(new wxImageList(24, 24));
   notebook_connections->GetImageList()->Add(bitmapFromMem(unicast_png));
@@ -1623,6 +1625,19 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 #else
   onFullScreenChanged(show_fullscreen);
 #endif
+}
+
+
+void MyFrameMain::view_toggle1to1(wxCommandEvent &event)
+{
+    view_1to1 = ! view_1to1;
+    wxLogDebug("view_toggle1to1 %d", view_1to1);
+
+    // keep toolbar and menu entries in sync
+    frame_main_menubar->Check(ID_ONE_TO_ONE, view_1to1);
+    GetToolBar()->ToggleTool(ID_ONE_TO_ONE, view_1to1);
+
+
 }
 
 
