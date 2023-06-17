@@ -164,25 +164,20 @@ void VNCCanvas::ungrab_keyboard()
 
 void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 {
-  wxClientDC dc(this);
-  
   // get the update rect list
   wxRegionIterator upd(updated_area); 
   while(upd)
     {
       wxRect update_rect(upd.GetRect());
      
-      wxLogDebug(wxT("VNCCanvas %p: drawing updated rect: (%i,%i,%i,%i)"),
+      wxLogDebug(wxT("VNCCanvas %p: invalidating updated rect: (%i,%i,%i,%i)"),
 		 this,
 		 update_rect.x,
 		 update_rect.y,
 		 update_rect.width,
 		 update_rect.height);
 
-      const wxBitmap& region = conn->getFrameBufferRegion(update_rect);
-      if(region.IsOk())
-	dc.DrawBitmap(region, update_rect.x, update_rect.y);
-	
+      Refresh(false, &update_rect);
       ++upd;
     }
 
