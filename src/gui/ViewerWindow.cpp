@@ -164,12 +164,6 @@ void VNCCanvas::ungrab_keyboard()
 
 void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 {
-#ifdef __WXDEBUG__
-  wxLongLong t0 = wxGetLocalTimeMillis();
-  size_t nr_rects = 0;
-  size_t nr_bytes = 0;
-#endif
-  
   wxClientDC dc(this);
   
   // get the update rect list
@@ -184,10 +178,6 @@ void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 		 update_rect.y,
 		 update_rect.width,
 		 update_rect.height);
-#ifdef __WXDEBUG__      
-      ++nr_rects;
-      nr_bytes += update_rect.width * update_rect.height;
-#endif
 
       const wxBitmap& region = conn->getFrameBufferRegion(update_rect);
       if(region.IsOk())
@@ -198,20 +188,17 @@ void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 
   updated_area.Clear();
 
-
-#ifdef __WXDEBUG__
-  wxLongLong t1 = wxGetLocalTimeMillis();
-  wxLogDebug(wxT("VNCCanvas %p: updating %zu rects (%zu bytes) took %lld ms"),
-	     this,
-	     nr_rects,
-	     nr_bytes,
-	     (t1-t0).GetValue());
-#endif
 }
 
 
 void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 {
+#ifdef __WXDEBUG__
+  wxLongLong t0 = wxGetLocalTimeMillis();
+  size_t nr_rects = 0;
+  size_t nr_pixels = 0;
+#endif
+
   // this happens on GTK even if our size is (0,0)
   if(GetSize().GetWidth() == 0 || GetSize().GetHeight() == 0)
     return;
@@ -230,7 +217,11 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 		 update_rect.y,
 		 update_rect.width,
 		 update_rect.height);
-      
+
+#ifdef __WXDEBUG__
+      ++nr_rects;
+      nr_pixels += update_rect.width * update_rect.height;
+#endif
     
       const wxBitmap& region = conn->getFrameBufferRegion(update_rect);
       if(region.IsOk())
@@ -238,6 +229,15 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 	
       ++upd;
     }
+
+#ifdef __WXDEBUG__
+  wxLongLong t1 = wxGetLocalTimeMillis();
+  wxLogDebug(wxT("VNCCanvas %p: updating %zu rects (%f megapixels) took %lld ms"),
+	     this,
+	     nr_rects,
+	     (double)nr_pixels/(1024.0*1024.0),
+	     (t1-t0).GetValue());
+#endif
 }
 
 
