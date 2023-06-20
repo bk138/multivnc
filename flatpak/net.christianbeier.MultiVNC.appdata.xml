@@ -13,6 +13,7 @@
   </content_rating>
 
   <url type="homepage">https://github.com/bk138/multivnc</url>
+  <url type="bugtracker">https://github.com/bk138/multivnc/issues</url>
 
   <developer_name>Christian Beier</developer_name>
 
