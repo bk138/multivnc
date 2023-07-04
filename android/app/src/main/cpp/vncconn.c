@@ -927,13 +927,14 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSet
     if(cl) {
         log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbSetFramebufferUpdatesEnabled() %d", enable);
         if(enable) {
-            // set
-            cl->supportedMessages.client2server[((rfbFramebufferUpdateRequest & 0xFF)/8)] |= (1<<(rfbFramebufferUpdateRequest % 8));
+            // set to managed-by-lib again
+            rfbClientSetUpdateRect(cl, NULL);
             // request full update
             SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
         } else {
-            // clear
-            cl->supportedMessages.client2server[((rfbFramebufferUpdateRequest & 0xFF)/8)] &= ~(1<<(rfbFramebufferUpdateRequest % 8));
+            // set to no-updates-wanted
+            rfbRectangle noRect = {0,0,0,0,};
+            rfbClientSetUpdateRect(cl, &noRect);
         }
         return JNI_TRUE;
     }
