@@ -8,8 +8,8 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/
     ${CMAKE_SOURCE_DIR}/libwxservdisc/src
-    ${CMAKE_SOURCE_DIR}/libvncserver
-    ${CMAKE_BINARY_DIR}/libvncserver
+    ${CMAKE_SOURCE_DIR}/libvncserver/include
+    ${CMAKE_BINARY_DIR}/libvncserver/include
 )
 
 
