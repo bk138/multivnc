@@ -23,6 +23,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 
 public class MDNSService extends Service {
@@ -38,8 +40,8 @@ public class MDNSService extends Service {
 	private OnEventListener callback;
 
 	public interface OnEventListener {
-		public void onMDNSstartupCompleted(boolean wasSuccessful);
-		public void onMDNSnotify(final String conn_name, final ConnectionBean conn, final Hashtable<String,ConnectionBean> connectionTable);
+		void onMDNSstartupCompleted(boolean wasSuccessful);
+		void onMDNSnotify(final String conn_name, final ConnectionBean conn, final Hashtable<String,ConnectionBean> connectionTable);
 	}
 
 	/**
@@ -174,7 +176,7 @@ public class MDNSService extends Service {
 
 			handler = new Handler() {
 
-				public void handleMessage(Message msg) {
+				public void handleMessage(@NonNull Message msg) {
 					// if interrupted, bail out at once
 					if(isInterrupted())
 					{
