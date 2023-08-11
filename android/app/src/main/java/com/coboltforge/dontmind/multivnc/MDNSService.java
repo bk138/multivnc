@@ -231,9 +231,11 @@ public class MDNSService extends Service {
 				}
 			}
 			else {
+					// This is needed on older Android platforms as the NsdManager does not have it
+					// built in before Android 14.
 					android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
 					assert wifi != null;
-					multicastLock = wifi.createMulticastLock("mylockthereturn");
+					multicastLock = wifi.createMulticastLock(TAG);
 					multicastLock.setReferenceCounted(true);
 					multicastLock.acquire();
 
