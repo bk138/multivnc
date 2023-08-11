@@ -3,24 +3,19 @@ package com.coboltforge.dontmind.multivnc;
 /*
  * @author Christian Beier
  * mDNS Service Discovery Service.
- * Copyright © 2011-2012 Christian Beier <dontmind@freeshell.org>
+ * Copyright © 2011-2023 Christian Beier <dontmind@freeshell.org>
  */
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.util.Hashtable;
-
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceEvent;
-import javax.jmdns.ServiceListener;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -35,9 +30,10 @@ public class MDNSService extends Service {
 	private final String TAG = "MDNSService";
 	private final IBinder mBinder = new LocalBinder();
 
-	private BroadcastReceiver netStateChangedReceiver;
-
-	private MDNSWorkerThread workerThread = new MDNSWorkerThread();
+	private NsdManager nsdManager;
+	// we use a separate worker thread to do the resolve OPs one after another, see
+	// https://stackoverflow.com/a/68424163/361413
+	private final MDNSWorkerThread workerThread = new MDNSWorkerThread();
 
 	private OnEventListener callback;
 
@@ -72,37 +68,8 @@ public class MDNSService extends Service {
 		//code to execute when the service is first created
 		Log.d(TAG, "mDNS service onCreate()!");
 
+		nsdManager = (NsdManager) getSystemService(Context.NSD_SERVICE);
 		workerThread.start();
-
-		// listen for scan results
-		netStateChangedReceiver = new BroadcastReceiver() {
-			//@Override
-			public void onReceive(Context context, Intent intent)
-			{
-				boolean no_net = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-				Log.d(TAG, "Connectivity changed, still sth. available: " +  !no_net + " " + intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO).toString());
-
-				// we get this as soon as we're registering, see http://stackoverflow.com/questions/6670514/connectivitymanager-connectivity-action-always-broadcast-when-registering-a-rec
-				// thus it's okay to have the (re-)startup here!
-				try {
-					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_STOP).sendToTarget();
-				}
-				catch(NullPointerException e) {
-					//unused
-				}
-
-				//  (re)start
-				try {
-					Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_START).sendToTarget();
-				}
-				catch(NullPointerException e) {
-					//unused
-				}
-
-			}
-		};
-		registerReceiver(netStateChangedReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-
 	}
 
 
@@ -110,8 +77,6 @@ public class MDNSService extends Service {
 	public void onDestroy() {
 		//code to execute when the service is shutting down
 		Log.d(TAG, "mDNS service onDestroy()!");
-
-		unregisterReceiver(netStateChangedReceiver);
 
 		// this will end the worker thread
 		workerThread.interrupt();
@@ -153,20 +118,58 @@ public class MDNSService extends Service {
 	private class MDNSWorkerThread extends Thread
 	{
 		private android.net.wifi.WifiManager.MulticastLock multicastLock;
-		private String mdnstype = "_rfb._tcp.local.";
-		private JmDNS jmdns = null;
-		private ServiceListener listener = null;
-		private Hashtable<String,ConnectionBean> connections_discovered = new Hashtable<>();
+		private static final String mdnstype = "_rfb._tcp";
+		private NsdManager.DiscoveryListener discoveryListener;
+		private NsdManager.ResolveListener resolveListener;
+		// work around the fact that only one resolve OP can be active at one time
+		// https://stackoverflow.com/a/68424163/361413
+		private final Semaphore resolveSemaphore = new Semaphore(1);
+		// accessed from both worker thread and nsdManager thread
+		private final ConcurrentHashMap<String,ConnectionBean> connections_discovered = new ConcurrentHashMap<>();
 		private Handler handler;
 
 		final static int MESSAGE_START = 0;
 		final static int MESSAGE_STOP = 1;
 		final static int MESSAGE_DUMP = 2;
+		final static int MESSAGE_RESOLVE = 3;
 
 
 		// this just runs a message loop and acts according to messages
 		@SuppressLint("HandlerLeak") // no handler leak as looper runs on worker thread
 		public void run() {
+
+			resolveListener = new NsdManager.ResolveListener() {
+				@Override
+				public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+					resolveSemaphore.release();
+
+					Log.e(TAG, "Resolve for " + serviceInfo + " failed with code " + errorCode);
+				}
+
+				@Override
+				public void onServiceResolved(NsdServiceInfo serviceInfo) {
+					resolveSemaphore.release();
+
+					ConnectionBean c = new ConnectionBean();
+					c.id = 0; // new!
+					c.nickname = serviceInfo.getServiceName();
+					c.address = serviceInfo.getHost().toString().replace('/', ' ').trim();
+					c.port = serviceInfo.getPort();
+					c.useLocalCursor = true; // always enable
+
+					connections_discovered.put(serviceInfo.getServiceName(), c);
+
+					Log.d(TAG, "Resolve succeeded for server :" + serviceInfo.getServiceName()
+							+ ", now " + connections_discovered.size());
+
+					mDNSnotify(serviceInfo.getServiceName(), c);
+				}
+			};
+
+			// start on our own
+			mDNSstart();
+
+
 			Looper.prepare();
 
 			handler = new Handler() {
@@ -194,6 +197,17 @@ public class MDNSService extends Service {
 							mDNSnotify(c.nickname, c);
 						}
 						break;
+					case MESSAGE_RESOLVE:
+						try {
+							resolveSemaphore.acquire();
+							nsdManager.resolveService((NsdServiceInfo) msg.obj, resolveListener);
+						} catch (InterruptedException e) {
+							Log.d(TAG, "INTERRUPTED, bailing out!");
+							mDNSstop();
+							getLooper().quit();
+							return;
+						}
+						break;
 					}
 				}
 
@@ -205,96 +219,91 @@ public class MDNSService extends Service {
 
 		private void mDNSstart()
 		{
-			Log.d(TAG, "starting MDNS " + JmDNS.VERSION);
+			Log.d(TAG, "starting MDNS");
 
-			boolean success = true;
-
-			if(jmdns != null) {
+			if(discoveryListener != null) {
 				Log.d(TAG, "MDNS already running, doing nothing");
-				success = false;
+				try{
+					callback.onMDNSstartupCompleted(false);
+				}
+				catch(NullPointerException e) {
+					Log.d(TAG, "callback is NULL, not notified about startup");
+				}
 			}
 			else {
-				try {
-
 					android.net.wifi.WifiManager wifi = (android.net.wifi.WifiManager) getApplicationContext().getSystemService(android.content.Context.WIFI_SERVICE);
 					assert wifi != null;
 					multicastLock = wifi.createMulticastLock("mylockthereturn");
 					multicastLock.setReferenceCounted(true);
 					multicastLock.acquire();
-					InetAddress addr = Utils.intToInetAddress(wifi.getConnectionInfo().getIpAddress());
 
-					Log.d(TAG, "Creating MDNS with address " + addr);
 
-					jmdns = JmDNS.create(addr);
-					jmdns.addServiceListener(mdnstype, listener = new ServiceListener() {
+					discoveryListener = new NsdManager.DiscoveryListener() {
+						@Override
+						public void onDiscoveryStarted(String regType) {
+							Log.d(TAG, "Discovery started for " + regType);
+							try{
+								callback.onMDNSstartupCompleted(true);
+							}
+							catch(NullPointerException e) {
+								Log.d(TAG, "callback is NULL, not notified about startup");
+							}
+						}
 
 						@Override
-						public void serviceResolved(ServiceEvent ev) {
-							ConnectionBean c = new ConnectionBean();
-							c.id = 0; // new!
-							c.nickname = ev.getName();
-							c.address = ev.getInfo().getInetAddresses()[0].toString().replace('/', ' ').trim();
-							c.port = ev.getInfo().getPort();
-							c.useLocalCursor = true; // always enable
+						public void onServiceFound(NsdServiceInfo service) {
+							// A service was found! Do something with it.
+							Log.d(TAG, "Discovery found: " + service);
+							Message m = Message.obtain(workerThread.handler, MDNSWorkerThread.MESSAGE_RESOLVE);
+							m.obj = service;
+							m.sendToTarget();
+						}
 
-							connections_discovered.put(ev.getInfo().getQualifiedName(), c);
+						@Override
+						public void onServiceLost(NsdServiceInfo service) {
+							connections_discovered.remove(service.getServiceName());
 
-							Log.d(TAG, "discovered server :" + ev.getName()
+							Log.d(TAG, "Discovery lost: " + service.getServiceName()
 									+ ", now " + connections_discovered.size());
 
-							mDNSnotify(ev.getName(), c);
+							mDNSnotify(service.getServiceName(), null);
 						}
 
 						@Override
-						public void serviceRemoved(ServiceEvent ev) {
-							connections_discovered.remove(ev.getInfo().getQualifiedName());
-
-							Log.d(TAG, "server gone:" + ev.getName()
-									+ ", now " + connections_discovered.size());
-
-							mDNSnotify(ev.getName(), null);
+						public void onDiscoveryStopped(String serviceType) {
+							Log.d(TAG, "Discovery stopped: " + serviceType);
 						}
 
 						@Override
-						public void serviceAdded(ServiceEvent event) {
-							// Required to force serviceResolved to be called again (after the first search)
-							jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
+						public void onStartDiscoveryFailed(String serviceType, int errorCode) {
+							Log.e(TAG, "Discovery start failed with error code: " + errorCode);
+							try{
+								callback.onMDNSstartupCompleted(false);
+							}
+							catch(NullPointerException e) {
+								Log.d(TAG, "callback is NULL, not notified about startup");
+							}
 						}
-					});
 
-				} catch (Exception e) {  // can be IOException and UnsupportedOperationException (in setsockopt)
-					e.printStackTrace();
-					success = false;
-				} catch (NoSuchMethodError e) { // at leat on user got "java.lang.NoSuchMethodError: javax.jmdns.JmDNS.create". phew...
-					e.printStackTrace();
-					success = false;
-				}
-			}
+						@Override
+						public void onStopDiscoveryFailed(String serviceType, int errorCode) {
+							Log.e(TAG, "Discovery stop failed with error code: " + errorCode);
+						}
+					};
 
-			Log.d(TAG, "Startup completed, success " + success);
-
-			try{
-				callback.onMDNSstartupCompleted(success);
-			}
-			catch(NullPointerException e) {
-				Log.d(TAG, "callback is NULL, not notified about startup");
+					nsdManager.discoverServices(mdnstype, NsdManager.PROTOCOL_DNS_SD, discoveryListener);
 			}
 		}
 
 		private void mDNSstop()
 		{
 			Log.d(TAG, "stopping MDNS");
-			if (jmdns != null) {
-				if (listener != null) {
-					jmdns.removeServiceListener(mdnstype, listener);
-					listener = null;
-				}
+			if (discoveryListener != null) {
 				try {
-					jmdns.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+					nsdManager.stopServiceDiscovery(discoveryListener);
+				} catch (Exception ignored) {
 				}
-				jmdns = null;
+				discoveryListener = null;
 			}
 
 			if(multicastLock != null) {
@@ -314,7 +323,7 @@ public class MDNSService extends Service {
 		// do the GUI stuff in Runnable posted to main thread handler
 		private void mDNSnotify(final String conn_name, final ConnectionBean conn) {
 			if(callback!=null)
-				callback.onMDNSnotify(conn_name, conn, connections_discovered);
+				callback.onMDNSnotify(conn_name, conn, new Hashtable<>(connections_discovered));
 			else
 				Log.d(TAG, "callback is NULL, not notifying");
 
