@@ -22,7 +22,6 @@
 #include <errno.h>
 #include <libssh2.h>
 #include <rfb/rfbclient.h>
-#include "rfb/rfbclient.h"
 
 #define TAG "VNCConn-native"
 
