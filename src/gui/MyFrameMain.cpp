@@ -1148,9 +1148,16 @@ bool MyFrameMain::loadbookmarks()
 
 void MyFrameMain::machine_connect(wxCommandEvent &event)
 {
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    wxString host;
+    pConfig->Read(K_LASTHOST, &host);
+
   wxString s = wxGetTextFromUser(_("Enter host to connect to:"),
-				 _("Connect to a specific host."));
-				
+				 _("Connect to a specific host."),
+				 host);
+
+  pConfig->Write(K_LASTHOST, s);
+
   if(s != wxEmptyString)
     spawn_conn(s);
 }

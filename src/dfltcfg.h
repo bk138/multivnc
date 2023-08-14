@@ -57,6 +57,7 @@
 #define V_QOS_EF true
 #define K_GRABKEYBOARD wxT("GrabKeyboard")
 #define V_GRABKEYBOARD false
+#define K_LASTHOST "LastHost"
 
 // encodings settings
 #define K_ENC_COPYRECT wxT("EncodingCopyRect")
