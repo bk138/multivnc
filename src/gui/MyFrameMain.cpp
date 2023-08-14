@@ -1156,10 +1156,10 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 				 _("Connect to a specific host."),
 				 host);
 
-  pConfig->Write(K_LASTHOST, s);
-
-  if(s != wxEmptyString)
-    spawn_conn(s);
+  if (s != wxEmptyString) {
+      pConfig->Write(K_LASTHOST, s);
+      spawn_conn(s);
+  }
 }
 
 
