@@ -62,9 +62,6 @@ public class VNCConn {
 
 	private String serverCutText;
 
-	// VNC Encoding parameters
-	private int preferredEncoding = -1;
-
 	// Useful shortcuts for modifier masks.
     public final static int CTRL_MASK  = KeyEvent.META_SYM_ON;
     public final static int SHIFT_MASK = KeyEvent.META_SHIFT_ON;
