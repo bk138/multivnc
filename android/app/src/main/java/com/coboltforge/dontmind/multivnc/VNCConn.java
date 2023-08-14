@@ -307,7 +307,8 @@ public class VNCConn {
 
     	public void run() {
 
-			if(Utils.DEBUG()) Log.d(TAG, "ClientToServerThread started!");
+			if(Utils.DEBUG())
+				Log.d(TAG, "ClientToServerThread started!");
 
     		//
     		// main output loop
