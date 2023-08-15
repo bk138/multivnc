@@ -159,12 +159,9 @@ public class VNCConn {
     private class ServerToClientThread extends Thread {
 
     	private final onInitResultListener initResultCallback;
-    	private Runnable setModes;
 
-
-    	public ServerToClientThread(onInitResultListener initResultCallback, Runnable setModes) {
+    	public ServerToClientThread(onInitResultListener initResultCallback) {
     		this.initResultCallback = initResultCallback;
-    		this.setModes = setModes;
     	}
 
 
@@ -412,18 +409,18 @@ public class VNCConn {
 	}
 
 	/**
-	 * Create a view showing a VNC connection
+	 * Initialise a VNC connection
 	 * @param bean Connection settings
-	 * @param setModes Callback to run on UI thread after connection is set up
+	 * @param initResultCallback Callback that's called after connection is set up
 	 */
-	public void init(ConnectionBean bean, final Runnable setModes, onInitResultListener initResultCallback) {
+	public void init(ConnectionBean bean, onInitResultListener initResultCallback) {
 
 		Log.d(TAG, "initializing");
 
 		connSettings = bean;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
-		inputThread = new ServerToClientThread(initResultCallback, setModes);
+		inputThread = new ServerToClientThread(initResultCallback);
 		inputThread.start();
 	}
 
