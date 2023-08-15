@@ -182,7 +182,7 @@ public class VNCConn {
 					Inet6Address in6 = Inet6Address.getByAddress(
 							address.getHostName(),
 							address.getAddress(),
-							Utils.getActiveNetworkInterface(canvas.getContext()));
+							Utils.getActiveNetworkInterface());
 
 					connSettings.address = in6.getHostAddress();
 					Log.i(TAG, "Using IPv6");
