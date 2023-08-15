@@ -244,11 +244,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		pd.setButton(DialogInterface.BUTTON_NEGATIVE, getString(android.R.string.cancel), (dialog, which) -> finish());
 		pd.show();
 		firstFrameWaitDialog = pd;
-		conn.init(connection, new Runnable() {
-			public void run() {
-				setModes();
-			}
-		}, err -> {
+		conn.init(connection, err -> {
 			runOnUiThread(() -> {
 				if (err == null) {
 					// init success
