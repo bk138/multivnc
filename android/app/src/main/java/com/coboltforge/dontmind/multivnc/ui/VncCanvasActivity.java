@@ -232,7 +232,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		/*
 		 * Setup canvas and conn.
 		 */
-		VNCConn conn = new VNCConn();
+		VNCConn conn = new VNCConn(vncCanvas, vncCanvas);
 		vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
 		conn.setCanvas(vncCanvas); // add canvas to conn. be sure to call this before init!
 		// the actual connection init
