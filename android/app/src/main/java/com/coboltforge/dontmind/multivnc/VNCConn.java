@@ -12,7 +12,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -20,18 +19,29 @@ import java.util.concurrent.locks.ReentrantLock;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import androidx.annotation.Keep;
 
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
-import com.coboltforge.dontmind.multivnc.db.SshKnownHost;
-import com.coboltforge.dontmind.multivnc.db.VncDatabase;
 import com.coboltforge.dontmind.multivnc.ui.VncCanvas;
 
 
 public class VNCConn {
+
+	public interface OnFramebufferEventListener {
+		void onFramebufferUpdateFinished();
+		void onNewFramebufferSize(int w, int h);
+	}
+
+	public interface OnAuthEventListener {
+		void onRequestCredsFromUser(final ConnectionBean conn, boolean isUserNameNeeded);
+		void onRequestSshFingerprintCheck(String host, byte[] fingerprint, final AtomicBoolean doContinue);
+	}
+
+	private final OnFramebufferEventListener onFramebufferEventCallback;
+	private final OnAuthEventListener onAuthEventCallback;
+
 	static {
 		System.loadLibrary("vncconn");
 	}
@@ -426,7 +436,9 @@ public class VNCConn {
 	private native boolean rfbIsEncrypted();
 
 
-	public VNCConn() {
+	public VNCConn(OnFramebufferEventListener framebufferCallback, OnAuthEventListener authCallback) {
+		onFramebufferEventCallback = framebufferCallback;
+		onAuthEventCallback = authCallback;
 		if(Utils.DEBUG()) Log.d(TAG, this + " constructed!");
 	}
 
@@ -736,20 +748,8 @@ public class VNCConn {
 	// called from native via worker thread context
 	@Keep
 	private void onFramebufferUpdateFinished() {
-
-		canvas.reDraw();
-
-		// Hide progress dialog
-		if (canvas.activity.firstFrameWaitDialog.isShowing())
-			canvas.handler.post(new Runnable() {
-				public void run() {
-					try {
-						canvas.activity.firstFrameWaitDialog.dismiss();
-					} catch (Exception e){
-						//unused
-					}
-				}
-			});
+		if(onFramebufferEventCallback != null)
+			onFramebufferEventCallback.onFramebufferUpdateFinished();
 	}
 
 	// called from native via worker thread context
@@ -762,8 +762,8 @@ public class VNCConn {
 	// called from native via worker thread context
 	@Keep
 	private String onGetPassword() {
-		if (connSettings.password == null || connSettings.password.length() == 0) {
-			canvas.getCredsFromUser(connSettings, false); // this cares for running on the main thread
+		if (onAuthEventCallback != null && (connSettings.password == null || connSettings.password.length() == 0)) {
+			onAuthEventCallback.onRequestCredsFromUser(connSettings, false); // this cares for running on the main thread
 			synchronized (VNCConn.this) {
 				try {
 					VNCConn.this.wait();  // wait for user input to finish
@@ -788,9 +788,10 @@ public class VNCConn {
 	@Keep
 	private UserCredential onGetUserCredential() {
 
-		if (connSettings.userName == null || connSettings.userName.isEmpty()
-			   || connSettings.password == null || connSettings.password.isEmpty()) {
-			canvas.getCredsFromUser(connSettings, connSettings.userName == null || connSettings.userName.isEmpty());
+		if (onAuthEventCallback != null &&
+				(connSettings.userName == null || connSettings.userName.isEmpty()
+			   || connSettings.password == null || connSettings.password.isEmpty())) {
+			onAuthEventCallback.onRequestCredsFromUser(connSettings, connSettings.userName == null || connSettings.userName.isEmpty());
 			synchronized (VNCConn.this) {
 				try {
 					VNCConn.this.wait();  // wait for user input to finish
@@ -810,22 +811,16 @@ public class VNCConn {
 	@Keep
 	private void onNewFramebufferSize(int w, int h) {
 		Log.d(TAG, "new framebuffer size " + w + " x " + h);
-		// this triggers an update on what the canvas thinks about cursor position.
-		// without this, the pointer highlight is off by some value after framebuffer size change
-		canvas.handler.post(() -> {
-			canvas.pan(0, 0);
-		});
+		if(onFramebufferEventCallback != null)
+			onFramebufferEventCallback.onNewFramebufferSize(w, h);
 	}
 
 	// called from native via worker thread context
 	@Keep
 	private int onSshFingerprintCheck(String host, byte[] fingerprint) {
-		// look for host, if not found create entry and return ok
-		SshKnownHost knownHost = VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().get(host);
-		if(knownHost == null) {
+		if(onAuthEventCallback != null) {
 			AtomicBoolean doContinue = new AtomicBoolean();
-			// always using SHA256 in native part, ok to hardocde this here
-			canvas.getSshFingerPrintNewDecision("SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP), doContinue); // this cares for running on the main thread
+			onAuthEventCallback.onRequestSshFingerprintCheck(host, fingerprint, doContinue);
 			synchronized (VNCConn.this) {
 				try {
 					VNCConn.this.wait();  // wait for user input to finish
@@ -833,38 +828,12 @@ public class VNCConn {
 					//unused
 				}
 			}
+			// evaluate result
 			if(doContinue.get()) {
-				VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, host, fingerprint));
 				return 0;
 			}
-			else {
-				return -1;
-			}
 		}
-
-		// host found, check if fingerprint matches
-	    if(Arrays.equals(knownHost.fingerprint, fingerprint))
-			return 0;
-		else {
-			// not matching, ask user!
-			AtomicBoolean doContinue = new AtomicBoolean();
-			// always using SHA256 in native part, ok to hardocde this here
-			canvas.getSshFingerPrintMismatchDecision("SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP), doContinue); // this cares for running on the main thread
-			synchronized (VNCConn.this) {
-				try {
-					VNCConn.this.wait();  // wait for user input to finish
-				} catch (InterruptedException e) {
-					//unused
-				}
-			}
-			if(doContinue.get())
-				return 0;
-			else {
-				SshKnownHost updatedHost = new SshKnownHost(knownHost.id, host, fingerprint);
-				VncDatabase.getInstance(canvas.getContext()).getSshKnownHostDao().update(updatedHost);
-				return -1;
-			}
-		}
+		return -1;
 	}
 }
 

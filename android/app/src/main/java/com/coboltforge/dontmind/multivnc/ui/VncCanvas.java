@@ -30,6 +30,7 @@
 
 package com.coboltforge.dontmind.multivnc.ui;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -44,6 +45,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.text.Html;
 import android.util.AttributeSet;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -60,9 +62,11 @@ import com.coboltforge.dontmind.multivnc.Utils;
 import com.coboltforge.dontmind.multivnc.VNCConn;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
+import com.coboltforge.dontmind.multivnc.db.SshKnownHost;
+import com.coboltforge.dontmind.multivnc.db.VncDatabase;
 
 
-public class VncCanvas extends GLSurfaceView {
+public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEventListener, VNCConn.OnAuthEventListener {
 	static {
 		System.loadLibrary("vnccanvas");
     }
@@ -836,7 +840,30 @@ public class VncCanvas extends GLSurfaceView {
 		return (int)((double)getHeight() / getScale() + 0.5);
 	}
 
-	public void getCredsFromUser(final ConnectionBean c, boolean isUserNameNeeded) {
+	@Override
+	public void onFramebufferUpdateFinished() {
+		reDraw();
+
+		// Hide progress dialog
+		if (activity.firstFrameWaitDialog.isShowing())
+			handler.post(() -> {
+				try {
+					activity.firstFrameWaitDialog.dismiss();
+				} catch (Exception e){
+					//unused
+				}
+			});
+	}
+
+	@Override
+	public void onNewFramebufferSize(int w, int h) {
+		// this triggers an update on what the canvas thinks about cursor position.
+		// without this, the pointer highlight is off by some value after framebuffer size change
+		handler.post(() -> pan(0, 0));
+	}
+
+	@Override
+	public void onRequestCredsFromUser(final ConnectionBean c, boolean isUserNameNeeded) {
 		// this method is probably called from the vnc thread
 		post(new Runnable() {
 			@Override
@@ -869,55 +896,72 @@ public class VncCanvas extends GLSurfaceView {
 
 	}
 
-	public void getSshFingerPrintNewDecision(String fingerprint, final AtomicBoolean doContinue) {
+	@Override
+	public void onRequestSshFingerprintCheck(String host, byte[] fingerprint, AtomicBoolean doContinue) {
 		// this method is probably called from the vnc thread
 		post(() -> {
-			AlertDialog dialog = new AlertDialog.Builder(getContext())
-					.setTitle(R.string.ssh_key_new_title)
-					.setMessage(Html.fromHtml(getContext().getString(R.string.ssh_key_new_message, fingerprint)))
-					.setCancelable(false)
-					.setPositiveButton(R.string.ssh_key_new_continue, (dialog12, whichButton) -> {
-						doContinue.set(true);
-						synchronized (vncConn) {
-							vncConn.notify();
-						}
-					})
-					.setNegativeButton(R.string.ssh_key_new_abort, (dialog1, whichButton) -> {
-						doContinue.set(false);
-						synchronized (vncConn) {
-							vncConn.notify();
-						}
-					})
-					.create();
+			// look for host, if not found create entry and return ok
+			SshKnownHost knownHost = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(host);
+			if(knownHost == null) {
+				AlertDialog dialog = new AlertDialog.Builder(getContext())
+						.setTitle(R.string.ssh_key_new_title)
+						// always using SHA256 in native part, ok to hardcode this here
+						.setMessage(Html.fromHtml(getContext().getString(R.string.ssh_key_new_message,
+								"SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP))))
+						.setCancelable(false)
+						.setPositiveButton(R.string.ssh_key_new_continue, (dialog12, whichButton) -> {
+							VncDatabase.getInstance(getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, host, fingerprint));
+							doContinue.set(true);
+							synchronized (vncConn) {
+								vncConn.notify();
+							}
+						})
+						.setNegativeButton(R.string.ssh_key_new_abort, (dialog1, whichButton) -> {
+							doContinue.set(false);
+							synchronized (vncConn) {
+								vncConn.notify();
+							}
+						})
+						.create();
 
-			dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-			dialog.show();
-		});
-	}
+				dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+				dialog.show();
+				return;
+			}
 
-	public void getSshFingerPrintMismatchDecision(String fingerprint, final AtomicBoolean doContinue) {
-		// this method is probably called from the vnc thread
-		post(() -> {
-			AlertDialog dialog = new AlertDialog.Builder(getContext())
-					.setTitle(R.string.ssh_key_mismatch_title)
-					.setMessage(getContext().getString(R.string.ssh_key_mismatch_message, fingerprint))
-					.setCancelable(false)
-					.setPositiveButton(R.string.ssh_key_mismatch_continue, (dialog12, whichButton) -> {
-						doContinue.set(true);
-						synchronized (vncConn) {
-							vncConn.notify();
-						}
-					})
-					.setNegativeButton(R.string.ssh_key_mismatch_abort, (dialog1, whichButton) -> {
-						doContinue.set(false);
-						synchronized (vncConn) {
-							vncConn.notify();
-						}
-					})
-					.create();
+			// host found, check if fingerprint matches
+			if(Arrays.equals(knownHost.fingerprint, fingerprint)) {
+				doContinue.set(true);
+				synchronized (vncConn) {
+					vncConn.notify();
+				}
+			} else {
+				// not matching, ask user!
+				AlertDialog dialog = new AlertDialog.Builder(getContext())
+						.setTitle(R.string.ssh_key_mismatch_title)
+						// always using SHA256 in native part, ok to hardcode this here
+						.setMessage(Html.fromHtml(getContext().getString(R.string.ssh_key_mismatch_message,
+								"SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP))))
+						.setCancelable(false)
+						.setPositiveButton(R.string.ssh_key_mismatch_continue, (dialog12, whichButton) -> {
+							SshKnownHost updatedHost = new SshKnownHost(knownHost.id, host, fingerprint);
+							VncDatabase.getInstance(getContext()).getSshKnownHostDao().update(updatedHost);
+							doContinue.set(true);
+							synchronized (vncConn) {
+								vncConn.notify();
+							}
+						})
+						.setNegativeButton(R.string.ssh_key_mismatch_abort, (dialog1, whichButton) -> {
+							doContinue.set(false);
+							synchronized (vncConn) {
+								vncConn.notify();
+							}
+						})
+						.create();
 
-			dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-			dialog.show();
+				dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+				dialog.show();
+			}
 		});
 	}
 
