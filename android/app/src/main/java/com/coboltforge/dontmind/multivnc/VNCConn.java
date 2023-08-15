@@ -61,10 +61,10 @@ public class VNCConn {
 	private boolean maintainConnection = true;
 	private boolean framebufferUpdatesEnabled = true;
 
-	private Lock bitmapDataPixelsLock = new ReentrantLock();
+	private final Lock bitmapDataPixelsLock = new ReentrantLock();
 
 	// message queue for communicating with the output worker thread
-	private ConcurrentLinkedQueue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<VNCConn.OutputEvent>();
+	private final ConcurrentLinkedQueue<OutputEvent> outputEventQueue = new ConcurrentLinkedQueue<>();
 
 	private COLORMODEL colorModel;
 
