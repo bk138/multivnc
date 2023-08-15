@@ -16,9 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.util.Log;
 import android.view.KeyEvent;
 import androidx.annotation.Keep;
@@ -160,12 +158,12 @@ public class VNCConn {
 
     private class ServerToClientThread extends Thread {
 
-    	private ProgressDialog pd;
+    	private final onInitResultListener initResultCallback;
     	private Runnable setModes;
 
 
-    	public ServerToClientThread(ProgressDialog pd, Runnable setModes) {
-    		this.pd = pd;
+    	public ServerToClientThread(onInitResultListener initResultCallback, Runnable setModes) {
+    		this.initResultCallback = initResultCallback;
     		this.setModes = setModes;
     	}
 
@@ -227,15 +225,6 @@ public class VNCConn {
 				// register connection
 				VNCConnService.register(appContext, VNCConn.this);
 
-				canvas.handler.post(new Runnable() {
-					public void run() {
-						canvas.activity.setTitle(getDesktopName());
-						// actually set scale type with this, otherwise no scaling
-						canvas.activity.setModes();
-						pd.setMessage("Downloading first frame.\nPlease wait...");
-					}
-				});
-
 				// update connection's nickname with desktop name if unset
 				if(connSettings.nickname == null || connSettings.nickname.isEmpty())
 					connSettings.nickname = getDesktopName();
@@ -244,9 +233,8 @@ public class VNCConn {
 				outputThread = new ClientToServerThread();
 				outputThread.start();
 
-				// center pointer
-				canvas.mouseX = getFramebufferWidth() / 2;
-				canvas.mouseY = getFramebufferHeight() / 2;
+				initResultCallback.onInitResult(null);
+
 				// main loop
 				while (maintainConnection) {
 					if (!rfbProcessServerMessage()) {
@@ -257,39 +245,8 @@ public class VNCConn {
 				if (maintainConnection) {
 					Log.e(TAG, e.toString());
 					e.printStackTrace();
-					// Ensure we dismiss the progress dialog
-					// before we fatal error finish
-					canvas.handler.post(new Runnable() {
-						public void run() {
-							try {
-								if (pd.isShowing())
-									pd.dismiss();
-							} catch (Exception e) {
-								//unused
-							}
-						}
-					});
-					if (e instanceof OutOfMemoryError) {
-						// TODO  Not sure if this will happen but...
-						// figure out how to gracefully notify the user
-						// Instantiating an alert dialog here doesn't work
-						// because we are out of memory. :(
-					} else {
-						String error = "VNC connection failed!";
-						if (e.getMessage() != null && (e.getMessage().indexOf("authentication") > -1)) {
-							error = "VNC authentication failed!";
-						}
-						final String error_ = error + "<br>" + ((e.getLocalizedMessage() != null) ? e.getLocalizedMessage() : "");
-						canvas.handler.post(new Runnable() {
-							public void run() {
-								try {
-									Utils.showFatalErrorMessage(canvas.getContext(), error_);
-								}
-								catch(NullPointerException e) {
-								}
-							}
-						});
-					}
+
+					initResultCallback.onInitResult(e);
 				}
 			}
 
@@ -446,35 +403,27 @@ public class VNCConn {
 		if(Utils.DEBUG()) Log.d(TAG, this + " finalized!");
 	}
 
+	public interface onInitResultListener {
+		/**
+		 * Conveys the result of init().
+		 * @param err Null on success, non-null on failure.
+		 */
+		void onInitResult(Throwable err);
+	}
 
 	/**
 	 * Create a view showing a VNC connection
 	 * @param bean Connection settings
 	 * @param setModes Callback to run on UI thread after connection is set up
 	 */
-	public void init(ConnectionBean bean, final Runnable setModes) {
+	public void init(ConnectionBean bean, final Runnable setModes, onInitResultListener initResultCallback) {
 
 		Log.d(TAG, "initializing");
 
 		connSettings = bean;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
-		// Startup the RFB thread with a nifty progess dialog
-		final ProgressDialog pd = new ProgressDialog(canvas.getContext());
-		pd.setCancelable(false); // on ICS, clicking somewhere cancels the dialog. not what we want...
-	    pd.setTitle("Connecting...");
-	    pd.setMessage("Establishing handshake.\nPlease wait...");
-	    pd.setButton(DialogInterface.BUTTON_NEGATIVE, canvas.getContext().getString(android.R.string.cancel), new DialogInterface.OnClickListener()
-	    {
-	        public void onClick(DialogInterface dialog, int which)
-	        {
-	        	canvas.activity.finish();
-	        }
-	    });
-	    pd.show();
-		canvas.activity.firstFrameWaitDialog = pd;
-
-		inputThread = new ServerToClientThread(pd, setModes);
+		inputThread = new ServerToClientThread(initResultCallback, setModes);
 		inputThread.start();
 	}
 

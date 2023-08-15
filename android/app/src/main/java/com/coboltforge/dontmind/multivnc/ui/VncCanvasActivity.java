@@ -236,10 +236,48 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
 		conn.setCanvas(vncCanvas); // add canvas to conn. be sure to call this before init!
 		// the actual connection init
+		// Startup the VNCConn with a nifty progress dialog
+		final ProgressDialog pd = new ProgressDialog(this);
+		pd.setCancelable(false); // on ICS, clicking somewhere cancels the dialog. not what we want...
+		pd.setTitle("Connecting...");
+		pd.setMessage("Establishing handshake.\nPlease wait...");
+		pd.setButton(DialogInterface.BUTTON_NEGATIVE, getString(android.R.string.cancel), (dialog, which) -> finish());
+		pd.show();
+		firstFrameWaitDialog = pd;
 		conn.init(connection, new Runnable() {
 			public void run() {
 				setModes();
 			}
+		}, err -> {
+			runOnUiThread(() -> {
+				if (err == null) {
+					// init success
+					setTitle(conn.getDesktopName());
+					// actually set scale type with this, otherwise no scaling
+					setModes();
+					firstFrameWaitDialog.setMessage("Downloading first frame.\nPlease wait...");
+					// center pointer
+					vncCanvas.mouseX = conn.getFramebufferWidth() / 2;
+					vncCanvas.mouseY = conn.getFramebufferHeight() / 2;
+				} else {
+					// init failure
+					try {
+						// Ensure we dismiss the progress dialog
+						// before we fatal error finish
+						if (firstFrameWaitDialog.isShowing())
+							firstFrameWaitDialog.dismiss();
+					} catch (Exception e) {
+						//unused
+					}
+
+					String error = "VNC connection failed!";
+					if (err.getMessage() != null && (err.getMessage().indexOf("authentication") > -1)) {
+						error = "VNC authentication failed!";
+					}
+					final String error_ = error + "<br>" + ((err.getLocalizedMessage() != null) ? err.getLocalizedMessage() : "");
+					Utils.showFatalErrorMessage(this, error_);
+				}
+			});
 		});
 
 
