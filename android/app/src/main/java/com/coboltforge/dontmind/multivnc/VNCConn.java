@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import android.content.Context;
 import android.util.Log;
 import android.view.KeyEvent;
 import androidx.annotation.Keep;
@@ -181,8 +180,6 @@ public class VNCConn {
 
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread started!");
 
-			Context appContext = canvas.getContext().getApplicationContext();
-
 			Throwable maybeError = null;
 
 			try {
@@ -233,9 +230,6 @@ public class VNCConn {
 				colorModel = pendingColorModel;
 				unlockFramebuffer();
 
-				// register connection
-				VNCConnService.register(appContext, VNCConn.this);
-
 				// update connection's nickname with desktop name if unset
 				if(connSettings.nickname == null || connSettings.nickname.isEmpty())
 					connSettings.nickname = getDesktopName();
@@ -268,9 +262,6 @@ public class VNCConn {
 			unlockFramebuffer();
 
 			connectionEventCallback.onDisconnected(maybeError);
-
-			// deregister connection
-			VNCConnService.deregister(appContext, VNCConn.this);
 
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread done!");
 		}

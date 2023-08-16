@@ -61,6 +61,7 @@ import com.coboltforge.dontmind.multivnc.Constants;
 import com.coboltforge.dontmind.multivnc.R;
 import com.coboltforge.dontmind.multivnc.Utils;
 import com.coboltforge.dontmind.multivnc.VNCConn;
+import com.coboltforge.dontmind.multivnc.VNCConnService;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
@@ -248,6 +249,8 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 					@Override
 					public void onConnected() {
 						runOnUiThread(() -> {
+							// register connection
+							VNCConnService.register(VncCanvasActivity.this, conn);
 							setTitle(conn.getDesktopName());
 							// actually set scale type with this, otherwise no scaling
 							setModes();
@@ -278,6 +281,9 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 								final String error_ = error + "<br>" + ((err.getLocalizedMessage() != null) ? err.getLocalizedMessage() : "");
 								Utils.showFatalErrorMessage(VncCanvasActivity.this, error_);
 							}
+
+							// deregister connection
+							VNCConnService.deregister(VncCanvasActivity.this, conn);
 						});
 					}
 				});
