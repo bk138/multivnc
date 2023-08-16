@@ -27,6 +27,18 @@ import com.coboltforge.dontmind.multivnc.ui.VncCanvas;
 
 public class VNCConn {
 
+	public interface OnConnectionEventListener {
+		/**
+		 * Fired when a connection was successfully made.
+		 */
+		void onConnected();
+		/**
+		 * Fired on disconnect, either orderly or with error
+		 * @param err Null on orderly disconnect, non-null on failure.
+		 */
+		void onDisconnected(Throwable err);
+	}
+
 	public interface OnFramebufferEventListener {
 		void onFramebufferUpdateFinished();
 		void onNewFramebufferSize(int w, int h);
@@ -158,10 +170,10 @@ public class VNCConn {
 
     private class ServerToClientThread extends Thread {
 
-    	private final onInitResultListener initResultCallback;
+    	private final OnConnectionEventListener connectionEventCallback;
 
-    	public ServerToClientThread(onInitResultListener initResultCallback) {
-    		this.initResultCallback = initResultCallback;
+    	public ServerToClientThread(OnConnectionEventListener connectionEventCallback) {
+    		this.connectionEventCallback = connectionEventCallback;
     	}
 
 
@@ -170,6 +182,8 @@ public class VNCConn {
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread started!");
 
 			Context appContext = canvas.getContext().getApplicationContext();
+
+			Throwable maybeError = null;
 
 			try {
 
@@ -230,7 +244,7 @@ public class VNCConn {
 				outputThread = new ClientToServerThread();
 				outputThread.start();
 
-				initResultCallback.onInitResult(null);
+				connectionEventCallback.onConnected();
 
 				// main loop
 				while (maintainConnection) {
@@ -243,7 +257,8 @@ public class VNCConn {
 					Log.e(TAG, e.toString());
 					e.printStackTrace();
 
-					initResultCallback.onInitResult(e);
+					// save for callback
+					maybeError = e;
 				}
 			}
 
@@ -251,6 +266,8 @@ public class VNCConn {
 			lockFramebuffer(); // make sure the native texture drawing is not accessing something invalid
 			rfbShutdown();
 			unlockFramebuffer();
+
+			connectionEventCallback.onDisconnected(maybeError);
 
 			// deregister connection
 			VNCConnService.deregister(appContext, VNCConn.this);
@@ -400,27 +417,20 @@ public class VNCConn {
 		if(Utils.DEBUG()) Log.d(TAG, this + " finalized!");
 	}
 
-	public interface onInitResultListener {
-		/**
-		 * Conveys the result of init().
-		 * @param err Null on success, non-null on failure.
-		 */
-		void onInitResult(Throwable err);
-	}
 
 	/**
 	 * Initialise a VNC connection
 	 * @param bean Connection settings
-	 * @param initResultCallback Callback that's called after connection is set up
+	 * @param connectionEventCallback Callback that's called after connection is set up
 	 */
-	public void init(ConnectionBean bean, onInitResultListener initResultCallback) {
+	public void init(ConnectionBean bean, OnConnectionEventListener connectionEventCallback) {
 
 		Log.d(TAG, "initializing");
 
 		connSettings = bean;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
-		inputThread = new ServerToClientThread(initResultCallback);
+		inputThread = new ServerToClientThread(connectionEventCallback);
 		inputThread.start();
 	}
 
