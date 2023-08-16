@@ -244,39 +244,43 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		pd.setButton(DialogInterface.BUTTON_NEGATIVE, getString(android.R.string.cancel), (dialog, which) -> finish());
 		pd.show();
 		firstFrameWaitDialog = pd;
-		conn.init(connection, err -> {
-			runOnUiThread(() -> {
-				if (err == null) {
-					// init success
-					setTitle(conn.getDesktopName());
-					// actually set scale type with this, otherwise no scaling
-					setModes();
-					firstFrameWaitDialog.setMessage("Downloading first frame.\nPlease wait...");
-					// center pointer
-					vncCanvas.mouseX = conn.getFramebufferWidth() / 2;
-					vncCanvas.mouseY = conn.getFramebufferHeight() / 2;
-				} else {
-					// init failure
-					try {
-						// Ensure we dismiss the progress dialog
-						// before we fatal error finish
-						if (firstFrameWaitDialog.isShowing())
-							firstFrameWaitDialog.dismiss();
-					} catch (Exception e) {
-						//unused
+		conn.init(connection, new VNCConn.OnConnectionEventListener() {
+					@Override
+					public void onConnected() {
+						runOnUiThread(() -> {
+							setTitle(conn.getDesktopName());
+							// actually set scale type with this, otherwise no scaling
+							setModes();
+							firstFrameWaitDialog.setMessage("Downloading first frame.\nPlease wait...");
+							// center pointer
+							vncCanvas.mouseX = conn.getFramebufferWidth() / 2;
+							vncCanvas.mouseY = conn.getFramebufferHeight() / 2;
+						});
 					}
 
-					String error = "VNC connection failed!";
-					if (err.getMessage() != null && (err.getMessage().indexOf("authentication") > -1)) {
-						error = "VNC authentication failed!";
+					@Override
+					public void onDisconnected(Throwable err) {
+						runOnUiThread(() -> {
+							try {
+								// Ensure we dismiss the progress dialog
+								// before we fatal error finish
+								if (firstFrameWaitDialog.isShowing())
+									firstFrameWaitDialog.dismiss();
+							} catch (Exception e) {
+								//unused
+							}
+
+							if(err != null) {
+								String error = "VNC connection failed!";
+								if (err.getMessage() != null && (err.getMessage().indexOf("authentication") > -1)) {
+									error = "VNC authentication failed!";
+								}
+								final String error_ = error + "<br>" + ((err.getLocalizedMessage() != null) ? err.getLocalizedMessage() : "");
+								Utils.showFatalErrorMessage(VncCanvasActivity.this, error_);
+							}
+						});
 					}
-					final String error_ = error + "<br>" + ((err.getLocalizedMessage() != null) ? err.getLocalizedMessage() : "");
-					Utils.showFatalErrorMessage(this, error_);
-				}
-			});
-		});
-
-
+				});
 
 		zoomer.setOnZoomInClickListener(new View.OnClickListener() {
 
