@@ -859,7 +859,12 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	public void onNewFramebufferSize(int w, int h) {
 		// this triggers an update on what the canvas thinks about cursor position.
 		// without this, the pointer highlight is off by some value after framebuffer size change
-		handler.post(() -> pan(0, 0));
+		handler.post(() -> {
+			try {
+				pan(0, 0);
+			} catch (Exception ignored) {
+			}
+		});
 	}
 
 	@Override
