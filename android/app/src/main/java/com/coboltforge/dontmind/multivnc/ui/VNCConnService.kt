@@ -1,4 +1,4 @@
-package com.coboltforge.dontmind.multivnc
+package com.coboltforge.dontmind.multivnc.ui
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -10,7 +10,8 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.coboltforge.dontmind.multivnc.ui.VncCanvasActivity
+import com.coboltforge.dontmind.multivnc.R
+import com.coboltforge.dontmind.multivnc.VNCConn
 import kotlinx.coroutines.*
 
 /**

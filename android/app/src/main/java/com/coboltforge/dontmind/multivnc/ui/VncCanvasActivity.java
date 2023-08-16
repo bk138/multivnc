@@ -61,7 +61,6 @@ import com.coboltforge.dontmind.multivnc.Constants;
 import com.coboltforge.dontmind.multivnc.R;
 import com.coboltforge.dontmind.multivnc.Utils;
 import com.coboltforge.dontmind.multivnc.VNCConn;
-import com.coboltforge.dontmind.multivnc.VNCConnService;
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
