@@ -323,9 +323,10 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	 */
 	public void warpMouse(int x, int y)
 	{
-		mouseX=x;
-		mouseY=y;
+		mouseX=vncConn.trimX(x);
+		mouseY=vncConn.trimY(y);
 		reDraw(); // update local pointer position
+		panToMouse();
 		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
 	}
 
@@ -678,7 +679,10 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 			    	if(Utils.DEBUG()) Log.d(TAG, "Input: all mouse buttons up");
 			    	pointerMask = 0;
 			    }
-
+			 mouseX = vncConn.trimX((int)evt.getX());
+			 mouseY = vncConn.trimY((int)evt.getY());
+			 reDraw(); // update local pointer position
+			 panToMouse();
 			 if(overridePointerMask > 0)
 				 return vncConn.sendPointerEvent((int)evt.getX(),(int)evt.getY(), evt.getMetaState(), overridePointerMask);
 			 else
@@ -704,6 +708,10 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 			else
 				pointerMask &= ~button;
 
+			mouseX = vncConn.trimX(x);
+			mouseY = vncConn.trimY(y);
+			reDraw(); // update local pointer position
+			panToMouse();
 			if (overridePointerMask > 0)
 				vncConn.sendPointerEvent(x, y, 0, overridePointerMask);
 			else
