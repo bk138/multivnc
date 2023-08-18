@@ -1,7 +1,7 @@
 /**
  *
  * This represents an *active* VNC connection (as opposed to ConnectionBean, which is more like a bookmark.).
- * Copyright (C) 2012-2023 Christian Beier <dontmind@freeshell.org>
+ * Copyright (C) 2012-2023 Christian Beier <info@christianbeier.net>
  */
 
 
