@@ -234,7 +234,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		 */
 		VNCConn conn = new VNCConn(vncCanvas, vncCanvas);
 		vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
-		conn.setCanvas(vncCanvas); // add canvas to conn. be sure to call this before init!
 		// the actual connection init
 		// Startup the VNCConn with a nifty progress dialog
 		final ProgressDialog pd = new ProgressDialog(this);

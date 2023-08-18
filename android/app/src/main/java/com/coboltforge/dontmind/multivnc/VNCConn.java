@@ -21,7 +21,6 @@ import android.view.KeyEvent;
 import androidx.annotation.Keep;
 
 import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
-import com.coboltforge.dontmind.multivnc.ui.VncCanvas;
 
 
 public class VNCConn {
@@ -56,8 +55,6 @@ public class VNCConn {
 	}
 
 	private final static String TAG = "VNCConn";
-
-	private VncCanvas canvas;
 
 	private ServerToClientThread inputThread;
 	private ClientToServerThread outputThread;
@@ -439,19 +436,9 @@ public class VNCConn {
 		catch(Exception e) {
 		}
 
-		canvas = null;
 		connSettings = null;
 
 		System.gc();
-	}
-
-	/**
-	 * Set/unset the canvas for this connection.
-	 * Unset canvas when keeping the VNCConn across application restarts to avoid memleaks.
-	 * @param c
-	 */
-	public void setCanvas(VncCanvas c) {
-		canvas = c;
 	}
 
 
