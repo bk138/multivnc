@@ -476,11 +476,9 @@ public class VNCConn {
 
 		if(rfbClient != 0) { // only queue if already connected
 
-			// trim coodinates
-			if (x<0) x=0;
-			else if (x>=getFramebufferWidth()) x=getFramebufferWidth()-1;
-			if (y<0) y=0;
-			else if (y>=getFramebufferHeight()) y=getFramebufferHeight()-1;
+			// safety: trim coordinates
+			x = trimX(x);
+			y = trimY(y);
 
 			OutputEvent e = new OutputEvent(x, y, modifiers, pointerMask);
 			outputEventQueue.add(e);
@@ -670,6 +668,18 @@ public class VNCConn {
 
 	public final int getFramebufferHeight() {
 		return rfbGetFramebufferHeight();
+	}
+
+	public int trimX(int x) {
+		if (x<0) return 0;
+		else if (x>=getFramebufferWidth()) return getFramebufferWidth()-1;
+		return x;
+	}
+
+	public int trimY(int y) {
+		if (y<0) return 0;
+		else if (y>=getFramebufferHeight()) return getFramebufferHeight()-1;
+		return y;
 	}
 
 	public String getCutText() {
