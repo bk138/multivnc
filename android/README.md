@@ -26,7 +26,7 @@ the `android` directory.
 * VncCanvasActivity
   * contains VncCanvas, which is a GLSurfaceView
   * contains UI buttons, ZoomControls
-  * contains MightyInputHandler
+  * contains PointerInputHandler
   * creates a new VNCConn, connects it with the VncCanvas and sets it up from a ConnectionBean
 
 * VNCConn
