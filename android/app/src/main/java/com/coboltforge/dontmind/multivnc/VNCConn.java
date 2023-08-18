@@ -486,11 +486,6 @@ public class VNCConn {
 				outputEventQueue.notify();
 			}
 
-			canvas.mouseX = x;
-			canvas.mouseY = y;
-			canvas.reDraw(); // update local pointer position
-			canvas.panToMouse();
-
 			return true;
 		}
 		else
