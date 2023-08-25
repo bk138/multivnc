@@ -1,5 +1,16 @@
 # Version 2.1.x:
 
+## 2.1.3
+
+### 🛠  Fixes
+
+* Fixed framebuffer update requests being sent although the client being in touchpad mode.
+* Updated Android library dependencies.
+* Updated libjpeg-turbo to latest ESR release.
+* Updated the internal service discovery to use Android-provided machinery, removed dependency on
+  jmDNS.
+* Refactored coupling of VNC connection handling with UI.
+
 ## 2.1.2
 
 ### 🛠  Fixes
