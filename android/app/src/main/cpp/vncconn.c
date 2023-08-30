@@ -493,8 +493,8 @@ static void onFramebufferUpdateFinished(rfbClient* client)
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
 
-    if(!env) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onFramebufferUpdateFinished failed due to env NULL");
+    if(!env || !obj) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onFramebufferUpdateFinished failed due to env or obj NULL");
         return;
     }
 
@@ -513,8 +513,8 @@ static void onGotCutText(rfbClient *client, const char *text, int len)
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
 
-    if(!env) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutText failed due to env NULL");
+    if(!env || !obj) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutText failed due to env or obj NULL");
         return;
     }
 
@@ -535,8 +535,8 @@ static char *onGetPassword(rfbClient *client)
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
 
-    if(!env) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetPassword failed due to env NULL");
+    if(!env || !obj) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetPassword failed due to env or obj NULL");
         return NULL;
     }
 
@@ -571,8 +571,8 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
 
-    if(!env) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to env NULL");
+    if(!env || !obj) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to env or obj NULL");
         return NULL;
     }
 
@@ -632,8 +632,8 @@ static rfbBool onNewFBSize(rfbClient *client)
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
 
-    if(!env) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onNewFBSize failed due to env NULL");
+    if(!env || !obj) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onNewFBSize failed due to env or obj NULL");
         return FALSE;
     }
 
@@ -663,8 +663,8 @@ static int onSshFingerprintCheck(const char *fingerprint, size_t fingerprint_len
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
 
-    if(!env) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onSshFingerprintCheck failed due to env NULL");
+    if(!env || !obj) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onSshFingerprintCheck failed due to env or obj NULL");
         return -1;
     }
 
