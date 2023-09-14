@@ -142,6 +142,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		vncCanvas = (VncCanvas) findViewById(R.id.vnc_canvas);
 		zoomer = (ZoomControls) findViewById(R.id.zoomer);
 		zoomLevel = findViewById(R.id.zoomLevel);
+		mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
 
 		prefs = getSharedPreferences(Constants.PREFSNAME, MODE_PRIVATE);
 
@@ -149,8 +150,11 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 		mClipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
+		// create an empty toast. we do this do be able to cancel
+		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
+		notificationToast.setGravity(Gravity.TOP, 0, 60);
 
-		inputHandler = new PointerInputHandler(this);
+		inputHandler = new PointerInputHandler(vncCanvas, mousebuttons, notificationToast);
 		inputHandler.init();
 
 		/*
@@ -334,7 +338,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 		});
 
-		mousebuttons = (ViewGroup) findViewById(R.id.virtualmousebuttons);
 		MouseButtonView mousebutton1 = (MouseButtonView) findViewById(R.id.mousebutton1);
 		MouseButtonView mousebutton2 = (MouseButtonView) findViewById(R.id.mousebutton2);
 		MouseButtonView mousebutton3 = (MouseButtonView) findViewById(R.id.mousebutton3);
@@ -347,10 +350,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 
 		touchpoints = (TouchPointView) findViewById(R.id.touchpoints);
 		touchpoints.setInputHandler(inputHandler);
-
-		// create an empty toast. we do this do be able to cancel
-		notificationToast = Toast.makeText(this,  "", Toast.LENGTH_SHORT);
-		notificationToast.setGravity(Gravity.TOP, 0, 60);
 
 
 		if(! prefs.getBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, true))

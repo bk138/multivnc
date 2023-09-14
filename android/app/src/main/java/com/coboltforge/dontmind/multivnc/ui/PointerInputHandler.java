@@ -10,6 +10,8 @@ import android.view.ScaleGestureDetector;
 import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.coboltforge.dontmind.multivnc.Utils;
 import com.coboltforge.dontmind.multivnc.VNCConn;
@@ -33,7 +35,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
     private static final String TAG = "PointerInputHandler";
 
-    private final VncCanvasActivity vncCanvasActivity;
+    private final VncCanvas vncCanvas;
+    private final ViewGroup mousebuttons;
+    private final Toast notificationToast;
     protected GestureDetector gestures;
     protected ScaleGestureDetector scaleGestures;
 
@@ -68,11 +72,13 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     private final int TWO_FINGER_FLING_UNITS = 1000;
     private final float TWO_FINGER_FLING_THRESHOLD = 1000;
 
-    PointerInputHandler(VncCanvasActivity vncCanvasActivity) {
-        this.vncCanvasActivity = vncCanvasActivity;
-        gestures= new GestureDetector(vncCanvasActivity, this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
+    PointerInputHandler(VncCanvas vncCanvas, ViewGroup mouseButtonView, Toast notificationToast) {
+        this.vncCanvas = vncCanvas;
+        mousebuttons = mouseButtonView;
+        this.notificationToast = notificationToast;
+        gestures= new GestureDetector(vncCanvas.getContext(), this, null, false); // this is a SDK 8+ feature and apparently needed if targetsdk is set
         gestures.setOnDoubleTapListener(this);
-        scaleGestures = new ScaleGestureDetector(vncCanvasActivity, this);
+        scaleGestures = new ScaleGestureDetector(vncCanvas.getContext(), this);
         scaleGestures.setQuickScaleEnabled(false);
 
         Log.d(TAG, "MightyInputHandler " + this +  " created!");
@@ -124,8 +130,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         }
 
         if (consumed && inScaling) {
-            if (vncCanvasActivity.vncCanvas != null && vncCanvasActivity.vncCanvas.scaling != null)
-                vncCanvasActivity.vncCanvas.scaling.adjust(detector.getScaleFactor(), fx, fy);
+            if (vncCanvas != null && vncCanvas.scaling != null)
+                vncCanvas.scaling.adjust(detector.getScaleFactor(), fx, fy);
         }
 
         return consumed;
@@ -172,29 +178,29 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     private void twoFingerFlingNotification(String str)
     {
         // bzzt if user enabled it in System Settings
-        vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+        vncCanvas.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
 
         // beep if user enabled it in System Settings
-        vncCanvasActivity.vncCanvas.playSoundEffect(SoundEffectConstants.CLICK);
+        vncCanvas.playSoundEffect(SoundEffectConstants.CLICK);
 
-        vncCanvasActivity.notificationToast.setText(str);
-        vncCanvasActivity.notificationToast.show();
+        notificationToast.setText(str);
+        notificationToast.show();
     }
 
     private void twoFingerFlingAction(Character d)
     {
         switch(d) {
         case '←':
-            vncCanvasActivity.vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
+            vncCanvas.sendMetaKey(MetaKeyBean.keyArrowLeft);
             break;
         case '→':
-            vncCanvasActivity.vncCanvas.sendMetaKey(MetaKeyBean.keyArrowRight);
+            vncCanvas.sendMetaKey(MetaKeyBean.keyArrowRight);
             break;
         case '↑':
-            vncCanvasActivity.vncCanvas.sendMetaKey(MetaKeyBean.keyArrowUp);
+            vncCanvas.sendMetaKey(MetaKeyBean.keyArrowUp);
             break;
         case '↓':
-            vncCanvasActivity.vncCanvas.sendMetaKey(MetaKeyBean.keyArrowDown);
+            vncCanvas.sendMetaKey(MetaKeyBean.keyArrowDown);
             break;
         }
     }
@@ -212,9 +218,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         dragY = e.getY();
 
         // only interpret as button down if virtual mouse buttons are disabled
-        if(vncCanvasActivity.mousebuttons.getVisibility() != View.VISIBLE) {
+        if(mousebuttons.getVisibility() != View.VISIBLE) {
             dragModeButtonDown = true;
-            vncCanvasActivity.vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+            vncCanvas.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         }
     }
 
@@ -237,7 +243,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
             // pan on 3 fingers and more
             if(e2.getPointerCount() > 2) {
-                return vncCanvasActivity.vncCanvas.pan((int) distanceX, (int) distanceY);
+                return vncCanvas.pan((int) distanceX, (int) distanceY);
             }
 
             /*
@@ -310,11 +316,11 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             deltaY = fineCtrlScale(deltaY);
 
             // compute the absolution new mouse pos on the remote site.
-            float newRemoteX = vncCanvasActivity.vncCanvas.mouseX + deltaX;
-            float newRemoteY = vncCanvasActivity.vncCanvas.mouseY + deltaY;
+            float newRemoteX = vncCanvas.mouseX + deltaX;
+            float newRemoteY = vncCanvas.mouseY + deltaY;
 
             if(Utils.DEBUG()) Log.d(TAG, "Input: scroll single touch from "
-                    + vncCanvasActivity.vncCanvas.mouseX + "," + vncCanvasActivity.vncCanvas.mouseY
+                    + vncCanvas.mouseX + "," + vncCanvas.mouseY
                     + " to " + (int)newRemoteX + "," + (int)newRemoteY);
 
 //				if (dragMode) {
@@ -330,7 +336,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 //				}
 
             e2.setLocation(newRemoteX, newRemoteY);
-            vncCanvasActivity.vncCanvas.processPointerEvent(e2, false);
+            vncCanvas.processPointerEvent(e2, false);
         }
         return false;
     }
@@ -341,7 +347,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
             if(Utils.DEBUG()) Log.d(TAG, "Input: touch not screen nor pad: x:" + e.getX() + " y:" + e.getY() + " action:" + e.getAction());
 
-            e = vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
+            e = vncCanvas.changeTouchCoordinatesToFullFrame(e);
 
             // modify MotionEvent to support Samsung S Pen Event and activate rightButton accordingly
             // if Samsung S Pen is not present or reports false, check for right mouse button
@@ -349,9 +355,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             boolean isRightButton = e.isButtonPressed(MotionEvent.BUTTON_SECONDARY);
 
             if (isSPen || Build.VERSION.SDK_INT < 23)
-                vncCanvasActivity.vncCanvas.processPointerEvent(e, true, isSPen || isRightButton);
+                vncCanvas.processPointerEvent(e, true, isSPen || isRightButton);
             else if (e.getActionMasked() == MotionEvent.ACTION_MOVE)
-                vncCanvasActivity.vncCanvas.processMouseEvent(0, true, (int) e.getX(), (int) e.getY());
+                vncCanvas.processMouseEvent(0, true, (int) e.getX(), (int) e.getY());
 
             return true;
         }
@@ -369,8 +375,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             deltaY = fineCtrlScale(deltaY);
 
             // compute the absolution new mouse pos on the remote site.
-            float newRemoteX = vncCanvasActivity.vncCanvas.mouseX + deltaX;
-            float newRemoteY = vncCanvasActivity.vncCanvas.mouseY + deltaY;
+            float newRemoteX = vncCanvas.mouseX + deltaX;
+            float newRemoteY = vncCanvas.mouseY + deltaY;
 
 
             if (e.getAction() == MotionEvent.ACTION_UP)
@@ -383,7 +389,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
                 dragModeButton2insteadof1 = false;
 
                 remoteMouseStayPut(e);
-                vncCanvasActivity.vncCanvas.processPointerEvent(e, false);
+                vncCanvas.processPointerEvent(e, false);
                 scaleGestures.onTouchEvent(e);
                 return gestures.onTouchEvent(e); // important! otherwise the gesture detector gets confused!
             }
@@ -392,12 +398,12 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             boolean status;
             if(dragModeButtonDown) {
                 if(!dragModeButton2insteadof1) // button 1 down
-                    status = vncCanvasActivity.vncCanvas.processPointerEvent(e, true, false);
+                    status = vncCanvas.processPointerEvent(e, true, false);
                 else // button2 down
-                    status = vncCanvasActivity.vncCanvas.processPointerEvent(e, true, true);
+                    status = vncCanvas.processPointerEvent(e, true, true);
             }
             else { // dragging without any button down
-                status = vncCanvasActivity.vncCanvas.processPointerEvent(e, false);
+                status = vncCanvas.processPointerEvent(e, false);
             }
 
             return status;
@@ -443,22 +449,22 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         if (isTouchEvent(e))
             return false;
 
-        vncCanvasActivity.vncCanvas.changeTouchCoordinatesToFullFrame(e);
+        vncCanvas.changeTouchCoordinatesToFullFrame(e);
         int x = (int) e.getX();
         int y = (int) e.getY();
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_HOVER_MOVE:
-                vncCanvasActivity.vncCanvas.processMouseEvent(0, false, x, y);
+                vncCanvas.processMouseEvent(0, false, x, y);
                 break;
 
             case MotionEvent.ACTION_SCROLL:
                 if (e.getAxisValue(MotionEvent.AXIS_VSCROLL) < 0.0f) {
-                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_DOWN, true, x, y);
-                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_DOWN, false, x, y);
+                    vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_DOWN, true, x, y);
+                    vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_DOWN, false, x, y);
                 } else {
-                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_UP, true, x, y);
-                    vncCanvasActivity.vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_UP, false, x, y);
+                    vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_UP, true, x, y);
+                    vncCanvas.processMouseEvent(VNCConn.MOUSE_BUTTON_SCROLL_UP, false, x, y);
                 }
                 break;
         }
@@ -467,11 +473,11 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             int button = androidButtonToVncButton(e.getActionButton());
             switch (e.getAction()) {
                 case MotionEvent.ACTION_BUTTON_PRESS:
-                    vncCanvasActivity.vncCanvas.processMouseEvent(button, true, x, y);
+                    vncCanvas.processMouseEvent(button, true, x, y);
                     break;
 
                 case MotionEvent.ACTION_BUTTON_RELEASE:
-                    vncCanvasActivity.vncCanvas.processMouseEvent(button, false, x, y);
+                    vncCanvas.processMouseEvent(button, false, x, y);
                     break;
             }
         }
@@ -497,7 +503,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
      * remote server.
      */
     private void remoteMouseStayPut(MotionEvent e) {
-        e.setLocation(vncCanvasActivity.vncCanvas.mouseX, vncCanvasActivity.vncCanvas.mouseY);
+        e.setLocation(vncCanvas.mouseX, vncCanvas.mouseY);
 
     }
 
@@ -511,7 +517,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             return false;
 
         // disable if virtual mouse buttons are in use
-        if(vncCanvasActivity.mousebuttons.getVisibility()== View.VISIBLE)
+        if(mousebuttons.getVisibility()== View.VISIBLE)
             return false;
 
         if(Utils.DEBUG()) Log.d(TAG, "Input: single tap");
@@ -519,9 +525,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         boolean multiTouch = e.getPointerCount() > 1;
         remoteMouseStayPut(e);
 
-        vncCanvasActivity.vncCanvas.processPointerEvent(e, true, multiTouch|| vncCanvasActivity.vncCanvas.cameraButtonDown);
+        vncCanvas.processPointerEvent(e, true, multiTouch|| vncCanvas.cameraButtonDown);
         e.setAction(MotionEvent.ACTION_UP);
-        return vncCanvasActivity.vncCanvas.processPointerEvent(e, false, multiTouch|| vncCanvasActivity.vncCanvas.cameraButtonDown);
+        return vncCanvas.processPointerEvent(e, false, multiTouch|| vncCanvas.cameraButtonDown);
     }
 
     /**
@@ -534,7 +540,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             return false;
 
         // disable if virtual mouse buttons are in use
-        if(vncCanvasActivity.mousebuttons.getVisibility()== View.VISIBLE)
+        if(mousebuttons.getVisibility()== View.VISIBLE)
             return false;
 
         if(Utils.DEBUG()) Log.d(TAG, "Input: double tap");
@@ -543,9 +549,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         dragModeButton2insteadof1 = true;
 
         remoteMouseStayPut(e);
-        vncCanvasActivity.vncCanvas.processPointerEvent(e, true, true);
+        vncCanvas.processPointerEvent(e, true, true);
         e.setAction(MotionEvent.ACTION_UP);
-        return vncCanvasActivity.vncCanvas.processPointerEvent(e, false, true);
+        return vncCanvas.processPointerEvent(e, false, true);
     }
 
 
