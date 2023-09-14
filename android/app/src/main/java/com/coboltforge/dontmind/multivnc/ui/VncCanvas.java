@@ -39,6 +39,7 @@ import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11Ext;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.opengl.GLSurfaceView;
@@ -85,7 +86,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	 */
 	boolean cameraButtonDown = false;
 
-	public VncCanvasActivity activity;
+	private Dialog firstFrameWaitDialog;
 
 	// VNC protocol connection
 	public VNCConn vncConn;
@@ -310,8 +311,8 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	/**
 	 * Create a view showing a VNC connection
 	 */
-	void initializeVncCanvas(VncCanvasActivity a, PointerInputHandler inputHandler, VNCConn conn) {
-		activity = a;
+	void initializeVncCanvas(Dialog progressDialog, PointerInputHandler inputHandler, VNCConn conn) {
+		firstFrameWaitDialog = progressDialog;
 		this.inputHandler = inputHandler;
 		vncConn = conn;
 	}
@@ -604,7 +605,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	public void showConnectionInfo() {
 		try {
 			String msg = vncConn.getDesktopName();
-			msg += "(" + (vncConn.isEncrypted() ? activity.getString(R.string.encrypted) : activity.getString(R.string.unencrypted)) + ")";
+			msg += "(" + (vncConn.isEncrypted() ? getContext().getString(R.string.encrypted) : getContext().getString(R.string.unencrypted)) + ")";
 			int idx = vncConn.getDesktopName().indexOf("(");
 			if (idx > -1) {
 				// Breakup actual desktop name from IP addresses for improved
@@ -853,10 +854,10 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 		reDraw();
 
 		// Hide progress dialog
-		if (activity.firstFrameWaitDialog.isShowing())
+		if (firstFrameWaitDialog.isShowing())
 			handler.post(() -> {
 				try {
-					activity.firstFrameWaitDialog.dismiss();
+					firstFrameWaitDialog.dismiss();
 				} catch (Exception e){
 					//unused
 				}
@@ -882,7 +883,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 			@Override
 			public void run() {
 
-				LayoutInflater layoutinflater = LayoutInflater.from(activity);
+				LayoutInflater layoutinflater = LayoutInflater.from(getContext());
 				View credentialsDialog = layoutinflater.inflate(R.layout.credentials_dialog, null);
 				if(!isUserNameNeeded)
 					credentialsDialog.findViewById(R.id.username_row).setVisibility(GONE);
