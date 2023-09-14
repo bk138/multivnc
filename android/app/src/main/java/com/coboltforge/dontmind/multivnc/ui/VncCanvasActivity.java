@@ -233,7 +233,6 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		 * Setup canvas and conn.
 		 */
 		VNCConn conn = new VNCConn(vncCanvas, vncCanvas);
-		vncCanvas.initializeVncCanvas(this, inputHandler, conn); // add conn to canvas
 		// the actual connection init
 		// Startup the VNCConn with a nifty progress dialog
 		final ProgressDialog pd = new ProgressDialog(this);
@@ -243,6 +242,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		pd.setButton(DialogInterface.BUTTON_NEGATIVE, getString(android.R.string.cancel), (dialog, which) -> finish());
 		pd.show();
 		firstFrameWaitDialog = pd;
+		vncCanvas.initializeVncCanvas(pd, inputHandler, conn); // add conn to canvas
 		conn.init(connection, new VNCConn.OnConnectionEventListener() {
 					@Override
 					public void onConnected() {
