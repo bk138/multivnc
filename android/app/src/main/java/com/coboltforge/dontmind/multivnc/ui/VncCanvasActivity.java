@@ -23,12 +23,14 @@ package com.coboltforge.dontmind.multivnc.ui;
 import java.util.List;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.os.Build;
 import android.text.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -56,6 +58,10 @@ import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.coboltforge.dontmind.multivnc.COLORMODEL;
 import com.coboltforge.dontmind.multivnc.Constants;
 import com.coboltforge.dontmind.multivnc.R;
@@ -68,7 +74,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
 @SuppressWarnings("deprecation")
-public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
+public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
 
 	private final static String TAG = "VncCanvasActivity";
@@ -357,10 +363,41 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 			vncCanvas.setPointerHighlight(false);
 
 
-		/*
-		 * ask whether to show help on first connection
-		 */
-		showHelpDialog();
+		if (Build.VERSION.SDK_INT < 33) {
+			/*
+			 * ask whether to show help on first connection directly
+			 */
+			showHelpDialog();
+		} else {
+			/*
+				permission asking according to the book https://developer.android.com/training/permissions/requesting
+			 */
+			// the permission launcher and callback handler
+			ActivityResultLauncher<String> requestPermissionLauncher =
+					registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+						// show help _after_ all the permission handling
+						showHelpDialog();
+					});
+
+			// the permission asking logic as per the book https://developer.android.com/training/permissions/requesting
+			if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == 	PackageManager.PERMISSION_GRANTED) {
+				showHelpDialog();
+			} else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+				new AlertDialog.Builder(this)
+						.setCancelable(false)
+						.setTitle(R.string.notification_title)
+						.setMessage(R.string.notification_msg)
+						.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+							requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+						})
+						.setCancelable(false)
+						.show();
+			} else {
+				// You can directly ask for the permission.
+				// The registered ActivityResultCallback gets the result of this request.
+				requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+			}
+		}
 
 	}
 
