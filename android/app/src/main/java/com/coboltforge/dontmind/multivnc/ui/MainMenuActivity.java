@@ -556,7 +556,9 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 				else
 					msg = getString(R.string.server_removed) + ": " + conn_name;
 
-				Toast.makeText(getApplicationContext(), msg , Toast.LENGTH_SHORT).show();
+				// only show Toasts if activity is in foreground
+				if(getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED))
+					Toast.makeText(getApplicationContext(), msg , Toast.LENGTH_SHORT).show();
 
 				// update
 				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
