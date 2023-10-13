@@ -78,7 +78,6 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 
 
 	// Runtime control flags
-	private AtomicBoolean showDesktopInfo = new AtomicBoolean(true);
 	private boolean repaintsEnabled = true;
 
 	/**
@@ -565,22 +564,8 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	public void reDraw() {
 
 		if (repaintsEnabled && vncConn.rfbClient != 0) {
-
 			// request a redraw from GL thread
 			requestRender();
-
-			// Show a Toast with the desktop info on first frame draw.
-			if (showDesktopInfo.get()) {
-				showDesktopInfo.set(false);
-
-				handler.post(new Runnable() {
-					@Override
-					public void run() {
-						showConnectionInfo();
-					}
-				});
-			}
-
 		}
 	}
 

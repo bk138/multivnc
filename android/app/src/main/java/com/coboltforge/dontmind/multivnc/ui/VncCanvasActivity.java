@@ -260,6 +260,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 							// center pointer
 							vncCanvas.mouseX = conn.getFramebufferWidth() / 2;
 							vncCanvas.mouseY = conn.getFramebufferHeight() / 2;
+							vncCanvas.showConnectionInfo();
 						});
 					}
 
