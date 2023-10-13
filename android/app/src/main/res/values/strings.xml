@@ -115,4 +115,7 @@
     <string name="ssh_key_mismatch_continue">I\'m confident this is legit, continue</string>
     <string name="ssh_key_mismatch_abort">I\'ll double-check the correct SSH server fingerprint, abort</string>
 
+    <string name="notification_title">Notifications disabled</string>
+    <string name="notification_msg">To be able to show client status information and provide a means of navigating back to the client more easily, it is recommended to enable notifications.</string>
+
 </resources>
