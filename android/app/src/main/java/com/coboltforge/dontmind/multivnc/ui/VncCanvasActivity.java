@@ -359,32 +359,7 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 		/*
 		 * ask whether to show help on first connection
 		 */
-		SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, 0);
-		if(settings.getBoolean(Constants.PREFS_KEY_FIRST_CONNECTION, true)) {
-			new AlertDialog.Builder(this)
-			.setMessage(R.string.firstrun_help_dialog_text)
-			.setTitle(R.string.firstrun_help_dialog_title)
-			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					Intent helpIntent = new Intent (VncCanvasActivity.this, HelpActivity.class);
-					VncCanvasActivity.this.startActivity(helpIntent);
-				}
-			})
-			.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					try {
-						dialog.dismiss();
-					}
-					catch(Exception e) {
-					}
-				}
-			})
-			.show();
-			// and set this
-			SharedPreferences.Editor ed = settings.edit();
-			ed.putBoolean(Constants.PREFS_KEY_FIRST_CONNECTION, false);
-			ed.apply();
-		}
+		showHelpDialog();
 
 	}
 
@@ -832,6 +807,32 @@ public class VncCanvasActivity extends Activity implements PopupMenu.OnMenuItemC
 						// Hide the nav bar and status bar
 						| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 						| View.SYSTEM_UI_FLAG_FULLSCREEN);
+	}
+
+
+	private void showHelpDialog() {
+		SharedPreferences settings = getSharedPreferences(Constants.PREFSNAME, 0);
+		if(settings.getBoolean(Constants.PREFS_KEY_FIRST_CONNECTION, true)) {
+			new AlertDialog.Builder(this)
+					.setMessage(R.string.firstrun_help_dialog_text)
+					.setTitle(R.string.firstrun_help_dialog_title)
+					.setPositiveButton(android.R.string.ok, (dialog, id) -> {
+						Intent helpIntent = new Intent (VncCanvasActivity.this, HelpActivity.class);
+						VncCanvasActivity.this.startActivity(helpIntent);
+					})
+					.setNegativeButton(android.R.string.cancel, (dialog, id) -> {
+						try {
+							dialog.dismiss();
+						}
+						catch(Exception ignored) {
+						}
+					})
+					.show();
+			// and set this
+			SharedPreferences.Editor ed = settings.edit();
+			ed.putBoolean(Constants.PREFS_KEY_FIRST_CONNECTION, false);
+			ed.apply();
+		}
 	}
 
 }
