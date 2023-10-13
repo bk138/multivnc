@@ -32,8 +32,8 @@ modules:
       - /share/aclocal
     sources:
       - type: archive
-        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.2.1/wxWidgets-3.2.2.1.tar.bz2
-        sha256: dffcb6be71296fff4b7f8840eb1b510178f57aa2eb236b20da41182009242c02
+        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.3/wxWidgets-3.2.3.tar.bz2
+        sha1: 694c4788aaf390983183a8648145eb883715c3d5
   - name: multivnc
     buildsystem: cmake-ninja
     sources:
