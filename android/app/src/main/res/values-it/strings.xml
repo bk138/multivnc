@@ -110,4 +110,8 @@
     <string name="ssh_key_mismatch_message">L\'impronta digitale &lt;b&gt;%s&lt;/b&gt; del server SSH non corrisponde a quella già nota. Ciò significa che qualcuno sta impersonando il server SSH corretto (attacco man-in-the-middle) o che la chiave host del server corretto è stata modificata. Si prega di contattare l\'amministratore del server SSH per verificare la chiave corretta. Vuoi continuare o interrompere la configurazione della connessione SSH?</string>
     <string name="ssh_key_mismatch_continue">Sono fiducioso che sia legittimo, continua</string>
     <string name="ssh_key_mismatch_abort">Ricontrollerò l\'impronta digitale del server SSH corretta, abortisco</string>
+
+    <string name="notification_title">Notifiche disabilitate</string>
+    <string name="notification_msg">Per poter mostrare le informazioni sullo stato del client e fornire un mezzo per tornare più facilmente al client, si consiglia di abilitare le notifiche.</string>
+
 </resources>

@@ -109,4 +109,8 @@
     <string name="ssh_key_mismatch_message">SSH サーバーのフィンガープリント &lt;b&gt;%s&lt;/b&gt; は既知のものと一致しません。これは、誰かが正しい SSH サーバーになりすましている (中間者攻撃) か、正しいサーバーのホスト キーが変更されたことを意味します。 SSH サーバーの管理者に連絡して、正しいキーを確認してください。 SSH 接続のセットアップを続行しますか、それとも中止しますか?</string>
     <string name="ssh_key_mismatch_continue">これは合法であると確信しています。続行してください</string>
     <string name="ssh_key_mismatch_abort">正しい SSH サーバーのフィンガープリントを再確認し、中止します</string>
+
+    <string name="notification_title">通知が無効になっています</string>
+    <string name="notification_msg">クライアントのステータス情報を表示し、より簡単にクライアントに戻る手段を提供できるようにするには、通知を有効にすることをお勧めします。</string>
+
 </resources>

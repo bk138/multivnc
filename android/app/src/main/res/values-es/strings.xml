@@ -114,4 +114,8 @@
     <string name="ssh_key_mismatch_message">La huella dactilar &lt;b&gt;%s&lt;/b&gt; del servidor SSH no coincide con la ya conocida. Esto significa que alguien se está haciendo pasar por el servidor SSH correcto (ataque de intermediario) o que se cambió la clave de host del servidor correcto. Póngase en contacto con el administrador del servidor SSH para verificar la clave correcta. ¿Desea continuar o cancelar la configuración de la conexión SSH?</string>
     <string name="ssh_key_mismatch_continue">Estoy seguro de que esto es legítimo, continuar</string>
     <string name="ssh_key_mismatch_abort">Verificaré dos veces la huella digital correcta del servidor SSH, cancelaré</string>
+
+    <string name="notification_title">Notificaciones deshabilitadas</string>
+    <string name="notification_msg">Para poder mostrar información del estado del cliente y proporcionar un medio para volver al cliente más fácilmente, se recomienda habilitar las notificaciones.</string>
+
 </resources>
