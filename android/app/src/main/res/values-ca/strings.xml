@@ -114,4 +114,8 @@
     <string name="ssh_key_mismatch_message">L\'empremta digital &lt;b&gt;%s&lt;/b&gt; del servidor SSH no coincideix amb la ja coneguda. Això significa que algú està suplantant la identitat del servidor SSH correcte (atac man-in-the-middle) o que s\'ha canviat la clau d\'amfitrió del servidor correcte. Poseu-vos en contacte amb l\'administrador del servidor SSH per verificar la clau correcta. Voleu continuar o avortar la configuració de la connexió SSH?</string>
     <string name="ssh_key_mismatch_continue">Estic segur que això és legítim, continua</string>
     <string name="ssh_key_mismatch_abort">Comprovaré l\'empremta correcta del servidor SSH, avortaré</string>
+
+    <string name="notification_title">Notificacions desactivades</string>
+    <string name="notification_msg">Per poder mostrar la informació de l\'estat del client i proporcionar un mitjà per tornar al client més fàcilment, es recomana habilitar les notificacions.</string>
+
 </resources>

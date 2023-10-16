@@ -114,4 +114,8 @@
     <string name="ssh_key_mismatch_message">A pegada dixital &lt;b&gt;%s&lt;/b&gt; do servidor SSH non coincide coa xa coñecida. Isto significa que alguén está suplantando o servidor SSH correcto (ataque home-in-the-middle) ou que se cambiou a clave de host do servidor correcto. Póñase en contacto co administrador do servidor SSH para verificar a clave correcta. Queres continuar ou abortar a configuración da conexión SSH?</string>
     <string name="ssh_key_mismatch_continue">Confío en que isto é lexítimo, continúa</string>
     <string name="ssh_key_mismatch_abort">Comprobarei dúas veces a pegada dixital correcta do servidor SSH, abortarei</string>
+
+    <string name="notification_title">Notificacións desactivadas</string>
+    <string name="notification_msg">Para poder mostrar a información do estado do cliente e proporcionar un medio para volver ao cliente máis facilmente, recoméndase habilitar as notificacións.</string>
+
 </resources>

@@ -109,4 +109,8 @@
     <string name="ssh_key_mismatch_message">SSH 服务器的指纹 &lt;b&gt;%s&lt;/b&gt; 与已知指纹不匹配。这要么意味着有人在冒充正确的 SSH 服务器（中间人攻击），要么意味着更改了正确服务器的主机密钥。请联系 SSH 服务器的管理员以验证正确的密钥。您要继续还是中止 SSH 连接设置？</string>
     <string name="ssh_key_mismatch_continue">我相信这是合法的，继续</string>
     <string name="ssh_key_mismatch_abort">我会仔细检查正确的 SSH 服务器指纹，中止</string>
+
+    <string name="notification_title">通知已禁用</string>
+    <string name="notification_msg">为了能够显示客户端状态信息并提供更轻松地导航回客户端的方法，建议启用通知。</string>
+
 </resources>

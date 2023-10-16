@@ -111,4 +111,8 @@
     <string name="ssh_key_mismatch_message">A impressão digital &lt;b>%s&lt;/b> do servidor SSH não corresponde à já conhecida. Isso significa que alguém está representando o servidor SSH correto (ataque man-in-the-middle) ou que a chave de host do servidor correto foi alterada. Entre em contato com o administrador do servidor SSH para verificar a chave correta. Deseja continuar ou abortar a configuração da conexão SSH?</string>
     <string name="ssh_key_mismatch_continue">Tenho certeza de que isso é legítimo, continue</string>
     <string name="ssh_key_mismatch_abort">Vou verificar novamente a impressão digital correta do servidor SSH, abortar</string>
+
+    <string name="notification_title">Notificações desativadas</string>
+    <string name="notification_msg">Para poder mostrar informações de status do cliente e fornecer um meio de navegar de volta ao cliente com mais facilidade, é recomendável ativar as notificações.</string>
+
 </resources>

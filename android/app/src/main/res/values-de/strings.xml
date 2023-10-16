@@ -113,4 +113,8 @@
     <string name="ssh_key_mismatch_message">Der Fingerabdruck &lt;b>%s&lt;/b> des SSH-Servers stimmt nicht mit dem bereits bekannten überein. Dies bedeutet entweder, dass jemand den richtigen SSH-Server imitiert (Man-in-the-Middle-Angriff) oder dass der Hostschlüssel des richtigen Servers geändert wurde. Bitte wenden Sie sich an den Administrator des SSH-Servers, um den richtigen Schlüssel zu überprüfen. Möchten Sie den SSH-Verbindungsaufbau fortsetzen oder abbrechen?</string>
     <string name="ssh_key_mismatch_continue">Ich bin zuversichtlich, dass dies legitim ist, fortfahren</string>
     <string name="ssh_key_mismatch_abort">Ich werde den korrekten Fingerabdruck des SSH-Servers noch einmal überprüfen, abbrechen</string>
+
+    <string name="notification_title">Benachrichtigungen deaktiviert</string>
+    <string name="notification_msg">Um Client-Statusinformationen anzeigen zu können und einfacher zum Client zurücknavigieren zu können, wird empfohlen, Benachrichtigungen zu aktivieren.</string>
+
 </resources>
