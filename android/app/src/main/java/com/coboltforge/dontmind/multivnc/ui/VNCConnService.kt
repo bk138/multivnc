@@ -8,12 +8,13 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.coboltforge.dontmind.multivnc.R
 import com.coboltforge.dontmind.multivnc.VNCConn
-import kotlinx.coroutines.*
 
 /**
  * Foreground service that runs whenever there is an active VNCConn.
@@ -34,8 +35,7 @@ class VNCConnService : Service() {
          */
         @JvmStatic
         fun register(ctx: Context, conn: VNCConn) {
-            // using GlobalScope here as this is a short fire-and-forget
-            GlobalScope.launch(Dispatchers.Main) {
+            Handler(Looper.getMainLooper()).post  {
                 mConnectionList.add(conn)
                 // tell service to update
                 val intent = Intent(ctx, VNCConnService::class.java)
@@ -48,8 +48,7 @@ class VNCConnService : Service() {
 
         @JvmStatic
         fun deregister(ctx: Context, conn: VNCConn) {
-            // using GlobalScope here as this is a short fire-and-forget
-            GlobalScope.launch(Dispatchers.Main) {
+            Handler(Looper.getMainLooper()).post {
                 if(mConnectionList.isNotEmpty()) { // calling startForegroundService() without Service.startForeground() crashes by OS intention
                     mConnectionList.remove(conn)
                     // tell service to update
