@@ -1,5 +1,15 @@
 # Version 2.1.x:
 
+## 2.1.4
+
+### 🛠  Fixes
+
+* Fixed one rare crash in native code.
+* Refactored VncCanvasActivity coupling with other components.
+* Fixed server discovery Toast messages wrongly showing when main menu activity was in background.
+* Fixed notification permission handling on Android 13+.
+* Fixed crash in foreground service showing active connections.
+
 ## 2.1.3
 
 ### 🛠  Fixes
