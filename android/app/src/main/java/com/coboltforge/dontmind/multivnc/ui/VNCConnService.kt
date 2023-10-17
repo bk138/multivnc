@@ -94,9 +94,9 @@ class VNCConnService : Service() {
         // stop if connection list got empty from a deregister() call or there is a connection but
         // its connSettings are null. This happens when:
         // * VNCConnService registered in VNCConn.ServerToClientThread
-        // * register() Coroutine is dispatched on Main thread
+        // * register() runnable is dispatched on Main thread
         // * VNCConn.shutdown() is called for some reason
-        // * register() Coroutine now runs but is actually late to the party and finds a VNCConn emptied by shutdown()
+        // * register() runnable now runs but is actually late to the party and finds a VNCConn emptied by shutdown()
         if (mConnectionList.isEmpty() || mConnectionList[0].connSettings == null) {
             stopSelf()
         } else {
