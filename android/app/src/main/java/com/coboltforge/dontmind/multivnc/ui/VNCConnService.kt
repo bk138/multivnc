@@ -81,6 +81,9 @@ class VNCConnService : Service() {
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(serviceChannel)
         }
+
+        // call startForeground() ASAP, with empty message
+        startForeground(NOTIFICATION_ID, getNotification(""))
     }
 
 
@@ -111,7 +114,7 @@ class VNCConnService : Service() {
                 }
             }
             Log.d(TAG, "onStartCommand: notifying with " + getString(R.string.connected_to, hosts))
-            startForeground(NOTIFICATION_ID, getNotification(getString(R.string.connected_to, hosts)))
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICATION_ID, getNotification(getString(R.string.connected_to, hosts)))
         }
         // stay until explicitly stopped
         return START_STICKY
