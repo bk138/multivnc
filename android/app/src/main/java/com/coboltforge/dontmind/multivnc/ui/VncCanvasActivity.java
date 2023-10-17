@@ -243,6 +243,14 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		 * Setup canvas and conn.
 		 */
 		VNCConn conn = new VNCConn(vncCanvas, vncCanvas);
+		// the Android 13 permission launcher and callback handler
+		ActivityResultLauncher<String> requestPermissionLauncher =
+				registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+					// show UI _after_ all the permission handling
+					showHelpDialog();
+					VNCConnService.register(VncCanvasActivity.this, conn);
+					vncCanvas.showConnectionInfo();
+				});
 		// the actual connection init
 		// Startup the VNCConn with a nifty progress dialog
 		final ProgressDialog pd = new ProgressDialog(this);
@@ -257,8 +265,40 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 					@Override
 					public void onConnected() {
 						runOnUiThread(() -> {
-							// register connection
-							VNCConnService.register(VncCanvasActivity.this, conn);
+
+							if (Build.VERSION.SDK_INT < 33) {
+								/*
+								 * Show all the on-connect UI directly
+								 */
+								showHelpDialog();
+								VNCConnService.register(VncCanvasActivity.this, conn);
+								vncCanvas.showConnectionInfo();
+							} else {
+								/*
+									permission asking according to the book https://developer.android.com/training/permissions/requesting
+								*/
+								// the permission asking logic as per the book https://developer.android.com/training/permissions/requesting
+								if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == 	PackageManager.PERMISSION_GRANTED) {
+									showHelpDialog();
+									VNCConnService.register(VncCanvasActivity.this, conn);
+									vncCanvas.showConnectionInfo();
+								} else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+									new AlertDialog.Builder(VncCanvasActivity.this)
+											.setCancelable(false)
+											.setTitle(R.string.notification_title)
+											.setMessage(R.string.notification_msg)
+											.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+												requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+											})
+											.setCancelable(false)
+											.show();
+								} else {
+									// You can directly ask for the permission.
+									// The registered ActivityResultCallback gets the result of this request.
+									requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+								}
+							}
+
 							setTitle(conn.getDesktopName());
 							// actually set scale type with this, otherwise no scaling
 							setModes();
@@ -266,7 +306,6 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 							// center pointer
 							vncCanvas.mouseX = conn.getFramebufferWidth() / 2;
 							vncCanvas.mouseY = conn.getFramebufferHeight() / 2;
-							vncCanvas.showConnectionInfo();
 						});
 					}
 
@@ -361,44 +400,6 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 
 		if(! prefs.getBoolean(Constants.PREFS_KEY_POINTERHIGHLIGHT, true))
 			vncCanvas.setPointerHighlight(false);
-
-
-		if (Build.VERSION.SDK_INT < 33) {
-			/*
-			 * ask whether to show help on first connection directly
-			 */
-			showHelpDialog();
-		} else {
-			/*
-				permission asking according to the book https://developer.android.com/training/permissions/requesting
-			 */
-			// the permission launcher and callback handler
-			ActivityResultLauncher<String> requestPermissionLauncher =
-					registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-						// show help _after_ all the permission handling
-						showHelpDialog();
-					});
-
-			// the permission asking logic as per the book https://developer.android.com/training/permissions/requesting
-			if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == 	PackageManager.PERMISSION_GRANTED) {
-				showHelpDialog();
-			} else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-				new AlertDialog.Builder(this)
-						.setCancelable(false)
-						.setTitle(R.string.notification_title)
-						.setMessage(R.string.notification_msg)
-						.setPositiveButton(android.R.string.ok, (dialog, which) -> {
-							requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-						})
-						.setCancelable(false)
-						.show();
-			} else {
-				// You can directly ask for the permission.
-				// The registered ActivityResultCallback gets the result of this request.
-				requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-			}
-		}
-
 	}
 
 	/**
