@@ -23,9 +23,8 @@ jobs:
       - name: Install MacOS Build Dependencies
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
-          brew update
-          brew reinstall gmp
-          brew install wxmac
+          brew uninstall --ignore-dependencies gnutls libgcrypt
+          brew install wxwidgets
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
         uses: johnwason/vcpkg-action@v4
