@@ -25,11 +25,16 @@ import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 
 public class VNCConn {
 
-	public interface OnConnectionEventListener {
+
+	public interface OnInitListener {
 		/**
-		 * Fired when a connection was successfully made.
+		 * Fired on connection init.
+		 * @param error Null on successful connection init (i.e. connected), non-null on failure.
 		 */
-		void onConnected();
+		void onInit(Throwable error);
+	}
+
+	public interface OnDisconnectListener {
 		/**
 		 * Fired on disconnect, either orderly or with error
 		 * @param err Null on orderly disconnect, non-null on failure.
@@ -166,10 +171,12 @@ public class VNCConn {
 
     private class ServerToClientThread extends Thread {
 
-    	private final OnConnectionEventListener connectionEventCallback;
+		private final OnInitListener initCallback;
+		private final OnDisconnectListener disconnectCallback;
 
-    	public ServerToClientThread(OnConnectionEventListener connectionEventCallback) {
-    		this.connectionEventCallback = connectionEventCallback;
+    	public ServerToClientThread(OnInitListener initCallback, OnDisconnectListener disconnectCallback) {
+			this.initCallback = initCallback;
+    		this.disconnectCallback = disconnectCallback;
     	}
 
 
@@ -222,7 +229,7 @@ public class VNCConn {
 						connSettings.sshPrivkeyPassword
 				)) {
 					unlockFramebuffer();
-					throw new Exception(); //TODO add some error reoprting here
+					throw new Exception(); //TODO add some error reoprting here, e.g. if auth fail or not
 				}
 				colorModel = pendingColorModel;
 				unlockFramebuffer();
@@ -235,7 +242,7 @@ public class VNCConn {
 				outputThread = new ClientToServerThread();
 				outputThread.start();
 
-				connectionEventCallback.onConnected();
+				initCallback.onInit(null);
 
 				// main loop
 				while (maintainConnection) {
@@ -258,7 +265,12 @@ public class VNCConn {
 			rfbShutdown();
 			unlockFramebuffer();
 
-			connectionEventCallback.onDisconnected(maybeError);
+			if(outputThread == null) {
+				// if outputThread is still unset, we were in init
+				initCallback.onInit(maybeError);
+			} else {
+				disconnectCallback.onDisconnected(maybeError);
+			}
 
 			if(Utils.DEBUG()) Log.d(TAG, "ServerToClientThread done!");
 		}
@@ -409,16 +421,17 @@ public class VNCConn {
 	/**
 	 * Initialise a VNC connection
 	 * @param bean Connection settings
-	 * @param connectionEventCallback Callback that's called after connection is set up
+	 * @param initCallback Callback that's called after init has succeeded or failed
+	 * @param disconnectCallback Callback that's called when an established connection disconnects
 	 */
-	public void init(ConnectionBean bean, OnConnectionEventListener connectionEventCallback) {
+	public void init(ConnectionBean bean, OnInitListener initCallback, OnDisconnectListener disconnectCallback) {
 
 		Log.d(TAG, "initializing");
 
 		connSettings = bean;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
-		inputThread = new ServerToClientThread(connectionEventCallback);
+		inputThread = new ServerToClientThread(initCallback, disconnectCallback);
 		inputThread.start();
 	}
 

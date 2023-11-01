@@ -261,80 +261,85 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		pd.show();
 		firstFrameWaitDialog = pd;
 		vncCanvas.initializeVncCanvas(pd, inputHandler, conn); // add conn to canvas
-		conn.init(connection, new VNCConn.OnConnectionEventListener() {
-					@Override
-					public void onConnected() {
-						runOnUiThread(() -> {
-
-							if (Build.VERSION.SDK_INT < 33) {
-								/*
-								 * Show all the on-connect UI directly
-								 */
+		conn.init(connection,
+				// onInit
+				initError -> runOnUiThread(() -> {
+					if(initError == null) {
+						// init success!
+						if (Build.VERSION.SDK_INT < 33) {
+							/*
+							 * Show all the on-connect UI directly
+							 */
+							showHelpDialog();
+							VNCConnService.register(VncCanvasActivity.this, conn);
+							vncCanvas.showConnectionInfo();
+						} else {
+							/*
+								permission asking according to the book https://developer.android.com/training/permissions/requesting
+							*/
+							// the permission asking logic as per the book https://developer.android.com/training/permissions/requesting
+							if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
 								showHelpDialog();
 								VNCConnService.register(VncCanvasActivity.this, conn);
 								vncCanvas.showConnectionInfo();
+							} else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+								new AlertDialog.Builder(VncCanvasActivity.this)
+										.setCancelable(false)
+										.setTitle(R.string.notification_title)
+										.setMessage(R.string.notification_msg)
+										.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+											requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+										})
+										.setCancelable(false)
+										.show();
 							} else {
-								/*
-									permission asking according to the book https://developer.android.com/training/permissions/requesting
-								*/
-								// the permission asking logic as per the book https://developer.android.com/training/permissions/requesting
-								if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == 	PackageManager.PERMISSION_GRANTED) {
-									showHelpDialog();
-									VNCConnService.register(VncCanvasActivity.this, conn);
-									vncCanvas.showConnectionInfo();
-								} else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-									new AlertDialog.Builder(VncCanvasActivity.this)
-											.setCancelable(false)
-											.setTitle(R.string.notification_title)
-											.setMessage(R.string.notification_msg)
-											.setPositiveButton(android.R.string.ok, (dialog, which) -> {
-												requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-											})
-											.setCancelable(false)
-											.show();
-								} else {
-									// You can directly ask for the permission.
-									// The registered ActivityResultCallback gets the result of this request.
-									requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-								}
+								// You can directly ask for the permission.
+								// The registered ActivityResultCallback gets the result of this request.
+								requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
 							}
+						}
 
-							setTitle(conn.getDesktopName());
-							// actually set scale type with this, otherwise no scaling
-							setModes();
-							firstFrameWaitDialog.setMessage("Downloading first frame.\nPlease wait...");
-							// center pointer
-							vncCanvas.mouseX = conn.getFramebufferWidth() / 2;
-							vncCanvas.mouseY = conn.getFramebufferHeight() / 2;
-						});
+						setTitle(conn.getDesktopName());
+						// actually set scale type with this, otherwise no scaling
+						setModes();
+						firstFrameWaitDialog.setMessage("Downloading first frame.\nPlease wait...");
+						// center pointer
+						vncCanvas.mouseX = conn.getFramebufferWidth() / 2;
+						vncCanvas.mouseY = conn.getFramebufferHeight() / 2;
+					} else {
+						// init fail
+						try {
+							firstFrameWaitDialog.dismiss();
+						} catch (Exception ignored) {
+						}
+						String error = "VNC connection setup failed!";
+						if (initError.getMessage() != null && (initError.getMessage().contains("authentication"))) {
+							error = "VNC authentication failed!";
+						}
+						final String error_ = error + "<br>" + ((initError.getLocalizedMessage() != null) ? initError.getLocalizedMessage() : "");
+						Utils.showFatalErrorMessage(VncCanvasActivity.this, error_);
+					}
+				}),
+				// onDisconnect
+				disconnectError -> runOnUiThread(() -> {
+					try {
+						// Ensure we dismiss the progress dialog
+						// before we fatal error finish
+						if (firstFrameWaitDialog.isShowing())
+							firstFrameWaitDialog.dismiss();
+					} catch (Exception e) {
+						//unused
 					}
 
-					@Override
-					public void onDisconnected(Throwable err) {
-						runOnUiThread(() -> {
-							try {
-								// Ensure we dismiss the progress dialog
-								// before we fatal error finish
-								if (firstFrameWaitDialog.isShowing())
-									firstFrameWaitDialog.dismiss();
-							} catch (Exception e) {
-								//unused
-							}
-
-							if(err != null) {
-								String error = "VNC connection failed!";
-								if (err.getMessage() != null && (err.getMessage().indexOf("authentication") > -1)) {
-									error = "VNC authentication failed!";
-								}
-								final String error_ = error + "<br>" + ((err.getLocalizedMessage() != null) ? err.getLocalizedMessage() : "");
-								Utils.showFatalErrorMessage(VncCanvasActivity.this, error_);
-							}
-
-							// deregister connection
-							VNCConnService.deregister(VncCanvasActivity.this, conn);
-						});
+					if(disconnectError != null) {
+						String error = "VNC connection failed!";
+						final String error_ = error + "<br>" + ((disconnectError.getLocalizedMessage() != null) ? disconnectError.getLocalizedMessage() : "");
+						Utils.showFatalErrorMessage(VncCanvasActivity.this, error_);
 					}
-				});
+
+					// deregister connection
+					VNCConnService.deregister(VncCanvasActivity.this, conn);
+				}));
 
 		zoomer.setOnZoomInClickListener(new View.OnClickListener() {
 
