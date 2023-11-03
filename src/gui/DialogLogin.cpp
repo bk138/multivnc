@@ -1,5 +1,6 @@
 #include "DialogLogin.h"
 #include <wx/wx.h>
+#include <wx/statline.h>
 
 /*
   adopted from http://imron02.wordpress.com/2014/09/26/c-simple-form-login-using-wxwidgets/, thanks!
@@ -26,15 +27,19 @@ DialogLogin::DialogLogin(wxFrame *parent, wxWindowID id, const wxString &title )
         wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD|wxTE_PROCESS_ENTER);
     hbox2->Add(m_passwordEntry, 1);
     vbox->Add(hbox2, 0, wxEXPAND | wxLEFT | wxTOP | wxRIGHT, 10);
- 
+
+    // divider
+    wxStaticLine *divider = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
+    vbox->Add(divider, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, 10);
+
+    // buttons
     wxBoxSizer *hbox3 = new wxBoxSizer(wxHORIZONTAL);
-    m_buttonLogin = new wxButton(this, BUTTON_Login, _("Login"));
-    hbox3->Add(m_buttonLogin, 1, wxEXPAND | wxALL);
- 
     m_buttonCancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
-    hbox3->Add(m_buttonCancel, 1, wxEXPAND | wxALL);
+    hbox3->Add(m_buttonCancel, 1, wxEXPAND | wxALL, 3);
+    m_buttonLogin = new wxButton(this, BUTTON_Login, _("Login"));
+    hbox3->Add(m_buttonLogin, 1, wxEXPAND | wxALL, 3);
     vbox->Add(hbox3, 0, wxEXPAND | wxALL, 10);
-    
+
     SetSizerAndFit(vbox);
     
 }
