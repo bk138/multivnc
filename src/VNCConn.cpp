@@ -126,7 +126,7 @@ extern "C"
 */
 
 
-VNCConn::VNCConn(void* p)
+VNCConn::VNCConn(void* p) : condition_auth(mutex_auth)
 {
   // save our caller
   parent = p;

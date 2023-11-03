@@ -234,7 +234,7 @@ private:
 #endif
   bool require_auth;
   wxMutex mutex_auth;
-  wxCondition condition_auth = wxCondition(mutex_auth);
+  wxCondition condition_auth;
 
   // statistics
   bool do_stats;
