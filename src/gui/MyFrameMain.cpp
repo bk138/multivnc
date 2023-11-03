@@ -411,15 +411,22 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
   // get sender
   VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
-  wxLogStatus( _("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
- 
+  if (!c->getServerHost().IsEmpty()) {
+      wxLogStatus(_("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
+  } else {
+      wxLogStatus(_("Reverse connection terminated."));
+  }
+
   wxArrayString log = VNCConn::getLog();
   // show last 3 log strings
   for(size_t i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
     wxLogMessage(log[i]);
-  wxLogMessage( _("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str() );
-    
-  
+  if (!c->getServerHost().IsEmpty()) {
+      wxLogMessage(_("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
+  } else {
+      wxLogMessage(_("Reverse connection terminated."));
+  }
+
   // find index of this connection
   vector<ConnBlob>::iterator it = connections.begin();
   size_t index = 0;
