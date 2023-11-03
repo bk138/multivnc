@@ -1091,6 +1091,7 @@ bool VNCConn::setupClient()
   cl->HandleXvpMsg = thread_handle_xvp;
 
   cl->canHandleNewFBSize = TRUE;
+  cl->connectTimeout = 5;
 
   return true;
 }
