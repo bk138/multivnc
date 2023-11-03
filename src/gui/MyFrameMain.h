@@ -57,7 +57,8 @@ class MyFrameMain: public FrameMain
   wxArrayString bookmarks;
   bool loadbookmarks();
 
-  bool spawn_conn(wxString service, int listenPort = -1);
+  void spawn_conn(wxString service, int listenPort = -1);
+  void setup_conn(VNCConn *conn);
   void terminate_conn(int which);
 
   // collab features
@@ -67,6 +68,10 @@ class MyFrameMain: public FrameMain
   
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
+  void onVNCConnListenNotify(wxCommandEvent& event);
+  void onVNCConnInitNotify(wxCommandEvent& event);
+  void onVNCConnGetPasswordNotify(wxCommandEvent& event);
+  void onVNCConnGetCredentialsNotify(wxCommandEvent& event);
   void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
   void onVNCConnUniMultiChangedNotify(wxCommandEvent& event);
   void onVNCConnReplayFinishedNotify(wxCommandEvent& event);
@@ -81,11 +86,6 @@ class MyFrameMain: public FrameMain
 #else
   void onFullScreenChanged(bool isFullScreen);
 #endif
-
-  static char* getpasswd(rfbClient* client);
-
-  static rfbCredential* getcreds(rfbClient* client, int type);
-
 
   bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
 
@@ -140,7 +140,7 @@ public:
   void help_issue_list(wxCommandEvent &event);
 
   // to be called from the App
-  bool cmdline_connect(wxString& hostarg);
+  void cmdline_connect(wxString& hostarg);
 
 };
 

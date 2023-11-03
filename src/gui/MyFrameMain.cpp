@@ -40,6 +40,10 @@ typedef void (wxEvtHandler::*wxFullScreenEventFunction)(wxFullScreenEvent&);
 BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, MyFrameLogCloseNOTIFY, MyFrameMain::onMyFrameLogCloseNotify)
   EVT_COMMAND (wxID_ANY, wxServDiscNOTIFY, MyFrameMain::onSDNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnListenNOTIFY, MyFrameMain::onVNCConnListenNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnInitNOTIFY, MyFrameMain::onVNCConnInitNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnGetPasswordNOTIFY, MyFrameMain::onVNCConnGetPasswordNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnGetCredentialsNOTIFY, MyFrameMain::onVNCConnGetCredentialsNotify)
   EVT_VNCCONNUPDATENOTIFY (wxID_ANY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnUniMultiChangedNOTIFY, MyFrameMain::onVNCConnUniMultiChangedNotify)
   EVT_COMMAND (wxID_ANY, VNCConnReplayFinishedNOTIFY, MyFrameMain::onVNCConnReplayFinishedNotify)
@@ -271,6 +275,64 @@ void MyFrameMain::onMyFrameLogCloseNotify(wxCommandEvent& event)
 }
 
 
+void MyFrameMain::onVNCConnListenNotify(wxCommandEvent& event)
+{
+    VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
+    if (event.GetInt() == 0) {
+	setup_conn(c);
+    } else {
+	// listen error
+	wxLogError(c->getErr());
+	delete c;
+    }
+}
+
+void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
+{
+    wxEndBusyCursor();
+
+    VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
+
+    if (event.GetInt() == 0) {
+	setup_conn(c);
+    } else {
+	// error. only show error if this was not a auth case with empty password, i.e. a canceled one
+	if (c->getRequireAuth()
+#if wxUSE_SECRETSTORE
+	    && !c->getPassword().IsOk()) {
+#else
+	    && c->getPassword().IsEmpty()) {
+#endif
+	    wxLogStatus(_("Authentication canceled."));
+        } else {
+	    wxLogStatus(_("Connection failed."));
+            wxArrayString log = VNCConn::getLog();
+            // show last 3 log strings
+            for (size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0;
+                 i < log.GetCount(); ++i)
+                wxLogMessage(log[i]);
+            wxLogError(c->getErr());
+        }
+
+	// find out if we already setup this this connection.
+	// this happens if it was a listening one that failed it's Init()
+	vector<ConnBlob>::iterator it = connections.begin();
+	size_t index = 0;
+	while(it != connections.end() && it->conn != c)
+	    {
+		++it;
+		++index;
+	    }
+	if (index < connections.size()) {
+	    // found it. terminate!
+	    terminate_conn(index);
+        } else {
+	    // not yet setup in UI, simply delete
+	    delete c;
+        }
+    }
+}
+
 
 
 void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
@@ -492,34 +554,11 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   encodings = encodings.AfterFirst(' '); 
 
   
-  if(!c->Init(wxEmptyString, wxEmptyString,
+  c->Init(wxEmptyString, wxEmptyString,
 #if wxUSE_SECRETSTORE
-	      wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
+	  wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
 #endif
-	      encodings, compresslevel, quality))
-    {
-      wxLogStatus( _("Connection failed."));
-      wxArrayString log = VNCConn::getLog();
-      // show last 3 log strings
-      for(size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
-	wxLogMessage(log[i]);
-      
-      wxLogError(c->getErr());
-    }
-  else
-    {
-      // find index of this connection
-      vector<ConnBlob>::iterator it = connections.begin();
-      size_t index = 0;
-      while(it != connections.end() && it->conn != c)
-	{
-	  ++it;
-	  ++index;
-	}
-
-      if(index < connections.size())
-	notebook_connections->SetPageText(index, c->getDesktopName() + " " +  _("(Reverse Connection)"));
-    }
+	  encodings, compresslevel, quality);
 }
 
 
@@ -634,68 +673,57 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
 }
 
 
-char* MyFrameMain::getpasswd(rfbClient* client)
+
+void MyFrameMain::onVNCConnGetPasswordNotify(wxCommandEvent &event)
 {
-    VNCConn *conn = VNCConn::getVNCConnFromRfbClient(client);
+    // get sender
+    VNCConn *conn = static_cast<VNCConn*>(event.GetEventObject());
 
-    conn->setRequireAuth(true);
-
-    wxString pass;
+    // Get password. We are only called if the password is needed!
+    wxString pass = wxGetPasswordFromUser(_("Enter password:"), _("Password required!"));
+    // And set password at conn.
 #if wxUSE_SECRETSTORE
-    if(conn->getPassword().IsOk())
-	pass = conn->getPassword().GetAsString();
-    else {
+    conn->setPassword(pass.IsEmpty() ? wxSecretValue() : wxSecretValue(pass));
+#else
+    conn->setPassword(pass);
 #endif
-	pass = wxGetPasswordFromUser(_("Enter password:"), _("Password required!"));
-#if wxUSE_SECRETSTORE
-	// for later saving as bookmark
-	conn->setPassword(wxSecretValue(pass));
-    }
-#endif
-
-    return strdup(pass.char_str());
 }
 
 
-
-rfbCredential* MyFrameMain::getcreds(rfbClient* client, int type)
+void MyFrameMain::onVNCConnGetCredentialsNotify(wxCommandEvent &event)
 {
-    VNCConn *conn = VNCConn::getVNCConnFromRfbClient(client);
+    // get sender
+    VNCConn *conn = static_cast<VNCConn*>(event.GetEventObject());
 
-    conn->setRequireAuth(true);
-    
-    if(type == rfbCredentialTypeUser) {
-
-	if(conn->getUserName() != wxEmptyString) {
-	    // already got a username from a bookmark, get password
-	    wxString pass;
+    if(!event.GetInt()) {
+	// without user prompt, get only password
+	wxString pass = wxGetPasswordFromUser(wxString::Format(_("Please enter password for user '%s'"), conn->getUserName()),
+					    _("Credentials required..."));
+	// And set password at conn.
 #if wxUSE_SECRETSTORE
-	    if(conn->getPassword().IsOk())
-		pass = conn->getPassword().GetAsString();
-	    else
+	conn->setPassword(wxSecretValue(pass));
+#else
+	conn->setPassword(pass);
 #endif
-		pass = wxGetPasswordFromUser(wxString::Format(_("Please enter password for user '%s'"), conn->getUserName()),
-						  _("Credentials required..."));
-	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
-	    c->userCredential.username = strdup(conn->getUserName().char_str());
-	    c->userCredential.password = strdup(pass.char_str());
-	    return c;
-	}
-
-	DialogLogin formLogin(0, wxID_ANY, _("Credentials required..."));
-	if ( formLogin.ShowModal() == wxID_OK ) {
-	    conn->setUserName(formLogin.getUserName());
+    } else {
+	// with user prompt
+        DialogLogin formLogin(0, wxID_ANY, _("Credentials required..."));
+        if (formLogin.ShowModal() == wxID_OK) {
+            conn->setUserName(formLogin.getUserName());
 #if wxUSE_SECRETSTORE
-	    conn->setPassword(wxSecretValue(formLogin.getPassword()));
+            conn->setPassword(wxSecretValue(formLogin.getPassword()));
+#else
+            conn->setPassword(formLogin.getPassword());
 #endif
-	    rfbCredential *c = (rfbCredential*)calloc(1, sizeof(rfbCredential));
-	    c->userCredential.username = strdup(formLogin.getUserName().char_str());
-	    c->userCredential.password = strdup(formLogin.getPassword().char_str());
-	    return c;
-	}
+        } else {
+	    // canceled
+#if wxUSE_SECRETSTORE
+            conn->setPassword(wxSecretValue());
+#else
+            conn->setPassword(wxEmptyString);
+#endif
+        }
     }
-
-    return NULL;
 }
 
 
@@ -749,21 +777,16 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-bool MyFrameMain::spawn_conn(wxString service, int listenPort)
+void MyFrameMain::spawn_conn(wxString service, int listenPort)
 {
-  wxBusyCursor busy;
-
   // get connection settings
-  int compresslevel, quality, multicast_socketrecvbuf, multicast_recvbuf, fastrequest_interval;
-  bool multicast, fastrequest, qos_ef, enc_enabled;
+  int compresslevel, quality, multicast_socketrecvbuf, multicast_recvbuf;
+  bool multicast, enc_enabled;
   wxString encodings;
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_MULTICAST, &multicast, V_MULTICAST);
   pConfig->Read(K_MULTICASTSOCKETRECVBUF, &multicast_socketrecvbuf, V_MULTICASTSOCKETRECVBUF);
   pConfig->Read(K_MULTICASTRECVBUF, &multicast_recvbuf, V_MULTICASTRECVBUF);
-  pConfig->Read(K_FASTREQUEST, &fastrequest, V_FASTREQUEST);
-  pConfig->Read(K_FASTREQUESTINTERVAL, &fastrequest_interval, V_FASTREQUESTINTERVAL);
-  pConfig->Read(K_QOS_EF, &qos_ef, V_QOS_EF);
 
   pConfig->Read(K_ENC_TIGHT, &enc_enabled, V_ENC_TIGHT);
   if(enc_enabled) 
@@ -801,20 +824,16 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
 
-  VNCConn* c = new VNCConn(this, getpasswd, getcreds);
+  VNCConn* c = new VNCConn(this);
 
   if(listenPort > 0)
     {
       wxLogStatus(_("Listening on port") + " " + (wxString() << listenPort) + wxT(" ..."));
-      if(!c->Listen(listenPort))
-	{
-	  wxLogError(c->getErr());
-	  delete c;
-	  return false;
-	}
+      c->Listen(listenPort);
     }
   else // normal init without previous listen
     {
+      wxBeginBusyCursor();
       wxLogStatus(_("Connecting to %s..."), service);
 
       wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
@@ -822,31 +841,47 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 #if wxUSE_SECRETSTORE
       wxSecretValue password;
       wxSecretStore store = wxSecretStore::GetDefault();
-      if(store.IsOk()) {
-	  wxString username; // this will not be used
-	  store.Load("MultiVNC/Bookmarks/" + service, username, password); // if Load() fails, password will still be empty
+      if (store.IsOk()) {
+        wxString username; // this will not be used
+        store.Load("MultiVNC/Bookmarks/" + service, username,
+                   password); // if Load() fails, password will still be empty
       }
 #endif
-      if(!c->Init(host, user,
+      c->Init(host, user,
 #if wxUSE_SECRETSTORE
-		  password,
+              password,
 #endif
-		  encodings, compresslevel, quality, multicast, multicast_socketrecvbuf, multicast_recvbuf))
-	{
-	  if(! (c->getRequireAuth() && c->getUserName() == wxEmptyString)) {
-	  wxLogStatus( _("Connection failed."));
-	  wxArrayString log = VNCConn::getLog();
-	  // show last 3 log strings
-	  for(size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i)
-	    wxLogMessage(log[i]);
-	  
-	  wxLogError(c->getErr());
-	  }
-	  delete c;
-	  return false;
-	}
+              encodings, compresslevel, quality, multicast,
+              multicast_socketrecvbuf, multicast_recvbuf);
     }
-  
+}
+
+
+void MyFrameMain::setup_conn(VNCConn *c) {
+
+  // first, find out if we already setup this this connection.
+  // this happens if it was a listening one that's now connected.
+  vector<ConnBlob>::iterator it = connections.begin();
+  size_t index = 0;
+  while(it != connections.end() && it->conn != c)
+      {
+	  ++it;
+	  ++index;
+      }
+  if (index < connections.size()) {
+      // found it, just update the label and skip the rest we already did
+      notebook_connections->SetPageText(index, c->getDesktopName() + " " + _("(Reverse Connection)"));
+      return;
+  }
+
+  // get more settings
+  int fastrequest_interval;
+  bool fastrequest, qos_ef;
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  pConfig->Read(K_FASTREQUEST, &fastrequest, V_FASTREQUEST);
+  pConfig->Read(K_FASTREQUESTINTERVAL, &fastrequest_interval, V_FASTREQUESTINTERVAL);
+  pConfig->Read(K_QOS_EF, &qos_ef, V_QOS_EF);
+
   if(show_stats)
     c->doStats(true);
 
@@ -869,8 +904,8 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
 
   connections.push_back(cb);
 
-  if(listenPort > 0)
-    notebook_connections->AddPage(win, _("Listening on port") + " " + wxString() << listenPort, true);
+  if(!c->getListenPort().IsEmpty())
+    notebook_connections->AddPage(win, _("Listening on port") + " " + c->getListenPort(), true);
   else
     notebook_connections->AddPage(win, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")") , true);
 
@@ -908,8 +943,7 @@ bool MyFrameMain::spawn_conn(wxString service, int listenPort)
       GetToolBar()->EnableTool(ID_INPUT_REPLAY, true);
       GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
     }
-  
-  return true;
+
 }
 
 
@@ -1980,9 +2014,9 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
 
 
 
-bool MyFrameMain::cmdline_connect(wxString& hostarg)
+void MyFrameMain::cmdline_connect(wxString& hostarg)
 {
-  return spawn_conn(hostarg);
+  spawn_conn(hostarg);
 }
 
 
