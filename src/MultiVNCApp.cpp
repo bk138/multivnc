@@ -134,8 +134,7 @@ bool MultiVNCApp::OnInit()
   for(int i=1; i < wxApp::argc; ++i)
     {
       wxString arg(wxApp::argv[i]);
-      if(! frame_main->cmdline_connect(arg))
-	return false;
+      frame_main->cmdline_connect(arg);
     }
 
   SetTopWindow(frame_main);
