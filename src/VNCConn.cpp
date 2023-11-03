@@ -50,6 +50,10 @@
 
 
 // define our new notify events!
+DEFINE_EVENT_TYPE(VNCConnListenNOTIFY)
+DEFINE_EVENT_TYPE(VNCConnInitNOTIFY)
+wxDEFINE_EVENT(VNCConnGetPasswordNOTIFY, wxCommandEvent);
+wxDEFINE_EVENT(VNCConnGetCredentialsNOTIFY, wxCommandEvent);
 DEFINE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
@@ -122,7 +126,7 @@ extern "C"
 */
 
 
-VNCConn::VNCConn(void* p, char* (*getpassworddfunc)(rfbClient*), rfbCredential* (*getcredentialfunc)(rfbClient*, int))
+VNCConn::VNCConn(void* p)
 {
   // save our caller
   parent = p;
@@ -160,9 +164,6 @@ VNCConn::VNCConn(void* p, char* (*getpassworddfunc)(rfbClient*), rfbCredential* 
   // record/replay stuff
   recording = replaying = false;
 
-  // save the credential and password getters
-  this->getpasswordfunc = getpassworddfunc;
-  this->getcredentialfunc = getcredentialfunc;
   require_auth = false;
 }
 
@@ -243,7 +244,7 @@ void VNCConn::on_stats_timer(wxTimerEvent& event)
 
 
 
-rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
+rfbBool VNCConn::thread_alloc_framebuffer(rfbClient* client)
 {
   // get VNCConn object belonging to this client
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID); 
@@ -279,26 +280,82 @@ rfbBool VNCConn::alloc_framebuffer(rfbClient* client)
 
 wxThread::ExitCode VNCConn::Entry()
 {
+ // init connection before going into main loop if this is not a listening one
+ if (!thread_listenmode) {
+     rfbClientLog("About to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
+
+     // save these for the error case
+     wxString host = wxString(cl->serverHost);
+     int port = cl->serverPort;
+     if (!rfbInitClient(cl, 0, NULL)) {
+	 //  rfbInitClient() calls rfbClientCleanup() on failure, but
+	 //  this does not zero the ptr
+	 cl = 0;
+	 err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
+	 wxLogDebug("VNCConn %p: rfbInitClient() failed. Cleanup by library.", this);
+	 thread_post_init_notify(1); // TODO add more error codes
+	 wxLogDebug("VNCConn %p: vncthread done", this);
+	 return 0;
+     }
+
+     // set the client sock to blocking again until libvncclient is fixed
+#ifdef WIN32
+     unsigned long block = 0;
+     if (ioctlsocket(cl->sock, FIONBIO, &block) == SOCKET_ERROR) {
+       errno = WSAGetLastError();
+#else
+     int flags = fcntl(cl->sock, F_GETFL);
+     if (flags < 0 || fcntl(cl->sock, F_SETFL, flags & ~O_NONBLOCK) < 0) {
+#endif
+	 rfbClientErr("Setting socket to blocking failed: %s\n", strerror(errno));
+     }
+
+     // if there was an error in alloc_framebuffer(), catch that here
+     // err is set by alloc_framebuffer()
+     if (!cl->frameBuffer) {
+	 thread_post_init_notify(1); // TODO add more error codes
+	 wxLogDebug("VNCConn %p: vncthread done", this);
+	 return 0;
+     }
+     // connect succesful
+     thread_post_init_notify(0);
+  }
+
   int i=0;
 
   pointerEvent pe;
   keyEvent ke = {0, 0};
+
+  bool listen_outcome_posted = false;
 
   while(! GetThread()->TestDestroy()) 
     {
       if(thread_listenmode)
 	{
 	  i=listenForIncomingConnectionsNoFork(cl, 100000); // 100 ms
-	  if(i<0)
+          if (i == 0) {
+	      // just notify about success once
+	      if (!listen_outcome_posted) {
+		  thread_post_listen_notify(0);
+		  listen_outcome_posted = true;
+	      }
+          }
+          if(i<0)
 	    {
 	      if(errno==EINTR)
 		continue;
 	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), this);
-	      thread_post_disconnect_notify();
+	      thread_post_listen_notify(1); //TODO add more error codes
 	      break;
 	    }
 	  if(i)
 	    {
+              // have this here in case of immediate connection
+	      // but just notify about success once
+	      if (!listen_outcome_posted) {
+		  thread_post_listen_notify(0);
+		  listen_outcome_posted = true;
+	      }
 	      thread_post_incomingconnection_notify();
 	      break;
 	    }
@@ -476,7 +533,8 @@ wxThread::ExitCode VNCConn::Entry()
 	    }
 	}
     }
-  
+
+  wxLogDebug("VNCConn %p: vncthread done", this);
   return 0;
 }
 
@@ -599,6 +657,37 @@ bool VNCConn::thread_send_latency_probe()
   return result;
 }
 
+void VNCConn::thread_post_listen_notify(int error) {
+  wxLogDebug(wxT("VNCConn %p: post_listen_notify(%d)"), this, error);
+  wxCommandEvent event(VNCConnListenNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  event.SetInt(error);
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+void VNCConn::thread_post_init_notify(int error) {
+  wxLogDebug(wxT("VNCConn %p: post_init_notify(%d)"), this, error);
+  wxCommandEvent event(VNCConnInitNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  event.SetInt(error);
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+void VNCConn::thread_post_getpasswd_notify() {
+  wxLogDebug(wxT("VNCConn %p: post_getpasswd_notify()"), this);
+  wxCommandEvent event(VNCConnGetPasswordNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
+void VNCConn::thread_post_getcreds_notify(bool withUserPrompt) {
+  wxLogDebug(wxT("VNCConn %p: post_getcreds_notify()"), this);
+  wxCommandEvent event(VNCConnGetCredentialsNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  event.SetInt(withUserPrompt);
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
 
 void VNCConn::thread_post_incomingconnection_notify() 
 {
@@ -704,6 +793,74 @@ void VNCConn::thread_post_replayfinished_notify()
   wxPostEvent((wxEvtHandler*)parent, event);
 }
 
+
+char* VNCConn::thread_getpasswd(rfbClient *client) {
+    VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+
+    conn->require_auth = true;
+
+#if wxUSE_SECRETSTORE
+    if (!conn->getPassword().IsOk()) {
+#else
+    if (conn->getPassword().IsEmpty()) {
+#endif
+        // get password from user
+	conn->thread_post_getpasswd_notify();
+	// wxMutexes are not recursive under Unix, so test first
+        if (conn->mutex_auth.TryLock() == wxMUTEX_NO_ERROR) {
+            conn->mutex_auth.Lock();
+        }
+	wxLogDebug("VNCConn %p: vncthread waiting for password", conn);
+        conn->condition_auth.Wait();
+	wxLogDebug("VNCConn %p: vncthread done waiting for password", conn);
+	// we get here once setPassword() was called
+    }
+#if wxUSE_SECRETSTORE
+    return strdup(conn->getPassword().GetAsString().char_str());
+#else
+    return strdup(conn->getPassword().char_str());
+#endif
+};
+
+
+rfbCredential* VNCConn::thread_getcreds(rfbClient *client, int type) {
+    VNCConn *conn = VNCConn::getVNCConnFromRfbClient(client);
+
+    conn->require_auth = true;
+
+    if(type == rfbCredentialTypeUser) {
+
+	if(conn->getUserName().IsEmpty()
+#if wxUSE_SECRETSTORE
+            || !conn->getPassword().IsOk()) {
+#else
+            || conn->getPassword().IsEmpty()) {
+#endif
+	    // username and/or password needed
+            conn->thread_post_getcreds_notify(conn->getUserName().IsEmpty());
+            // wxMutexes are not recursive under Unix, so test first
+            if (conn->mutex_auth.TryLock() == wxMUTEX_NO_ERROR) {
+                conn->mutex_auth.Lock();
+            }
+            wxLogDebug("VNCConn %p: vncthread waiting for credentials", conn);
+            conn->condition_auth.Wait();
+            wxLogDebug("VNCConn %p: vncthread done waiting for credentials",
+                       conn);
+            // we get here once setPassword() was called
+        }
+
+        rfbCredential *c = (rfbCredential *)calloc(1, sizeof(rfbCredential));
+        c->userCredential.username = strdup(conn->getUserName().char_str());
+#if wxUSE_SECRETSTORE
+        c->userCredential.password = strdup(conn->getPassword().GetAsString().char_str());
+#else
+        c->userCredential.password = strdup(conn->getPassword().char_str());
+#endif
+        return c;
+    }
+
+    return NULL;
+};
 
 
 
@@ -922,11 +1079,11 @@ bool VNCConn::setupClient()
   rfbClientSetClientData(cl, VNCCONN_OBJ_ID, this); 
 
   // callbacks
-  cl->MallocFrameBuffer = alloc_framebuffer;
+  cl->MallocFrameBuffer = thread_alloc_framebuffer;
   cl->GotFrameBufferUpdate = thread_got_update;
   cl->FinishedFrameBufferUpdate = thread_update_finished;
-  cl->GetPassword = getpasswordfunc;
-  cl->GetCredential = getcredentialfunc;
+  cl->GetPassword = thread_getpasswd;
+  cl->GetCredential = thread_getcreds;
   cl->HandleKeyboardLedState = thread_kbd_leds;
   cl->HandleTextChat = thread_textchat;
   cl->GotXCutText = thread_got_cuttext;
@@ -940,7 +1097,7 @@ bool VNCConn::setupClient()
 
 
 
-bool VNCConn::Listen(int port)
+void VNCConn::Listen(int port)
 {
   wxLogDebug(wxT("VNCConn %p: Listen() port %d"), this, port);
 
@@ -955,27 +1112,27 @@ bool VNCConn::Listen(int port)
     {
       err.Printf(_("Could not create VNC listener thread!"));
       Shutdown();
-      return false;
+      thread_post_listen_notify(1); //TODO add more error codes
+      return;
     }
 
   if( GetThread()->Run() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not start VNC listener thread!")); 
       Shutdown();
-      return false;
+      thread_post_listen_notify(1); //TODO add more error codes
+      return;
     }
-
-  return true;
 }
 
 
-bool VNCConn::Init(const wxString& host, const wxString& username,
+void VNCConn::Init(const wxString& host, const wxString& username,
 #if wxUSE_SECRETSTORE
 		   const wxSecretValue& password,
 #endif
 		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
-  wxLogDebug(wxT("VNCConn %p: Init()"), this);
+  wxLogDebug("VNCConn %p: Init() host '%s'", this, host);
 
   if(!cl)
       setupClient();
@@ -983,7 +1140,8 @@ bool VNCConn::Init(const wxString& host, const wxString& username,
   if(cl->frameBuffer || (GetThread() && GetThread()->IsRunning()))
     {
       wxLogDebug(wxT("VNCConn %p: Init() already done. Call Shutdown() first!"), this);
-      return false;
+      thread_post_init_notify(1); // TODO add more error codes
+      return;
     }
 
   // reset stats before doing new connection
@@ -1012,57 +1170,25 @@ bool VNCConn::Init(const wxString& host, const wxString& username,
   else
     cl->canHandleMulticastVNC = FALSE;
 
-  rfbClientLog("About to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
-
-  if(! rfbInitClient(cl, 0, NULL))
-    {
-      cl = 0; //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
-      err.Printf(_("Failure connecting to server at %s!"),  host.c_str());
-      wxLogDebug(wxT("VNCConn %p: Init() failed. Cleanup by library."), this);
-      Shutdown();
-      return false;
-    }
-
-  // set the client sock to blocking again until libvncclient is fixed
-#ifdef WIN32
-  unsigned long block=0;
-  if(ioctlsocket(cl->sock, FIONBIO, &block) == SOCKET_ERROR) {
-    errno=WSAGetLastError();
-#else
-  int flags = fcntl(cl->sock, F_GETFL);
-  if(flags < 0 || fcntl(cl->sock, F_SETFL, flags & ~O_NONBLOCK) < 0) {
-#endif
-      rfbClientErr("Setting socket to blocking failed: %s\n",strerror(errno));
-    }
-
-  
-  // if there was an error in alloc_framebuffer(), catch that here
-  // err is set by alloc_framebuffer()
-  if(! cl->frameBuffer)
-    {
-      Shutdown();
-      return false;
-    }
-  
   // this is like our main loop
   thread_listenmode = false;
   if( CreateThread() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not create VNC thread!"));
       Shutdown();
-      return false;
+      thread_post_init_notify(1); // TODO add more error codes
+      return;
     }
 
   if( GetThread()->Run() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not start VNC thread!")); 
       Shutdown();
-      return false;
+      thread_post_init_notify(1); // TODO add more error codes
+      return;
     }
 
   conn_stopwatch.Start();
-
-  return true;
 }
 
 
@@ -1073,6 +1199,8 @@ void VNCConn::Shutdown()
   wxLogDebug(wxT("VNCConn %p: Shutdown()"), this);
 
   conn_stopwatch.Pause();
+
+  mutex_auth.Unlock();
 
   if(GetThread() && GetThread()->IsRunning())
     {
@@ -1531,21 +1659,27 @@ void VNCConn::setUserName(const wxString& username) {
 
 #if wxUSE_SECRETSTORE
 const wxSecretValue& VNCConn::getPassword() const {
+#else
+const wxString& VNCConn::getPassword() const {
+#endif
     return password;
 }
 
+#if wxUSE_SECRETSTORE
 void VNCConn::setPassword(const wxSecretValue& password) {
-    this->password = password;
-}
+#else
+void VNCConn::setPassword(const wxString& password) {
 #endif
+    this->password = password;
+    // tell worker thread to go on
+    condition_auth.Signal();
+}
+
 
 const bool VNCConn::getRequireAuth() const {
     return require_auth;
 }
 
-void VNCConn::setRequireAuth(bool yesno) {
-    require_auth = yesno;
-}
 
 wxString VNCConn::getServerHost() const
 {
@@ -1565,13 +1699,21 @@ wxString VNCConn::getServerHost() const
 wxString VNCConn::getServerPort() const
 {
   if(cl)
-    if(cl->listenSpecified)
-      return wxString() << cl->listenPort;
-    else
-      return wxString() << cl->serverPort;
+    return wxString() << cl->serverPort;
   else
     return wxEmptyString;
 }
+
+
+
+wxString VNCConn::getListenPort() const
+{
+  if(cl && cl->listenSpecified)
+    return wxString() << cl->listenPort;
+  else
+    return wxEmptyString;
+}
+
 
 
 bool VNCConn::isMulticast() const

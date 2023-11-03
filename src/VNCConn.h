@@ -44,6 +44,14 @@
 /*
   custom events
 */
+/// Sent when Listen() completes with success(listening, m_commandInt==0) or failure (m_commandInt!=0)
+DECLARE_EVENT_TYPE(VNCConnListenNOTIFY, -1)
+/// Sent when Init() completes with success(connection established, m_commandInt==0) or failure (m_commandInt!=0)
+DECLARE_EVENT_TYPE(VNCConnInitNOTIFY, -1)
+/// Sent when this VNCConn wants a password. This blocks the VNCConn's internal worker thread until SetPassword() is called!
+wxDECLARE_EVENT(VNCConnGetPasswordNOTIFY, wxCommandEvent);
+/// Sent when this VNCConn wants a username and password. This blocks the VNCConn's internal worker thread until SetPassword() is called!
+wxDECLARE_EVENT(VNCConnGetCredentialsNOTIFY, wxCommandEvent);
 // sent when an incoming connection is available
 DECLARE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY, -1)
 // sent on disconnect
@@ -63,21 +71,26 @@ DECLARE_EVENT_TYPE(VNCConnUniMultiChangedNOTIFY, -1)
 DECLARE_EVENT_TYPE(VNCConnReplayFinishedNOTIFY, -1) 
 
 
+/**
+   To make a listening connection, call Listen().
+   You'll be informed by a VNCConnListenNOTIFY event about the outcome.
+   You'll get a VNCConnIncomingConnectionNOTIFY event when a connection is made from the outside;
+   in this case, call Init() with empty host and port to finalise the connection to the remote.
 
+   To make an outgoing connection, call Init().
+   You'll be informed by a VNCConnInitNOTIFY event about the outcome.
+   You'll get a VNCConnDisconnectNOTIFY when the connection is unexpectedly terminated.
+
+   To shut down a connection, call Shutdown().
+ */
 class VNCConn: public wxEvtHandler, public wxThreadHelper
 {
 public:
-  VNCConn(void *parent, char* (*getpasswdfunc)(rfbClient*), rfbCredential* (*getCredentialFunc)(rfbClient*, int));
+  VNCConn(void *parent);
   ~VNCConn(); 
 
-  /*
-    To make an outgoing connection, call Init().
-    To make a listening connection, call Listen().
-    To shut down a connection, call Shutdown().
-  */
-
-  bool Listen(int port);
-  bool Init(const wxString& host, const wxString& username,
+  void Listen(int port);
+  void Init(const wxString& host, const wxString& username,
 #if wxUSE_SECRETSTORE
 	    const wxSecretValue& password,
 #endif
@@ -139,15 +152,18 @@ public:
   wxString getDesktopName() const;
   wxString getServerHost() const;
   wxString getServerPort() const;
+  wxString getListenPort() const;
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);
 #if wxUSE_SECRETSTORE
   const wxSecretValue& getPassword() const;
   void setPassword(const wxSecretValue& password);
+#else
+  const wxString& getPassword() const;
+  void setPassword(const wxString& password);
 #endif
   const bool getRequireAuth() const;
-  void setRequireAuth(bool yesno);
 
 
   // get current multicast receive buf state
@@ -213,11 +229,12 @@ private:
   wxString username;
 #if wxUSE_SECRETSTORE
   wxSecretValue password;
+#else
+  wxString password;
 #endif
   bool require_auth;
-  // these are set saved by the constructor and later attached to the client
-  GetPasswordProc getpasswordfunc;
-  GetCredentialProc getcredentialfunc;
+  wxMutex mutex_auth;
+  wxCondition condition_auth = wxCondition(mutex_auth);
 
   // statistics
   bool do_stats;
@@ -273,13 +290,17 @@ private:
   wxMessageQueue<pointerEvent> pointer_event_q;
   wxMessageQueue<keyEvent> key_event_q;
 
-  bool thread_listenmode; 
+  bool thread_listenmode;
   bool thread_send_pointer_event(pointerEvent &event);
   bool thread_send_key_event(keyEvent &event);
   bool thread_send_latency_probe();
 
 
   // event dispatchers
+  void thread_post_listen_notify(int error);
+  void thread_post_init_notify(int error);
+  void thread_post_getpasswd_notify();
+  void thread_post_getcreds_notify(bool withUserPrompt);
   void thread_post_incomingconnection_notify();
   void thread_post_disconnect_notify();
   void thread_post_update_notify(int x, int y, int w, int h);
@@ -290,7 +311,7 @@ private:
   void thread_post_replayfinished_notify();
 
   // libvncclient callbacks
-  static rfbBool alloc_framebuffer(rfbClient* client);
+  static rfbBool thread_alloc_framebuffer(rfbClient* client);
   static void thread_got_update(rfbClient* cl,int x,int y,int w,int h);
   static void thread_update_finished(rfbClient* client);
   static void thread_kbd_leds(rfbClient* cl, int value, int pad);
@@ -299,6 +320,8 @@ private:
   static void thread_bell(rfbClient *cl);
   static void thread_handle_xvp(rfbClient *cl, uint8_t ver, uint8_t code);
   static void thread_logger(const char *format, ...);
+  static char* thread_getpasswd(rfbClient* client);
+  static rfbCredential* thread_getcreds(rfbClient* client, int type);
 };
 
 
