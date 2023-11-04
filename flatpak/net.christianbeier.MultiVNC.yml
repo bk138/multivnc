@@ -5,6 +5,7 @@ sdk: org.gnome.Sdk
 command: multivnc
 finish-args:
   - --share=ipc
+  - --socket=wayland
   - --socket=fallback-x11
   - --share=network
   - --talk-name=org.freedesktop.secrets
