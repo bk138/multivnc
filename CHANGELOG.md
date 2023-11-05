@@ -1,3 +1,12 @@
+# MultiVNC 0.7.0 - "A step in between" - 2023-11-05
+* Added Swedish translation thanks to Åke Engelbrektson.
+* Added more tooltips to more UI elements.
+* Added keyboard shortcut for making a new connection.
+* Added secret store use for credentials without user name.
+* Fixed error dialog sometimes being not shown.
+* Fixed drawing on MacOS and Wayland. The flatpak now uses Wayland.
+* Fixed hang when connecting to unreachable servers.
+
 # MultiVNC 0.6.0 - "Back from the dead" - 2023-05-17
 * Added record/replay of user input. You can now record a
   VNC session and replay this 'macro' later.
