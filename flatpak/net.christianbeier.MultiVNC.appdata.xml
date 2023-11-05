@@ -52,17 +52,15 @@
   <releases>
     <release version="0.7.0" date="2023-11-05">
       <description>
-	<p>
-	  <ul>
-	    <li>Added Swedish translation thanks to Åke Engelbrektson.</li>
-	    <li>Added more tooltips to more UI elements.</li>
-	    <li>Added keyboard shortcut for making a new connection.</li>
-	    <li>Added secret store use for credentials without user name.</li>
-	    <li>Fixed error dialog sometimes being not shown.</li>
-	    <li>Fixed drawing on MacOS and Wayland. The flatpak now uses Wayland.</li>
-	    <li>Fixed hang when connecting to unreachable servers.</li>
-	  </ul>
-	</p>
+	<ul>
+	  <li>Added Swedish translation thanks to Åke Engelbrektson.</li>
+	  <li>Added more tooltips to more UI elements.</li>
+	  <li>Added keyboard shortcut for making a new connection.</li>
+	  <li>Added secret store use for credentials without user name.</li>
+	  <li>Fixed error dialog sometimes being not shown.</li>
+	  <li>Fixed drawing on MacOS and Wayland. The flatpak now uses Wayland.</li>
+	  <li>Fixed hang when connecting to unreachable servers.</li>
+	</ul>
       </description>
     </release>
 
