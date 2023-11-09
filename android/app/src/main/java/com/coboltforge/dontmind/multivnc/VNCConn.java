@@ -428,6 +428,8 @@ public class VNCConn {
 
 		Log.d(TAG, "initializing");
 
+		maintainConnection = true;
+
 		connSettings = bean;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
