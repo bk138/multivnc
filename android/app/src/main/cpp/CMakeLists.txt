@@ -12,7 +12,7 @@ endif ()
 
 # build libJPEG
 set(BUILD_SHARED_LIBS OFF)
-set(libjpeg_src_DIR ../../../../../libjpeg-turbo)
+set(libjpeg_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libjpeg-turbo)
 set(libjpeg_build_DIR ${CMAKE_BINARY_DIR}/libjpeg)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libjpeg_src_DIR} ${libjpeg_build_DIR})
@@ -27,7 +27,7 @@ include_directories(
 
 # build libressl
 set(BUILD_SHARED_LIBS OFF)
-set(libssl_src_DIR ../../../../../libressl)
+set(libssl_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libressl)
 set(libssl_build_DIR ${CMAKE_BINARY_DIR}/libssl)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libssl_src_DIR} ${libssl_build_DIR})
@@ -42,7 +42,7 @@ include_directories(
 
 # build libssh2
 set(BUILD_SHARED_LIBS OFF)
-set(libssh2_src_DIR ../../../../../libssh2)
+set(libssh2_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libssh2)
 set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libssh2_src_DIR} ${libssh2_build_DIR})
@@ -57,7 +57,7 @@ link_directories(
 
 # build LibVNCClient
 set(BUILD_SHARED_LIBS OFF)
-set(libvnc_src_DIR ../../../../../libvncserver)
+set(libvnc_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libvncserver)
 set(libvnc_build_DIR ${CMAKE_BINARY_DIR}/libvnc)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libvnc_src_DIR} ${libvnc_build_DIR})
