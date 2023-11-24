@@ -46,13 +46,23 @@ set(libssh2_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libssh2)
 set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libssh2_src_DIR} ${libssh2_build_DIR})
+# set these variables so FindLibSSH2 can find the library
+set(LIBSSH2_LIBRARY ${libssh2_build_DIR}/src/libssh2.a)
+set(LIBSSH2_INCLUDE_DIR ${libssh2_src_DIR}/include)
 # set include directories so dependent code can find the headers
 include_directories(
         ${libssh2_src_DIR}/include
 )
-# set link directories as libssh2.a appears in ./src subdir of libssh2 build dir
-link_directories(
-        ${libssh2_build_DIR}/src
+
+# build libsshtunnel
+set(BUILD_SHARED_LIBS OFF)
+set(libsshtunnel_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libsshtunnel)
+set(libsshtunnel_build_DIR ${CMAKE_BINARY_DIR}/libsshtunnel)
+# adds a source subdir with specifying a build output dir
+add_subdirectory(${libsshtunnel_src_DIR} ${libsshtunnel_build_DIR})
+# set include directories so dependent code can find the headers
+include_directories(
+        ${libsshtunnel_src_DIR}/include
 )
 
 # build LibVNCClient
@@ -71,7 +81,7 @@ include_directories(
 add_library(vncconn SHARED vncconn.c)
 target_link_libraries(vncconn
     log
-    ssh2
+    sshtunnel
     vncclient)
 
 # build VNCCanvas
