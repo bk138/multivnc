@@ -479,11 +479,11 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
 
     // see whether we are ssh-tunneling or not
     int is_ssh_connection = cSshHost != NULL;
+    ssh_tunnel_t *tunnel = NULL;
 
     if(is_ssh_connection) {
         log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() setting up SSH-tunneled connection");
         // ssh-tunneling, check whether it's password- or key-based
-        ssh_tunnel_t *tunnel;
         if(cSshPassword) {
             // password-based
             tunnel = ssh_tunnel_open_with_password(cSshHost, cSshUser, cSshPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
@@ -553,6 +553,10 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
     if(!rfbInitClient(cl, 0, NULL)) {
         setRfbClient(env, obj, 0); //  rfbInitClient() calls rfbClientCleanup() on failure, but this does not zero the ptr
         log_obj_tostring(env, obj, ANDROID_LOG_ERROR, "rfbInit() connection failed. Cleanup by library.");
+        // There might be the case that the SSH tunnel got setup alright, but connecting to the VNC server failed.
+        // In this case we have to dispose of the tunnel explicitly here.
+        // We cannot use rfbClientGetClientData(cl, VNCCONN_SSH_ID) here as there was already a rfbClientCleanup()
+        ssh_tunnel_close(tunnel);
         return JNI_FALSE;
     }
 
