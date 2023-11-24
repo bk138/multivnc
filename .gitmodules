@@ -13,3 +13,6 @@
 [submodule "libssh2"]
 	path = libssh2
 	url = https://github.com/libssh2/libssh2.git
+[submodule "libsshtunnel"]
+	path = libsshtunnel
+	url = https://github.com/bk138/libsshtunnel.git
