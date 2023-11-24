@@ -483,19 +483,19 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
     if(is_ssh_connection) {
         log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() setting up SSH-tunneled connection");
         // ssh-tunneling, check whether it's password- or key-based
-        ssh_tunnel_t *data;
+        ssh_tunnel_t *tunnel;
         if(cSshPassword) {
             // password-based
-            data = ssh_tunnel_open_with_password(cSshHost, cSshUser, cSshPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
+            tunnel = ssh_tunnel_open_with_password(cSshHost, cSshUser, cSshPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
         } else {
             // key-based
-            data = ssh_tunnel_open_with_privkey(cSshHost, cSshUser, (char*)cSshPrivKey, cSshPrivKeyLen, cSshPrivKeyPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
+            tunnel = ssh_tunnel_open_with_privkey(cSshHost, cSshUser, (char*)cSshPrivKey, cSshPrivKeyLen, cSshPrivKeyPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
         }
 
         cl->serverHost = strdup("127.0.0.1");
-        if(data) // might be NULL if ssh setup failed
-            cl->serverPort = ssh_tunnel_get_port(data);
-        rfbClientSetClientData(cl, VNCCONN_SSH_ID, data);
+        if(tunnel) // might be NULL if ssh setup failed
+            cl->serverPort = ssh_tunnel_get_port(tunnel);
+        rfbClientSetClientData(cl, VNCCONN_SSH_ID, tunnel);
     } else {
         log_obj_tostring(env, obj, ANDROID_LOG_INFO, "rfbInit() setting up direct connection");
         // direct connection
