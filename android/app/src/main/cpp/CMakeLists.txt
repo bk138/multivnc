@@ -44,6 +44,7 @@ include_directories(
 
 # build libssh2
 message("-----libssh2-----")
+SET(BUILD_TESTING OFF CACHE BOOL "Build libssh2 test suite")
 set(libssh2_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libssh2)
 set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
 # adds a source subdir with specifying a build output dir
