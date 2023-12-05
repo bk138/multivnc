@@ -19,8 +19,8 @@ set(libjpeg_build_DIR ${CMAKE_BINARY_DIR}/libjpeg)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libjpeg_src_DIR} ${libjpeg_build_DIR})
 # set these variables so FindJPEG can find the library
-set(JPEG_LIBRARY ${libjpeg_build_DIR}/libturbojpeg.a)
-set(JPEG_INCLUDE_DIR ${libjpeg_src_DIR})
+set(JPEG_LIBRARY ${libjpeg_build_DIR}/libturbojpeg.a CACHE FILEPATH "")
+set(JPEG_INCLUDE_DIR ${libjpeg_src_DIR} CACHE PATH "")
 # set include directories so dependent code can find the headers
 include_directories(
         ${libjpeg_src_DIR}
@@ -34,9 +34,9 @@ set(libssl_build_DIR ${CMAKE_BINARY_DIR}/libssl)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libssl_src_DIR} ${libssl_build_DIR})
 # set these variables so Findssl can find the library
-set(OPENSSL_SSL_LIBRARY ${libssl_build_DIR}/ssl/libssl.a)
-set(OPENSSL_CRYPTO_LIBRARY ${libssl_build_DIR}/crypto/libcrypto.a)
-set(OPENSSL_INCLUDE_DIR ${libssl_src_DIR}/include)
+set(OPENSSL_SSL_LIBRARY ${libssl_build_DIR}/ssl/libssl.a CACHE FILEPATH "")
+set(OPENSSL_CRYPTO_LIBRARY ${libssl_build_DIR}/crypto/libcrypto.a CACHE FILEPATH "")
+set(OPENSSL_INCLUDE_DIR ${libssl_src_DIR}/include CACHE PATH "")
 # set include directories so dependent code can find the headers
 include_directories(
         ${libssl_src_DIR}/include
@@ -50,8 +50,8 @@ set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libssh2_src_DIR} ${libssh2_build_DIR})
 # set these variables so FindLibSSH2 can find the library
-set(LIBSSH2_LIBRARY ${libssh2_build_DIR}/src/libssh2.a)
-set(LIBSSH2_INCLUDE_DIR ${libssh2_src_DIR}/include)
+set(LIBSSH2_LIBRARY ${libssh2_build_DIR}/src/libssh2.a CACHE FILEPATH "")
+set(LIBSSH2_INCLUDE_DIR ${libssh2_src_DIR}/include CACHE PATH "")
 # set include directories so dependent code can find the headers
 include_directories(
         ${libssh2_src_DIR}/include
