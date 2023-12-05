@@ -14,8 +14,8 @@ android {
         versionName "2.1.4"
         externalNativeBuild {
             cmake {
-                // exclude the other LibVNCServer targets
-                targets "ssl", "crypto", "libssh2", "turbojpeg-static", "vncclient", "vncconn" , "vnccanvas"
+                // specify explicit target list to exclude examples, tests, utils. etc from used libraries
+                targets "ssl", "crypto", "libssh2", "sshtunnel", "turbojpeg-static", "vncclient", "vncconn" , "vnccanvas"
             }
         }
     }
