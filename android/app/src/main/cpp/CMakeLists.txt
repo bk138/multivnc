@@ -39,6 +39,7 @@ set(OPENSSL_CRYPTO_LIBRARY ${libssl_build_DIR}/crypto/libcrypto.a CACHE FILEPATH
 set(OPENSSL_INCLUDE_DIR ${libssl_src_DIR}/include CACHE PATH "")
 # set include directories so dependent code can find the headers
 include_directories(
+        ${CMAKE_BINARY_DIR}/include # generates headers in there
         ${libssl_src_DIR}/include
 )
 
