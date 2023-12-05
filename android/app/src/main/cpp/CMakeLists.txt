@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project (MultiVNC C ASM) # defaults to C, the ASM is needed for LibreSSL
 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared Libs" FORCE)
+
 # Requred to enable SIMD support on ARM
 if (CMAKE_ANDROID_ARCH STREQUAL "arm64")
     set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} --target=aarch64-linux-android${ANDROID_NATIVE_API_LEVEL}")
@@ -12,7 +14,6 @@ endif ()
 
 # build libJPEG
 message("-----libjpeg-turbo-----")
-set(BUILD_SHARED_LIBS OFF)
 set(libjpeg_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libjpeg-turbo)
 set(libjpeg_build_DIR ${CMAKE_BINARY_DIR}/libjpeg)
 # adds a source subdir with specifying a build output dir
@@ -28,7 +29,6 @@ include_directories(
 
 # build libressl
 message("-----LibreSSL-----")
-set(BUILD_SHARED_LIBS OFF)
 set(libssl_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libressl)
 set(libssl_build_DIR ${CMAKE_BINARY_DIR}/libssl)
 # adds a source subdir with specifying a build output dir
@@ -44,7 +44,6 @@ include_directories(
 
 # build libssh2
 message("-----libssh2-----")
-set(BUILD_SHARED_LIBS OFF)
 set(libssh2_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libssh2)
 set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
 # adds a source subdir with specifying a build output dir
@@ -59,7 +58,6 @@ include_directories(
 
 # build libsshtunnel
 message("-----libsshtunnel-----")
-set(BUILD_SHARED_LIBS OFF)
 set(libsshtunnel_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libsshtunnel)
 set(libsshtunnel_build_DIR ${CMAKE_BINARY_DIR}/libsshtunnel)
 # adds a source subdir with specifying a build output dir
@@ -71,7 +69,6 @@ include_directories(
 
 # build LibVNCClient
 message("-----LibVNCClient-----")
-set(BUILD_SHARED_LIBS OFF)
 set(libvnc_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libvncserver)
 set(libvnc_build_DIR ${CMAKE_BINARY_DIR}/libvnc)
 # adds a source subdir with specifying a build output dir
