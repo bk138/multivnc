@@ -420,6 +420,8 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   // IMPORTANT: make sizer obey to size hints!
   stats_container->GetSizer()->SetSizeHints(stats_container);
 
+  // set some default for now
+  this->show_1to1  = false;
 
   stats_timer.SetOwner(this, VIEWERWINDOW_STATS_TIMER_ID);
 }
@@ -551,6 +553,11 @@ void ViewerWindow::showStats(bool show_stats)
   text_ctrl_latency->Clear();
   text_ctrl_lossratio->Clear();
   gauge_recvbuf->SetValue(0);
+}
+
+void ViewerWindow::showOneToOne(bool show_1to1)
+{
+    this->show_1to1 = show_1to1;
 }
 
 

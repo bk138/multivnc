@@ -1639,7 +1639,10 @@ void MyFrameMain::view_toggle1to1(wxCommandEvent &event)
     frame_main_menubar->Check(ID_ONE_TO_ONE, view_1to1);
     GetToolBar()->ToggleTool(ID_ONE_TO_ONE, view_1to1);
 
-
+    // for now, toggle all connections
+    for(size_t i=0; i < connections.size(); ++i) {
+        connections.at(i).viewerwindow->showOneToOne(view_1to1);
+    }
 }
 
 
