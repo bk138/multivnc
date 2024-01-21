@@ -365,6 +365,8 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   /*
     setup upper window
   */
+  // set some default for now
+  this->show_1to1  = false;
   canvas_container->SetSizer(new wxBoxSizer(wxHORIZONTAL));
   canvas = new VNCCanvas(canvas_container, conn);
   adjustCanvasSize();
@@ -416,9 +418,6 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
 
   // IMPORTANT: make sizer obey to size hints!
   stats_container->GetSizer()->SetSizeHints(stats_container);
-
-  // set some default for now
-  this->show_1to1  = false;
 
   stats_timer.SetOwner(this, VIEWERWINDOW_STATS_TIMER_ID);
 }
