@@ -103,6 +103,10 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
   update_timer.SetOwner(this, VNCCANVAS_UPDATE_TIMER_ID);
   update_timer.Start(VNCCANVAS_UPDATE_TIMER_INTERVAL);
+
+#ifdef __WXDEBUG__
+  SetBackgroundColour(*wxRED);
+#endif
 }
 
 
@@ -351,6 +355,10 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
 
   // the upper subwindow
   canvas_container = new wxScrolledWindow(this);
+#ifdef __WXDEBUG__
+  canvas_container->SetBackgroundColour(*wxBLUE);
+#endif
+
   canvas_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
   GetSizer()->Add(canvas_container, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 3);
 
@@ -420,6 +428,10 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   stats_container->GetSizer()->SetSizeHints(stats_container);
 
   stats_timer.SetOwner(this, VIEWERWINDOW_STATS_TIMER_ID);
+
+#ifdef __WXDEBUG__
+  SetBackgroundColour(*wxGREEN);
+#endif
 }
 
 
