@@ -51,6 +51,7 @@ protected:
   DECLARE_EVENT_TABLE();
 
 public:
+  /// Creates a new canvas with 0,0 size. Need to call adjustCanvasSize()!
   VNCCanvas(wxWindow* parent, VNCConn* c);
   void grab_keyboard();
   void ungrab_keyboard();
@@ -102,11 +103,6 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
   update_timer.SetOwner(this, VNCCANVAS_UPDATE_TIMER_ID);
   update_timer.Start(VNCCANVAS_UPDATE_TIMER_INTERVAL);
-
-  // SetSize() isn't enough...
-  SetInitialSize(wxSize(c->getFrameBufferWidth(), c->getFrameBufferHeight()));
-  CentreOnParent();
-  parent->Layout();
 }
 
 
@@ -371,6 +367,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   */
   canvas_container->SetSizer(new wxBoxSizer(wxHORIZONTAL));
   canvas = new VNCCanvas(canvas_container, conn);
+  adjustCanvasSize();
   wxBoxSizer* sizer_vert_canvas = new wxBoxSizer(wxVERTICAL);
   sizer_vert_canvas->Add(canvas, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
   canvas_container->GetSizer()->Add(sizer_vert_canvas, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
