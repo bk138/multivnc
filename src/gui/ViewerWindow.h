@@ -24,6 +24,7 @@ public:
   void adjustCanvasSize(); 
 
   void showStats(bool yesno);
+  void showOneToOne(bool show_1to1);
   void grabKeyboard(bool yesno);
 
 
@@ -56,6 +57,7 @@ private:
   // save default foreground colour to be able to flash when buffer full
   wxColour dflt_fg;
 
+  bool show_1to1;
 
 };
 	

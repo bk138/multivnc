@@ -100,6 +100,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   EnableFullScreenView();
 #endif
 
+  view_1to1 = false;
+
   // assign image list to notebook_connections
   notebook_connections->AssignImageList(new wxImageList(24, 24));
   notebook_connections->GetImageList()->Add(bitmapFromMem(unicast_png));
@@ -651,6 +653,7 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
     if (show_fullscreen) {
 	// tick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, true);
+	GetToolBar()->ToggleTool(ID_FULLSCREEN, true);
 #ifndef __WXMAC__
 	// hide menu
 	frame_main_menubar->Show(false);
@@ -661,6 +664,7 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
     } else {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
+	GetToolBar()->ToggleTool(ID_FULLSCREEN, false);
 #ifndef __WXMAC__
 	// show menu
 	frame_main_menubar->Show(true);
@@ -1623,6 +1627,22 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 #else
   onFullScreenChanged(show_fullscreen);
 #endif
+}
+
+
+void MyFrameMain::view_toggle1to1(wxCommandEvent &event)
+{
+    view_1to1 = ! view_1to1;
+    wxLogDebug("view_toggle1to1 %d", view_1to1);
+
+    // keep toolbar and menu entries in sync
+    frame_main_menubar->Check(ID_ONE_TO_ONE, view_1to1);
+    GetToolBar()->ToggleTool(ID_ONE_TO_ONE, view_1to1);
+
+    // for now, toggle all connections
+    for(size_t i=0; i < connections.size(); ++i) {
+        connections.at(i).viewerwindow->showOneToOne(view_1to1);
+    }
 }
 
 
