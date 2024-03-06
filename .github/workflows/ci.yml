@@ -30,7 +30,7 @@ jobs:
         uses: johnwason/vcpkg-action@v4
         id: vcpkg
         with:
-          pkgs: wxwidgets
+          pkgs: wxwidgets gettext
           triplet: x64-windows
           token: ${{ github.token }}
       - name: Build
