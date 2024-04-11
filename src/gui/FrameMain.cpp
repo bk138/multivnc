@@ -74,6 +74,8 @@ FrameMain::FrameMain(wxWindow* parent, wxWindowID id, const wxString& title, con
     wxglade_tmp_menu->AppendSeparator();
     wxglade_tmp_menu->Append(ID_FULLSCREEN, _("Fullscreen\tF11"), wxEmptyString, wxITEM_CHECK);
     Bind(wxEVT_MENU, &FrameMain::view_togglefullscreen, this, ID_FULLSCREEN);
+    wxglade_tmp_menu->Append(ID_ONE_TO_ONE, _("View 1:1"), wxEmptyString, wxITEM_CHECK);
+    Bind(wxEVT_MENU, &FrameMain::view_toggle1to1, this, ID_ONE_TO_ONE);
     frame_main_menubar->Append(wxglade_tmp_menu, _("&View"));
     wxglade_tmp_menu = new wxMenu();
     wxglade_tmp_menu->Append(wxID_ADD, _("&Add Bookmark"), wxEmptyString);
@@ -130,8 +132,10 @@ FrameMain::FrameMain(wxWindow* parent, wxWindowID id, const wxString& title, con
     frame_main_toolbar->AddTool(ID_INPUT_REPLAY, _("Replay Input"), bitmapFromMem(replay_png), wxNullBitmap, wxITEM_NORMAL, _("Replay a recorded mouse and keyboard input macro. If <Shift> is held down while clicking this button, the macro is replayed in a loop."), wxEmptyString);
     Bind(wxEVT_MENU, &FrameMain::machine_input_replay, this, ID_INPUT_REPLAY);
     frame_main_toolbar->AddSeparator();
-    frame_main_toolbar->AddTool(ID_FULLSCREEN, _("Fullscreen"), bitmapFromMem(fullscreen_png), wxNullBitmap, wxITEM_NORMAL, _("Toggle fullscreen view."), wxEmptyString);
+    frame_main_toolbar->AddTool(ID_FULLSCREEN, _("Fullscreen"), bitmapFromMem(fullscreen_png), wxNullBitmap, wxITEM_CHECK, _("Toggle fullscreen view."), wxEmptyString);
     Bind(wxEVT_MENU, &FrameMain::view_togglefullscreen, this, ID_FULLSCREEN);
+    frame_main_toolbar->AddTool(ID_ONE_TO_ONE, _("View 1:1"), bitmapFromMem(one_to_one_png), wxNullBitmap, wxITEM_CHECK, _("Toggle 1:1 view, disabling all scaling."), wxEmptyString);
+    Bind(wxEVT_MENU, &FrameMain::view_toggle1to1, this, ID_ONE_TO_ONE);
     frame_main_toolbar->Realize();
     wxBoxSizer* sizer_top = new wxBoxSizer(wxHORIZONTAL);
     panel_top = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_STATIC|wxTAB_TRAVERSAL);
@@ -296,6 +300,13 @@ void FrameMain::view_togglefullscreen(wxCommandEvent &event)  // wxGlade: FrameM
     event.Skip();
     // notify the user that he hasn't implemented the event handler yet
     wxLogDebug(wxT("Event handler (FrameMain::view_togglefullscreen) not implemented yet"));
+}
+
+void FrameMain::view_toggle1to1(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>
+{
+    event.Skip();
+    // notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::view_toggle1to1) not implemented yet"));
 }
 
 void FrameMain::bookmarks_add(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>

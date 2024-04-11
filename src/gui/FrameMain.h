@@ -37,6 +37,7 @@
 #include "res/listen.png.h"
 #include "res/disconnect.png.h"
 #include "res/fullscreen.png.h"
+#include "res/one-to-one.png.h"
 #include "res/screenshot.png.h"
 #include "res/toggle-keyboard-grab.png.h"
 #include "res/replay.png.h"
@@ -91,6 +92,7 @@ public:
     virtual void view_togglestatistics(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_seamless(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglefullscreen(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void view_toggle1to1(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_add(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_edit(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_delete(wxCommandEvent &event); // wxGlade: <event_handler>
