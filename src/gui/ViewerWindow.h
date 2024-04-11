@@ -51,7 +51,7 @@ private:
   // timer to update stats win
   wxTimer stats_timer;
   void onStatsTimer(wxTimerEvent& event);
-
+  void onResize(wxSizeEvent &event);
   void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
 
   // save default foreground colour to be able to flash when buffer full

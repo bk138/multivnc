@@ -1,5 +1,8 @@
 
 
+#include <wx/gdicmn.h>
+#include <wx/log.h>
+#include <wx/math.h>
 #include <wx/sizer.h>
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
@@ -58,6 +61,7 @@ public:
 
   VNCConn* conn;
   wxRegion updated_area;
+  double scale_factor = 1.0;
   bool do_keyboard_grab;
 };
 	
@@ -169,7 +173,18 @@ void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
   while(upd)
     {
       wxRect update_rect(upd.GetRect());
-     
+
+      if(scale_factor != 1.0) {
+          update_rect.x *= scale_factor;
+          update_rect.y *= scale_factor;
+          update_rect.width *= scale_factor;
+          update_rect.height *= scale_factor;
+
+          // fixes artifacts. +2 because double->int cuttofs can happen for x,y _and_ w,h scaling
+          update_rect.width += 2;
+          update_rect.height += 2;
+      }
+
       wxLogDebug(wxT("VNCCanvas %p: invalidating updated rect: (%i,%i,%i,%i)"),
 		 this,
 		 update_rect.x,
@@ -177,6 +192,7 @@ void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 		 update_rect.width,
 		 update_rect.height);
 
+      // triggers onPaint()
       Refresh(false, &update_rect);
       ++upd;
     }
@@ -199,13 +215,32 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
     return;
 
   wxPaintDC dc(this);
+  dc.SetUserScale(scale_factor, scale_factor);
 
   // get the update rect list
   wxRegionIterator upd(GetUpdateRegion()); 
   while(upd)
     {
       wxRect update_rect(upd.GetRect());
-     
+
+      if(scale_factor != 1.0) {
+          update_rect.x /= scale_factor;
+          update_rect.y /= scale_factor;
+          update_rect.width /= scale_factor;
+          update_rect.height /= scale_factor;
+
+          // fixes artifacts. +2 because double->int cuttofs can happen for x,y _and_ w,h scaling
+          update_rect.width += 2;
+          update_rect.height += 2;
+
+          // make sure this is always within the framebuffer boudaries;
+          // might not always be due to the artifact fix above, would not be drawn then
+          update_rect.Intersect(wxRect(0,
+                                       0,
+                                       conn->getFrameBufferWidth(),
+                                       conn->getFrameBufferHeight()));
+      }
+
       wxLogDebug(wxT("VNCCanvas %p: got repaint event: (%i,%i,%i,%i)"),
 		 this,
 		 update_rect.x,
@@ -268,6 +303,10 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
       if(do_keyboard_grab)
 	ungrab_keyboard();
     }
+
+  // use rounding here to be a bit more correct if scaling causes fractional values
+  event.m_x = std::round(event.m_x / scale_factor);
+  event.m_y = std::round(event.m_y / scale_factor);
 
   conn->sendPointerEvent(event);
 }
@@ -337,6 +376,7 @@ void VNCCanvas::onFocusLoss(wxFocusEvent &event)
 BEGIN_EVENT_TABLE(ViewerWindow, wxPanel)
   EVT_TIMER   (VIEWERWINDOW_STATS_TIMER_ID, ViewerWindow::onStatsTimer)
   EVT_VNCCONNUPDATENOTIFY (wxID_ANY, ViewerWindow::onVNCConnUpdateNotify)
+  EVT_SIZE (ViewerWindow::onResize)
 END_EVENT_TABLE()
 
 
@@ -516,7 +556,11 @@ void ViewerWindow::onStatsTimer(wxTimerEvent& event)
     }
 }
 
-
+void ViewerWindow::onResize(wxSizeEvent &event)
+{
+    wxLogDebug("ViewerWindow %p: resized to (%i, %i)", this, GetSize().GetWidth(), GetSize().GetHeight());
+    adjustCanvasSize();
+}
 
 /*
   public members
@@ -527,15 +571,57 @@ void ViewerWindow::adjustCanvasSize()
 {
   if(canvas)
     {
-      wxLogDebug(wxT("ViewerWindow %p: adjusting canvas size to (%i, %i)"),
-		 this,
-		 canvas->conn->getFrameBufferWidth(),
-		 canvas->conn->getFrameBufferHeight());
+        if(show_1to1) {
+            // reset scale factor
+            canvas->scale_factor = 1.0;
+            // and enable scroll bars
+            canvas_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
+        } else {
+            /*
+              calculate scale factor
+             */
+            wxLogDebug("ViewerWindow %p: adjustCanvasSize: framebuffer is %d x %d",
+                       this,
+                       canvas->conn->getFrameBufferWidth(),
+                       canvas->conn->getFrameBufferHeight());
+            wxLogDebug("ViewerWindow %p: adjustCanvasSize: window      is %d x %d",
+                       this,
+                       GetSize().GetWidth(),
+                       GetSize().GetHeight());
 
-      // SetSize() isn't enough...
-      canvas->SetInitialSize(wxSize(canvas->conn->getFrameBufferWidth(), canvas->conn->getFrameBufferHeight()));
-      canvas->CentreOnParent();
-      Layout();
+            float width_factor = GetSize().GetWidth() / (float)canvas->conn->getFrameBufferWidth();
+
+            // stats shown?
+            int stats_height = 0;
+            if(GetSizer()->IsShown(1)) {
+                // compute correct size for initial case
+                Layout();
+                stats_height = stats_container->GetSize().GetHeight();
+            }
+            float height_factor = (GetSize().GetHeight() - stats_height) / (float)canvas->conn->getFrameBufferHeight();
+
+            wxLogDebug("ViewerWindow %p: adjustCanvasSize: width factor is %f", this, width_factor);
+            wxLogDebug("ViewerWindow %p: adjustCanvasSize: height factor is %f", this, height_factor);
+
+            canvas->scale_factor = wxMin(width_factor, height_factor);
+
+            /*
+              and disable scroll bars
+             */
+            canvas_container->SetScrollRate(0, 0);
+        }
+        wxSize dimensions(canvas->conn->getFrameBufferWidth() * canvas->scale_factor,
+                          canvas->conn->getFrameBufferHeight() * canvas->scale_factor);
+
+        wxLogDebug(wxT("ViewerWindow %p: adjustCanvasSize: adjusting canvas size to (%i, %i)"),
+                   this,
+                   dimensions.GetWidth(),
+                   dimensions.GetHeight());
+
+        // SetSize() isn't enough...
+        canvas->SetInitialSize(dimensions);
+        canvas->CentreOnParent();
+        Layout();
     }
 }
 
@@ -554,6 +640,7 @@ void ViewerWindow::showStats(bool show_stats)
       stats_timer.Stop();
       GetSizer()->Show(1, false);
     }
+  adjustCanvasSize();
   Layout();
 
   text_ctrl_updrawbytes->Clear();
@@ -566,6 +653,7 @@ void ViewerWindow::showStats(bool show_stats)
 void ViewerWindow::showOneToOne(bool show_1to1)
 {
     this->show_1to1 = show_1to1;
+    adjustCanvasSize();
 }
 
 
