@@ -704,6 +704,9 @@ void MyFrameMain::onVNCConnGetCredentialsNotify(wxCommandEvent &event)
     // get sender
     VNCConn *conn = static_cast<VNCConn*>(event.GetEventObject());
 
+    // stop showing connection setup busy cursor when entering creds
+    wxEndBusyCursor();
+
     if(!event.GetInt()) {
 	// without user prompt, get only password
 	wxString pass = wxGetPasswordFromUser(wxString::Format(_("Please enter password for user '%s'"), conn->getUserName()),
@@ -1834,12 +1837,14 @@ void MyFrameMain::help_about(wxCommandEvent &event)
 #endif
 #endif
 
+#ifndef __WXMAC__
   info.SetIcon(icon);
+  info.SetVersion(VERSION);
+  info.SetWebSite(wxString(PACKAGE_URL));
+#endif
   info.SetName(wxT("MultiVNC"));
-  info.SetVersion(wxT(VERSION));
   info.SetDescription(desc);
   info.SetCopyright(wxT(COPYRIGHT));
-  info.SetWebSite(wxString(wxT(PACKAGE_URL)));
   info.AddDeveloper("Christian Beier");
   info.AddDeveloper("Evgeny Zinoviev");
   

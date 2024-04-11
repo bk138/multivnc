@@ -27,10 +27,10 @@ jobs:
           brew install wxwidgets
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
-        uses: johnwason/vcpkg-action@v4
+        uses: johnwason/vcpkg-action@v6
         id: vcpkg
         with:
-          pkgs: wxwidgets
+          pkgs: wxwidgets gettext[tools]
           triplet: x64-windows
           token: ${{ github.token }}
       - name: Build
