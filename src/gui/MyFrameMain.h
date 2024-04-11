@@ -47,7 +47,7 @@ class MyFrameMain: public FrameMain
   bool show_stats;
   bool show_fullscreen;
   int  show_seamless;
-  bool view_1to1;
+  bool show_1to1;
 
   // log window
   MyFrameLog* logwindow;

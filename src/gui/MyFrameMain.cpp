@@ -78,6 +78,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
   pConfig->Read(K_SHOWSEAMLESS, &show_seamless, V_SHOWSEAMLESS);
+  pConfig->Read(K_SHOW1TO1, &show_1to1, V_SHOW1TO1);
   pConfig->Read(K_GRABKEYBOARD, &grab_keyboard, V_GRABKEYBOARD);
   pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
   pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
@@ -100,7 +101,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   EnableFullScreenView();
 #endif
 
-  view_1to1 = false;
 
   // assign image list to notebook_connections
   notebook_connections->AssignImageList(new wxImageList(24, 24));
@@ -196,6 +196,11 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     default:
       frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
     }
+
+  if(show_1to1) {
+      frame_main_menubar->Check(ID_ONE_TO_ONE, true);
+      GetToolBar()->ToggleTool(ID_ONE_TO_ONE, true);
+  }
 
   // setup clipboard
 #ifdef __WXGTK__
@@ -891,6 +896,7 @@ void MyFrameMain::setup_conn(VNCConn *c) {
 
   ViewerWindow* win = new ViewerWindow(notebook_connections, c);
   win->showStats(show_stats);
+  win->showOneToOne(show_1to1);
 #ifdef MULTIVNC_GRABKEYBOARD
   win->grabKeyboard(frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
 #endif
@@ -1632,17 +1638,20 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
 
 void MyFrameMain::view_toggle1to1(wxCommandEvent &event)
 {
-    view_1to1 = ! view_1to1;
-    wxLogDebug("view_toggle1to1 %d", view_1to1);
+    show_1to1 = ! show_1to1;
+    wxLogDebug("view_toggle1to1 %d", show_1to1);
 
     // keep toolbar and menu entries in sync
-    frame_main_menubar->Check(ID_ONE_TO_ONE, view_1to1);
-    GetToolBar()->ToggleTool(ID_ONE_TO_ONE, view_1to1);
+    frame_main_menubar->Check(ID_ONE_TO_ONE, show_1to1);
+    GetToolBar()->ToggleTool(ID_ONE_TO_ONE, show_1to1);
 
     // for now, toggle all connections
     for(size_t i=0; i < connections.size(); ++i) {
-        connections.at(i).viewerwindow->showOneToOne(view_1to1);
+        connections.at(i).viewerwindow->showOneToOne(show_1to1);
     }
+
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    pConfig->Write(K_SHOW1TO1, show_1to1);
 }
 
 
