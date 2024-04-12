@@ -36,3 +36,4 @@ flatpak/build-dir/
 
 # ccls cache
 .ccls-cache/
+.cache/
