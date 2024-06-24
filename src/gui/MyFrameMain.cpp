@@ -666,6 +666,8 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
 	// hide bookmarks and discovered servers
 	show_bookmarks = show_discovered = false;
 	splitwinlayout();
+        // hide toolbar labels
+        GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() & ~wxTB_TEXT);
     } else {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
@@ -678,6 +680,8 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
 	wxConfigBase::Get()->Read(K_SHOWDISCOVERED, &show_discovered, V_SHOWDISCOVERED);
 	wxConfigBase::Get()->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
 	splitwinlayout();
+        // show toolbar labels
+        GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() | wxTB_TEXT);
   }
 }
 
