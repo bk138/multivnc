@@ -668,6 +668,8 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
 	splitwinlayout();
         // hide toolbar labels
         GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() & ~wxTB_TEXT);
+        // hide status bar
+        GetStatusBar()->Hide();
     } else {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
@@ -682,6 +684,8 @@ void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
 	splitwinlayout();
         // show toolbar labels
         GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() | wxTB_TEXT);
+        // show status bar
+        GetStatusBar()->Show();
   }
 }
 
