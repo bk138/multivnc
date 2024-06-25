@@ -164,7 +164,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   else
     {
       frame_main_toolbar->Show(false);
-      SetToolBar(NULL);
     }
 
 
@@ -1564,11 +1563,11 @@ void MyFrameMain::view_toggletoolbar(wxCommandEvent &event)
       frame_main_toolbar->EnableTool(wxID_STOP, enable); // disconnect
       frame_main_toolbar->EnableTool(wxID_SAVE, enable); // screenshot
       
-      SetToolBar(frame_main_toolbar);
+      frame_main_toolbar->Show();
     }
   else
     {
-      SetToolBar(NULL);
+        frame_main_toolbar->Hide();
     }
 
   // this does more than Layout() which only deals with sizers
