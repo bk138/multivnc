@@ -9,6 +9,7 @@
 	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application android:icon="@drawable/ic_launcher" android:label="MultiVNC" android:hardwareAccelerated="true"
@@ -69,7 +70,8 @@
         <service
             android:enabled="true"
             android:exported="false"
-            android:name=".ui.VNCConnService" >
+            android:name=".ui.VNCConnService"
+			android:foregroundServiceType="connectedDevice">
         </service>
 
     </application>
