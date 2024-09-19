@@ -168,10 +168,6 @@ public class MDNSService extends Service {
 				}
 			};
 
-			// start on our own
-			mDNSstart();
-
-
 			Looper.prepare();
 
 			handler = new Handler() {
@@ -214,6 +210,9 @@ public class MDNSService extends Service {
 				}
 
 			};
+
+			// start on our own
+			mDNSstart();
 
 			Looper.loop();
 		}
