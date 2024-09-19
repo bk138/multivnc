@@ -1,5 +1,12 @@
 # Version 2.1.x:
 
+## 2.1.5
+
+### 🛠  Fixes
+
+* Adapted to API level 34 as required by Google.
+* Fixed rare crash in service discovery module.
+
 ## 2.1.4
 
 ### 🛠  Fixes
