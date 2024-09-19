@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.coboltforge.dontmind.multivnc"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 97
         versionName "2.1.4"
         externalNativeBuild {
