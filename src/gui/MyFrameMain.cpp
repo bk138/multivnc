@@ -1830,7 +1830,7 @@ void MyFrameMain::help_about(wxCommandEvent &event)
 #if defined LIBVNCSERVER_HAVE_GNUTLS || defined LIBVNCSERVER_HAVE_LIBSSL
   desc += wxT(", Anonymous TLS, VeNCrypt");
 #endif
-#ifdef LIBVNCSERVER_HAVE_LIBGCRYPT
+#if defined LIBVNCSERVER_HAVE_LIBGCRYPT || defined LIBVNCSERVER_HAVE_LIBSSL
   desc += wxT(", Apple Remote Desktop");
 #endif
   desc += "\n\n";
