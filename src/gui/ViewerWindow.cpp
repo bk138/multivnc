@@ -108,7 +108,7 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
   update_timer.SetOwner(this, VNCCANVAS_UPDATE_TIMER_ID);
   update_timer.Start(VNCCANVAS_UPDATE_TIMER_INTERVAL);
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
   SetBackgroundColour(*wxRED);
 #endif
 }
@@ -204,7 +204,7 @@ void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
 
 void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 {
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
   wxLongLong t0 = wxGetLocalTimeMillis();
   size_t nr_rects = 0;
   size_t nr_pixels = 0;
@@ -248,7 +248,7 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 		 update_rect.width,
 		 update_rect.height);
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
       ++nr_rects;
       nr_pixels += update_rect.width * update_rect.height;
 #endif
@@ -260,7 +260,7 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
       ++upd;
     }
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
   wxLongLong t1 = wxGetLocalTimeMillis();
   wxLogDebug(wxT("VNCCanvas %p: updating %zu rects (%f megapixels) took %lld ms"),
 	     this,
@@ -395,7 +395,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
 
   // the upper subwindow
   canvas_container = new wxScrolledWindow(this);
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
   canvas_container->SetBackgroundColour(*wxBLUE);
 #endif
 
@@ -469,7 +469,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
 
   stats_timer.SetOwner(this, VIEWERWINDOW_STATS_TIMER_ID);
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
   SetBackgroundColour(*wxGREEN);
 #endif
 }

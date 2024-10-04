@@ -89,7 +89,7 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
 #endif
 
   canvas = new VNCSeamlessConnectorCanvas(this);
-#ifndef __WXDEBUG__
+#ifdef NDEBUG
   canvas->SetCursor(wxCursor(wxCURSOR_BLANK));
 #endif
   wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
