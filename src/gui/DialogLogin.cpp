@@ -24,7 +24,7 @@ DialogLogin::DialogLogin(wxFrame *parent, wxWindowID id, const wxString &title )
     hbox2->Add(m_passwordLabel, 0);
  
     m_passwordEntry = new wxTextCtrl(this, BUTTON_Login, wxString(""),
-        wxDefaultPosition, wxDefaultSize, wxTE_PASSWORD|wxTE_PROCESS_ENTER);
+        wxDefaultPosition, wxSize(220, -1), wxTE_PASSWORD|wxTE_PROCESS_ENTER);
     hbox2->Add(m_passwordEntry, 1);
     vbox->Add(hbox2, 0, wxEXPAND | wxLEFT | wxTOP | wxRIGHT, 10);
 
