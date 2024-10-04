@@ -39,7 +39,7 @@
 #define PACKAGE_URL "http://multivnc.sf.net"
 #endif
 
-#define COPYRIGHT "Copyright (C) 2009-2023 Christian Beier <multivnc@christianbeier.net>"
+#define COPYRIGHT "Copyright (C) 2009-2024 Christian Beier <multivnc@christianbeier.net>"
 #define CFGFILE "multivnc.cfg"
 
 class MultiVNCApp: public wxApp 
