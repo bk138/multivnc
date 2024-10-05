@@ -8,7 +8,7 @@ For the time being, we're building an Intel binary only. Universal builds to com
 ```
    mkdir build
    cd build
-   cmake .. -DCMAKE_BUILD_TYPE=Release
+   MACOSX_DEPLOYMENT_TARGET=10.15 cmake .. -DCMAKE_BUILD_TYPE=Release
    cmake --build .
    cmake --install . --prefix .
 ```
