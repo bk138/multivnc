@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-03 22:18+0100\n"
-"PO-Revision-Date: 2023-11-03 22:30+0100\n"
+"POT-Creation-Date: 2024-10-06 18:13+0200\n"
+"PO-Revision-Date: 2024-10-06 20:30+0200\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -18,14 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.2.2\n"
 
-msgid "translator-credits"
-msgstr "Åke Engelbrektson <eson@svenskasprakfiler.se>"
-
-#: ../src/gui/FrameMain.cpp:79
+#: ../src/gui/FrameMain.cpp:81
 msgid "&Add Bookmark"
 msgstr "&Lägg till bokmärke"
 
-#: ../src/gui/FrameMain.cpp:86
+#: ../src/gui/FrameMain.cpp:88
 msgid "&Bookmarks"
 msgstr "&Bokmärken"
 
@@ -33,11 +30,11 @@ msgstr "&Bokmärken"
 msgid "&Connect...\tCtrl-T"
 msgstr "&Anslut...\tCtrl-T"
 
-#: ../src/gui/FrameMain.cpp:94
+#: ../src/gui/FrameMain.cpp:96
 msgid "&Contents"
 msgstr "&Innehåll"
 
-#: ../src/gui/FrameMain.cpp:84
+#: ../src/gui/FrameMain.cpp:86
 msgid "&Delete Bookmark"
 msgstr "&Ta bort bokmärke"
 
@@ -45,11 +42,11 @@ msgstr "&Ta bort bokmärke"
 msgid "&Disconnect"
 msgstr "&Koppla från"
 
-#: ../src/gui/FrameMain.cpp:82
+#: ../src/gui/FrameMain.cpp:84
 msgid "&Edit Bookmark"
 msgstr "&Redigera bokmärke"
 
-#: ../src/gui/FrameMain.cpp:100
+#: ../src/gui/FrameMain.cpp:102
 msgid "&Help"
 msgstr "&Hjälp"
 
@@ -61,23 +58,23 @@ msgstr "&Lyssna"
 msgid "&Machine"
 msgstr "&Maskin"
 
-#: ../src/gui/FrameMain.cpp:88
+#: ../src/gui/FrameMain.cpp:90
 msgid "&Share a Window"
 msgstr "&Dela ett fönster"
 
-#: ../src/gui/FrameMain.cpp:77
+#: ../src/gui/FrameMain.cpp:79
 msgid "&View"
 msgstr "&Visa"
 
-#: ../src/gui/MyFrameMain.cpp:873
+#: ../src/gui/MyFrameMain.cpp:890
 msgid "(Reverse Connection)"
 msgstr "(Omvänd anslutning)"
 
-#: ../src/gui/MyFrameMain.cpp:1688
+#: ../src/gui/MyFrameMain.cpp:1725
 msgid "A bookmark with this name already exists!"
 msgstr "Det finns redan ett bokmärke med det här namnet!"
 
-#: ../src/gui/MyFrameMain.cpp:306
+#: ../src/gui/MyFrameMain.cpp:310
 msgid "Authentication canceled."
 msgstr "Autentiseringen avbröts."
 
@@ -85,34 +82,34 @@ msgstr "Autentiseringen avbröts."
 msgid "Autosave statistics on close"
 msgstr "Spara statistik automatiskt vid avslut"
 
-#: ../src/gui/FrameMain.cpp:149
+#: ../src/gui/FrameMain.cpp:153
 msgid "Available VNC Servers"
 msgstr "Tillgängliga VNC-servrar"
 
-#: ../src/gui/FrameMain.cpp:88
+#: ../src/gui/FrameMain.cpp:90
 msgid "Beam a window to the server."
 msgstr "Stråla ett fönster till servern."
 
-#: ../src/gui/MyFrameMain.cpp:1169
+#: ../src/gui/MyFrameMain.cpp:1187
 msgid "Bookmark"
 msgstr "Bokmärk"
 
-#: ../src/gui/MyFrameMain.cpp:1953
+#: ../src/gui/MyFrameMain.cpp:1991
 #, c-format
 msgid "Bookmark %s"
 msgstr "Bokmärk %s"
 
-#: ../src/gui/FrameMain.cpp:58 ../src/gui/FrameMain.cpp:154
-#: ../src/gui/MyFrameMain.cpp:1127
+#: ../src/gui/FrameMain.cpp:58 ../src/gui/FrameMain.cpp:158
+#: ../src/gui/MyFrameMain.cpp:1145
 msgid "Bookmarks"
 msgstr "Bokmärken"
 
-#: ../src/gui/MyFrameMain.cpp:1786
+#: ../src/gui/MyFrameMain.cpp:1822
 msgid "Built with"
 msgstr "Byggt med"
 
-#: ../src/gui/MyFrameMain.cpp:752 ../src/gui/MyFrameMain.cpp:1387
-#: ../src/gui/MyFrameMain.cpp:1474
+#: ../src/gui/MyFrameMain.cpp:769 ../src/gui/MyFrameMain.cpp:1405
+#: ../src/gui/MyFrameMain.cpp:1492
 msgid "CSV files|*.csv"
 msgstr "CSV-filer|*.csv"
 
@@ -120,7 +117,7 @@ msgstr "CSV-filer|*.csv"
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: ../src/gui/MyFrameMain.cpp:1676
+#: ../src/gui/MyFrameMain.cpp:1713
 msgid "Cannot bookmark a reverse connection!"
 msgstr "Kan inte bokmärka en omvänd anslutning!"
 
@@ -136,44 +133,44 @@ msgstr "CoRRE"
 msgid "Compression level for 'Tight' and 'Zlib' encodings:"
 msgstr "Komprimeringsnivå för Tight- och Zlib-kodningar:"
 
-#: ../src/gui/FrameMain.cpp:116
+#: ../src/gui/FrameMain.cpp:117
 msgid "Connect"
 msgstr "Anslut"
 
-#: ../src/gui/FrameMain.cpp:31 ../src/gui/FrameMain.cpp:116
-#: ../src/gui/MyFrameMain.cpp:1197
+#: ../src/gui/FrameMain.cpp:31 ../src/gui/FrameMain.cpp:117
+#: ../src/gui/MyFrameMain.cpp:1215
 msgid "Connect to a specific host."
 msgstr "Anslut en specifik värddator."
 
-#: ../src/gui/MyFrameMain.cpp:837
+#: ../src/gui/MyFrameMain.cpp:854
 #, c-format
 msgid "Connecting to %s..."
 msgstr "Ansluter %s..."
 
-#: ../src/gui/MyFrameMain.cpp:308
+#: ../src/gui/MyFrameMain.cpp:312
 msgid "Connection failed."
 msgstr "Anslutningen misslyckades."
 
-#: ../src/gui/MyFrameMain.cpp:1037
+#: ../src/gui/MyFrameMain.cpp:1055
 msgid "Connection terminated."
 msgstr "Anslutningen avbröts."
 
-#: ../src/gui/MyFrameMain.cpp:373
+#: ../src/gui/MyFrameMain.cpp:377
 #, c-format
 msgid "Connection to %s is now multicast."
 msgstr "Anslutningen till %s är nu multicast."
 
-#: ../src/gui/MyFrameMain.cpp:384
+#: ../src/gui/MyFrameMain.cpp:388
 #, c-format
 msgid "Connection to %s is now unicast."
 msgstr "Anslutningen till %s är nu unicast."
 
-#: ../src/gui/MyFrameMain.cpp:382
+#: ../src/gui/MyFrameMain.cpp:386
 #, c-format
 msgid "Connection to %s switched to unicast."
 msgstr "Anslutningen till %s ändrades till unicast."
 
-#: ../src/gui/MyFrameMain.cpp:477 ../src/gui/MyFrameMain.cpp:487
+#: ../src/gui/MyFrameMain.cpp:481 ../src/gui/MyFrameMain.cpp:491
 #, c-format
 msgid "Connection to %s:%s terminated."
 msgstr "Anslutningen till %s:%s avbröts."
@@ -199,7 +196,7 @@ msgstr "Begär kontinuerliga uppdateringar med angivet milisekundintervall:"
 msgid "CopyRect"
 msgstr "CopyRect"
 
-#: ../src/gui/MyFrameMain.cpp:976
+#: ../src/gui/MyFrameMain.cpp:994
 msgid "Could not autosave statistics!"
 msgstr "Kunde inte spara statistik automatiskt!"
 
@@ -215,11 +212,11 @@ msgstr "Kunde inte skapa VNC-tråd!"
 msgid "Could not open config file!"
 msgstr "Kunde öppna config-fil!"
 
-#: ../src/gui/MyFrameMain.cpp:1486
+#: ../src/gui/MyFrameMain.cpp:1504
 msgid "Could not open file!"
 msgstr "Kunde öppna fil!"
 
-#: ../src/gui/MyFrameMain.cpp:622 ../src/gui/MyFrameMain.cpp:623
+#: ../src/gui/MyFrameMain.cpp:626 ../src/gui/MyFrameMain.cpp:627
 msgid "Could not run window share helper."
 msgstr "Kunde inte köra fönsterdelningshjälpen."
 
@@ -227,11 +224,11 @@ msgstr "Kunde inte köra fönsterdelningshjälpen."
 msgid "Could not save config file!"
 msgstr "Kunde inte spara config-fil!"
 
-#: ../src/gui/MyFrameMain.cpp:764 ../src/gui/MyFrameMain.cpp:1398
+#: ../src/gui/MyFrameMain.cpp:781 ../src/gui/MyFrameMain.cpp:1416
 msgid "Could not save file!"
 msgstr "Kunde inte spara fil!"
 
-#: ../src/gui/MyFrameMain.cpp:2069
+#: ../src/gui/MyFrameMain.cpp:2107
 msgid "Could not share window, external program execution failed."
 msgstr "Kunde inte dela fönster, extern programstart misslyckades."
 
@@ -243,11 +240,11 @@ msgstr "Kunde inte starta VNC-lyssnartråd!"
 msgid "Could not start VNC thread!"
 msgstr "Kunde inte starta VNC-tråd!"
 
-#: ../src/gui/MyFrameMain.cpp:701 ../src/gui/MyFrameMain.cpp:710
+#: ../src/gui/MyFrameMain.cpp:718 ../src/gui/MyFrameMain.cpp:727
 msgid "Credentials required..."
 msgstr "Autentiseringsuppgifter krävs..."
 
-#: ../src/gui/MyFrameMain.cpp:1241
+#: ../src/gui/MyFrameMain.cpp:1259
 msgid "Detailed VNC Log"
 msgstr "Detaljerad VNC-logg"
 
@@ -255,7 +252,7 @@ msgstr "Detaljerad VNC-logg"
 msgid "Disabled"
 msgstr "Inaktiverad"
 
-#: ../src/gui/FrameMain.cpp:121
+#: ../src/gui/FrameMain.cpp:122
 msgid "Disconnect"
 msgstr "Koppla från"
 
@@ -271,11 +268,11 @@ msgstr "Öst"
 msgid "Edge Connector"
 msgstr "Edge Connector"
 
-#: ../src/gui/MyFrameMain.cpp:1727
+#: ../src/gui/MyFrameMain.cpp:1764
 msgid "Edit bookmark"
 msgstr "Redigera bokmärke"
 
-#: ../src/gui/ViewerWindow.cpp:389
+#: ../src/gui/ViewerWindow.cpp:436
 msgid "Eff. KB/s:"
 msgstr "Eff. KB/s:"
 
@@ -299,28 +296,28 @@ msgstr "Aktiverade kodningar"
 msgid "Encodings"
 msgstr "Kodningar"
 
-#: ../src/gui/MyFrameMain.cpp:1680
+#: ../src/gui/MyFrameMain.cpp:1717
 msgid "Enter bookmark name:"
 msgstr "Ange bokmärkesnamn:"
 
-#: ../src/gui/MyFrameMain.cpp:1196
+#: ../src/gui/MyFrameMain.cpp:1214
 msgid "Enter host to connect to:"
 msgstr "Ange värddator att ansluta:"
 
-#: ../src/gui/MyFrameMain.cpp:2037
+#: ../src/gui/MyFrameMain.cpp:2075
 msgid "Enter name of window to share:"
 msgstr "Ange namn för fönster att dela:"
 
-#: ../src/gui/MyFrameMain.cpp:683
+#: ../src/gui/MyFrameMain.cpp:697
 msgid "Enter password:"
 msgstr "Ange lösenord:"
 
-#: ../src/gui/MyFrameMain.cpp:1142
+#: ../src/gui/MyFrameMain.cpp:1160
 #, c-format
 msgid "Error reading hostname of bookmark '%s'!"
 msgstr "Fel vid inläsning av värdnamn för bokmärket %s!"
 
-#: ../src/gui/MyFrameMain.cpp:1149
+#: ../src/gui/MyFrameMain.cpp:1167
 #, c-format
 msgid "Error reading port of bookmark '%s'!"
 msgstr "Fel vid inläsning av port för bokmärket %s!"
@@ -329,7 +326,7 @@ msgstr "Fel vid inläsning av port för bokmärket %s!"
 msgid "Exit MultiVNC."
 msgstr "Avsluta MultiVNC."
 
-#: ../src/gui/MyFrameMain.cpp:1702
+#: ../src/gui/MyFrameMain.cpp:1739
 msgid "Failed to save credentials to the system secret store."
 msgstr "Kunde inte spara autentiseringsuppgifter i systemets hemliga arkiv."
 
@@ -346,7 +343,7 @@ msgstr "Fel i inställningen av rambuffert: Fel BPP!"
 msgid "FastRequest"
 msgstr "FastRequest"
 
-#: ../src/gui/MyFrameMain.cpp:1410
+#: ../src/gui/MyFrameMain.cpp:1428
 msgid ""
 "From now on, all your mouse and keyboard input will be recorded. Click the "
 "stop button to finish recording and save your input."
@@ -355,7 +352,7 @@ msgstr ""
 "registreras. Klicka på stoppknappen för att avsluta inspelningen och spara "
 "din inmatning."
 
-#: ../src/gui/FrameMain.cpp:133
+#: ../src/gui/FrameMain.cpp:134
 msgid "Fullscreen"
 msgstr "Fullskärm"
 
@@ -367,7 +364,7 @@ msgstr "Fullskärm\tF11"
 msgid "GAAH! Got an unhandled exception! This should not happen."
 msgstr "GAAH! Vi fick ett obehandlat undantag! Detta borde inte inträffa."
 
-#: ../src/gui/FrameMain.cpp:123
+#: ../src/gui/FrameMain.cpp:124
 msgid "Grab Keyboard"
 msgstr "Ta över tangentbordet"
 
@@ -375,7 +372,7 @@ msgstr "Ta över tangentbordet"
 msgid "Hextile"
 msgstr "Hextile"
 
-#: ../src/gui/MyFrameMain.cpp:1825
+#: ../src/gui/MyFrameMain.cpp:1863
 msgid ""
 "If there are VNC servers advertising themselves via ZeroConf, you can select "
 "a host in the'Available VNC Servers' list. Otherwise, use the 'Connect' "
@@ -391,11 +388,11 @@ msgstr ""
 "När du är ansluten visar en blå eller grön ikon på fliketiketten om du kör i "
 "unicast- eller multicast-läge."
 
-#: ../src/gui/MyFrameMain.cpp:510
+#: ../src/gui/MyFrameMain.cpp:514
 msgid "Incoming Connection."
 msgstr "Inkommande anslutning."
 
-#: ../src/gui/FrameMain.cpp:123
+#: ../src/gui/FrameMain.cpp:124
 msgid ""
 "Intercept all keyboard input. Allows you to use special keys that would "
 "otherwise be interpreted by the local computer."
@@ -403,23 +400,23 @@ msgstr ""
 "Uppfattar all tangentbordsinmatning. Gör det möjligt att använda speciella "
 "tangenter som annars skulle tolkas av den lokala datorn."
 
-#: ../src/gui/ViewerWindow.cpp:393
+#: ../src/gui/ViewerWindow.cpp:440
 msgid "Latency ms:"
 msgstr "Latens ms:"
 
-#: ../src/gui/FrameMain.cpp:118
+#: ../src/gui/FrameMain.cpp:119
 msgid "Listen"
 msgstr "Lyssna"
 
-#: ../src/gui/FrameMain.cpp:33 ../src/gui/FrameMain.cpp:118
+#: ../src/gui/FrameMain.cpp:33 ../src/gui/FrameMain.cpp:119
 msgid "Listen for an incoming connection."
 msgstr "Lyssnar efter inkommande anslutning."
 
-#: ../src/gui/MyFrameMain.cpp:831 ../src/gui/MyFrameMain.cpp:908
+#: ../src/gui/MyFrameMain.cpp:848 ../src/gui/MyFrameMain.cpp:926
 msgid "Listening on port"
 msgstr "Lyssnar på port"
 
-#: ../src/gui/MyFrameMain.cpp:1470
+#: ../src/gui/MyFrameMain.cpp:1488
 msgid "Load recorded input..."
 msgstr "Läs in inspelad indata..."
 
@@ -431,11 +428,11 @@ msgstr "Loggning"
 msgid "Login"
 msgstr "Inloggning"
 
-#: ../src/gui/MyFrameMain.cpp:1865
+#: ../src/gui/MyFrameMain.cpp:1903
 msgid "Looking up host address..."
 msgstr "Söker upp värdadress..."
 
-#: ../src/gui/ViewerWindow.cpp:395
+#: ../src/gui/ViewerWindow.cpp:442
 msgid "Loss Ratio:"
 msgstr "Förlustkvot:"
 
@@ -451,7 +448,7 @@ msgstr "MultiVNC"
 msgid "MultiVNC crashed"
 msgstr "MultiVNC kraschade"
 
-#: ../src/gui/MyFrameMain.cpp:1784
+#: ../src/gui/MyFrameMain.cpp:1820
 msgid "MultiVNC is a cross-platform Multicast-enabled VNC client."
 msgstr "MultiVNC är en plattformsöverskridande Multicast-aktiverad VNC-klient."
 
@@ -459,15 +456,15 @@ msgstr "MultiVNC är en plattformsöverskridande Multicast-aktiverad VNC-klient.
 msgid "MulticastVNC"
 msgstr "MulticastVNC"
 
-#: ../src/gui/MyFrameMain.cpp:1726
+#: ../src/gui/MyFrameMain.cpp:1763
 msgid "New bookmark name:"
 msgstr "Nytt bokmärkesnamn:"
 
-#: ../src/gui/MyFrameMain.cpp:1722 ../src/gui/MyFrameMain.cpp:1751
+#: ../src/gui/MyFrameMain.cpp:1759 ../src/gui/MyFrameMain.cpp:1788
 msgid "No bookmark selected!"
 msgstr "Inget bokmärke valt!"
 
-#: ../src/gui/MyFrameMain.cpp:1757
+#: ../src/gui/MyFrameMain.cpp:1794
 msgid "No bookmark with this name!"
 msgstr "Det finns inget bokmärke med det namnet!"
 
@@ -475,7 +472,7 @@ msgstr "Det finns inget bokmärke med det namnet!"
 msgid "North"
 msgstr "Norr"
 
-#: ../src/gui/MyFrameMain.cpp:736 ../src/gui/MyFrameMain.cpp:1372
+#: ../src/gui/MyFrameMain.cpp:753 ../src/gui/MyFrameMain.cpp:1390
 msgid "Nothing to save!"
 msgstr "Inget att spara!"
 
@@ -487,11 +484,11 @@ msgstr ""
 "Ajaj! MultiVNC kraschade. Detta borde inte hända. Vill du generera en "
 "felrapport?"
 
-#: ../src/gui/MyFrameMain.cpp:1306
+#: ../src/gui/MyFrameMain.cpp:1324
 msgid "PNG files|*.png"
 msgstr "PNG-filer|*.png"
 
-#: ../src/gui/MyFrameMain.cpp:683
+#: ../src/gui/MyFrameMain.cpp:697
 msgid "Password required!"
 msgstr "Lösenord krävs!"
 
@@ -499,12 +496,12 @@ msgstr "Lösenord krävs!"
 msgid "Password:"
 msgstr "Lösenord:"
 
-#: ../src/gui/MyFrameMain.cpp:700
+#: ../src/gui/MyFrameMain.cpp:717
 #, c-format
 msgid "Please enter password for user '%s'"
 msgstr "Ange lösenord för användare '%s'"
 
-#: ../src/gui/MyFrameMain.cpp:1254
+#: ../src/gui/MyFrameMain.cpp:1272
 msgid "Preferences"
 msgstr "Inställningar"
 
@@ -520,7 +517,7 @@ msgstr "Tjänstens kvalitet"
 msgid "RRE"
 msgstr "RRE"
 
-#: ../src/gui/ViewerWindow.cpp:397
+#: ../src/gui/ViewerWindow.cpp:444
 msgid "Rcv Buffer:"
 msgstr "Rcv-buffert:"
 
@@ -528,28 +525,28 @@ msgstr "Rcv-buffert:"
 msgid "Receive Buffer Size (kB):"
 msgstr "Storlek på mottagningsbuffert (kB):"
 
-#: ../src/gui/FrameMain.cpp:45 ../src/gui/FrameMain.cpp:128
-#: ../src/gui/MyFrameMain.cpp:1356 ../src/gui/MyFrameMain.cpp:1364
+#: ../src/gui/FrameMain.cpp:45 ../src/gui/FrameMain.cpp:129
+#: ../src/gui/MyFrameMain.cpp:1374 ../src/gui/MyFrameMain.cpp:1382
 msgid "Record Input"
 msgstr "Spela in indata"
 
-#: ../src/gui/FrameMain.cpp:128
+#: ../src/gui/FrameMain.cpp:129
 msgid "Record mouse and keyboard input for later replay as a macro."
 msgstr ""
 "Spelar in mus- och tangentbordsinmatning för senare uppspelning som ett "
 "makro."
 
-#: ../src/gui/MyFrameMain.cpp:1422
+#: ../src/gui/MyFrameMain.cpp:1440
 msgid "Recording user input..."
 msgstr "Spelar in användarindata..."
 
-#: ../src/gui/FrameMain.cpp:47 ../src/gui/FrameMain.cpp:130
-#: ../src/gui/MyFrameMain.cpp:410 ../src/gui/MyFrameMain.cpp:414
-#: ../src/gui/MyFrameMain.cpp:1452 ../src/gui/MyFrameMain.cpp:1456
+#: ../src/gui/FrameMain.cpp:47 ../src/gui/FrameMain.cpp:131
+#: ../src/gui/MyFrameMain.cpp:414 ../src/gui/MyFrameMain.cpp:418
+#: ../src/gui/MyFrameMain.cpp:1470 ../src/gui/MyFrameMain.cpp:1474
 msgid "Replay Input"
 msgstr "Återupprepa indata"
 
-#: ../src/gui/FrameMain.cpp:130
+#: ../src/gui/FrameMain.cpp:131
 msgid ""
 "Replay a recorded mouse and keyboard input macro. If <Shift> is held down "
 "while clicking this button, the macro is replayed in a loop."
@@ -558,27 +555,27 @@ msgstr ""
 "hålls nedtryckt medan du klickar på den här knappen, spelas makrot upp i en "
 "loop."
 
-#: ../src/gui/MyFrameMain.cpp:421 ../src/gui/MyFrameMain.cpp:422
+#: ../src/gui/MyFrameMain.cpp:425 ../src/gui/MyFrameMain.cpp:426
 msgid "Replay finished!"
 msgstr "Återupprepning slutförd!"
 
-#: ../src/gui/MyFrameMain.cpp:1510
+#: ../src/gui/MyFrameMain.cpp:1528
 msgid "Replaying user input in loop..."
 msgstr "Återupprepar användarinmatning i loop..."
 
-#: ../src/gui/MyFrameMain.cpp:1512
+#: ../src/gui/MyFrameMain.cpp:1530
 msgid "Replaying user input..."
 msgstr "Återupprepar användarinmatning..."
 
-#: ../src/gui/FrameMain.cpp:96
+#: ../src/gui/FrameMain.cpp:98
 msgid "Request a Feature / Report a Bug"
 msgstr "Begär en funktion / Rapportera ett fel"
 
-#: ../src/gui/MyFrameMain.cpp:479 ../src/gui/MyFrameMain.cpp:489
+#: ../src/gui/MyFrameMain.cpp:483 ../src/gui/MyFrameMain.cpp:493
 msgid "Reverse connection terminated."
 msgstr "Omvänd anslutning avslutad."
 
-#: ../src/gui/FrameMain.cpp:90
+#: ../src/gui/FrameMain.cpp:92
 msgid "S&top Sharing Window"
 msgstr "Stoppa fönsterdelning"
 
@@ -590,20 +587,20 @@ msgstr "Spara statistik..."
 msgid "Save log as..."
 msgstr "Spara logg som..."
 
-#: ../src/gui/MyFrameMain.cpp:1383
+#: ../src/gui/MyFrameMain.cpp:1401
 msgid "Save recorded input..."
 msgstr "Spara inspelad indata..."
 
-#: ../src/gui/MyFrameMain.cpp:1302
+#: ../src/gui/MyFrameMain.cpp:1320
 msgid "Save screenshot..."
 msgstr "Spara skärmklipp..."
 
-#: ../src/gui/MyFrameMain.cpp:748
+#: ../src/gui/MyFrameMain.cpp:765
 #, c-format
 msgid "Saving %s statistics..."
 msgstr "Sparar %s statistik..."
 
-#: ../src/gui/MyFrameMain.cpp:1681
+#: ../src/gui/MyFrameMain.cpp:1718
 msgid "Saving bookmark"
 msgstr "Sparar bokmärke"
 
@@ -626,11 +623,11 @@ msgstr ""
 "värdet kan det hjälpa mot paketförlust. Observera att det maximala värdet "
 "beror på operativsystemet."
 
-#: ../src/gui/MyFrameMain.cpp:2037 ../src/gui/MyFrameMain.cpp:2042
+#: ../src/gui/MyFrameMain.cpp:2075 ../src/gui/MyFrameMain.cpp:2080
 msgid "Share a Window"
 msgstr "Dela ett fönster"
 
-#: ../src/gui/MyFrameMain.cpp:2077
+#: ../src/gui/MyFrameMain.cpp:2115
 #, c-format
 msgid "Sharing window with %s"
 msgstr "Delar fönster med %s"
@@ -639,7 +636,7 @@ msgstr "Delar fönster med %s"
 msgid "Show &Log"
 msgstr "Visa &loggen"
 
-#: ../src/gui/FrameMain.cpp:94
+#: ../src/gui/FrameMain.cpp:96
 msgid "Show Help."
 msgstr "Visa hjälpen."
 
@@ -655,60 +652,60 @@ msgstr "Storlek på mottagningsbuffert för socket (kB):"
 msgid "South"
 msgstr "Syd"
 
-#: ../src/gui/FrameMain.cpp:60 ../src/gui/ViewerWindow.cpp:384
+#: ../src/gui/FrameMain.cpp:60 ../src/gui/ViewerWindow.cpp:431
 msgid "Statistics"
 msgstr "Statistik"
 
-#: ../src/gui/FrameMain.cpp:108
+#: ../src/gui/FrameMain.cpp:110
 msgid "Status"
 msgstr "Status"
 
-#: ../src/gui/MyFrameMain.cpp:1419 ../src/gui/MyFrameMain.cpp:1506
+#: ../src/gui/MyFrameMain.cpp:1437 ../src/gui/MyFrameMain.cpp:1524
 msgid "Stop"
 msgstr "Stopp"
 
-#: ../src/gui/MyFrameMain.cpp:1415
+#: ../src/gui/MyFrameMain.cpp:1433
 msgid "Stop Recording"
 msgstr "Stoppa inspelning"
 
-#: ../src/gui/MyFrameMain.cpp:1502
+#: ../src/gui/MyFrameMain.cpp:1520
 msgid "Stop Replaying"
 msgstr "Stoppa återuppspelning"
 
-#: ../src/gui/FrameMain.cpp:90
+#: ../src/gui/FrameMain.cpp:92
 msgid "Stop Window Sharing."
 msgstr "Stoppa fönsterdelning."
 
-#: ../src/gui/MyFrameMain.cpp:1363
+#: ../src/gui/MyFrameMain.cpp:1381
 msgid "Stopped recording user input!"
 msgstr "Stoppade inspelning av användarindata!"
 
-#: ../src/gui/MyFrameMain.cpp:1459
+#: ../src/gui/MyFrameMain.cpp:1477
 msgid "Stopped replaying user input!"
 msgstr "Stoppade återuppspelning av användarindata!"
 
-#: ../src/gui/MyFrameMain.cpp:2118
+#: ../src/gui/MyFrameMain.cpp:2156
 #, c-format
 msgid "Stopped sharing window with %s"
 msgstr "Stoppade fönsterdelning med %s"
 
-#: ../src/gui/MyFrameMain.cpp:1798
+#: ../src/gui/MyFrameMain.cpp:1834
 msgid "Supported Encodings:"
 msgstr "Kodningar som stöds:"
 
-#: ../src/gui/MyFrameMain.cpp:1788
+#: ../src/gui/MyFrameMain.cpp:1824
 msgid "Supported Security Types:"
 msgstr "Säkerhetstyper som stöds:"
 
-#: ../src/gui/FrameMain.cpp:41 ../src/gui/FrameMain.cpp:125
+#: ../src/gui/FrameMain.cpp:41 ../src/gui/FrameMain.cpp:126
 msgid "Take Screenshot"
 msgstr "Ta ett skärmklipp"
 
-#: ../src/gui/FrameMain.cpp:125
+#: ../src/gui/FrameMain.cpp:126
 msgid "Take a screenshot of the current connection."
 msgstr "Tar en skärmdump av den aktuella anslutningen."
 
-#: ../src/gui/FrameMain.cpp:35 ../src/gui/FrameMain.cpp:121
+#: ../src/gui/FrameMain.cpp:35 ../src/gui/FrameMain.cpp:122
 msgid "Terminate connection."
 msgstr "Avbryt anslutningen."
 
@@ -716,7 +713,7 @@ msgstr "Avbryt anslutningen."
 msgid "Text files (*.txt)|*.txt"
 msgstr "Textfiler (*.txt)|*.txt"
 
-#: ../src/gui/MyFrameMain.cpp:2041
+#: ../src/gui/MyFrameMain.cpp:2079
 msgid ""
 "The MultiVNC window will be minimized and a cross-shaped cursor will appear. "
 "Use it to select the window you want to share."
@@ -728,15 +725,19 @@ msgstr ""
 msgid "Tight"
 msgstr "Tight"
 
-#: ../src/gui/MyFrameMain.cpp:1919 ../src/gui/MyFrameMain.cpp:1920
+#: ../src/gui/MyFrameMain.cpp:1957 ../src/gui/MyFrameMain.cpp:1958
 msgid "Timeout looking up IP address."
 msgstr "Tidsgränsen för IP-uppslagning överskreds."
 
-#: ../src/gui/MyFrameMain.cpp:1880 ../src/gui/MyFrameMain.cpp:1881
+#: ../src/gui/MyFrameMain.cpp:1918 ../src/gui/MyFrameMain.cpp:1919
 msgid "Timeout looking up hostname."
 msgstr "Tidsgränsen för värdnamnsuppslagning överskreds."
 
-#: ../src/gui/FrameMain.cpp:133
+#: ../src/gui/FrameMain.cpp:136
+msgid "Toggle 1:1 view, disabling all scaling."
+msgstr "Växla mellan 1:1-vy och skalad vy."
+
+#: ../src/gui/FrameMain.cpp:134
 msgid "Toggle fullscreen view."
 msgstr "Växlar helskärmsvy."
 
@@ -748,7 +749,7 @@ msgstr "Verktygsfält"
 msgid "Ultra"
 msgstr "Ultra"
 
-#: ../src/gui/ViewerWindow.cpp:391
+#: ../src/gui/ViewerWindow.cpp:438
 msgid "Updates/s:"
 msgstr "Uppdateringar/s:"
 
@@ -790,13 +791,17 @@ msgstr "Användarnamn och lösenord kan inte vara tomt"
 msgid "Username:"
 msgstr "Användarnamn:"
 
-#: ../src/gui/MyFrameMain.cpp:1790
+#: ../src/gui/MyFrameMain.cpp:1826
 msgid "VNC Authentication"
 msgstr "VNC-autentisering"
 
-#: ../src/gui/MyFrameMain.cpp:1852
+#: ../src/gui/MyFrameMain.cpp:1890
 msgid "VNC Server"
 msgstr "VNC-server"
+
+#: ../src/gui/FrameMain.cpp:77 ../src/gui/FrameMain.cpp:136
+msgid "View 1:1"
+msgstr "Vy 1:1"
 
 #: ../src/gui/DialogLogin.cpp:58
 msgid "Warning!"
@@ -806,12 +811,12 @@ msgstr "Varning!"
 msgid "West"
 msgstr "Väst"
 
-#: ../src/gui/FrameMain.cpp:92 ../src/gui/MyFrameMain.cpp:134
+#: ../src/gui/FrameMain.cpp:94 ../src/gui/MyFrameMain.cpp:134
 #: ../src/gui/MyFrameMain.cpp:139
 msgid "Window &Sharing"
 msgstr "&Fönsterdelning"
 
-#: ../src/gui/MyFrameMain.cpp:607
+#: ../src/gui/MyFrameMain.cpp:611
 msgid ""
 "Window share helper exited without an associated connection. That should not "
 "happen."
@@ -819,15 +824,15 @@ msgstr ""
 "Hjälparen för fönsterdelning avslutades utan associerad anslutning. Det "
 "borde inte hända."
 
-#: ../src/gui/MyFrameMain.cpp:2068
+#: ../src/gui/MyFrameMain.cpp:2106
 msgid "Window sharing helper execution failed."
 msgstr "Exekvering av fönsterdelningshjälpen misslyckades."
 
-#: ../src/gui/MyFrameMain.cpp:619
+#: ../src/gui/MyFrameMain.cpp:623
 msgid "Window sharing stopped. Shared window was closed."
 msgstr "Fönsterdelningen har stoppats. Det delade fönstret stängdes."
 
-#: ../src/gui/MyFrameMain.cpp:613
+#: ../src/gui/MyFrameMain.cpp:617
 #, c-format
 msgid ""
 "Window sharing with %s stopped. Either the other side does not support "
@@ -855,3 +860,6 @@ msgstr "Zlib"
 #: ../src/gui/DialogSettings.cpp:73
 msgid "ZlibHex"
 msgstr "ZlibHex"
+
+#~ msgid "translator-credits"
+#~ msgstr "Åke Engelbrektson <eson@svenskasprakfiler.se>"
