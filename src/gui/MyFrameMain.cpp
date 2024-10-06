@@ -1,4 +1,5 @@
 
+#include "gui/bitmapFromMem.h"
 #include <fstream>
 #include <wx/aboutdlg.h>
 #include <wx/socket.h>
@@ -9,9 +10,6 @@
 #endif
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
-#include "res/about.png.h"
-#include "res/unicast.png.h"
-#include "res/multicast.png.h"
 
 #include "MyFrameMain.h"
 #include "MyDialogSettings.h"
@@ -104,8 +102,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   // assign image list to notebook_connections
   notebook_connections->AssignImageList(new wxImageList(24, 24));
-  notebook_connections->GetImageList()->Add(bitmapFromMem(unicast_png));
-  notebook_connections->GetImageList()->Add(bitmapFromMem(multicast_png));
+  notebook_connections->GetImageList()->Add(bitmapBundleFromSVGResource("unicast").GetBitmapFor(this));
+  notebook_connections->GetImageList()->Add(bitmapBundleFromSVGResource("multicast").GetBitmapFor(this));
 
 
   /*
@@ -412,7 +410,7 @@ void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
 
   if(index < connections.size()) // found
     {
-      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
+      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource("replay"));
       frame_main_menubar->SetLabel(ID_INPUT_REPLAY, _("Replay Input"));
       // remove and insert are necessary, otherwise label won't be updated
       size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
@@ -1369,7 +1367,7 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 
       if(c->isRecording())
 	{
-	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(record_png));
+	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource("record"));
 	  // remove and insert are necessary, otherwise label won't be updated
 	  size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_RECORD);
 	  wxToolBarToolBase *button =  frame_main_toolbar->RemoveTool(ID_INPUT_RECORD);
@@ -1431,7 +1429,7 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 
 	  if( c->recordUserInputStart()) 
 	    {
-	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapFromMem(stop_png));
+	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource("stop"));
 	      frame_main_menubar->SetLabel(ID_INPUT_RECORD, _("Stop Recording"));
 	      // remove and insert are necessary, otherwise label won't be updated
 	      size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_RECORD);
@@ -1468,7 +1466,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	{
 	  c->replayUserInputStop();
 
-	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(replay_png));
+	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource("replay"));
 	  frame_main_menubar->SetLabel(ID_INPUT_REPLAY,_("Replay Input"));
 	  // remove and insert are necessary, otherwise label won't be updated
 	  size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
@@ -1518,7 +1516,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  // start replay
 	  if(c->replayUserInputStart(recorded_input, shift_was_down))
 	    {
-	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapFromMem(stop_png));
+	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource("stop"));
 	      frame_main_menubar->SetLabel(ID_INPUT_REPLAY, _("Stop Replaying"));
 	      // remove and insert are necessary, otherwise label won't be updated
 	      size_t pos = frame_main_toolbar->GetToolPos(ID_INPUT_REPLAY);
@@ -1816,8 +1814,7 @@ void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
 void MyFrameMain::help_about(wxCommandEvent &event)
 {	
   wxAboutDialogInfo info;
-  wxIcon icon;
-  icon.CopyFromBitmap(bitmapFromMem(about_png));
+  wxIcon icon = bitmapBundleFromSVGResource("about").GetIcon(this->FromDIP(wxSize(128,128)));
 
   wxString desc = "\n";
   desc += _("MultiVNC is a cross-platform Multicast-enabled VNC client.");
