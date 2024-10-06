@@ -25,14 +25,6 @@ SET(MultiVNCgui_SRCS
    DialogLogin.h
    evtids.h
    bitmapFromMem.h
-   res/about.png.h
-   res/connect.png.h
-   res/listen.png.h
-   res/disconnect.png.h
-   res/fullscreen.png.h
-   res/screenshot.png.h
-   res/unicast.png.h
-   res/multicast.png.h
    res/multivnc.xpm
    res/vnccursor-mask.xbm
    res/vnccursor.xbm
