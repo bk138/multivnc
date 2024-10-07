@@ -37,6 +37,8 @@ modules:
         sha1: 4ffee63f4109cafe98b82b44adec6ed9a4e4ad1e
   - name: multivnc
     buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
     sources:
       - type: dir
         path: ..
