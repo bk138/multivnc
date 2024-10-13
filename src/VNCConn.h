@@ -33,9 +33,7 @@
 #include <wx/rawbmp.h>
 #include <wx/timer.h>
 #include <wx/thread.h>
-#if wxCHECK_VERSION(3, 1, 1)
 #include <wx/secretstore.h>
-#endif
 #include <wx/msgqueue.h>
 #include "rfb/rfbclient.h"
 
