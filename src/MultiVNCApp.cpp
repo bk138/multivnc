@@ -28,9 +28,7 @@
 #ifdef __WXMAC__
 #include <ApplicationServices/ApplicationServices.h>
 #endif
-#if wxCHECK_VERSION(3, 1, 1)
 #include <wx/stdpaths.h>
-#endif
 #include "MultiVNCApp.h"
 #include "DebugReportEmail.h"
 #include "gui/MyFrameMain.h"
@@ -113,11 +111,9 @@ bool MultiVNCApp::OnInit()
     }
 #endif
 
-#if wxCHECK_VERSION(3, 1, 1)
   // use XDG layout if running as flatpak or there is no old-style config file already
   if(wxGetEnv("FLATPAK_ID", NULL) || !wxFile::Exists(wxFileName::GetHomeDir() + wxFileName::GetPathSeparator() + ".multivnc"))
       wxStandardPaths::Get().SetFileLayout(wxStandardPaths::FileLayout_XDG);
-#endif
 
   // greetings to anyone who made it...
   cout << "\n:::  this is MultiVNC  :::\n\n";
