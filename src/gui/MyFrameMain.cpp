@@ -402,7 +402,8 @@ void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
 
   if(index < connections.size()) // found
     {
-      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource("replay"));
+      wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
+      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource(prefix + "/" + "replay"));
       frame_main_toolbar->FindById(ID_INPUT_REPLAY)->SetLabel(_("Replay Input"));
       frame_main_menubar->SetLabel(ID_INPUT_REPLAY, _("Replay Input"));
 
@@ -1367,7 +1368,8 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 
       if(c->isRecording())
 	{
-	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource("record"));
+          wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
+	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource(prefix + "/" + "record"));
           frame_main_toolbar->FindById(ID_INPUT_RECORD)->SetLabel(_("Record Input"));
 	  
 	  wxArrayString recorded_input;
@@ -1425,7 +1427,8 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 
 	  if( c->recordUserInputStart()) 
 	    {
-	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource("stop"));
+              wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
+	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource(prefix + "/" + "stop"));
               frame_main_toolbar->FindById(ID_INPUT_RECORD)->SetLabel(_("Stop"));
 	      frame_main_menubar->SetLabel(ID_INPUT_RECORD, _("Stop Recording"));
 
@@ -1458,7 +1461,8 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	{
 	  c->replayUserInputStop();
 
-	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource("replay"));
+          wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
+	  frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource(prefix + "/" + "replay"));
           frame_main_toolbar->FindById(ID_INPUT_REPLAY)->SetLabel(_("Replay Input"));
 	  frame_main_menubar->SetLabel(ID_INPUT_REPLAY,_("Replay Input"));
 
@@ -1504,7 +1508,8 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	  // start replay
 	  if(c->replayUserInputStart(recorded_input, shift_was_down))
 	    {
-	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource("stop"));
+              wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
+	      frame_main_toolbar->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource(prefix + "/" + "stop"));
 	      frame_main_menubar->SetLabel(ID_INPUT_REPLAY, _("Stop Replaying"));
               frame_main_toolbar->FindById(ID_INPUT_REPLAY)->SetLabel(_("Stop"));
 
