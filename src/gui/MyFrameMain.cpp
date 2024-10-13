@@ -671,17 +671,15 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 void MyFrameMain::onSysColourChanged(wxSysColourChangedEvent& event)
 {
     wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
-    GetToolBar()->FindById(wxID_YES)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "connect"));
-    GetToolBar()->FindById(wxID_REDO)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/"  + "listen"));
-    GetToolBar()->FindById(wxID_STOP)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "disconnect"));
-#ifdef MULTIVNC_GRABKEYBOARD
-    GetToolBar()->FindById(ID_GRABKEYBOARD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "toggle-keyboard-grab"));
-#endif
-    GetToolBar()->FindById(wxID_SAVE)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "screenshot"));
-    GetToolBar()->FindById(ID_INPUT_RECORD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "record"));
-    GetToolBar()->FindById(ID_INPUT_REPLAY)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "replay"));
-    GetToolBar()->FindById(ID_FULLSCREEN)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "fullscreen"));
-    GetToolBar()->FindById(ID_ONE_TO_ONE)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "one-to-one"));
+    GetToolBar()->SetToolNormalBitmap(wxID_YES, bitmapBundleFromSVGResource(prefix + "/" + "connect"));
+    GetToolBar()->SetToolNormalBitmap(wxID_REDO, bitmapBundleFromSVGResource(prefix + "/"  + "listen"));
+    GetToolBar()->SetToolNormalBitmap(wxID_STOP, bitmapBundleFromSVGResource(prefix + "/" + "disconnect"));
+    GetToolBar()->SetToolNormalBitmap(ID_GRABKEYBOARD, bitmapBundleFromSVGResource(prefix + "/" + "toggle-keyboard-grab"));
+    GetToolBar()->SetToolNormalBitmap(wxID_SAVE, bitmapBundleFromSVGResource(prefix + "/" + "screenshot"));
+    GetToolBar()->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource(prefix + "/" + "record"));
+    GetToolBar()->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource(prefix + "/" + "replay"));
+    GetToolBar()->SetToolNormalBitmap(ID_FULLSCREEN, bitmapBundleFromSVGResource(prefix + "/" + "fullscreen"));
+    GetToolBar()->SetToolNormalBitmap(ID_ONE_TO_ONE, bitmapBundleFromSVGResource(prefix + "/" + "one-to-one"));
 }
 
 
