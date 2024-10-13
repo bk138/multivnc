@@ -1,5 +1,6 @@
 
 #include "gui/bitmapFromMem.h"
+#include "gui/evtids.h"
 #include <fstream>
 #include <wx/aboutdlg.h>
 #include <wx/socket.h>
@@ -167,6 +168,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   splitwinlayout();
 
+  load_toolbar_icons();
+  
   loadbookmarks();
 
   if(show_discovered)
@@ -1117,7 +1120,18 @@ void MyFrameMain::splitwinlayout()
 }
 
 
-
+void MyFrameMain::load_toolbar_icons()
+{
+    GetToolBar()->FindById(wxID_YES)->SetNormalBitmap(bitmapBundleFromSVGResource("connect"));
+    GetToolBar()->FindById(wxID_REDO)->SetNormalBitmap(bitmapBundleFromSVGResource("listen"));
+    GetToolBar()->FindById(wxID_STOP)->SetNormalBitmap(bitmapBundleFromSVGResource("disconnect"));
+    GetToolBar()->FindById(ID_GRABKEYBOARD)->SetNormalBitmap(bitmapBundleFromSVGResource("toggle-keyboard-grab"));
+    GetToolBar()->FindById(wxID_SAVE)->SetNormalBitmap(bitmapBundleFromSVGResource("screenshot"));
+    GetToolBar()->FindById(ID_INPUT_RECORD)->SetNormalBitmap(bitmapBundleFromSVGResource("record"));
+    GetToolBar()->FindById(ID_INPUT_REPLAY)->SetNormalBitmap(bitmapBundleFromSVGResource("replay"));
+    GetToolBar()->FindById(ID_FULLSCREEN)->SetNormalBitmap(bitmapBundleFromSVGResource("fullscreen"));
+    GetToolBar()->FindById(ID_ONE_TO_ONE)->SetNormalBitmap(bitmapBundleFromSVGResource("one-to-one"));
+}
 
 
 bool MyFrameMain::loadbookmarks()
