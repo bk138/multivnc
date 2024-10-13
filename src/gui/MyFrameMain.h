@@ -89,6 +89,7 @@ class MyFrameMain: public FrameMain
 #else
   void onFullScreenChanged(bool isFullScreen);
 #endif
+  void onSysColourChanged(wxSysColourChangedEvent& event);
 
   bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
 
