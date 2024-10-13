@@ -6,9 +6,7 @@
 #include <wx/socket.h>
 #include <wx/clipbrd.h>
 #include <wx/imaglist.h>
-#if wxCHECK_VERSION(3, 1, 1)
 #include <wx/secretstore.h>
-#endif
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
 
@@ -25,14 +23,12 @@ using namespace std;
 #define MULTIVNC_GRABKEYBOARD
 #endif
 
-#if wxCHECK_VERSION(3, 1, 5)
 #ifndef EVT_FULLSCREEN
 // workaround for missing EVT_FULLSCREEN
 #define wxFullScreenEventHandler(func) \
     wxEVENT_HANDLER_CAST(wxFullScreenEventFunction, func)
 typedef void (wxEvtHandler::*wxFullScreenEventFunction)(wxFullScreenEvent&);
 #define EVT_FULLSCREEN(func) wx__DECLARE_EVT0(wxEVT_FULLSCREEN, wxFullScreenEventHandler(func))
-#endif
 #endif
 
 // map recv of custom events to handler methods
@@ -52,9 +48,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnDisconnectNOTIFY, MyFrameMain::onVNCConnDisconnectNotify)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
   EVT_END_PROCESS (ID_WINDOWSHARE_PROC_END, MyFrameMain::onWindowshareTerminate)
-#if wxCHECK_VERSION(3, 1, 5)
   EVT_FULLSCREEN (MyFrameMain::onFullScreenChanged)
-#endif
   EVT_SYS_COLOUR_CHANGED(MyFrameMain::onSysColourChanged)
 END_EVENT_TABLE()
 
@@ -97,9 +91,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   splitwin_main->SetMinimumPaneSize(160);
   splitwin_left->SetMinimumPaneSize(250);
   SetSize(x, y);
-#if wxCHECK_VERSION(3, 1, 0)
   EnableFullScreenView();
-#endif
 
 
   // assign image list to notebook_connections
@@ -247,11 +239,7 @@ MyFrameMain::~MyFrameMain()
   // the library would segfault while trying to delete the m_callbackUserData 
   // member of m_dynamicEvents
   if (m_dynamicEvents)
-#if wxCHECK_VERSION(3, 1, 0)
     for ( wxVector<wxDynamicEventTableEntry*>::iterator it = m_dynamicEvents->begin(),
-#else
-    for ( wxList::iterator it = m_dynamicEvents->begin(),
-#endif
 	    end = m_dynamicEvents->end();
 	  it != end;
 	  ++it )
@@ -646,16 +634,10 @@ void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
     }
 }
 
-#if wxCHECK_VERSION(3, 1, 5)
 void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
     wxLogDebug("onFullScreenChanged %d", event.IsFullScreen());
-
     // update this here as well as it might have been triggered from the WM buttons outside of our control
     show_fullscreen = event.IsFullScreen();
-#else
-void MyFrameMain::onFullScreenChanged(bool isFullScreen) {
-    wxLogDebug("onFullScreenChanged %d", isFullScreen);
-#endif
     if (show_fullscreen) {
 	// tick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, true);
@@ -1657,12 +1639,8 @@ void MyFrameMain::view_togglefullscreen(wxCommandEvent &event)
   // the event is not fired when using ShowFullScreen(), so manually do this here
   // (it is fired on OSX when entering fullscreen via the green button, so we need to
   // have the extra event handler).
-#if wxCHECK_VERSION(3, 1, 5)
   wxFullScreenEvent e = wxFullScreenEvent(0, show_fullscreen);
   onFullScreenChanged(e);
-#else
-  onFullScreenChanged(show_fullscreen);
-#endif
 }
 
 
