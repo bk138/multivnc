@@ -4,6 +4,12 @@
 
 ### 🛠  Fixes
 
+* Fix reported crash in screen drawing module.
+
+## 2.1.5
+
+### 🛠  Fixes
+
 * Adapted to API level 34 as required by Google.
 * Fixed rare crash in service discovery module.
 
