@@ -3,6 +3,7 @@ bin/
 gen/
 build/
 .cxx/
+release/
 
 # Gradle
 .gradle/
