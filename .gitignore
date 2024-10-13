@@ -37,3 +37,6 @@ flatpak/build-dir/
 # ccls cache
 .ccls-cache/
 .cache/
+
+# OS files
+.DS_Store
