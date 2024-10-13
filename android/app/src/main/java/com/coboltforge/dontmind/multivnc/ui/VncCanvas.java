@@ -820,8 +820,12 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 		int displayHeight = getHeight();
 		for (; scale >= 0; scale -= 0.25)
 		{
-			if (scale * vncConn.getFramebufferWidth() < displayWidth && scale * vncConn.getFramebufferHeight() < displayHeight)
+			try {
+				if (scale * vncConn.getFramebufferWidth() < displayWidth && scale * vncConn.getFramebufferHeight() < displayHeight)
+					break;
+			} catch (NullPointerException ignored) {
 				break;
+			}
 		}
 		return (float)(scale + 0.25);
 	}
