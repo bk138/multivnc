@@ -54,8 +54,6 @@ class MyFrameMain: public FrameMain
 
   void splitwinlayout();
 
-  void load_toolbar_icons();
-
   // array of bookmark strings
   wxArrayString bookmarks;
   bool loadbookmarks();

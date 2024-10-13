@@ -161,8 +161,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   splitwinlayout();
 
-  load_toolbar_icons();
-  
   loadbookmarks();
 
   if(show_discovered)
@@ -672,7 +670,16 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 
 void MyFrameMain::onSysColourChanged(wxSysColourChangedEvent& event)
 {
-    load_toolbar_icons();
+    wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
+    GetToolBar()->FindById(wxID_YES)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "connect"));
+    GetToolBar()->FindById(wxID_REDO)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/"  + "listen"));
+    GetToolBar()->FindById(wxID_STOP)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "disconnect"));
+    GetToolBar()->FindById(ID_GRABKEYBOARD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "toggle-keyboard-grab"));
+    GetToolBar()->FindById(wxID_SAVE)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "screenshot"));
+    GetToolBar()->FindById(ID_INPUT_RECORD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "record"));
+    GetToolBar()->FindById(ID_INPUT_REPLAY)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "replay"));
+    GetToolBar()->FindById(ID_FULLSCREEN)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "fullscreen"));
+    GetToolBar()->FindById(ID_ONE_TO_ONE)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "one-to-one"));
 }
 
 
@@ -1103,21 +1110,6 @@ void MyFrameMain::splitwinlayout()
 	    frame_main_menubar->Enable(wxID_DELETE, true);
 	}
     }
-}
-
-
-void MyFrameMain::load_toolbar_icons()
-{
-    wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
-    GetToolBar()->FindById(wxID_YES)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "connect"));
-    GetToolBar()->FindById(wxID_REDO)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/"  + "listen"));
-    GetToolBar()->FindById(wxID_STOP)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "disconnect"));
-    GetToolBar()->FindById(ID_GRABKEYBOARD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "toggle-keyboard-grab"));
-    GetToolBar()->FindById(wxID_SAVE)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "screenshot"));
-    GetToolBar()->FindById(ID_INPUT_RECORD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "record"));
-    GetToolBar()->FindById(ID_INPUT_REPLAY)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "replay"));
-    GetToolBar()->FindById(ID_FULLSCREEN)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "fullscreen"));
-    GetToolBar()->FindById(ID_ONE_TO_ONE)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "one-to-one"));
 }
 
 
