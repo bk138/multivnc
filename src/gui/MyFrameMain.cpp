@@ -674,7 +674,9 @@ void MyFrameMain::onSysColourChanged(wxSysColourChangedEvent& event)
     GetToolBar()->FindById(wxID_YES)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "connect"));
     GetToolBar()->FindById(wxID_REDO)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/"  + "listen"));
     GetToolBar()->FindById(wxID_STOP)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "disconnect"));
+#ifdef MULTIVNC_GRABKEYBOARD
     GetToolBar()->FindById(ID_GRABKEYBOARD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "toggle-keyboard-grab"));
+#endif
     GetToolBar()->FindById(wxID_SAVE)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "screenshot"));
     GetToolBar()->FindById(ID_INPUT_RECORD)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "record"));
     GetToolBar()->FindById(ID_INPUT_REPLAY)->SetNormalBitmap(bitmapBundleFromSVGResource(prefix + "/" + "replay"));
