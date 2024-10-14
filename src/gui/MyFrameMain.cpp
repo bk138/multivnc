@@ -637,8 +637,12 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 	// tick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, true);
 	GetToolBar()->ToggleTool(ID_FULLSCREEN, true);
-#ifndef __WXMAC__
-	// hide menu
+#ifdef __WXMAC__
+        // only disable affected view items
+        frame_main_menubar->Enable(ID_BOOKMARKS, false);
+        frame_main_menubar->Enable(ID_DISCOVERED, false);
+#else
+        // hide whole menu
 	frame_main_menubar->Show(false);
 #endif
 	// hide bookmarks and discovered servers
@@ -652,8 +656,12 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
 	GetToolBar()->ToggleTool(ID_FULLSCREEN, false);
-#ifndef __WXMAC__
-	// show menu
+#ifdef __WXMAC__
+        // only enable affected view items
+        frame_main_menubar->Enable(ID_BOOKMARKS, true);
+        frame_main_menubar->Enable(ID_DISCOVERED, true);
+#else
+        // show whole menu again
 	frame_main_menubar->Show(true);
 #endif
 	// restore bookmarks and discovered servers to saved state
