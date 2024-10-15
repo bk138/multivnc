@@ -633,10 +633,11 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
     wxLogDebug("onFullScreenChanged %d", event.IsFullScreen());
     // update this here as well as it might have been triggered from the WM buttons outside of our control
     show_fullscreen = event.IsFullScreen();
+    wxString prefix = wxSystemSettings::GetAppearance().IsDark() ? "dark" : "light";
     if (show_fullscreen) {
 	// tick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, true);
-	GetToolBar()->ToggleTool(ID_FULLSCREEN, true);
+        GetToolBar()->SetToolNormalBitmap(ID_FULLSCREEN, bitmapBundleFromSVGResource(prefix + "/" + "restore"));
 #ifdef __WXMAC__
         // only disable affected view items
         frame_main_menubar->Enable(ID_BOOKMARKS, false);
@@ -655,7 +656,7 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
     } else {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
-	GetToolBar()->ToggleTool(ID_FULLSCREEN, false);
+        GetToolBar()->SetToolNormalBitmap(ID_FULLSCREEN, bitmapBundleFromSVGResource(prefix + "/" + "fullscreen"));
 #ifdef __WXMAC__
         // only enable affected view items
         frame_main_menubar->Enable(ID_BOOKMARKS, true);
@@ -686,7 +687,7 @@ void MyFrameMain::onSysColourChanged(wxSysColourChangedEvent& event)
     GetToolBar()->SetToolNormalBitmap(wxID_SAVE, bitmapBundleFromSVGResource(prefix + "/" + "screenshot"));
     GetToolBar()->SetToolNormalBitmap(ID_INPUT_RECORD, bitmapBundleFromSVGResource(prefix + "/" + "record"));
     GetToolBar()->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource(prefix + "/" + "replay"));
-    GetToolBar()->SetToolNormalBitmap(ID_FULLSCREEN, bitmapBundleFromSVGResource(prefix + "/" + "fullscreen"));
+    GetToolBar()->SetToolNormalBitmap(ID_FULLSCREEN, bitmapBundleFromSVGResource(prefix + "/" + (show_fullscreen ? "restore" : "fullscreen")));
     GetToolBar()->SetToolNormalBitmap(ID_ONE_TO_ONE, bitmapBundleFromSVGResource(prefix + "/" + "one-to-one"));
 }
 
