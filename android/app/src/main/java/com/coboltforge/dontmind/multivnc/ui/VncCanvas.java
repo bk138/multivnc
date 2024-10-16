@@ -500,37 +500,39 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	 */
 	public boolean pan(int dX, int dY) {
 
-		double scale = getScale();
+		try {
+			double scale = getScale();
 
-		double sX = (double)dX / scale;
-		double sY = (double)dY / scale;
+			double sX = (double) dX / scale;
+			double sY = (double) dY / scale;
 
-		if (absoluteXPosition + sX < 0)
-			// dX = diff to 0
-			sX = -absoluteXPosition;
-		if (absoluteYPosition + sY < 0)
-			sY = -absoluteYPosition;
+			if (absoluteXPosition + sX < 0)
+				// dX = diff to 0
+				sX = -absoluteXPosition;
+			if (absoluteYPosition + sY < 0)
+				sY = -absoluteYPosition;
 
-		// Prevent panning right or below desktop image
-		if (absoluteXPosition + getVisibleWidth() + sX > vncConn.getFramebufferWidth())
-			sX = vncConn.getFramebufferWidth() - getVisibleWidth() - absoluteXPosition;
-		if (absoluteYPosition + getVisibleHeight() + sY >  vncConn.getFramebufferHeight())
-			sY = vncConn.getFramebufferHeight() - getVisibleHeight() - absoluteYPosition;
+			// Prevent panning right or below desktop image
+			if (absoluteXPosition + getVisibleWidth() + sX > vncConn.getFramebufferWidth())
+				sX = vncConn.getFramebufferWidth() - getVisibleWidth() - absoluteXPosition;
+			if (absoluteYPosition + getVisibleHeight() + sY > vncConn.getFramebufferHeight())
+				sY = vncConn.getFramebufferHeight() - getVisibleHeight() - absoluteYPosition;
 
-		absoluteXPosition += sX;
-		absoluteYPosition += sY;
+			absoluteXPosition += sX;
+			absoluteYPosition += sY;
 
-		// whene the frame buffer is smaller than the view,
-		// it is is centered!
-		if(vncConn.getFramebufferWidth() < getVisibleWidth())
-			absoluteXPosition /= 2;
-		if(vncConn.getFramebufferHeight() < getVisibleHeight())
-			absoluteYPosition /= 2;
+			// whene the frame buffer is smaller than the view,
+			// it is is centered!
+			if (vncConn.getFramebufferWidth() < getVisibleWidth())
+				absoluteXPosition /= 2;
+			if (vncConn.getFramebufferHeight() < getVisibleHeight())
+				absoluteYPosition /= 2;
 
 
-		if (sX != 0.0 || sY != 0.0)
-		{
-			return true;
+			if (sX != 0.0 || sY != 0.0) {
+				return true;
+			}
+		} catch (Exception ignored) {
 		}
 		return false;
 	}
