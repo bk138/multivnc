@@ -1,5 +1,11 @@
 # Version 2.1.x:
 
+## 2.1.7
+
+### 🛠  Fixes
+
+* Fix another reported crash in screen drawing module.
+
 ## 2.1.6
 
 ### 🛠  Fixes
