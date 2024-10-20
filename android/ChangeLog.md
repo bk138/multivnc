@@ -1,5 +1,12 @@
 # Version 2.1.x:
 
+## 2.1.8
+
+### 🛠  Fixes
+
+* Fix regression that caused failures when connecting VNC servers using encryption.
+* Fix race condition on start when init UI would be tried to show despite activity finishing.
+
 ## 2.1.7
 
 ### 🛠  Fixes
