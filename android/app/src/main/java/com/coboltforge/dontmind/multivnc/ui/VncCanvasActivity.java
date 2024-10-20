@@ -264,6 +264,12 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		conn.init(connection,
 				// onInit
 				initError -> runOnUiThread(() -> {
+					if(isFinishing()) {
+						// this can happen when the activity is finishing, but the runOnUiThread comes later
+						Log.w(TAG, "VNCConn's onInit run while finishing activity, doing nothing");
+						return;
+					}
+
 					if(initError == null) {
 						// init success!
 						if (Build.VERSION.SDK_INT < 33) {
