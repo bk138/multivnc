@@ -13,7 +13,7 @@ uses [wxWidgets](https://www.wxwidgets.org/) and runs on Unix, Mac OS X and
 Windows. There also is an [Android version](/android/).
 
 The roadmap for future developments regarding the project can be found
-[here](https://github.com/bk138/multivnc/projects?type=classic).
+[here](https://github.com/bk138/multivnc/projects).
 
 ## MultiVNC for Android
 
