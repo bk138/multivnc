@@ -136,13 +136,6 @@ bool MultiVNCApp::OnInit()
   SetTopWindow(frame_main);
   frame_main->Show();
 
-  // bring window to foreground in OS X
-#ifdef __WXMAC__
-  ProcessSerialNumber PSN;
-  GetCurrentProcess(&PSN);
-  TransformProcessType(&PSN,kProcessTransformToForegroundApplication);
-#endif
-
   return true;
 }
 
