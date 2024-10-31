@@ -21,6 +21,11 @@
     <control>pointing</control>
     <control>keyboard</control>
   </recommends>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#E8F3E2</color>
+    <color type="primary" scheme_preference="dark">#1A2E1D</color>
+  </branding>
   
   <description>
     <p>
