@@ -4,7 +4,7 @@
   <id>net.christianbeier.MultiVNC</id>
   
   <name>MultiVNC</name>
-  <summary>Cross-platform Multicast-enabled VNC viewer</summary>
+  <summary>Multicast-enabled VNC viewer</summary>
   
   <metadata_license>CC-BY-4.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
