@@ -1841,6 +1841,7 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   info.SetCopyright(wxT(COPYRIGHT));
   info.AddDeveloper("Christian Beier");
   info.AddDeveloper("Evgeny Zinoviev");
+  info.AddDeveloper("Audrey Dutcher");
   
   wxAboutBox(info); 
 }
