@@ -1040,7 +1040,7 @@ void VNCConn::thread_logger(const char *format, ...)
       logfile=fopen(logfile_str.char_str(),"a");    
       
       va_start(args, format);
-      fprintf(logfile, wxString(timebuf).mb_str());
+      fprintf(logfile, "%s", (const char*)wxString(timebuf).mb_str());
       vfprintf(logfile, format, args);
       va_end(args);
 
@@ -1049,7 +1049,7 @@ void VNCConn::thread_logger(const char *format, ...)
  
   // and stderr
   va_start(args, format);
-  fprintf(stderr, wxString(timebuf).mb_str());
+  fprintf(stderr, "%s", (const char*)wxString(timebuf).mb_str());
   vfprintf(stderr, format, args);
   va_end(args);
 }
