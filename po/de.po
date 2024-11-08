@@ -876,8 +876,8 @@ msgstr "Zlib"
 msgid "ZlibHex"
 msgstr "ZlibHex"
 
-#~ msgid "translator-credits"
-#~ msgstr "Christian Beier <multivnc@christianbeier.net>"
+msgid "translator-credits"
+msgstr "Christian Beier <multivnc@christianbeier.net>"
 
 #, fuzzy
 #~| msgid "Window &Sharing"
