@@ -32,6 +32,7 @@ SET(multivnc_SRCS
 
 if(APPLE)
     set(executable_name MultiVNC)
+    set(MACOSX_BUNDLE_BUNDLE_NAME "MultiVNC")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "net.christianbeier.MultiVNC")
     set(MACOSX_BUNDLE_COPYRIGHT "© Christian Beier (multivnc@christianbeier.net), 2009-2024")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
