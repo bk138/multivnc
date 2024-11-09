@@ -17,3 +17,6 @@ For the time being, we're building an Intel binary only. Universal builds to com
   - Sign embedded libs: `codesign -s <codesigning-ID> -f -i net.christianbeier.MultiVNC.libs MultiVNC.app/Contents/Frameworks/*`
   - Sign app: `codesign -s <codesigning-ID> --entitlements ../macos/MultiVNC.entitlements MultiVNC.app`
   - Verify: `codesign -d -vv MultiVNC.app`
+- [Build an installer package for App Store distribution](https://developer.apple.com/documentation/xcode/packaging-mac-software-for-distribution):
+  - Get Mac Installer Distribution signing identity: `security find-identity -v`
+  - `productbuild --sign <codesigning-ID> --component MultiVNC.app /Applications MultiVNC.pkg`
