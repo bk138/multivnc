@@ -20,3 +20,7 @@ For the time being, we're building an Intel binary only. Universal builds to com
 - [Build an installer package for App Store distribution](https://developer.apple.com/documentation/xcode/packaging-mac-software-for-distribution):
   - Get Mac Installer Distribution signing identity: `security find-identity -v`
   - `productbuild --sign <codesigning-ID> --component MultiVNC.app /Applications MultiVNC.pkg`
+- [Validate and upload package](https://help.apple.com/asc/appsaltool)
+  - Might need an app-specific password if using 2FA.
+  - Need to create app in https://appstoreconnect.apple.com/apps first.
+  - Validate: `xcrun altool --validate-app -f MultiVNC.pkg -t osx -u <apple-id> -p <password> --output-format xml`
