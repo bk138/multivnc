@@ -25,8 +25,8 @@ set -e
 echo
 echo "Build release app bundle"
 echo
-mkdir -p build
-cd build
+mkdir -p build-dir
+cd build-dir
 MACOSX_DEPLOYMENT_TARGET=10.15 cmake ../.. -DCMAKE_BUILD_TYPE=Release
 make -j
 cmake --install . --prefix .
