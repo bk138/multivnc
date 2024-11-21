@@ -7,6 +7,8 @@
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.png)](https://www.paypal.com/donate/?hosted_button_id=HKRTWKNKBKPKN)
 [![Gitter](https://badges.gitter.im/multivnc/community.svg)](https://gitter.im/multivnc/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
+![MultiVNC logo](src/gui/res/net.christianbeier.MultiVNC.svg)
+
 MultiVNC is a cross-platform Multicast-enabled VNC viewer based on
 [LibVNCClient](https://github.com/LibVNC/libvncserver). The desktop version
 uses [wxWidgets](https://www.wxwidgets.org/) and runs on Unix, Mac OS X and
