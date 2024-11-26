@@ -36,5 +36,7 @@
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>MultiVNC requires access to your local network to be able to discover and connect to VNC servers for remote desktop control.</string>
 </dict>
 </plist>
