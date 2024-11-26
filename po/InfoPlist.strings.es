@@ -1,0 +1,1 @@
+"NSLocalNetworkUsageDescription" = "MultiVNC requiere acceso a su red local para poder descubrir y conectarse a servidores VNC para el control de escritorio remoto.";
