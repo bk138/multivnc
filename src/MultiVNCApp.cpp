@@ -172,10 +172,12 @@ void MultiVNCApp::OnUnhandledException()
 
 void MultiVNCApp::OnFatalException()
 {
+#ifndef __WXMAC__ // handled by CrashReporter on MacOS
   int answer = wxMessageBox(_("Ouch! MultiVNC crashed. This should not happen. Do you want to generate a bug report?"), _("MultiVNC crashed"),
 			    wxICON_ERROR | wxYES_NO, NULL);
   if(answer == wxYES)
     genDebugReport(wxDebugReport::Context_Exception);
+#endif
 }
 
 
