@@ -55,6 +55,17 @@
   </screenshots>
 
   <releases>
+    <release version="0.8.0">
+      <description>
+	<ul>
+	  <li>Added a scale-to-fit view mode which is now the default. Previous 1-to-1 view mode can still be toggled.</li>
+          <li>Improved fullscreen mode to show less controls and more of the remote view.</li>
+          <li>Improved toolbar icons to use scalable resources that look good for any display resolution as well as light and dark display mode.</li>
+          <li>Added MacOS packaging.</li>
+	</ul>
+      </description>
+    </release>
+
     <release version="0.7.0" date="2023-11-05">
       <description>
 	<ul>
