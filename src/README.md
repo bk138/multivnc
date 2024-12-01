@@ -8,4 +8,5 @@
 * [ ] Update AppStream.
 * [ ] Fill out GitHub release.
 * [ ] Make Flathub release.
+* [ ] Make App Store release.
 * [ ] Announce on social.
