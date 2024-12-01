@@ -1,3 +1,11 @@
+# MultiVNC 0.8.0 - "Hello New World"
+* Added a scale-to-fit view mode which is now the default.
+  Previous 1-to-1 view mode can still be toggled.
+* Improved fullscreen mode to show less controls and more of the remote view.
+* Improved toolbar icons to use scalable resources that look good for any
+  display resolution as well as light and dark display mode.
+* Added MacOS packaging.
+
 # MultiVNC 0.7.0 - "A step in between" - 2023-11-05
 * Added Swedish translation thanks to Åke Engelbrektson.
 * Added more tooltips to more UI elements.
