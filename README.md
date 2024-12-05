@@ -61,7 +61,7 @@ The roadmap for future developments regarding the project can be found
 
 ### MultiVNC for Desktop
 
-[<img src="https://flathub.org/assets/badges/flathub-badge-i-en.png" height="60" />](https://flathub.org/apps/details/net.christianbeier.MultiVNC)
+[<img src="https://flathub.org/api/badge?svg" height="60" />](https://flathub.org/apps/details/net.christianbeier.MultiVNC)
 [<img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" height="60" />](https://apps.apple.com/us/app/multivnc/id6738012997)
 
 To get bleeding-edge packages built from the master development branch, navigate to
