@@ -1,4 +1,4 @@
-# MultiVNC 0.8.0 - "Hello New World"
+# MultiVNC 0.8.0 - "Hello New World" - 2024-12-06
 * Added a scale-to-fit view mode which is now the default.
   Previous 1-to-1 view mode can still be toggled.
 * Improved fullscreen mode to show less controls and more of the remote view.
