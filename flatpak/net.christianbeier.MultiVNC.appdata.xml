@@ -55,7 +55,7 @@
   </screenshots>
 
   <releases>
-    <release version="0.8.0">
+    <release version="0.8.0" date="2024-12-06">
       <description>
 	<ul>
 	  <li>Added a scale-to-fit view mode which is now the default. Previous 1-to-1 view mode can still be toggled.</li>
