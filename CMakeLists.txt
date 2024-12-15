@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.13)
 project(multivnc VERSION 0.8.0)
 set (CMAKE_CXX_STANDARD 11)
 
-set(LOCALE_DOMAIN ${CMAKE_PROJECT_NAME})
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(CMAKE_GENERATOR MATCHES "Unix Makefiles|Ninja")
 # some LSP servers expect compile_commands.json in the project root
@@ -16,10 +14,15 @@ add_custom_target(
     )
 endif(CMAKE_GENERATOR MATCHES "Unix Makefiles|Ninja")
 
-# all the build configuration switches
+configure_file(config.h.cmake_in config.h)
+
+
+#
+# dependencies
+#
+
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-configure_file(config.h.cmake_in config.h)
 
 set(WXSERVDISC_INSTALL OFF CACHE BOOL "Set to OFF to not include wxservdisc artifacts in install")
 add_subdirectory(libwxservdisc/src)
@@ -27,19 +30,30 @@ set(LIBVNCSERVER_INSTALL OFF CACHE BOOL "Set to OFF to not include libvncserver 
 set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples")
 add_subdirectory(libvncserver)
 
+
+#
+# source proper
+#
+
 add_subdirectory(src)
 
+
+#
+# l18n
+#
+
+set(LOCALE_DOMAIN ${CMAKE_PROJECT_NAME})
+
 find_package(Gettext)
-
-
-#
-# install directives
-#
 
 GETTEXT_PROCESS_PO_FILES(de ALL PO_FILES po/de.po)
 GETTEXT_PROCESS_PO_FILES(es ALL PO_FILES po/es.po)
 GETTEXT_PROCESS_PO_FILES(sv ALL PO_FILES po/sv.po)
 
+
+#
+# install directives
+#
 
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
