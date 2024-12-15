@@ -23,9 +23,13 @@ configure_file(config.h.cmake_in config.h)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-
+# wxservdisc
+message("-----wxServDisc-----")
 set(WXSERVDISC_INSTALL OFF CACHE BOOL "Set to OFF to not include wxservdisc artifacts in install")
 add_subdirectory(libwxservdisc/src)
+
+# libvncclient
+message("-----LibVNCClient-----")
 set(LIBVNCSERVER_INSTALL OFF CACHE BOOL "Set to OFF to not include libvncserver artifacts in install")
 set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples")
 add_subdirectory(libvncserver)
@@ -34,7 +38,7 @@ add_subdirectory(libvncserver)
 #
 # source proper
 #
-
+message("-----MultiVNC-----")
 add_subdirectory(src)
 
 
