@@ -114,8 +114,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->Enable(ID_INPUT_REPLAY, false);
   // bookmarks
   frame_main_menubar->Enable(wxID_ADD, false);
-  frame_main_menubar->Enable(wxID_EDIT, false);
-  frame_main_menubar->Enable(wxID_DELETE, false);
   // window sharing
   frame_main_menubar->Enable(wxID_UP, false);
   frame_main_menubar->Enable(wxID_CANCEL, false);
@@ -209,6 +207,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   // finally, our mdns service scanner
   servscan = new wxServDisc(this, wxT("_rfb._tcp.local."), QTYPE_PTR);
+
+  // right click handler for bookmarks
+  list_box_bookmarks->Bind(wxEVT_CONTEXT_MENU, &MyFrameMain::listbox_bookmarks_context, this);
 }
 
 
@@ -1108,21 +1109,6 @@ void MyFrameMain::splitwinlayout()
 
   splitwin_main->SetSashPosition(w * 0.1);
   splitwin_left->SetSashPosition(h * 0.4);
-  
-  // finally if not shown, disable menu items
-  if(!show_bookmarks)
-    {
-	frame_main_menubar->Enable(wxID_EDIT, false);
-	frame_main_menubar->Enable(wxID_DELETE, false);
-    }  
-  else
-    {
-      if(list_box_bookmarks->GetSelection() >= 0)
-	{
-	    frame_main_menubar->Enable(wxID_EDIT, true);
-	    frame_main_menubar->Enable(wxID_DELETE, true);
-	}
-    }
 }
 
 
@@ -1149,7 +1135,7 @@ bool MyFrameMain::loadbookmarks()
   // clean up
   bookmarks.Clear();
   wxMenu* bm_menu = frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(_("Bookmarks")));
-  for(int i = bm_menu->GetMenuItemCount()-1; i > 3; --i)
+  for(int i = bm_menu->GetMenuItemCount()-1; i > 0; --i)
     bm_menu->Destroy(bm_menu->FindItemByPosition(i));
   bm_menu->AppendSeparator();
 
@@ -1967,18 +1953,8 @@ void MyFrameMain::listbox_bookmarks_select(wxCommandEvent &event)
 {
   int sel = event.GetInt();
 
-  if(sel < 0) //nothing selected
+  if(sel >= 0) // something selected
     {
-      frame_main_menubar->Enable(wxID_EDIT, false);
-      frame_main_menubar->Enable(wxID_DELETE, false);
-      
-      return;
-    }
-  else
-    {
-      frame_main_menubar->Enable(wxID_EDIT, true);
-      frame_main_menubar->Enable(wxID_DELETE, true);
-     
       wxLogStatus(_("Bookmark %s"), bookmarks[sel]);
     }
 }
@@ -1999,6 +1975,29 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
   spawn_conn(bookmarks[sel]);
 }
 
+
+void MyFrameMain::listbox_bookmarks_context(wxContextMenuEvent &event)
+{
+    wxPoint clientPosition =
+        list_box_bookmarks->ScreenToClient(event.GetPosition());
+
+    int itemIndex = list_box_bookmarks->HitTest(clientPosition);
+
+    if (itemIndex != wxNOT_FOUND) {
+        // Programmatically select the item. This is for UX purposes and,
+        // more important, so that edit and delete function work on the
+        // correct item.
+        list_box_bookmarks->SetSelection(itemIndex);
+
+        // and show the context menu
+        wxMenu menu;
+        menu.Append(wxID_EDIT, _("&Edit Bookmark"));
+        menu.Bind(wxEVT_MENU, &MyFrameMain::bookmarks_edit, this, wxID_EDIT);
+        menu.Append(wxID_DELETE, _("&Delete Bookmark"));
+        menu.Bind(wxEVT_MENU, &MyFrameMain::bookmarks_delete, this, wxID_DELETE);
+        PopupMenu(&menu);
+    }
+}
 
 void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
 {

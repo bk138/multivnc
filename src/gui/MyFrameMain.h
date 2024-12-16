@@ -104,6 +104,7 @@ public:
   void listbox_services_dclick(wxCommandEvent &event); 
   void listbox_bookmarks_select(wxCommandEvent &event); 
   void listbox_bookmarks_dclick(wxCommandEvent &event); 
+  void listbox_bookmarks_context(wxContextMenuEvent &event);
 
   void notebook_connections_pagechanged(wxNotebookEvent &event);
 
