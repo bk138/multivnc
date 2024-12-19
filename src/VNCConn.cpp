@@ -564,16 +564,23 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
   if(event.Entering() && ! cuttext.IsEmpty())
     {
       wxCriticalSectionLocker lock(mutex_cuttext); // since cuttext can be set from the main thread
-      // if encoding fails, length() returns 0
-      if(cuttext.mb_str(wxCSConv("iso-8859-1")).length())
-	{
-	  wxLogDebug(wxT("VNCConn %p: sending Latin1 cuttext: '%s'"), this, cuttext.c_str());
-	  char* encoded_text = strdup(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
-	  SendClientCutText(cl, encoded_text, strlen(encoded_text));
-	  free(encoded_text);	  
-	}
-      else
-	wxLogDebug(wxT("VNCConn %p: sending Latin1 cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
+
+      // first, try sending UTF-8
+      if(SendClientCutTextUTF8(cl, const_cast<char*>(cuttext.utf8_str().data()), strlen(cuttext.utf8_str().data()))) {
+          wxLogDebug(wxT("VNCConn %p: sent UTF-8 cuttext: '%s'"), this, cuttext.utf8_str());
+      } else {
+          // server does not support Extended Clipboard, try Latin-1.
+          // if encoding fails, length() returns 0
+          if(cuttext.mb_str(wxCSConv("iso-8859-1")).length())
+              {
+                  char* encoded_text = strdup(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
+                  SendClientCutText(cl, encoded_text, strlen(encoded_text));
+                  wxLogDebug(wxT("VNCConn %p: sent Latin-1 cuttext: '%s'"), this, encoded_text);
+                  free(encoded_text);
+              }
+          else
+              wxLogDebug(wxT("VNCConn %p: sending Latin-1 cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
+      }
     }
 
   // record here
