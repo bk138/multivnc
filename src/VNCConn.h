@@ -315,6 +315,7 @@ private:
   static void thread_kbd_leds(rfbClient* cl, int value, int pad);
   static void thread_textchat(rfbClient* cl, int value, char *text);
   static void thread_got_cuttext(rfbClient *cl, const char *text, int len);
+  static void thread_got_cuttext_utf8(rfbClient *cl, const char *text, int len);
   static void thread_bell(rfbClient *cl);
   static void thread_handle_xvp(rfbClient *cl, uint8_t ver, uint8_t code);
   static void thread_logger(const char *format, ...);

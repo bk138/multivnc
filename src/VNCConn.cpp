@@ -961,10 +961,22 @@ void VNCConn::thread_got_cuttext(rfbClient *cl, const char *text, int len)
 {
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
 
-  wxLogDebug(wxT("VNCConn %p: got cuttext: '%s'"), conn, wxString(text, wxCSConv(wxT("iso-8859-1"))).c_str());
+  wxLogDebug(wxT("VNCConn %p: got Latin1 cuttext: '%s'"), conn, wxString(text, wxCSConv(wxT("iso-8859-1"))).c_str());
 
   wxCriticalSectionLocker lock(conn->mutex_cuttext); // since cuttext can also be set from the main thread
   conn->cuttext = wxString(text, wxCSConv(wxT("iso-8859-1")));
+  conn->thread_post_cuttext_notify();
+}
+
+
+void VNCConn::thread_got_cuttext_utf8(rfbClient *cl, const char *text, int len)
+{
+  VNCConn* conn = (VNCConn*) rfbClientGetClientData(cl, VNCCONN_OBJ_ID);
+
+  wxLogDebug(wxT("VNCConn %p: got UTF-8 cuttext: '%s'"), conn, wxString(text, wxConvUTF8).c_str());
+
+  wxCriticalSectionLocker lock(conn->mutex_cuttext); // since cuttext can also be set from the main thread
+  conn->cuttext = wxString(text, wxConvUTF8);
   conn->thread_post_cuttext_notify();
 }
 
@@ -1087,6 +1099,7 @@ bool VNCConn::setupClient()
   cl->HandleKeyboardLedState = thread_kbd_leds;
   cl->HandleTextChat = thread_textchat;
   cl->GotXCutText = thread_got_cuttext;
+  cl->GotXCutTextUTF8 = thread_got_cuttext_utf8;
   cl->Bell = thread_bell;
   cl->HandleXvpMsg = thread_handle_xvp;
 
