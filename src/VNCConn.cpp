@@ -564,16 +564,16 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
   if(event.Entering() && ! cuttext.IsEmpty())
     {
       wxCriticalSectionLocker lock(mutex_cuttext); // since cuttext can be set from the main thread
-      // if encoding fails, a NULL pointer is returned!
-      if(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))))
+      // if encoding fails, length() returns 0
+      if(cuttext.mb_str(wxCSConv("iso-8859-1")).length())
 	{
-	  wxLogDebug(wxT("VNCConn %p: sending cuttext: '%s'"), this, cuttext.c_str());
+	  wxLogDebug(wxT("VNCConn %p: sending Latin1 cuttext: '%s'"), this, cuttext.c_str());
 	  char* encoded_text = strdup(cuttext.mb_str(wxCSConv(wxT("iso-8859-1"))));
 	  SendClientCutText(cl, encoded_text, strlen(encoded_text));
 	  free(encoded_text);	  
 	}
       else
-	wxLogDebug(wxT("VNCConn %p: sending cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
+	wxLogDebug(wxT("VNCConn %p: sending Latin1 cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
     }
 
   // record here
