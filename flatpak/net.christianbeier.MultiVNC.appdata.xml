@@ -49,8 +49,8 @@
   <launchable type="desktop-id">net.christianbeier.MultiVNC.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/bk138/multivnc/master/flatpak/screenshot-to-macos.png</image>
-      <caption>MultiVNC connected to a MacOS remote desktop</caption>
+      <image>https://raw.githubusercontent.com/bk138/multivnc/master/flatpak/screenshot-hello-world.png</image>
+      <caption>MultiVNC connected to an example VNC server</caption>
     </screenshot>
   </screenshots>
 
