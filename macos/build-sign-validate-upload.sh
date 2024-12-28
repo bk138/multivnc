@@ -34,7 +34,7 @@ echo
 mkdir -p build-dir
 cd build-dir
 MACOSX_DEPLOYMENT_TARGET=10.15 cmake ../.. -DCMAKE_BUILD_TYPE=Release
-make -j
+make -j$(nproc)
 cmake --install . --prefix .
 # workaround until we're installing the whole framework https://github.com/bk138/multivnc/issues/244
 cp $WX_LOCALES_PATH/de/LC_MESSAGES/wxstd-3.2.mo MultiVNC.app/Contents/Resources/de.lproj/
