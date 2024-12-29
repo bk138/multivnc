@@ -1,3 +1,10 @@
+# MultiVNC 0.9.0 - "Hello New Year" - 2024-12-29
+* Improved bookmark editing/deleting by adding a context menu.
+* Added UTF-8 cuttext handling.
+* Improved log window by making it wider.
+* Fixed a bug where MultiVNC on Apple Silicon would not be able to connect
+  to TLS-enabled servers.
+
 # MultiVNC 0.8.0 - "Hello New World" - 2024-12-06
 * Added a scale-to-fit view mode which is now the default.
   Previous 1-to-1 view mode can still be toggled.
