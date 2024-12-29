@@ -55,6 +55,18 @@
   </screenshots>
 
   <releases>
+    <release version="0.9.0" date="2024-12-29">
+      <description>
+	<ul>
+	  <li>Improved bookmark editing/deleting by adding a context menu.</li>
+          <li>Added UTF-8 cuttext handling.</li>
+          <li>Improved log window by making it wider.</li>
+          <li>Fixed a bug where MultiVNC on Apple Silicon would not be able to connect to TLS-enabled servers.</li>
+	</ul>
+      </description>
+    </release>
+
+
     <release version="0.8.0" date="2024-12-06">
       <description>
 	<ul>
