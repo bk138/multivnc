@@ -94,11 +94,11 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   EnableFullScreenView();
 
 
-  // assign image list to notebook_connections
-  notebook_connections->AssignImageList(new wxImageList(24, 24));
-  notebook_connections->GetImageList()->Add(bitmapBundleFromSVGResource("unicast").GetBitmapFor(this));
-  notebook_connections->GetImageList()->Add(bitmapBundleFromSVGResource("multicast").GetBitmapFor(this));
-
+  // assign images to notebook_connections
+  wxVector<wxBitmapBundle> images;
+  images.push_back(bitmapBundleFromSVGResource("unicast"));
+  images.push_back(bitmapBundleFromSVGResource("multicast"));
+  notebook_connections->SetImages(images);
 
   /*
     setup menu items for the frame
