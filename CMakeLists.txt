@@ -48,7 +48,7 @@ add_subdirectory(src)
 
 set(LOCALE_DOMAIN ${CMAKE_PROJECT_NAME})
 
-find_package(Gettext)
+find_package(Gettext REQUIRED)
 
 GETTEXT_PROCESS_PO_FILES(de ALL PO_FILES po/de.po)
 GETTEXT_PROCESS_PO_FILES(es ALL PO_FILES po/es.po)
