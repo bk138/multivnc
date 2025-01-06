@@ -3,6 +3,8 @@
 #include "gui/evtids.h"
 #include <fstream>
 #include <wx/aboutdlg.h>
+#include <wx/textctrl.h>
+#include <wx/creddlg.h>
 #include <wx/socket.h>
 #include <wx/clipbrd.h>
 #include <wx/imaglist.h>
@@ -12,7 +14,6 @@
 
 #include "MyFrameMain.h"
 #include "MyDialogSettings.h"
-#include "DialogLogin.h"
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
@@ -734,13 +735,13 @@ void MyFrameMain::onVNCConnGetCredentialsNotify(wxCommandEvent &event)
 #endif
     } else {
 	// with user prompt
-        DialogLogin formLogin(0, wxID_ANY, _("Credentials required..."));
+        wxCredentialEntryDialog formLogin(this, wxEmptyString, _("Credentials required..."));
         if (formLogin.ShowModal() == wxID_OK) {
-            conn->setUserName(formLogin.getUserName());
+            conn->setUserName(formLogin.GetCredentials().GetUser());
 #if wxUSE_SECRETSTORE
-            conn->setPassword(wxSecretValue(formLogin.getPassword()));
+            conn->setPassword(formLogin.GetCredentials().GetPassword());
 #else
-            conn->setPassword(formLogin.getPassword());
+            conn->setPassword(formLogin.GetCredentials().GetPassword().GetAsString());
 #endif
         } else {
 	    // canceled
