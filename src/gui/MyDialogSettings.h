@@ -14,8 +14,6 @@ public:
  
   MyDialogSettings(wxWindow* parent, int id, const wxString& title, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
 
-  ~MyDialogSettings();
-  
   bool getStatsAutosave() const { return checkbox_stats_save->GetValue(); };
   bool getLogSavetofile() const { return checkbox_logfile->GetValue(); };
   bool getDoMulticast() const { return checkbox_multicast->GetValue(); };

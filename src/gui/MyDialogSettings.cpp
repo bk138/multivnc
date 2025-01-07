@@ -92,12 +92,3 @@ MyDialogSettings::MyDialogSettings(wxWindow* parent, int id, const wxString& tit
 }
 
 
-MyDialogSettings::~MyDialogSettings()
-{
-  
-
-}
-
-
-
-
