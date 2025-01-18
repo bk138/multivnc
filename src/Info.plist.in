@@ -42,5 +42,12 @@
         <array>
           <string>_rfb._tcp</string>
         </array>
+        <key>CFBundleLocalizations</key>
+        <array>
+          <string>en</string>
+          <string>de</string>
+          <string>es</string>
+          <string>sv</string>
+        </array>
 </dict>
 </plist>
