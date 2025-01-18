@@ -58,9 +58,9 @@ class MyFrameMain: public FrameMain
   wxArrayString bookmarks;
   bool loadbookmarks();
 
-  void spawn_conn(wxString service, int listenPort = -1);
-  void setup_conn(VNCConn *conn);
-  void terminate_conn(int which);
+  void conn_spawn(wxString service, int listenPort = -1);
+  void conn_setup(VNCConn *conn);
+  void conn_terminate(int which);
 
   // collab features
   wxString windowshare_cmd_template;

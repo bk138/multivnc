@@ -229,7 +229,7 @@ MyFrameMain::~MyFrameMain()
 
   // this has to be from end to start in order for stats autosave to assign right connection numbers!
   for(int i = connections.size()-1; i >= 0; --i)
-    terminate_conn(i);
+    conn_terminate(i);
 
   delete servscan;
 
@@ -275,7 +275,7 @@ void MyFrameMain::onVNCConnListenNotify(wxCommandEvent& event)
 {
     VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
     if (event.GetInt() == 0) {
-	setup_conn(c);
+	conn_setup(c);
     } else {
 	// listen error
 	wxLogError(c->getErr());
@@ -290,7 +290,7 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
     VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
     if (event.GetInt() == 0) {
-	setup_conn(c);
+	conn_setup(c);
     } else {
 	// error. only show error if this was not a auth case with empty password, i.e. a canceled one
 	if (c->getRequireAuth()
@@ -321,7 +321,7 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
 	    }
 	if (index < connections.size()) {
 	    // found it. terminate!
-	    terminate_conn(index);
+	    conn_terminate(index);
         } else {
 	    // not yet setup in UI, simply delete
 	    delete c;
@@ -492,7 +492,7 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
     }
 
   if(index < connections.size())
-    terminate_conn(index);
+    conn_terminate(index);
 }
 
 
@@ -805,7 +805,7 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-void MyFrameMain::spawn_conn(wxString service, int listenPort)
+void MyFrameMain::conn_spawn(wxString service, int listenPort)
 {
   // get connection settings
   int compresslevel, quality, multicast_socketrecvbuf, multicast_recvbuf;
@@ -885,7 +885,7 @@ void MyFrameMain::spawn_conn(wxString service, int listenPort)
 }
 
 
-void MyFrameMain::setup_conn(VNCConn *c) {
+void MyFrameMain::conn_setup(VNCConn *c) {
 
   // first, find out if we already setup this this connection.
   // this happens if it was a listening one that's now connected.
@@ -976,7 +976,7 @@ void MyFrameMain::setup_conn(VNCConn *c) {
 }
 
 
-void MyFrameMain::terminate_conn(int which)
+void MyFrameMain::conn_terminate(int which)
 {
   if(which == wxNOT_FOUND)
     return;
@@ -1019,19 +1019,19 @@ void MyFrameMain::terminate_conn(int which)
   // this deletes the windowsharer, if there's any
   if(cb->windowshare_proc)
     {
-      wxLogDebug(wxT("terminate_conn(): trying to kill %d."), cb->windowshare_proc_pid);
+      wxLogDebug("conn_terminate(): trying to kill %d.", cb->windowshare_proc_pid);
       if(!wxProcess::Exists(cb->windowshare_proc_pid))
 	{
-	  wxLogDebug(wxT("terminate_conn(): window sharing helper PID does not exist!"));
+	  wxLogDebug("conn_terminate(): window sharing helper PID does not exist!");
 	}
       else
 	{
 	  // avoid callback call, now obj pointed to by windowshare_proc deletes itself!
 	  cb->windowshare_proc->Detach(); 
 	  if(wxKill(cb->windowshare_proc_pid, wxSIGTERM, NULL, wxKILL_CHILDREN) == 0)
-	    wxLogDebug(wxT("terminate_conn(): successfully killed %d."), cb->windowshare_proc_pid);
+	    wxLogDebug("conn_terminate(): successfully killed %d.", cb->windowshare_proc_pid);
 	  else
-	    wxLogDebug(wxT("terminate_conn(): could not kill %d."), cb->windowshare_proc_pid);
+	    wxLogDebug("conn_terminate(): could not kill %d.", cb->windowshare_proc_pid);
 	}
     }
   // erase the ConnBlob
@@ -1210,7 +1210,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
   if (s != wxEmptyString) {
       pConfig->Write(K_LASTHOST, s);
-      spawn_conn(s);
+      conn_spawn(s);
   }
 }
 
@@ -1231,7 +1231,7 @@ void MyFrameMain::machine_listen(wxCommandEvent &event)
     }
 
   listen_ports.insert(port);
-  spawn_conn(wxEmptyString, port);
+  conn_spawn(wxEmptyString, port);
 }
 
 
@@ -1239,7 +1239,7 @@ void MyFrameMain::machine_listen(wxCommandEvent &event)
 void MyFrameMain::machine_disconnect(wxCommandEvent &event)
 {
   // terminate connection thats currently selected
-  terminate_conn(notebook_connections->GetSelection());
+  conn_terminate(notebook_connections->GetSelection());
 }
 
 
@@ -1945,7 +1945,7 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
   wxLogStatus(services_hostname + wxT(" (") + services_addr + wxT(":") + services_port + wxT(")"));
 
 
-  spawn_conn(services_addr + wxT(":") + services_port);
+  conn_spawn(services_addr + wxT(":") + services_port);
 } 
  
 
@@ -1973,7 +1973,7 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 	  return;
   }
 
-  spawn_conn(bookmarks[sel]);
+  conn_spawn(bookmarks[sel]);
 }
 
 
@@ -2045,7 +2045,7 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
 
 void MyFrameMain::cmdline_connect(wxString& hostarg)
 {
-  spawn_conn(hostarg);
+  conn_spawn(hostarg);
 }
 
 
