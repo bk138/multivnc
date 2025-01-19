@@ -275,7 +275,17 @@ void MyFrameMain::onVNCConnListenNotify(wxCommandEvent& event)
 {
     VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
     if (event.GetInt() == 0) {
-	conn_setup(c);
+        // successfully entered listening state, just update the tab label
+        ConnBlob *cb;
+        vector<ConnBlob>::iterator it = connections.begin();
+        size_t index = 0;
+        while(it != connections.end() && it->conn != c) {
+            ++it;
+            ++index;
+        }
+        if (index < connections.size()) {
+            notebook_connections->SetPageText(index, _("Listening on port") + " " + c->getListenPort());
+        }
     } else {
 	// listen error
 	wxLogError(c->getErr());
@@ -807,6 +817,47 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 // connection initiation and shutdown
 void MyFrameMain::conn_spawn(wxString service, int listenPort)
 {
+  VNCConn* c = new VNCConn(this);
+
+  /*
+    Create UI elements
+   */
+  ViewerWindow* win = new ViewerWindow(notebook_connections, c);
+  win->showStats(show_stats);
+  win->showOneToOne(show_1to1);
+#ifdef MULTIVNC_GRABKEYBOARD
+  win->grabKeyboard(frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
+#endif
+
+  VNCSeamlessConnector* sc = 0;
+  if(VNCSeamlessConnector::isSupportedByCurrentPlatform() && show_seamless != EDGE_NONE)
+    sc = new VNCSeamlessConnector(this, c, show_seamless);
+
+  /*
+    save VNCConn and UI elements blobbed together
+   */
+  ConnBlob cb;
+  cb.conn = c;
+  cb.viewerwindow = win;
+  cb.seamlessconnector = sc;
+  cb.windowshare_proc = 0;
+  cb.windowshare_proc_pid = 0;
+
+  connections.push_back(cb);
+
+  // add to notebook, needs to be after connections list add
+  if(listenPort > 0)
+      notebook_connections->AddPage(win, wxEmptyString, true);
+  else
+      notebook_connections->AddPage(win, wxString::Format(_("Connecting to %s..."), service), true);
+
+  // enable "disconnect"
+  frame_main_menubar->Enable(wxID_STOP, true);
+  GetToolBar()->EnableTool(wxID_STOP, true);
+
+  /*
+    Initialise connection
+   */
   // get connection settings
   int compresslevel, quality, multicast_socketrecvbuf, multicast_recvbuf;
   bool multicast, enc_enabled;
@@ -852,8 +903,6 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort)
   pConfig->Read(K_COMPRESSLEVEL, &compresslevel, V_COMPRESSLEVEL);
   pConfig->Read(K_QUALITY, &quality, V_QUALITY);
 
-  VNCConn* c = new VNCConn(this);
-
   if(listenPort > 0)
     {
       wxLogStatus(_("Listening on port") + " " + (wxString() << listenPort) + wxT(" ..."));
@@ -887,8 +936,8 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort)
 
 void MyFrameMain::conn_setup(VNCConn *c) {
 
-  // first, find out if we already setup this this connection.
-  // this happens if it was a listening one that's now connected.
+  // first, find related ConnBlob
+  ConnBlob *cb;
   vector<ConnBlob>::iterator it = connections.begin();
   size_t index = 0;
   while(it != connections.end() && it->conn != c)
@@ -897,9 +946,9 @@ void MyFrameMain::conn_setup(VNCConn *c) {
 	  ++index;
       }
   if (index < connections.size()) {
-      // found it, just update the label and skip the rest we already did
-      notebook_connections->SetPageText(index, c->getDesktopName() + " " + _("(Reverse Connection)"));
-      return;
+      cb = &*it;
+  } else {
+      wxLogFatalError("Could not find UI elements for connection %p. Please report as a bug", c);
   }
 
   // get more settings
@@ -913,35 +962,16 @@ void MyFrameMain::conn_setup(VNCConn *c) {
   if(show_stats)
     c->doStats(true);
 
-  ViewerWindow* win = new ViewerWindow(notebook_connections, c);
-  win->showStats(show_stats);
-  win->showOneToOne(show_1to1);
-#ifdef MULTIVNC_GRABKEYBOARD
-  win->grabKeyboard(frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
-#endif
-
-  VNCSeamlessConnector* sc = 0;
-  if(VNCSeamlessConnector::isSupportedByCurrentPlatform() && show_seamless != EDGE_NONE)
-    sc = new VNCSeamlessConnector(this, c, show_seamless);
-
-  ConnBlob cb;
-  cb.conn = c;
-  cb.viewerwindow = win;
-  cb.seamlessconnector = sc;  
-  cb.windowshare_proc = 0;
-  cb.windowshare_proc_pid = 0;
-
-  connections.push_back(cb);
-
+  // set page label
   if(!c->getListenPort().IsEmpty())
-    notebook_connections->AddPage(win, _("Listening on port") + " " + c->getListenPort(), true);
+      notebook_connections->SetPageText(index, c->getDesktopName() + " " + _("(Reverse Connection)"));
   else
-    notebook_connections->AddPage(win, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")") , true);
+      notebook_connections->SetPageText(index, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")"));
 
   if(c->isMulticast())
-    notebook_connections->SetPageImage(notebook_connections->GetSelection(), 1);
+    notebook_connections->SetPageImage(index, 1);
   else
-    notebook_connections->SetPageImage(notebook_connections->GetSelection(), 0);
+    notebook_connections->SetPageImage(index, 0);
 
   if(fastrequest)
     c->setFastRequest(fastrequest_interval);
@@ -950,8 +980,6 @@ void MyFrameMain::conn_setup(VNCConn *c) {
     c->setDSCP(184); // 184 == 0xb8 == expedited forwarding
 
 
-  // "end connection"
-  frame_main_menubar->Enable(wxID_STOP, true);
   // "screenshot"
   frame_main_menubar->Enable(wxID_SAVE, true);
   // stats
@@ -967,7 +995,6 @@ void MyFrameMain::conn_setup(VNCConn *c) {
 
   if(GetToolBar())
     {
-      GetToolBar()->EnableTool(wxID_STOP, true); // disconnect
       GetToolBar()->EnableTool(wxID_SAVE, true); // screenshot
       GetToolBar()->EnableTool(ID_INPUT_REPLAY, true);
       GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
