@@ -8,6 +8,7 @@
 #include <wx/socket.h>
 #include <wx/clipbrd.h>
 #include <wx/imaglist.h>
+#include <wx/richmsgdlg.h>
 #include <wx/secretstore.h>
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
@@ -312,12 +313,24 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
 	    wxLogStatus(_("Authentication canceled."));
         } else {
 	    wxLogStatus(_("Connection failed."));
-            wxArrayString log = VNCConn::getLog();
+            // We want a modal dialog here so that the viewer window closes after the dialog.
+            // The title is translated in wx itself.
+            wxRichMessageDialog dialog (this,
+                                        c->getErr(),
+                                        wxString::Format(_("%s Error"), wxTheApp->GetAppDisplayName()),
+                                        wxICON_ERROR|wxHELP);
             // show last 3 log strings
-            for (size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0;
-                 i < log.GetCount(); ++i)
-                wxLogMessage(log[i]);
-            wxLogError(c->getErr());
+            wxArrayString log = VNCConn::getLog();
+            wxString detailed;
+            for (size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i) {
+                detailed += log[i];
+            }
+            dialog.ShowDetailedText(detailed);
+            dialog.SetHelpLabel(_("Show &Log"));
+            if(dialog.ShowModal() == wxID_HELP) {
+                wxCommandEvent unused;
+                machine_showlog(unused);
+            }
         }
 
 	// find out if we already setup this this connection.
@@ -482,14 +495,29 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
       wxLogStatus(_("Reverse connection terminated."));
   }
 
-  wxArrayString log = VNCConn::getLog();
-  // show last 3 log strings
-  for(size_t i = log.GetCount() >= 3 ? log.GetCount()-3 : 0; i < log.GetCount(); ++i)
-    wxLogMessage(log[i]);
+  // We want a modal dialog here so that the viewer window closes after the dialog.
+  // The title is translated in wx itself.
+  wxString message;
   if (!c->getServerHost().IsEmpty()) {
-      wxLogMessage(_("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
+      message = wxString::Format(_("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
   } else {
-      wxLogMessage(_("Reverse connection terminated."));
+      message = _("Reverse connection terminated.");
+  }
+  wxRichMessageDialog dialog (this,
+                              message,
+                              wxString::Format(_("%s Information"), wxTheApp->GetAppDisplayName()),
+                              wxICON_INFORMATION|wxHELP);
+  // show last 3 log strings
+  wxArrayString log = VNCConn::getLog();
+  wxString detailed;
+  for (size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i) {
+      detailed += log[i];
+  }
+  dialog.ShowDetailedText(detailed);
+  dialog.SetHelpLabel(_("Show &Log"));
+  if(dialog.ShowModal() == wxID_HELP) {
+      wxCommandEvent unused;
+      machine_showlog(unused);
   }
 
   // find index of this connection
