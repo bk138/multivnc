@@ -296,8 +296,6 @@ void MyFrameMain::onVNCConnListenNotify(wxCommandEvent& event)
 
 void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
 {
-    wxEndBusyCursor();
-
     VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
     if (event.GetInt() == 0) {
@@ -758,9 +756,6 @@ void MyFrameMain::onVNCConnGetCredentialsNotify(wxCommandEvent &event)
     // get sender
     VNCConn *conn = static_cast<VNCConn*>(event.GetEventObject());
 
-    // stop showing connection setup busy cursor when entering creds
-    wxEndBusyCursor();
-
     if(!event.GetInt()) {
 	// without user prompt, get only password
 	wxString pass = wxGetPasswordFromUser(wxString::Format(_("Please enter password for user '%s'"), conn->getUserName()),
@@ -938,7 +933,6 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxBeginBusyCursor();
       wxLogStatus(_("Connecting to %s..."), service);
 
       wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
