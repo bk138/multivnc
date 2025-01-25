@@ -76,13 +76,6 @@ See the [Android version's README](android/README.md).
 
 ### MultiVNC for Desktop
 
-The prerequisites:
-
-* the usual c-compiler with headers and stuff
-* wxWidgets dev package version >= 3.0
-* zlib dev package 
-* libjpeg dev package 
-
 After cloning the repo, do
 
 ```
