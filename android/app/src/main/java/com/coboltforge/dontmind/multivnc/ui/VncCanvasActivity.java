@@ -487,17 +487,6 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		super.onResume();
 		// needed for the GLSurfaceView
 		vncCanvas.onResume();
-
-		// get Android clipboard contents
-		if (mClipboardManager.hasText()) {
-			try {
-				vncCanvas.vncConn.sendCutText(mClipboardManager.getText().toString());
-			}
-			catch(NullPointerException e) {
-				//unused
-			}
-		}
-
 	}
 
 	/**
@@ -840,6 +829,16 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		super.onWindowFocusChanged(hasFocus);
 		if (hasFocus) {
 			hideSystemUI();
+
+			// get Android clipboard contents
+			if (mClipboardManager.hasText()) {
+				try {
+					vncCanvas.vncConn.sendCutText(mClipboardManager.getText().toString());
+				}
+				catch(NullPointerException e) {
+					//unused
+				}
+			}
 		}
 	}
 
