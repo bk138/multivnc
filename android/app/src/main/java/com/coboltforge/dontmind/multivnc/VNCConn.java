@@ -710,7 +710,14 @@ public class VNCConn {
 	@Keep
 	private void onGotCutText(byte[] bytes) {
 		serverCutText = StandardCharsets.ISO_8859_1.decode(ByteBuffer.wrap(bytes)).toString();
-		Log.d(TAG, "got server cuttext: " + serverCutText);
+		Log.d(TAG, "got ISO-8859-1 server cuttext: " + serverCutText);
+	}
+
+	// called from native via worker thread context
+	@Keep
+	private void onGotCutTextUTF8(String text) {
+		serverCutText = text;
+		Log.d(TAG, "got UTF-8 server cuttext: " + serverCutText);
 	}
 
 	// called from native via worker thread context

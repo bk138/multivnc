@@ -194,6 +194,26 @@ static void onGotCutText(rfbClient *client, const char *text, int len)
     (*env)->CallVoidMethod(env, obj, mid, jBytes);
 }
 
+static void onGotCutTextUTF8(rfbClient *client, const char *text, __attribute__((unused)) int len)
+{
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutTextUTF8 failed due to client NULL");
+        return;
+    }
+
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    if(!env || !obj) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGotCutTextUTF8 failed due to env or obj NULL");
+        return;
+    }
+
+    jclass cls = (*env)->GetObjectClass(env, obj);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onGotCutTextUTF8", "(Ljava/lang/String;)V");
+    (*env)->CallVoidMethod(env, obj, mid, (*env)->NewStringUTF(env, text));
+}
+
 static char *onGetPassword(rfbClient *client)
 {
     if(!client) {
@@ -399,6 +419,7 @@ static jboolean setupClient(JNIEnv *env, jobject obj, jint bytesPerPixel) {
     // set callbacks
     cl->FinishedFrameBufferUpdate = onFramebufferUpdateFinished;
     cl->GotXCutText = onGotCutText;
+    cl->GotXCutTextUTF8 = onGotCutTextUTF8;
     cl->GetPassword = onGetPassword;
     cl->GetCredential = onGetCredential;
     defaultMallocFramebuffer = cl->MallocFrameBuffer; // save default one
