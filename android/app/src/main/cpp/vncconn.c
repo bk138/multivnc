@@ -695,6 +695,20 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
         return JNI_FALSE;
 }
 
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendClientCutTextUTF8(JNIEnv *env, jobject obj, jstring jText) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if (cl) {
+        const char *cText = (*env)->GetStringUTFChars(env, jText, NULL);
+        if (!cText)
+            return JNI_FALSE;
+        jboolean status = SendClientCutTextUTF8(cl, (char *) cText, (int) strlen(cText));
+        (*env)->ReleaseStringUTFChars(env, jText, cText);
+        return status;
+    }
+    else
+        return JNI_FALSE;
+}
+
 JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIsEncrypted(JNIEnv *env, jobject obj) {
     rfbClient *cl = getRfbClient(env, obj);
     if (cl)

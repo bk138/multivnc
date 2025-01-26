@@ -376,11 +376,21 @@ public class VNCConn {
 
 
 		private boolean sendCutText(String text) {
+			boolean status = false;
 			if (rfbClient != 0) {
-				if (Utils.DEBUG()) Log.d(TAG, "sending cuttext " + text);
-				return rfbSendClientCutText(StandardCharsets.ISO_8859_1.encode(text).array());
+				// first, try sending UTF-8
+				if(rfbSendClientCutTextUTF8(text)) {
+					if (Utils.DEBUG()) Log.d(TAG, "Sent UTF-8 cuttext: '"  + text + "' successfully");
+					status = true;
+				} else {
+					// server does not support Extended Clipboard, try Latin-1.
+					// encode() docs say: "This method always replaces malformed-input and unmappable-character
+					// sequences with this charset's default replacement string."
+					status = rfbSendClientCutText(StandardCharsets.ISO_8859_1.encode(text).array());
+					if (Utils.DEBUG()) Log.d(TAG, "Sent ISO-8859-1 cuttext: '"  + text + "'" + (status ? "successfully" : "unsuccessfully"));
+				}
 			}
-			return false;
+			return status;
 		}
 
 
@@ -404,6 +414,7 @@ public class VNCConn {
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
 	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
 	private native boolean rfbSendClientCutText(byte[] bytes);
+	private native boolean rfbSendClientCutTextUTF8(String text);
 	private native boolean rfbIsEncrypted();
 
 
