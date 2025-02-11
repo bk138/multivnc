@@ -44,8 +44,6 @@
 
 class MultiVNCApp: public wxApp 
 {
-  wxLocale *locale;
-  
 public:
   
   virtual bool OnInit();
@@ -56,9 +54,6 @@ public:
   
   // this is where we really generate the debug report
   void genDebugReport(wxDebugReport::Context ctx);
-  
-  bool setLocale(int language);
-
 };
 
 

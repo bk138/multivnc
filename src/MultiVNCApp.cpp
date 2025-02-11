@@ -29,6 +29,8 @@
 #include <ApplicationServices/ApplicationServices.h>
 #endif
 #include <wx/stdpaths.h>
+#include <wx/translation.h>
+#include <wx/uilocale.h>
 #include "MultiVNCApp.h"
 #include "DebugReportEmail.h"
 #include "gui/MyFrameMain.h"
@@ -68,11 +70,29 @@ IMPLEMENT_APP(MultiVNCApp);
 
 bool MultiVNCApp::OnInit()
 {
-  locale = 0;
+  /*
+    Set locale and load translations
+  */
+  wxUILocale::UseDefault();
 
-  setLocale(wxLANGUAGE_DEFAULT);
+  // normally this wouldn't be necessary as the catalog files would be found
+  // in the default locations, but when the program is not installed the
+  // catalogs are in the build directory where we wouldn't find them by
+  // default
+  wxFileTranslationsLoader::AddCatalogLookupPathPrefix(".");
 
-  // setup signal handlers
+  // Create the object for message translation and set it up for global use.
+  wxTranslations* const trans = new wxTranslations();
+  wxTranslations::Set(trans);
+
+  // Initialize the catalogs we'll be using
+  trans->AddStdCatalog();        // translations shipped by wx itself
+  trans->AddCatalog("multivnc"); // ours
+
+
+  /*
+    setup signal handlers
+  */
   nr_sigints = 0;
   signal(SIGINT, handle_sig);
 #if !defined __WXMSW__ || defined __BORLANDC__ || defined _MSC_VER // on win32, does only work with borland c++ or visual c++
@@ -193,31 +213,4 @@ void MultiVNCApp::genDebugReport(wxDebugReport::Context ctx)
   if(wxDebugReportPreviewStd().Show(report))
       report.Process();
 }
-
-
-
-
-bool MultiVNCApp::setLocale(int language)
-{
-  delete locale;
-     
-  locale = new wxLocale;
-
-  // don't use wxLOCALE_LOAD_DEFAULT flag so that Init() doesn't return 
-  // false just because it failed to load wxstd catalog                                 
-  if(! locale->Init(language) )                      
-    return false;    
-
-  // normally this wouldn't be necessary as the catalog files would be found  
-  // in the default locations, but when the program is not installed the
-  // catalogs are in the build directory where we wouldn't find them by  
-  // default
-  wxLocale::AddCatalogLookupPathPrefix(wxT("."));            
-           
-  // Initialize the catalogs we'll be using  
-  locale->AddCatalog(wxT("multivnc"));  
-
-  return true;
-}
-
 
