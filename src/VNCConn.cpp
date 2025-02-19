@@ -1223,6 +1223,13 @@ void VNCConn::Shutdown()
 
   mutex_auth.Unlock();
 
+  // break any connection so that vnc thread moves over blocking calls
+  if(cl) {
+      wxLogDebug(wxT( "VNCConn %p: Shutdown() closing connection"), this);
+      rfbCloseSocket(cl->sock);
+  }
+
+  // end vnc thread and wait for it to get done
   if(GetThread() && GetThread()->IsRunning())
     {
       wxLogDebug(wxT( "VNCConn %p: Shutdown() before vncthread delete"), this);
@@ -1230,15 +1237,10 @@ void VNCConn::Shutdown()
       GetThread()->Delete(); // this blocks if thread is joinable, i.e. on stack
       wxLogDebug(wxT("VNCConn %p: Shutdown() after vncthread delete"), this);
     }
-  
-  if(cl)
-    {
-      wxLogDebug(wxT( "VNCConn %p: Shutdown() closing connection"), this);
-#ifdef __WIN32__
-      closesocket(cl->sock);
-#else
-      close(cl->sock);
-#endif
+
+  // then, clean up client
+  if(cl) {
+      wxLogDebug(wxT( "VNCConn %p: Shutdown() cleaning up client"), this);
       // this one was strdup'ed before
       if(!cl->listenSpecified)
 	free((void*)cl->appData.encodingsString);
