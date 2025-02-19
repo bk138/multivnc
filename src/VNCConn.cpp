@@ -1540,9 +1540,10 @@ bool VNCConn::recordUserInputStop(wxArrayString &dst)
  */
 wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 {
-  // sanity check requested region
+  // sanity check requested region and client
   if(rect.x < 0 || rect.x + rect.width > getFrameBufferWidth()
-     || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight())
+     || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight()
+     || !cl)
        return wxBitmap();
 
   /*
