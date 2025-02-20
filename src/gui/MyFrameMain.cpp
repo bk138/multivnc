@@ -511,12 +511,6 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
   // get sender
   VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
-  if (!c->getServerHost().IsEmpty()) {
-      wxLogStatus(_("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
-  } else {
-      wxLogStatus(_("Reverse connection terminated."));
-  }
-
   if (event.GetInt() == 1) {
       // Disconnect by remote side.
       // We want a modal dialog here so that the viewer window closes after the dialog.
