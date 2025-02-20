@@ -294,7 +294,7 @@ wxThread::ExitCode VNCConn::Entry()
 	 err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
 	 wxLogDebug("VNCConn %p: rfbInitClient() failed. Cleanup by library.", this);
 	 thread_post_init_notify(1); // TODO add more error codes
-	 wxLogDebug("VNCConn %p: vncthread done", this);
+	 wxLogDebug("VNCConn %p: vncthread done early w/ VNCConnInitNOTIFY(fail)", this);
 	 return 0;
      }
 
@@ -314,7 +314,7 @@ wxThread::ExitCode VNCConn::Entry()
      // err is set by alloc_framebuffer()
      if (!cl->frameBuffer) {
 	 thread_post_init_notify(1); // TODO add more error codes
-	 wxLogDebug("VNCConn %p: vncthread done", this);
+	 wxLogDebug("VNCConn %p: vncthread done early w/ VNCConnInitNOTIFY(fail)", this);
 	 return 0;
      }
      // connect succesful
@@ -344,9 +344,9 @@ wxThread::ExitCode VNCConn::Entry()
 	    {
 	      if(errno==EINTR)
 		continue;
-	      wxLogDebug(wxT("VNCConn %p: vncthread listen() failed"), this);
 	      thread_post_listen_notify(1); //TODO add more error codes
-	      break;
+              wxLogDebug("VNCConn %p: vncthread done w/ VNCConnListenNOTIFY(fail)", this);
+              return 0;
 	    }
 	  if(i)
 	    {
@@ -455,7 +455,7 @@ wxThread::ExitCode VNCConn::Entry()
 	      if(errno == EINTR)
 		continue;
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), this);
-	      thread_post_disconnect_notify();
+              rfbCloseSocket(cl->sock); // as a marker for thread_post_disconnect_notify()
 	      break;
 	    }
 
@@ -534,7 +534,15 @@ wxThread::ExitCode VNCConn::Entry()
 	}
     }
 
-  wxLogDebug("VNCConn %p: vncthread done", this);
+  // by calling rfbCloseSocket(), we have made sure this happens
+  // - either on Shutdown() (local disconnect)
+  // - or after rfbProcessServerMessage() fail (remote disconnect)
+  if(cl->sock == RFB_INVALID_SOCKET) {
+      thread_post_disconnect_notify();
+      wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY", this);
+  } else {
+      wxLogDebug("VNCConn %p: vncthread done", this);
+  }
   return 0;
 }
 

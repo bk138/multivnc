@@ -70,14 +70,16 @@ DECLARE_EVENT_TYPE(VNCConnReplayFinishedNOTIFY, -1)
 
 
 /**
+   To make an outgoing connection, call Init().
+   You'll be informed by a VNCConnInitNOTIFY event about the outcome, can be success or failure.
+   You'll get a VNCConnDisconnectNOTIFY when an established connection is terminated.
+
    To make a listening connection, call Listen().
-   You'll be informed by a VNCConnListenNOTIFY event about the outcome.
+   You'll be informed by a VNCConnListenNOTIFY event about the outcome, can be success or failure.
    You'll get a VNCConnIncomingConnectionNOTIFY event when a connection is made from the outside;
    in this case, call Init() with empty host and port to finalise the connection to the remote.
-
-   To make an outgoing connection, call Init().
-   You'll be informed by a VNCConnInitNOTIFY event about the outcome.
-   You'll get a VNCConnDisconnectNOTIFY when the connection is unexpectedly terminated.
+   You'll be informed by a VNCConnInitNOTIFY event about the outcome, can be success or failure.
+   You'll get a VNCConnDisconnectNOTIFY when an established connection is terminated.
 
    To shut down a connection, call Shutdown().
  */
