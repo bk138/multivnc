@@ -345,6 +345,7 @@ wxThread::ExitCode VNCConn::Entry()
 	      if(errno==EINTR)
 		continue;
 	      thread_post_listen_notify(1); //TODO add more error codes
+              err.Printf(_("Failure listening on port %d!"), cl->listenPort);
               wxLogDebug("VNCConn %p: vncthread done w/ VNCConnListenNOTIFY(fail)", this);
               return 0;
 	    }

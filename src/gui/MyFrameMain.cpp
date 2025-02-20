@@ -289,7 +289,26 @@ void MyFrameMain::onVNCConnListenNotify(wxCommandEvent& event)
         }
     } else {
 	// listen error
-	wxLogError(c->getErr());
+        wxLogStatus(_("Listening failed."));
+        // We want a modal dialog here so that the viewer window closes after the dialog.
+        // The title is translated in wx itself.
+        wxRichMessageDialog dialog (this,
+                                    c->getErr(),
+                                    wxString::Format(_("%s Error"), wxTheApp->GetAppDisplayName()),
+                                    wxICON_ERROR|wxHELP);
+        // show last 3 log strings
+        wxArrayString log = VNCConn::getLog();
+        wxString detailed;
+        for (size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i) {
+            detailed += log[i];
+        }
+        dialog.ShowDetailedText(detailed);
+        dialog.SetHelpLabel(_("Show &Log"));
+        if(dialog.ShowModal() == wxID_HELP) {
+            wxCommandEvent unused;
+            machine_showlog(unused);
+        }
+
         // clean up
 	vector<ConnBlob>::iterator it = connections.begin();
 	size_t index = 0;
