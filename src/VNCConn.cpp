@@ -455,8 +455,9 @@ wxThread::ExitCode VNCConn::Entry()
 	      if(errno == EINTR)
 		continue;
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), this);
-              rfbCloseSocket(cl->sock); // as a marker for thread_post_disconnect_notify()
-	      break;
+              thread_post_disconnect_notify(1);
+              wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY(by-remote)", this);
+              return 0;
 	    }
 
 	  
@@ -534,13 +535,13 @@ wxThread::ExitCode VNCConn::Entry()
 	}
     }
 
-  // by calling rfbCloseSocket(), we have made sure this happens
-  // - either on Shutdown() (local disconnect)
-  // - or after rfbProcessServerMessage() fail (remote disconnect)
+  // If the socket is invalid and we've come here it must have been
+  // by calling Shutdown() (local disconnect)
   if(cl->sock == RFB_INVALID_SOCKET) {
-      thread_post_disconnect_notify();
-      wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY", this);
+      thread_post_disconnect_notify(0);
+      wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY(by-local)", this);
   } else {
+      // happens when listening socket got a connection
       wxLogDebug("VNCConn %p: vncthread done", this);
   }
   return 0;
@@ -717,14 +718,14 @@ void VNCConn::thread_post_incomingconnection_notify()
 }
 
 
-void VNCConn::thread_post_disconnect_notify() 
+void VNCConn::thread_post_disconnect_notify(int reason)
 {
-  wxLogDebug(wxT("VNCConn %p: post_disconnect_notify()"), this);
+  wxLogDebug(wxT("VNCConn %p: post_disconnect_notify(%d)"), this, reason);
 
   // new NOTIFY event, we got no window id
   wxCommandEvent event(VNCConnDisconnectNOTIFY, wxID_ANY);
   event.SetEventObject(this); // set sender
-
+  event.SetInt(reason);
   // Send it
   wxPostEvent((wxEvtHandler*)parent, event);
 }

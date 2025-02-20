@@ -52,7 +52,7 @@ wxDECLARE_EVENT(VNCConnGetPasswordNOTIFY, wxCommandEvent);
 wxDECLARE_EVENT(VNCConnGetCredentialsNOTIFY, wxCommandEvent);
 // sent when an incoming connection is available
 DECLARE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY, -1)
-// sent on disconnect
+/// Sent on disconnect by local side (m_commandInt==0) or remote side (m_commandInt==1)
 DECLARE_EVENT_TYPE(VNCConnDisconnectNOTIFY, -1)
 // sent on framebuffer resize, get new size via getFrameBufferWidth/Height()
 DECLARE_EVENT_TYPE(VNCConnFBResizeNOTIFY, -1)
@@ -302,7 +302,7 @@ private:
   void thread_post_getpasswd_notify();
   void thread_post_getcreds_notify(bool withUserPrompt);
   void thread_post_incomingconnection_notify();
-  void thread_post_disconnect_notify();
+  void thread_post_disconnect_notify(int reason);
   void thread_post_update_notify(int x, int y, int w, int h);
   void thread_post_fbresize_notify();
   void thread_post_cuttext_notify();
