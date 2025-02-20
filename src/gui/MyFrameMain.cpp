@@ -290,7 +290,16 @@ void MyFrameMain::onVNCConnListenNotify(wxCommandEvent& event)
     } else {
 	// listen error
 	wxLogError(c->getErr());
-	delete c;
+        // clean up
+	vector<ConnBlob>::iterator it = connections.begin();
+	size_t index = 0;
+	while(it != connections.end() && it->conn != c)  {
+		++it;
+		++index;
+        }
+	if (index < connections.size()) {
+	    conn_terminate(index);
+        }
     }
 }
 
@@ -341,11 +350,7 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
 		++index;
 	    }
 	if (index < connections.size()) {
-	    // found it. terminate!
 	    conn_terminate(index);
-        } else {
-	    // not yet setup in UI, simply delete
-	    delete c;
         }
     }
 }
@@ -493,29 +498,32 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
       wxLogStatus(_("Reverse connection terminated."));
   }
 
-  // We want a modal dialog here so that the viewer window closes after the dialog.
-  // The title is translated in wx itself.
-  wxString message;
-  if (!c->getServerHost().IsEmpty()) {
-      message = wxString::Format(_("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
-  } else {
-      message = _("Reverse connection terminated.");
-  }
-  wxRichMessageDialog dialog (this,
-                              message,
-                              wxString::Format(_("%s Information"), wxTheApp->GetAppDisplayName()),
-                              wxICON_INFORMATION|wxHELP);
-  // show last 3 log strings
-  wxArrayString log = VNCConn::getLog();
-  wxString detailed;
-  for (size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i) {
-      detailed += log[i];
-  }
-  dialog.ShowDetailedText(detailed);
-  dialog.SetHelpLabel(_("Show &Log"));
-  if(dialog.ShowModal() == wxID_HELP) {
-      wxCommandEvent unused;
-      machine_showlog(unused);
+  if (event.GetInt() == 1) {
+      // Disconnect by remote side.
+      // We want a modal dialog here so that the viewer window closes after the dialog.
+      // The title is translated in wx itself.
+      wxString message;
+      if (!c->getServerHost().IsEmpty()) {
+          message = wxString::Format(_("Connection to %s:%s terminated."), c->getServerHost().c_str(), c->getServerPort().c_str());
+      } else {
+          message = _("Reverse connection terminated.");
+      }
+      wxRichMessageDialog dialog (this,
+                                  message,
+                                  wxString::Format(_("%s Information"), wxTheApp->GetAppDisplayName()),
+                                  wxICON_INFORMATION|wxHELP);
+      // show last 3 log strings
+      wxArrayString log = VNCConn::getLog();
+      wxString detailed;
+      for (size_t i = log.GetCount() >= 3 ? log.GetCount() - 3 : 0; i < log.GetCount(); ++i) {
+          detailed += log[i];
+      }
+      dialog.ShowDetailedText(detailed);
+      dialog.SetHelpLabel(_("Show &Log"));
+      if(dialog.ShowModal() == wxID_HELP) {
+          wxCommandEvent unused;
+          machine_showlog(unused);
+      }
   }
 
   // find index of this connection
@@ -1293,8 +1301,11 @@ void MyFrameMain::machine_listen(wxCommandEvent &event)
 
 void MyFrameMain::machine_disconnect(wxCommandEvent &event)
 {
-  // terminate connection thats currently selected
-  conn_terminate(notebook_connections->GetSelection());
+    // shut down connection thats currently selected
+    int sel;
+    if((sel = notebook_connections->GetSelection()) != -1) {
+        connections.at(sel).conn->Shutdown();
+    }
 }
 
 
