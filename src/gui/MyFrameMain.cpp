@@ -840,6 +840,8 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 // connection initiation and shutdown
 void MyFrameMain::conn_spawn(wxString service, int listenPort)
 {
+  wxLogDebug("%s: %s %d", __func__, service, listenPort);
+
   VNCConn* c = new VNCConn(this);
 
   /*
@@ -958,6 +960,8 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort)
 
 void MyFrameMain::conn_setup(VNCConn *c) {
 
+  wxLogDebug("%s: %p", __func__, c);
+
   // first, find related ConnBlob
   ConnBlob *cb;
   vector<ConnBlob>::iterator it = connections.begin();
@@ -1031,6 +1035,8 @@ void MyFrameMain::conn_terminate(int which)
     return;
 
   ConnBlob* cb = &connections.at(which);
+
+  wxLogDebug("%s: %p at %d", __func__, cb->conn, which);
 
   wxConfigBase *pConfig = wxConfigBase::Get();
   bool autosave_stats;
