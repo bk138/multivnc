@@ -456,8 +456,14 @@ wxThread::ExitCode VNCConn::Entry()
 	      if(errno == EINTR)
 		continue;
 	      wxLogDebug(wxT("VNCConn %p: vncthread rfbProcessServerMessage() failed"), this);
-              thread_post_disconnect_notify(1);
-              wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY(by-remote)", this);
+              if(thread_shutdown) {
+                  // it can (rarely) happen that the socket close in Shutdown() makes rfbProcessServerMessage() fail, too
+                  thread_post_disconnect_notify(0);
+                  wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY(by-local)", this);
+              } else {
+                  thread_post_disconnect_notify(1);
+                  wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY(by-remote)", this);
+              }
               return 0;
 	    }
 
@@ -536,9 +542,8 @@ wxThread::ExitCode VNCConn::Entry()
 	}
     }
 
-  // If the socket is invalid and we've come here it must have been
-  // by calling Shutdown() (local disconnect)
-  if(cl->sock == RFB_INVALID_SOCKET) {
+  if(thread_shutdown) {
+      // happens when TestDestroy() makes the loop end
       thread_post_disconnect_notify(0);
       wxLogDebug("VNCConn %p: vncthread done w/ VNCConnDisconnectNOTIFY(by-local)", this);
   } else {
@@ -1203,6 +1208,7 @@ void VNCConn::Init(const wxString& host, const wxString& username,
 
   // this is like our main loop
   thread_listenmode = false;
+  thread_shutdown = false;
   if( CreateThread() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not create VNC thread!"));
@@ -1230,6 +1236,8 @@ void VNCConn::Shutdown()
   wxLogDebug(wxT("VNCConn %p: Shutdown()"), this);
 
   conn_stopwatch.Pause();
+
+  thread_shutdown = true;
 
   mutex_auth.Unlock();
 

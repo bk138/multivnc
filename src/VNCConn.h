@@ -291,6 +291,7 @@ private:
   wxMessageQueue<keyEvent> key_event_q;
 
   bool thread_listenmode;
+  bool thread_shutdown;
   bool thread_send_pointer_event(pointerEvent &event);
   bool thread_send_key_event(keyEvent &event);
   bool thread_send_latency_probe();
