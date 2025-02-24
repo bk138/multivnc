@@ -21,6 +21,9 @@ SET(MultiVNCgui_SRCS
    DialogSettings.h
    MyDialogSettings.cpp
    MyDialogSettings.h
+   DialogNewConnection.cpp
+   DialogNewConnection.h
+   MyDialogNewConnection.h
    evtids.h
    bitmapFromMem.h
    res/multivnc.xpm
