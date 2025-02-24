@@ -15,6 +15,7 @@
 
 #include "MyFrameMain.h"
 #include "MyDialogSettings.h"
+#include "MyDialogNewConnection.h"
 #include "../dfltcfg.h"
 #include "../MultiVNCApp.h"
 
@@ -1280,14 +1281,17 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
     wxString host;
     pConfig->Read(K_LASTHOST, &host);
 
-  wxString s = wxGetTextFromUser(_("Enter host to connect to:"),
-				 _("Connect to a specific host."),
-				 host);
+    MyDialogNewConnection dialog_new_connection(this, wxID_ANY, _("Connect to a specific host."));
+    dialog_new_connection.setHost(host);
+    dialog_new_connection.setShowAdvanced(pConfig->ReadBool(K_NEW_CONN_SHOW_ADVANCED, V_NEW_CONN_SHOW_ADVANCED));
 
-  if (s != wxEmptyString) {
-      pConfig->Write(K_LASTHOST, s);
-      conn_spawn(s);
-  }
+    if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getHost() != wxEmptyString) {
+        pConfig->Write(K_LASTHOST, dialog_new_connection.getHost());
+        conn_spawn(dialog_new_connection.getHost());
+    }
+
+    // save this in any case
+    pConfig->Write(K_NEW_CONN_SHOW_ADVANCED, dialog_new_connection.getShowAdvanced());
 }
 
 

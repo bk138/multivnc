@@ -60,6 +60,8 @@
 #define K_GRABKEYBOARD wxT("GrabKeyboard")
 #define V_GRABKEYBOARD false
 #define K_LASTHOST "LastHost"
+#define K_NEW_CONN_SHOW_ADVANCED "NewConnShowAdvanced"
+#define V_NEW_CONN_SHOW_ADVANCED false
 
 // encodings settings
 #define K_ENC_COPYRECT wxT("EncodingCopyRect")
