@@ -153,6 +153,7 @@ public:
   wxString getServerHost() const;
   wxString getServerPort() const;
   wxString getListenPort() const;
+  wxString getRepeaterId() const;
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);

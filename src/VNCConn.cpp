@@ -1756,6 +1756,14 @@ wxString VNCConn::getListenPort() const
     return wxEmptyString;
 }
 
+wxString VNCConn::getRepeaterId() const
+{
+  if(cl && cl->destHost)
+    return wxString() << cl->destPort;
+  else
+    return wxEmptyString;
+}
+
 
 
 bool VNCConn::isMulticast() const
