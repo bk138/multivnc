@@ -23,13 +23,13 @@ The roadmap for future developments regarding the project can be found
 * TLS support, i.e. AnonTLS and VeNCrypt.
 * Discovery of VNC servers advertising themselves via ZeroConf.
 * Bookmarking of connections.
+* UltraVNC Repeater support.
 * Supports server framebuffer resize.
 * Experimental support for MulticastVNC.
 
 ### Android-only Features
 
 * Support for SSH-Tunnelling with password- and privkey-based authentication.
-* UltraVNC Repeater support.
 * Import and export of saved connections.
 * Virtual mouse button controls with haptic feedback.
 * Two-finger swipe gesture recognition.
