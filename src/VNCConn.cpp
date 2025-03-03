@@ -1162,7 +1162,9 @@ void VNCConn::Listen(int port)
 }
 
 
-void VNCConn::Init(const wxString& host, const wxString& username,
+void VNCConn::Init(const wxString& host,
+                   int repeaterId,
+                   const wxString& username,
 #if wxUSE_SECRETSTORE
 		   const wxSecretValue& password,
 #endif
@@ -1192,6 +1194,11 @@ void VNCConn::Init(const wxString& host, const wxString& username,
   // Support short-form (:0, :1) 
   if(cl->serverPort < 100)
     cl->serverPort += 5900;
+
+  if(repeaterId >= 0) {
+      cl->destHost = strdup("ID");
+      cl->destPort = repeaterId;
+  }
 
   cl->appData.compressLevel = compresslevel;
   cl->appData.qualityLevel = quality;

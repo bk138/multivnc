@@ -90,7 +90,9 @@ public:
   ~VNCConn(); 
 
   void Listen(int port);
-  void Init(const wxString& host, const wxString& username,
+  void Init(const wxString& host,
+            int repeaterId,
+            const wxString& username,
 #if wxUSE_SECRETSTORE
 	    const wxSecretValue& password,
 #endif

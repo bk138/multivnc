@@ -604,8 +604,9 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   // chomp leading space
   encodings = encodings.AfterFirst(' '); 
 
-  
-  c->Init(wxEmptyString, wxEmptyString,
+  c->Init(wxEmptyString,
+          -1,
+          wxEmptyString,
 #if wxUSE_SECRETSTORE
 	  wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
 #endif
@@ -860,9 +861,9 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-void MyFrameMain::conn_spawn(wxString service, int listenPort)
+void MyFrameMain::conn_spawn(wxString service, int listenPort, int repeaterId)
 {
-  wxLogDebug("%s: %s %d", __func__, service, listenPort);
+  wxLogDebug("%s: %s %d %d", __func__, service, listenPort, repeaterId);
 
   VNCConn* c = new VNCConn(this);
 
@@ -970,7 +971,9 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort)
                    password); // if Load() fails, password will still be empty
       }
 #endif
-      c->Init(host, user,
+      c->Init(host,
+              repeaterId,
+              user,
 #if wxUSE_SECRETSTORE
               password,
 #endif
@@ -1287,7 +1290,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
     if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getHost() != wxEmptyString) {
         pConfig->Write(K_LASTHOST, dialog_new_connection.getHost());
-        conn_spawn(dialog_new_connection.getHost());
+        conn_spawn(dialog_new_connection.getHost(), -1, dialog_new_connection.getRepeaterId());
     }
 
     // save this in any case

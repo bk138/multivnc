@@ -58,7 +58,7 @@ class MyFrameMain: public FrameMain
   wxArrayString bookmarks;
   bool loadbookmarks();
 
-  void conn_spawn(wxString service, int listenPort = -1);
+  void conn_spawn(wxString service, int listenPort = -1, int repeaterId = -1);
   void conn_setup(VNCConn *conn);
   void conn_terminate(int which);
 
