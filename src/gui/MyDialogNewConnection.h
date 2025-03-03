@@ -1,6 +1,7 @@
 #ifndef MYDIALOGNEWCONNECTION_H
 #define MYDIALOGNEWCONNECTION_H
 
+#include <wx/valnum.h>
 #include "DialogNewConnection.h"
 
 class MyDialogNewConnection : public DialogNewConnection {
@@ -9,7 +10,9 @@ public:
                           const wxPoint &pos = wxDefaultPosition,
                           const wxSize &size = wxDefaultSize,
                           long style = wxDEFAULT_DIALOG_STYLE)
-        : DialogNewConnection(parent, id, title, pos, size, style){};
+        : DialogNewConnection(parent, id, title, pos, size, style){
+        text_ctrl_repeater_id->SetValidator(wxIntegerValidator<int>());
+    };
 
     wxString getHost() const { return text_ctrl_host->GetValue(); };
     void setHost(const wxString &host) { text_ctrl_host->SetValue(host); };
