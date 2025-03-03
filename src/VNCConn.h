@@ -44,7 +44,7 @@
 */
 /// Sent when Listen() completes with success(listening, m_commandInt==0) or failure (m_commandInt!=0)
 DECLARE_EVENT_TYPE(VNCConnListenNOTIFY, -1)
-/// Sent when Init() completes with success(connection established, m_commandInt==0) or failure (m_commandInt!=0)
+/// Sent when Init() completes one of its connection setup stages, m_commandInt is set to the respective VNCConn::InitState variant.
 DECLARE_EVENT_TYPE(VNCConnInitNOTIFY, -1)
 /// Sent when this VNCConn wants a password. This blocks the VNCConn's internal worker thread until SetPassword() is called!
 wxDECLARE_EVENT(VNCConnGetPasswordNOTIFY, wxCommandEvent);
@@ -71,14 +71,14 @@ DECLARE_EVENT_TYPE(VNCConnReplayFinishedNOTIFY, -1)
 
 /**
    To make an outgoing connection, call Init().
-   You'll be informed by a VNCConnInitNOTIFY event about the outcome, can be success or failure.
+   You'll be informed by VNCConnInitNOTIFY events about progress and outcome.
    You'll get a VNCConnDisconnectNOTIFY when an established connection is terminated.
 
    To make a listening connection, call Listen().
    You'll be informed by a VNCConnListenNOTIFY event about the outcome, can be success or failure.
    You'll get a VNCConnIncomingConnectionNOTIFY event when a connection is made from the outside;
    in this case, call Init() with empty host and port to finalise the connection to the remote.
-   You'll be informed by a VNCConnInitNOTIFY event about the outcome, can be success or failure.
+   You'll be informed by VNCConnInitNOTIFY events about progress and outcome.
    You'll get a VNCConnDisconnectNOTIFY when an established connection is terminated.
 
    To shut down a connection, call Shutdown().
@@ -90,7 +90,15 @@ public:
   ~VNCConn(); 
 
   void Listen(int port);
-  void Init(const wxString& host,
+  enum InitState {
+      CONNECT_SUCCESS,     ///< Connect succeeded, one of the Initialise states follows.
+      CONNECT_FAIL,        ///< Connect failed, terminal state.
+      CONNECT_CANCEL,      ///< Connect canceled, terminal state.
+      INITIALISE_SUCCESS,  ///< Initialise succeeded and connection established, terminal state.
+      INITIALISE_FAIL,     ///< Initialise failed, terminal state.
+      INITIALISE_CANCEL,   ///< Initialise canceled, terminal state.
+  };
+  bool Init(const wxString& host,
             int repeaterId,
             const wxString& username,
 #if wxUSE_SECRETSTORE

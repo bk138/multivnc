@@ -287,38 +287,50 @@ wxThread::ExitCode VNCConn::Entry()
      // save these for the error case
      wxString host = wxString(cl->serverHost);
      int port = cl->serverPort;
-     if (!rfbInitClient(cl, 0, NULL)) {
-	 //  rfbInitClient() calls rfbClientCleanup() on failure, but
-	 //  this does not zero the ptr
-	 cl = 0;
-	 err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
-	 wxLogDebug("VNCConn %p: rfbInitClient() failed. Cleanup by library.", this);
-	 thread_post_init_notify(1); // TODO add more error codes
-	 wxLogDebug("VNCConn %p: vncthread done early w/ VNCConnInitNOTIFY(fail)", this);
-	 return 0;
-     }
 
-     // set the client sock to blocking again until libvncclient is fixed
+     if (!rfbClientConnect(cl)) {
+         err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
+         if(thread_shutdown) {
+             wxLogDebug("VNCConn %p: rfbClientConnect() canceled.", this);
+             thread_post_init_notify(InitState::CONNECT_CANCEL);
+         } else {
+             wxLogDebug("VNCConn %p: rfbClientConnect() failed.", this);
+             thread_post_init_notify(InitState::CONNECT_FAIL);
+         }
+         wxLogDebug("VNCConn %p: vncthread done early", this);
+         return 0;
+     } else {
+         wxLogDebug("VNCConn %p: rfbClientConnect() succeeded.", this);
+         thread_post_init_notify(InitState::CONNECT_SUCCESS);
+         if (!rfbClientInitialise(cl)) {
+             err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
+             if(thread_shutdown) {
+                 wxLogDebug("VNCConn %p: rfbClientInitialise() canceled.", this);
+                 thread_post_init_notify(InitState::INITIALISE_CANCEL);
+             } else {
+                 wxLogDebug("VNCConn %p: rfbClientInitialise() failed.", this);
+                 thread_post_init_notify(InitState::INITIALISE_FAIL);
+             }
+             wxLogDebug("VNCConn %p: vncthread done early", this);
+             return 0;
+         } else {
+             wxLogDebug("VNCConn %p: rfbClientInitialise() succeeded.", this);
+
+             // set the client sock to blocking again until libvncclient is fixed
 #ifdef WIN32
-     unsigned long block = 0;
-     if (ioctlsocket(cl->sock, FIONBIO, &block) == SOCKET_ERROR) {
-       errno = WSAGetLastError();
+             unsigned long block = 0;
+             if (ioctlsocket(cl->sock, FIONBIO, &block) == SOCKET_ERROR) {
+                 errno = WSAGetLastError();
 #else
-     int flags = fcntl(cl->sock, F_GETFL);
-     if (flags < 0 || fcntl(cl->sock, F_SETFL, flags & ~O_NONBLOCK) < 0) {
+             int flags = fcntl(cl->sock, F_GETFL);
+             if (flags < 0 || fcntl(cl->sock, F_SETFL, flags & ~O_NONBLOCK) < 0) {
 #endif
-	 rfbClientErr("Setting socket to blocking failed: %s\n", strerror(errno));
-     }
+                  rfbClientErr("Setting socket to blocking failed: %s\n", strerror(errno));
+             }
 
-     // if there was an error in alloc_framebuffer(), catch that here
-     // err is set by alloc_framebuffer()
-     if (!cl->frameBuffer) {
-	 thread_post_init_notify(1); // TODO add more error codes
-	 wxLogDebug("VNCConn %p: vncthread done early w/ VNCConnInitNOTIFY(fail)", this);
-	 return 0;
+             thread_post_init_notify(InitState::INITIALISE_SUCCESS);
+         }
      }
-     // connect succesful
-     thread_post_init_notify(0);
   }
 
   int i=0;
@@ -687,11 +699,32 @@ void VNCConn::thread_post_listen_notify(int error) {
   wxPostEvent((wxEvtHandler*)parent, event);
 }
 
-void VNCConn::thread_post_init_notify(int error) {
-  wxLogDebug(wxT("VNCConn %p: post_init_notify(%d)"), this, error);
+void VNCConn::thread_post_init_notify(int state) {
+  wxString stateString;
+  switch(state) {
+  case InitState::CONNECT_SUCCESS:
+      stateString = "InitState::CONNECT_SUCCESS";
+      break;
+  case InitState::CONNECT_FAIL:
+      stateString = "InitState::CONNECT_FAIL";
+      break;
+  case InitState::CONNECT_CANCEL:
+      stateString = "InitState::CONNECT_CANCEL";
+      break;
+  case InitState::INITIALISE_SUCCESS:
+      stateString = "InitState::INITIALISE_SUCCESS";
+      break;
+  case InitState::INITIALISE_FAIL:
+      stateString = "InitState::INITIALISE_FAIL";
+      break;
+  case InitState::INITIALISE_CANCEL:
+      stateString = "InitState::INITIALISE_CANCEL";
+      break;
+  }
+  wxLogDebug(wxT("VNCConn %p: post_init_notify(%s)"), this, stateString);
   wxCommandEvent event(VNCConnInitNOTIFY, wxID_ANY);
   event.SetEventObject(this); // set sender
-  event.SetInt(error);
+  event.SetInt(state);
   wxPostEvent((wxEvtHandler*)parent, event);
 }
 
@@ -1162,7 +1195,7 @@ void VNCConn::Listen(int port)
 }
 
 
-void VNCConn::Init(const wxString& host,
+bool VNCConn::Init(const wxString& host,
                    int repeaterId,
                    const wxString& username,
 #if wxUSE_SECRETSTORE
@@ -1177,9 +1210,8 @@ void VNCConn::Init(const wxString& host,
 
   if(cl->frameBuffer || (GetThread() && GetThread()->IsRunning()))
     {
-      wxLogDebug(wxT("VNCConn %p: Init() already done. Call Shutdown() first!"), this);
-      thread_post_init_notify(1); // TODO add more error codes
-      return;
+      err.Printf(_("Connection already initialised. Please disconnect first."));
+      return false;
     }
 
   // reset stats before doing new connection
@@ -1220,19 +1252,19 @@ void VNCConn::Init(const wxString& host,
     {
       err.Printf(_("Could not create VNC thread!"));
       Shutdown();
-      thread_post_init_notify(1); // TODO add more error codes
-      return;
+      return false;
     }
 
   if( GetThread()->Run() != wxTHREAD_NO_ERROR )
     {
       err.Printf(_("Could not start VNC thread!")); 
       Shutdown();
-      thread_post_init_notify(1); // TODO add more error codes
-      return;
+      return false;
     }
 
   conn_stopwatch.Start();
+
+  return true;
 }
 
 

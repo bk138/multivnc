@@ -327,19 +327,36 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
 {
     VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
 
-    if (event.GetInt() == 0) {
-	conn_setup(c);
-    } else {
-	// error. only show error if this was not a auth case with empty password, i.e. a canceled one
-	if (c->getRequireAuth()
+    // first, find index of this VNCConn's ConnBlob
+    vector<ConnBlob>::iterator it = connections.begin();
+    size_t index = 0;
+    while(it != connections.end() && it->conn != c) {
+        ++it;
+        ++index;
+    }
+
+    switch(event.GetInt()) {
+    case VNCConn::InitState::CONNECT_SUCCESS:
+        // update page label
+        if (!c->getRepeaterId().IsEmpty())
+            notebook_connections->SetPageText(index, wxString::Format(_("Connected to %s, waiting for peer %s"),
+                                                                      c->getServerHost(),
+                                                                      c->getRepeaterId()));
+        else
+            notebook_connections->SetPageText(index, wxString::Format(_("Connected to %s"),c->getServerHost()));
+        break;
+    case VNCConn::InitState::CONNECT_FAIL:
+    case VNCConn::InitState::INITIALISE_FAIL:
+        // error. only show error if this was not a auth case with empty password, i.e. a canceled ones
+        if (c->getRequireAuth()
 #if wxUSE_SECRETSTORE
-	    && !c->getPassword().IsOk()) {
+            && !c->getPassword().IsOk()) {
 #else
-	    && c->getPassword().IsEmpty()) {
+            && c->getPassword().IsEmpty()) {
 #endif
-	    wxLogStatus(_("Authentication canceled."));
+            wxLogStatus(_("Authentication canceled."));
         } else {
-	    wxLogStatus(_("Connection failed."));
+            wxLogStatus(_("Connection failed."));
             // We want a modal dialog here so that the viewer window closes after the dialog.
             // The title is translated in wx itself.
             wxRichMessageDialog dialog (this,
@@ -359,20 +376,17 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
                 machine_showlog(unused);
             }
         }
-
-	// find out if we already setup this this connection.
-	// this happens if it was a listening one that failed it's Init()
-	vector<ConnBlob>::iterator it = connections.begin();
-	size_t index = 0;
-	while(it != connections.end() && it->conn != c)
-	    {
-		++it;
-		++index;
-	    }
-	if (index < connections.size()) {
-	    conn_terminate(index);
+        // fall through to cancel cases
+    case VNCConn::InitState::CONNECT_CANCEL:
+    case VNCConn::InitState::INITIALISE_CANCEL:
+        if (index < connections.size()) {
+            conn_terminate(index);
         }
-    }
+        break;
+    case VNCConn::InitState::INITIALISE_SUCCESS:
+        conn_setup(c);
+        break;
+    };
 }
 
 
@@ -604,13 +618,15 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   // chomp leading space
   encodings = encodings.AfterFirst(' '); 
 
-  c->Init(wxEmptyString,
-          -1,
-          wxEmptyString,
+  if(!c->Init(wxEmptyString,
+              -1,
+              wxEmptyString,
 #if wxUSE_SECRETSTORE
-	  wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
+              wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
 #endif
-	  encodings, compresslevel, quality);
+              encodings, compresslevel, quality)) {
+      wxLogError(c->getErr());
+  }
 }
 
 
@@ -971,14 +987,16 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort, int repeaterId)
                    password); // if Load() fails, password will still be empty
       }
 #endif
-      c->Init(host,
-              repeaterId,
-              user,
+      if(!c->Init(host,
+                  repeaterId,
+                  user,
 #if wxUSE_SECRETSTORE
-              password,
+                  password,
 #endif
-              encodings, compresslevel, quality, multicast,
-              multicast_socketrecvbuf, multicast_recvbuf);
+                  encodings, compresslevel, quality, multicast,
+                  multicast_socketrecvbuf, multicast_recvbuf)) {
+          wxLogError(c->getErr());
+      }
     }
 }
 
@@ -1016,6 +1034,10 @@ void MyFrameMain::conn_setup(VNCConn *c) {
   // set page label
   if(!c->getListenPort().IsEmpty())
       notebook_connections->SetPageText(index, c->getDesktopName() + " " + _("(Reverse Connection)"));
+  else if (!c->getRepeaterId().IsEmpty())
+      notebook_connections->SetPageText(index, c->getDesktopName() + " " + wxString::Format(_("(peer %s on %s)"),
+                                                                                            c->getRepeaterId(),
+                                                                                            c->getServerHost()));
   else
       notebook_connections->SetPageText(index, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")"));
 
