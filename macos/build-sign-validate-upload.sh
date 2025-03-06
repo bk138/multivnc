@@ -67,7 +67,14 @@ echo "Validate package"
 echo
 xcrun altool --validate-app -f MultiVNC.pkg -t osx -u $APPLE_ID_EMAIL -p $APPLE_ID_PASSWORD --output-format xml
 
-echo
-echo "Upload package"
-echo
-xcrun altool --upload-app -f MultiVNC.pkg -t osx -u $APPLE_ID_EMAIL -p $APPLE_ID_PASSWORD --output-format xml
+if [ "$1" = "-u" ]
+then
+    echo
+    echo "Upload package"
+    echo
+    xcrun altool --upload-app -f MultiVNC.pkg -t osx -u $APPLE_ID_EMAIL -p $APPLE_ID_PASSWORD --output-format xml
+else
+    echo
+    echo "Provide -u to upload package"
+    echo
+fi
