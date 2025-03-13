@@ -1,3 +1,9 @@
+# MultiVNC 0.10.0 - "Spring Break" - 2025-03-13
+* Fixed hangs that could occur when connections were interrupted.
+* Improved connection setup dialog.
+* Fixed warning dialog appearing when English fallback locale was used on MacOS.
+* Added ability to connect to UltraVNC-style Mode2 repeaters.
+
 # MultiVNC 0.9.0 - "Hello New Year" - 2024-12-29
 * Improved bookmark editing/deleting by adding a context menu.
 * Added UTF-8 cuttext handling.
