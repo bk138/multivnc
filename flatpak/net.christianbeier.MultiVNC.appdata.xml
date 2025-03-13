@@ -55,6 +55,17 @@
   </screenshots>
 
   <releases>
+    <release version="0.10.0" date="2025-03-13">
+      <description>
+	<ul>
+	  <li>Fixed hangs that could occur when connections were interrupted.</li>
+          <li>Improved connection setup dialog.</li>
+          <li>Fixed warning dialog appearing when English fallback locale was used on MacOS.</li>
+          <li>Added ability to connect to UltraVNC-style Mode2 repeaters.</li>
+	</ul>
+      </description>
+    </release>
+
     <release version="0.9.0" date="2024-12-29">
       <description>
 	<ul>
@@ -65,7 +76,6 @@
 	</ul>
       </description>
     </release>
-
 
     <release version="0.8.0" date="2024-12-06">
       <description>
