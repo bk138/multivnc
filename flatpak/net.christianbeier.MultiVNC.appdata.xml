@@ -37,6 +37,7 @@
       <li>TLS support, i.e. AnonTLS and VeNCrypt.</li>
       <li>Discovery of VNC servers advertising themselves via ZeroConf.</li>
       <li>Bookmarking of connections.</li>
+      <li>UltraVNC Repeater support.</li>	    
       <li>Supports server framebuffer resize.</li>
       <li>Several connections with one viewer using tabs.</li>
       <li>Listen mode (Reverse VNC). Via tabs it's possible to listen for and serve multiple incoming connections.</li>
