@@ -976,6 +976,12 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort, int repeaterId)
     {
       wxLogStatus(_("Connecting to %s..."), service);
 
+      // remove scheme component if present
+      wxString prefix = "vnc://";
+      if(service.substr(0, prefix.length()) == prefix) {
+          service = service.substr(prefix.length());
+      }
+
       wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
       wxString host = service.Contains("@") ? service.AfterFirst('@') : service;
 #if wxUSE_SECRETSTORE
