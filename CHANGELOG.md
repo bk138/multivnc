@@ -1,3 +1,6 @@
+# MultiVNC 0.10.1 - "Scheming" - 2025-04-29
+* Fixed service parsing when vnc:// URI scheme is given.
+
 # MultiVNC 0.10.0 - "Spring Break" - 2025-03-13
 * Fixed hangs that could occur when connections were interrupted.
 * Improved connection setup dialog.
