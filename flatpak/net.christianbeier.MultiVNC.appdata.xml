@@ -56,6 +56,14 @@
   </screenshots>
 
   <releases>
+    <release version="0.10.1" date="2025-04-29">
+      <description>
+	<ul>
+	  <li>Fixed service parsing when vnc:// URI scheme is given.</li>
+	</ul>
+      </description>
+    </release>
+
     <release version="0.10.0" date="2025-03-13">
       <description>
 	<ul>
