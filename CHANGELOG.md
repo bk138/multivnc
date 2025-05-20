@@ -1,3 +1,6 @@
+# MultiVNC 0.10.2 - "All New In May" - 2025-05-20
+* Fix some minor MacOS display issues by updating wxWidgets to v3.2.8.
+
 # MultiVNC 0.10.1 - "Scheming" - 2025-04-29
 * Fixed service parsing when vnc:// URI scheme is given.
 
