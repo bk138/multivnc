@@ -571,23 +571,7 @@ wxThread::ExitCode VNCConn::Entry()
 
 bool VNCConn::thread_send_pointer_event(pointerEvent &event)
 {
-  int buttonmask = 0;
-
-  if(event.LeftIsDown())
-    buttonmask |= rfbButton1Mask;
-
-  if(event.MiddleIsDown())
-    buttonmask |= rfbButton2Mask;
-  
-  if(event.RightIsDown())
-    buttonmask |= rfbButton3Mask;
-
-  if(event.GetWheelRotation() > 0)
-    buttonmask |= rfbWheelUpMask;
-
-  if(event.GetWheelRotation() < 0)
-    buttonmask |= rfbWheelDownMask;
-
+  // first, handle cuttext sending, if any
   if(event.Entering() && ! cuttext.IsEmpty())
     {
       wxCriticalSectionLocker lock(mutex_cuttext); // since cuttext can be set from the main thread
@@ -609,6 +593,25 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
               wxLogDebug(wxT("VNCConn %p: sending Latin-1 cuttext FAILED, could not convert '%s' to ISO-8859-1"), this, cuttext.c_str());
       }
     }
+
+
+  int buttonmask = 0;
+
+  if(event.LeftIsDown())
+    buttonmask |= rfbButton1Mask;
+
+  if(event.MiddleIsDown())
+    buttonmask |= rfbButton2Mask;
+  
+  if(event.RightIsDown())
+    buttonmask |= rfbButton3Mask;
+
+  if(event.GetWheelRotation() > 0)
+    buttonmask |= rfbWheelUpMask;
+
+  if(event.GetWheelRotation() < 0)
+    buttonmask |= rfbWheelDownMask;
+
 
   // record here
   {
