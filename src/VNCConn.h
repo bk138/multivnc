@@ -292,7 +292,12 @@ private:
   static void parseHostString(const char *server, int defaultport, char **host, int *port);
  
   // messagequeues for posting events to the worker thread
-  typedef wxMouseEvent pointerEvent;
+  struct pointerEvent {
+      int x;
+      int y;
+      int buttonmask;
+      bool entering;
+  };
   struct keyEvent
   {
     rfbKeySym keysym;

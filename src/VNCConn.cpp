@@ -572,7 +572,7 @@ wxThread::ExitCode VNCConn::Entry()
 bool VNCConn::thread_send_pointer_event(pointerEvent &event)
 {
   // first, handle cuttext sending, if any
-  if(event.Entering() && ! cuttext.IsEmpty())
+  if(event.entering && !cuttext.IsEmpty())
     {
       wxCriticalSectionLocker lock(mutex_cuttext); // since cuttext can be set from the main thread
 
@@ -595,24 +595,6 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
     }
 
 
-  int buttonmask = 0;
-
-  if(event.LeftIsDown())
-    buttonmask |= rfbButton1Mask;
-
-  if(event.MiddleIsDown())
-    buttonmask |= rfbButton2Mask;
-  
-  if(event.RightIsDown())
-    buttonmask |= rfbButton3Mask;
-
-  if(event.GetWheelRotation() > 0)
-    buttonmask |= rfbWheelUpMask;
-
-  if(event.GetWheelRotation() < 0)
-    buttonmask |= rfbWheelDownMask;
-
-
   // record here
   {
     wxCriticalSectionLocker lock(mutex_recordreplay);
@@ -624,18 +606,18 @@ bool VNCConn::thread_send_pointer_event(pointerEvent &event)
 	ui_now += wxT(",");
 	ui_now += wxT("p"); // is pointer event
 	ui_now += wxT(",");
-	ui_now += (wxString() << event.m_x);
+	ui_now += (wxString() << event.x);
 	ui_now += wxT(",");
-	ui_now += (wxString() << event.m_y);
+	ui_now += (wxString() << event.y);
 	ui_now += wxT(",");
-	ui_now += (wxString() << buttonmask);
+	ui_now += (wxString() << event.buttonmask);
 
 	userinput.Add(ui_now);
       }
   }
 
-  wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.m_x, event.m_y, buttonmask);
-  return SendPointerEvent(cl, event.m_x, event.m_y, buttonmask);
+  wxLogDebug(wxT("VNCConn %p: sending pointer event at (%d,%d), buttonmask %d"), this, event.x, event.y, event.buttonmask);
+  return SendPointerEvent(cl, event.x, event.y, event.buttonmask);
 }
 
 
@@ -1341,8 +1323,25 @@ void VNCConn::sendPointerEvent(wxMouseEvent &event)
   if(replaying)
     return;
 
+  pointerEvent pev = {event.m_x, event.m_y, 0, event.Entering()};
+
+  if(event.LeftIsDown())
+    pev.buttonmask |= rfbButton1Mask;
+
+  if(event.MiddleIsDown())
+    pev.buttonmask |= rfbButton2Mask;
+
+  if(event.RightIsDown())
+    pev.buttonmask |= rfbButton3Mask;
+
+  if(event.GetWheelRotation() > 0)
+    pev.buttonmask |= rfbWheelUpMask;
+
+  if(event.GetWheelRotation() < 0)
+    pev.buttonmask |= rfbWheelDownMask;
+
   if(GetThread() && GetThread()->IsRunning())
-    pointer_event_q.Post(event);
+    pointer_event_q.Post(pev);
 }
 
 
