@@ -450,8 +450,9 @@ wxThread::ExitCode VNCConn::Entry()
 		thread_send_latency_probe();
 	      }
 	  }
-	 
-	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval)
+
+          // do FastRequest when interval set and expired and only after one full update was received
+	  if(fastrequest_interval && (size_t)fastrequest_stopwatch.Time() > fastrequest_interval && upd_count)
 	    {
 	      if(isMulticast())
 		SendMulticastFramebufferUpdateRequest(cl, TRUE);
@@ -960,7 +961,7 @@ void VNCConn::thread_update_finished(rfbClient* client)
 
       conn->updated_rect = wxRect();
 
-      if(conn->do_stats)
+      if(conn->do_stats || conn->fastrequest_interval)
 	{
 	  wxCriticalSectionLocker lock(conn->mutex_stats);
 	  conn->upd_count++;

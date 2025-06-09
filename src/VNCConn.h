@@ -257,7 +257,7 @@ private:
   int upd_bytes;
   // counts uncompressed bytes of updates
   int upd_bytes_inflated;
-  // counts updates 
+  // counts full updates, also used for FastRequest
   int upd_count; 
   // check latency by isueing an xvp request with some unsupported version
 #define LATENCY_TEST_XVP_VER 42
