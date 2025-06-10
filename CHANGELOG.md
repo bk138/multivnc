@@ -1,3 +1,7 @@
+# MultiVNC 0.10.3 - "Magic Scrolls and Fast Requests" - 2025-06-10
+* Fixed FastRequest for newer UltraVNC servers.
+* Fixed scrolling for some VNC servers like TigerVNC and others.
+
 # MultiVNC 0.10.2 - "All New In May" - 2025-05-20
 * Fix some minor MacOS display issues by updating wxWidgets to v3.2.8.
 
