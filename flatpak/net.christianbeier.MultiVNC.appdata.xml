@@ -57,6 +57,15 @@
 
   <releases>
 
+    <release version="0.10.3" date="2025-06-10">
+      <description>
+	<ul>
+	  <li>Fixed FastRequest mode for newer UltraVNC servers.</li>
+          <li>Fixed scrolling for some VNC servers like TigerVNC and others.</li>
+	</ul>
+      </description>
+    </release>
+
     <release version="0.10.2" date="2025-05-20">
       <description>
 	<ul>
