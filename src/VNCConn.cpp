@@ -1326,6 +1326,9 @@ void VNCConn::sendPointerEvent(wxMouseEvent &event)
 
   pointerEvent pev = {event.m_x, event.m_y, 0, event.Entering()};
 
+  /*
+    Populate buttonmask with pressed buttons
+   */
   if(event.LeftIsDown())
     pev.buttonmask |= rfbButton1Mask;
 
@@ -1335,14 +1338,36 @@ void VNCConn::sendPointerEvent(wxMouseEvent &event)
   if(event.RightIsDown())
     pev.buttonmask |= rfbButton3Mask;
 
-  if(event.GetWheelRotation() > 0)
-    pev.buttonmask |= rfbWheelUpMask;
+  if (event.GetWheelRotation() != 0 && event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL) {
 
-  if(event.GetWheelRotation() < 0)
-    pev.buttonmask |= rfbWheelDownMask;
+      if(event.GetWheelRotation() > 0) {
+          pev.buttonmask |= rfbWheelUpMask;
+      }
 
+      if(event.GetWheelRotation() < 0) {
+          pev.buttonmask |= rfbWheelDownMask;
+      }
+  }
+
+  // Queue event
   if(GetThread() && GetThread()->IsRunning())
     pointer_event_q.Post(pev);
+
+  // For each queued button 4 or 5 down, queue another synthesised button 4 or 5 up
+  if (pev.buttonmask & rfbWheelUpMask || pev.buttonmask & rfbWheelDownMask) {
+
+      if (pev.buttonmask & rfbWheelUpMask) {
+          pev.buttonmask ^= rfbWheelUpMask;
+      }
+
+      if (pev.buttonmask & rfbWheelDownMask) {
+          pev.buttonmask ^= rfbWheelDownMask;
+      }
+
+      if(GetThread() && GetThread()->IsRunning())
+          pointer_event_q.Post(pev);
+  }
+
 }
 
 
