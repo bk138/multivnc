@@ -298,6 +298,7 @@ private:
       int buttonmask;
       bool entering;
   };
+  wxStopWatch pointer_scroll_stopwatch;
   struct keyEvent
   {
     rfbKeySym keysym;

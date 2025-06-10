@@ -1249,6 +1249,7 @@ bool VNCConn::Init(const wxString& host,
     }
 
   conn_stopwatch.Start();
+  pointer_scroll_stopwatch.Start();
 
   return true;
 }
@@ -1338,7 +1339,7 @@ void VNCConn::sendPointerEvent(wxMouseEvent &event)
   if(event.RightIsDown())
     pev.buttonmask |= rfbButton3Mask;
 
-  if (event.GetWheelRotation() != 0 && event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL) {
+  if (event.GetWheelRotation() != 0 && event.GetWheelAxis() == wxMOUSE_WHEEL_VERTICAL && pointer_scroll_stopwatch.Time() >= 20) {
 
       if(event.GetWheelRotation() > 0) {
           pev.buttonmask |= rfbWheelUpMask;
@@ -1347,6 +1348,9 @@ void VNCConn::sendPointerEvent(wxMouseEvent &event)
       if(event.GetWheelRotation() < 0) {
           pev.buttonmask |= rfbWheelDownMask;
       }
+
+      // restart the timer
+      pointer_scroll_stopwatch.Start();
   }
 
   // Queue event
