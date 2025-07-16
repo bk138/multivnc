@@ -4,7 +4,7 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlinx-serialization'
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 36
 
     defaultConfig {
         applicationId "com.coboltforge.dontmind.multivnc"
