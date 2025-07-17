@@ -59,7 +59,8 @@
 
          <activity android:name=".ui.HelpActivity"
              android:label="@string/help"
-             >
+			 android:theme="@style/AppTheme.NoActionBar"
+			 >
 		</activity>
 
         <service
