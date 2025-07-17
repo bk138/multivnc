@@ -8,11 +8,11 @@ package com.coboltforge.dontmind.multivnc.ui;
  */
 
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,14 +20,23 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.coboltforge.dontmind.multivnc.R;
 
 
-public class AboutActivity extends Activity {
+public class AboutActivity extends AppCompatActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// On Android 15 and later, calling enableEdgeToEdge ensures system bar icon colors update
+		// when the device theme changes. Because calling it on pre-Android 15 has the side effect of
+		// enabling EdgeToEdge there as well, we only use it on Android 15 and later.
+		if (Build.VERSION.SDK_INT >= 35) {
+			EdgeToEdge.enable(this);
+		}
 		setContentView(R.layout.about_activity);
 
 		//Get version number/name and add it to the screen

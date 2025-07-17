@@ -53,6 +53,7 @@
 
         <activity android:name=".ui.AboutActivity"
              android:label="@string/about"
+			android:theme="@style/AppTheme.NoActionBar"
              >
 		</activity>
 
