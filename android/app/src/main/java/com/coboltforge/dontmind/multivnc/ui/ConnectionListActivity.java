@@ -22,11 +22,13 @@ import android.content.Intent;
 import android.content.Intent.ShortcutIconResource;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,6 +48,12 @@ public class ConnectionListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // On Android 15 and later, calling enableEdgeToEdge ensures system bar icon colors update
+        // when the device theme changes. Because calling it on pre-Android 15 has the side effect of
+        // enabling EdgeToEdge there as well, we only use it on Android 15 and later.
+        if (Build.VERSION.SDK_INT >= 35) {
+            EdgeToEdge.enable(this);
+        }
 
         setContentView(R.layout.connection_list_activity);
 
