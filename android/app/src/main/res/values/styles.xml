@@ -14,6 +14,11 @@
         <item name="android:buttonBarButtonStyle">@style/App.ButtonBarButton</item>
     </style>
 
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="App.Button" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textColor">@android:color/white</item>
     </style>
