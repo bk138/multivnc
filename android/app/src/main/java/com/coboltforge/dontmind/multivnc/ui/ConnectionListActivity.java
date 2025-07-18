@@ -19,7 +19,6 @@
 package com.coboltforge.dontmind.multivnc.ui;
 
 import android.content.Intent;
-import android.content.Intent.ShortcutIconResource;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -32,6 +31,9 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.ListFragment;
 
 import com.coboltforge.dontmind.multivnc.Constants;
@@ -103,20 +105,21 @@ public class ConnectionListActivity extends AppCompatActivity {
         public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id) {
             ConnectionBean connection = database.getConnectionDao().get(id);
             if (connection != null) {
-                // Create shortcut if requested
-                ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(getActivity(), R.drawable.ic_launcher);
-                Intent intent = new Intent();
-
+                // Intent that is used when tapping shortcut
                 Intent launchIntent = new Intent(getActivity(), VncCanvasActivity.class);
                 Uri.Builder builder = new Uri.Builder();
                 builder.authority(Constants.CONNECTION + ":" + connection.id);
                 builder.scheme("vnc");
                 launchIntent.setData(builder.build());
+                launchIntent.setAction(Intent.ACTION_VIEW); // important on Android 14+
 
-                intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, launchIntent);
-                intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, connection.nickname);
-                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
-                getActivity().setResult(AppCompatActivity.RESULT_OK, intent);
+                ShortcutInfoCompat shortcut = new ShortcutInfoCompat.Builder(getActivity(), getActivity().getPackageName() + "-" + connection.id)
+                        .setShortLabel(connection.nickname)
+                        .setIcon(IconCompat.createWithResource(getActivity(), R.drawable.ic_launcher))
+                        .setIntent(launchIntent)
+                        .build();
+
+                getActivity().setResult(AppCompatActivity.RESULT_OK, ShortcutManagerCompat.createShortcutResultIntent(getActivity(), shortcut));
             } else {
                 getActivity().setResult(AppCompatActivity.RESULT_CANCELED);
             }
