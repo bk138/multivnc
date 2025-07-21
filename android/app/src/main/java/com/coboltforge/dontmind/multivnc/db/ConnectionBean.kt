@@ -116,6 +116,10 @@ data class ConnectionBean(
         var sshHost: String? = null,
 
     @JvmField
+        @ColumnInfo(name = "SSH_PORT")
+        var sshPort: Int? = 22,
+
+    @JvmField
         @ColumnInfo(name = "SSH_USERNAME")
         var sshUsername: String? = null,
 

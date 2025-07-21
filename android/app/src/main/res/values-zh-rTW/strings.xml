@@ -44,6 +44,7 @@
 <string name="repeater_hint">連線到 UltraVNC 中繼器時使用的伺服器 ID</string>
     <string name="ssh_caption">SSH 隧道</string>
     <string name="ssh_host_hint">SSH 服务器</string>
+    <string name="ssh_port_hint">SSH 連接埠</string>
     <string name="ssh_username_hint">SSH 用户名</string>
     <string name="ssh_password">密码</string>
     <string name="ssh_privkey">私钥</string>

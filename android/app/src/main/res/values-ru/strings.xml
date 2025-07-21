@@ -42,6 +42,7 @@
 <string name="repeater_hint">"ID сервера при подключении к UltraVNC-ретранслятору"</string>
     <string name="ssh_caption">Тунелювання SSH</string>
     <string name="ssh_host_hint">Сервер SSH</string>
+    <string name="ssh_port_hint">SSH-порт</string>
     <string name="ssh_username_hint">Ім\'я користувача SSH</string>
     <string name="ssh_password">Пароль</string>
     <string name="ssh_privkey">Приватний ключ</string>

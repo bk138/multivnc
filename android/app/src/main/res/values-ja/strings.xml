@@ -45,6 +45,7 @@
 <string name="repeater_hint">UltraVNCリピーターに接続するときのサーバーID</string>
     <string name="ssh_caption">SSH トンネリング</string>
     <string name="ssh_host_hint">SSHサーバー</string>
+    <string name="ssh_port_hint">SSHポート</string>
     <string name="ssh_username_hint">SSH ユーザー名</string>
     <string name="ssh_password">パスワード</string>
     <string name="ssh_privkey">秘密鍵</string>

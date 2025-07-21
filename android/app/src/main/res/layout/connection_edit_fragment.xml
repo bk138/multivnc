@@ -231,6 +231,16 @@
                 android:hint="@string/ssh_host_hint"
                 android:singleLine="true" />
 
+
+            <EditText
+                android:id="@+id/ssh_port_input"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/ssh_port_hint"
+                android:inputType="number"
+                android:singleLine="true" />
+
             <EditText
                 android:id="@+id/ssh_username_input"
                 android:layout_width="fill_parent"

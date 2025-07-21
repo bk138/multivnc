@@ -42,6 +42,7 @@
 <string name="repeater_hint">"Server-ID bei Verbindung zu einem UltraVNC-Repeater"</string>
     <string name="ssh_caption">SSH-Tunnel</string>
     <string name="ssh_host_hint">SSH-Server</string>
+    <string name="ssh_port_hint">SSH-Port</string>
     <string name="ssh_username_hint">SSH-Username</string>
     <string name="ssh_password">Passwort</string>
     <string name="ssh_privkey">Privater Schlüssel</string>

@@ -19,7 +19,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 @Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class, SshKnownHost.class}, version = VncDatabase.VERSION, exportSchema = false)
 public abstract class VncDatabase extends RoomDatabase {
 
-    public static final int VERSION = 14;
+    public static final int VERSION = 15;
     public static final String NAME = "VncDatabase";
 
     public abstract MetaListDao getMetaListDao();
@@ -39,6 +39,7 @@ public abstract class VncDatabase extends RoomDatabase {
                     .allowMainThreadQueries()
                     .addMigrations(MIGRATION_12_13)
                     .addMigrations(MIGRATION_13_14)
+                    .addMigrations(MIGRATION_14_15)
                     .build();
 
             setupDefaultMetaList(instance);
@@ -151,6 +152,18 @@ public abstract class VncDatabase extends RoomDatabase {
                              "HOST TEXT NOT NULL," +
                              "FINGERPRINT BLOB NOT NULL" +
                              ")");
+        }
+    };
+
+    // this adds an SSH_PORT column to CONNECTION_BEAN table
+    private static final Migration MIGRATION_14_15 = new Migration(14, 15) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Log.i("VncDatabase", "Migrating to Room [14 -> 15]");
+
+            // add new SSH_PORT column to CONNECTION_BEAN, nullable as we don't want pre-v15
+            // entries to show any value
+            database.execSQL("ALTER TABLE CONNECTION_BEAN ADD SSH_PORT INTEGER");
         }
     };
 }

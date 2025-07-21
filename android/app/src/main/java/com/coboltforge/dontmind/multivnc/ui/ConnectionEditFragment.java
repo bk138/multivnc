@@ -60,6 +60,7 @@ public class ConnectionEditFragment extends Fragment {
     private EditText textUsername;
     private SwitchMaterial sshSwitch;
     private EditText sshHostText;
+    private EditText sshPortText;
     private EditText sshUsernameText;
     private RadioGroup sshCredentialsRadioGroup;
     private EditText sshPasswordText;
@@ -147,6 +148,7 @@ public class ConnectionEditFragment extends Fragment {
         repeaterText = (TextView)view.findViewById(R.id.textRepeaterId);
 
         sshHostText = view.findViewById(R.id.ssh_host_input);
+        sshPortText = view.findViewById(R.id.ssh_port_input);
         sshUsernameText = view.findViewById(R.id.ssh_username_input);
         sshPasswordText = view.findViewById(R.id.ssh_password_input);
         sshPrivkeyImportButton = view.findViewById(R.id.ssh_privkey_import_button);
@@ -158,6 +160,7 @@ public class ConnectionEditFragment extends Fragment {
             // and clear contents if disabled again
             if(!isChecked) {
                 sshHostText.setText("");
+                sshPortText.setText("");
                 sshUsernameText.setText("");
                 sshPasswordText.setText("");
                 sshPrivkeyPasswordText.setText("");
@@ -274,6 +277,11 @@ public class ConnectionEditFragment extends Fragment {
         conn.sshHost = sshHostText.getText().toString().trim();
         if(conn.sshHost.isEmpty())
             conn.sshHost = null;
+        try {
+            conn.sshPort = Integer.parseInt(sshPortText.getText().toString().trim());
+        }
+        catch (NumberFormatException ignored) {
+        }
         conn.sshUsername = sshUsernameText.getText().toString().trim();
         if(conn.sshUsername.isEmpty())
             conn.sshUsername = null;
@@ -348,6 +356,8 @@ public class ConnectionEditFragment extends Fragment {
 
         sshSwitch.setChecked(conn.sshHost != null);
         sshHostText.setText(conn.sshHost);
+        if (conn.sshPort != null)
+            sshPortText.setText(Integer.toString(conn.sshPort));
         sshUsernameText.setText(conn.sshUsername);
         if(conn.sshPrivkey != null) {
             sshCredentialsRadioGroup.check(R.id.ssh_privkey_radiobutton);

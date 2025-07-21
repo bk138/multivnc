@@ -468,6 +468,7 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
                                                                                   jint compressLevel,
                                                                                   jint qualityLevel,
                                                                                   jstring ssh_host,
+                                                                                  jint ssh_port,
                                                                                   jstring ssh_user,
                                                                                   jstring ssh_password,
                                                                                   jbyteArray ssh_priv_key,
@@ -507,10 +508,10 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbIni
         // ssh-tunneling, check whether it's password- or key-based
         if(cSshPassword) {
             // password-based
-            tunnel = ssh_tunnel_open_with_password(cSshHost, 22, cSshUser, cSshPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
+            tunnel = ssh_tunnel_open_with_password(cSshHost, ssh_port, cSshUser, cSshPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
         } else {
             // key-based
-            tunnel = ssh_tunnel_open_with_privkey(cSshHost, 22, cSshUser, (char*)cSshPrivKey, cSshPrivKeyLen, cSshPrivKeyPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
+            tunnel = ssh_tunnel_open_with_privkey(cSshHost, ssh_port, cSshUser, (char*)cSshPrivKey, cSshPrivKeyLen, cSshPrivKeyPassword, cHost, port, cl, onSshFingerprintCheck, onSshError);
         }
 
         cl->serverHost = strdup("127.0.0.1");

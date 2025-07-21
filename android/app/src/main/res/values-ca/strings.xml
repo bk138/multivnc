@@ -44,6 +44,7 @@
 <string name="repeater_hint">Identificació del servidor quan es connecta a un repetidor UltraVNC</string>
     <string name="ssh_caption">Túneles SSH</string>
     <string name="ssh_host_hint">Servidor SSH</string>
+    <string name="ssh_port_hint">Port SSH</string>
     <string name="ssh_username_hint">Nom d\'usuari SSH</string>
     <string name="ssh_password">Contrasenya</string>
     <string name="ssh_privkey">Clau privada</string>
