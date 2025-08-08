@@ -1,6 +1,6 @@
 id: net.christianbeier.MultiVNC
 runtime: org.gnome.Platform # using GNOME since it contains libsecret already built
-runtime-version: '46'
+runtime-version: '48'
 sdk: org.gnome.Sdk
 command: multivnc
 finish-args:
