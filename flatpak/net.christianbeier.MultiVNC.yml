@@ -34,7 +34,7 @@ modules:
     sources:
       - type: archive
         url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxWidgets-3.2.8.tar.bz2
-        sha1: a74d573d03068cd0e86396e13263f67ef3a4fc51
+        sha256: c74784904109d7229e6894c85cfa068f1106a4a07c144afd78af41f373ee0fe6
   - name: multivnc
     buildsystem: cmake-ninja
     config-opts:
