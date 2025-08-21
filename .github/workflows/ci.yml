@@ -28,7 +28,7 @@ jobs:
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
           brew uninstall --ignore-dependencies gnutls libgcrypt
-          brew install wxwidgets
+          brew install wxwidgets@3.2
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
         uses: johnwason/vcpkg-action@v6
