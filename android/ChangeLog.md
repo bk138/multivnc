@@ -5,11 +5,13 @@
 ### ⚡ Features
 
 * Added support for sending and receiving UTF-8 cuttext to/from servers that support it.
+* Added ability to specify SSH server port number when using SSH tunneling.
 
 ### 🛠  Fixes
 
 * Fixed Help display in Dark Mode to be dark, as well.
 * Fixed connection shortcut creation on home launcher for Android 14 and newer.
+
 
 # Version 2.1.x:
 
