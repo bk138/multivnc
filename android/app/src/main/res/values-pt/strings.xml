@@ -30,6 +30,7 @@
 
 <string name="info">Informações sobre a conexão</string>
 <string name="meta_key_title">Enviar combinação de teclas</string>
+<string name="send_qemu_extended_keys_title">Teclas estendidas do QEMU</string>
 <string name="new_connection">Nova conexão</string>
 <string name="nickname_caption">Favoritos</string>
 <string name="discovered_servers">Servidores encontrados</string>

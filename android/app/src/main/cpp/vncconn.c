@@ -675,6 +675,22 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSen
         return JNI_FALSE;
 }
 
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendExtendedKeyEvent(JNIEnv *env, jobject obj, jlong keysym, jlong keycode, jboolean down) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return (jboolean) SendExtendedKeyEvent(cl, (uint32_t) keysym, (uint32_t) keycode, down);
+    else
+        return JNI_FALSE;
+}
+
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSupportsExtendedKeys(JNIEnv *env, jobject obj) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return (jboolean) SupportsClient2Server(cl, rfbQemuEvent);
+    else
+        return JNI_FALSE;
+}
+
 JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendPointerEvent(JNIEnv *env, jobject obj, jint x, jint y, jint buttonMask) {
     rfbClient *cl = getRfbClient(env, obj);
     if(cl)

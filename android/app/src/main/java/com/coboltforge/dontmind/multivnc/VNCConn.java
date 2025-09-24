@@ -109,12 +109,16 @@ public class VNCConn {
     		pointer.mask = pointerMask;
     	}
 
-    	public OutputEvent(int keyCode, int metaState, boolean down) {
+    	public OutputEvent(int keyCode, int metaState, boolean down, int xtKeycode, boolean useExtended) {
     		key = new KeyboardEvent();
     		key.keyCode = keyCode;
     		key.metaState = metaState;
     		key.down = down;
+    		key.xtKeycode = xtKeycode;
+    		key.useExtended = useExtended;
     	}
+
+
 
     	public OutputEvent(boolean incremental) {
     		ffur = new FullFramebufferUpdateRequest();
@@ -146,6 +150,8 @@ public class VNCConn {
     		int keyCode;
     		int metaState;
     		boolean down;
+    		int xtKeycode;  // XT key code for QEMU extended key events, 0 if unknown
+    		boolean useExtended;  // whether to use QEMU extended key events
     	}
 
     	private class FullFramebufferUpdateRequest {
@@ -365,7 +371,16 @@ public class VNCConn {
 				   }
 
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
-				   rfbSendKeyEvent(evt.keyCode, evt.down);
+
+				   // Use extended key event if available and enabled
+				   if (evt.useExtended && evt.xtKeycode != 0 && rfbSupportsExtendedKeys()) {
+					   if(Utils.DEBUG()) Log.d(TAG, "sending extended key: keysym=0x" + Integer.toHexString(evt.keyCode) +
+						   ", xtCode=0x" + Integer.toHexString(evt.xtKeycode) + (evt.down?" down":" up"));
+					   rfbSendExtendedKeyEvent(evt.keyCode, evt.xtKeycode, evt.down);
+				   } else {
+					   // Fallback to standard key event
+					   rfbSendKeyEvent(evt.keyCode, evt.down);
+				   }
 
 				   return true;
 				} catch (Exception e) {
@@ -414,6 +429,8 @@ public class VNCConn {
 	private native int rfbGetFramebufferWidth();
 	private native int rfbGetFramebufferHeight();
 	private native boolean rfbSendKeyEvent(long keysym, boolean down);
+	private native boolean rfbSendExtendedKeyEvent(long keysym, long keycode, boolean down);
+	private native boolean rfbSupportsExtendedKeys();
 	private native boolean rfbSendPointerEvent(int x, int y, int buttonMask);
 	private native boolean rfbSendClientCutText(byte[] bytes);
 	private native boolean rfbSendClientCutTextUTF8(String text);
@@ -525,12 +542,16 @@ public class VNCConn {
 				OutputEvent down = new OutputEvent(
 						evt.getCharacters().codePointAt(0),
 						evt.getMetaState(),
-						true);
+						true,
+						0,
+						false);
 				outputEventQueue.add(down);
 
 				OutputEvent up = new OutputEvent(
 						evt.getCharacters().codePointAt(0),
 						evt.getMetaState(),
+						false,
+						0,
 						false);
 				outputEventQueue.add(up);
 
@@ -607,10 +628,27 @@ public class VNCConn {
 					}
 				}
 
+				// Check if we should use extended key events
+				boolean useExtended = false;
+				int xtKeycode = 0;
+
+				if (connSettings != null && connSettings.sendExtendedKeys && !sendDirectly) {
+					xtKeycode = AndroidKeyToXt.getXtKeycode(evt.getKeyCode());
+					// Only use extended keys if we have a valid XT mapping
+					useExtended = (xtKeycode != 0);
+					if(Utils.DEBUG() && useExtended) {
+						Log.d(TAG, "Using extended key event: keyCode=" + evt.getKeyCode() +
+							" -> keysym=0x" + Integer.toHexString(keyCode) +
+							", xtCode=0x" + Integer.toHexString(xtKeycode));
+					}
+				}
+
 				OutputEvent e = new OutputEvent(
 						keyCode,
 						metaState,
-						evt.getAction() == KeyEvent.ACTION_DOWN);
+						evt.getAction() == KeyEvent.ACTION_DOWN,
+						xtKeycode,
+						useExtended);
 				outputEventQueue.add(e);
 				synchronized (outputEventQueue) {
 					outputEventQueue.notify();

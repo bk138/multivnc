@@ -30,6 +30,7 @@
 
 <string name="info">連線資訊</string>
 <string name="meta_key_title">傳送按鍵組合</string>
+<string name="send_qemu_extended_keys_title">QEMU 擴展鍵</string>
 <string name="new_connection">新增連線</string>
 <string name="nickname_caption">加入書籤</string>
 <string name="discovered_servers">探索到的伺服器</string>

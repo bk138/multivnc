@@ -30,6 +30,7 @@
 
 <string name="info">连接信息</string>
 <string name="meta_key_title">发送组合键</string>
+<string name="send_qemu_extended_keys_title">QEMU 扩展键</string>
 <string name="new_connection">新连接</string>
 <string name="nickname_caption">书签</string>
 <string name="discovered_servers">发现的服务器</string>

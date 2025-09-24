@@ -135,6 +135,16 @@ data class ConnectionBean(
         @ColumnInfo(name = "SSH_PRIVKEY_PASSWORD")
         var sshPrivkeyPassword: String? = null,
 
+    /**
+     * Whether to send extended key events using QEMU Extended Key Event protocol
+     * when the VNC server supports it. When enabled, sends both keysym and
+     * XT keycode for better terminal compatibility (e.g., Termux).
+     * Defaults to false to preserve existing behavior.
+     */
+    @JvmField
+        @ColumnInfo(name = "SEND_EXTENDED_KEYS", defaultValue = "0")
+        var sendExtendedKeys: Boolean = false,
+
     ) : Comparable<ConnectionBean>, Parcelable {
 
     override fun toString(): String {

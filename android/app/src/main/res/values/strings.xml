@@ -30,6 +30,7 @@
 
 <string name="info">Connection Info</string>
 <string name="meta_key_title">Send Key Combo</string>
+<string name="send_qemu_extended_keys_title">QEMU Extended Keys</string>
 <string name="new_connection">New Connection</string>
 <string name="nickname_caption">Bookmark</string>
 <string name="discovered_servers">Discovered Servers</string>

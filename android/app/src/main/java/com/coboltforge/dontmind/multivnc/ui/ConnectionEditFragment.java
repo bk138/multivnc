@@ -58,6 +58,7 @@ public class ConnectionEditFragment extends Fragment {
     private Spinner compressSpinner;
     private Spinner qualitySpinner;
     private EditText textUsername;
+    private SwitchMaterial sendExtendedKeysSwitch;
     private SwitchMaterial sshSwitch;
     private EditText sshHostText;
     private EditText sshPortText;
@@ -146,6 +147,8 @@ public class ConnectionEditFragment extends Fragment {
         qualitySpinner.setAdapter(qualitySpinnerAdapter);
 
         repeaterText = (TextView)view.findViewById(R.id.textRepeaterId);
+
+        sendExtendedKeysSwitch = view.findViewById(R.id.send_extended_keys_switch);
 
         sshHostText = view.findViewById(R.id.ssh_host_input);
         sshPortText = view.findViewById(R.id.ssh_port_input);
@@ -274,6 +277,8 @@ public class ConnectionEditFragment extends Fragment {
         }
         conn.encodingsString += "raw";
 
+        conn.sendExtendedKeys = sendExtendedKeysSwitch.isChecked();
+
         conn.sshHost = sshHostText.getText().toString().trim();
         if(conn.sshHost.isEmpty())
             conn.sshHost = null;
@@ -353,6 +358,8 @@ public class ConnectionEditFragment extends Fragment {
 
         if(conn.useRepeater)
             repeaterText.setText(conn.repeaterId);
+
+        sendExtendedKeysSwitch.setChecked(conn.sendExtendedKeys);
 
         sshSwitch.setChecked(conn.sshHost != null);
         sshHostText.setText(conn.sshHost);

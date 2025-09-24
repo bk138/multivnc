@@ -28,6 +28,7 @@
 
 <string name="info">"Info zur Verbindung"</string>
 <string name="meta_key_title">"Tastenkombination senden"</string>
+<string name="send_qemu_extended_keys_title">QEMU Erweiterte Tasten</string>
 <string name="new_connection">"Neue Verbindung"</string>
 <string name="nickname_caption">"Lesezeichen"</string>
 <string name="discovered_servers">"Erkannte Server"</string>

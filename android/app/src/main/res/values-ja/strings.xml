@@ -31,6 +31,7 @@
 
 <string name="info">接続情報</string>
 <string name="meta_key_title">キーコンボを送信</string>
+<string name="send_qemu_extended_keys_title">QEMU 拡張キー</string>
 <string name="new_connection">新しい接続</string>
 <string name="nickname_caption">ブックマーク</string>
 <string name="discovered_servers">検出されたサーバー</string>

@@ -29,6 +29,7 @@
 
 <string name="info">Інформація про з\'єднання</string>
 <string name="meta_key_title">Надіслати комбінацію клавіш</string>
+<string name="send_qemu_extended_keys_title">Розширені клавіші QEMU</string>
 <string name="new_connection">Нове з\'єднання</string>
 <string name="nickname_caption">Закладка</string>
 <string name="discovered_servers">Виявлені сервери</string>
