@@ -10,6 +10,9 @@ jobs:
           - ubuntu-24.04
           - macos-latest
           - windows-latest
+        include:
+          - os: windows-latest
+            cmake_options: "-DwxWidgets_ROOT_DIR=C:/wx"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -32,20 +35,22 @@ jobs:
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
+          # nsis, for CPack
           choco install nsis
-      - name: Install vcpkg Windows Build Dependencies
-        if: ${{ matrix.os == 'windows-latest' }}
-        uses: johnwason/vcpkg-action@v6
-        id: vcpkg
-        with:
-          pkgs: wxwidgets gettext[tools]
-          triplet: x64-windows
-          token: ${{ github.token }}
+          # gettext
+          curl -L -o gettext.zip https://github.com/mlocati/gettext-iconv-windows/releases/download/v0.26-v1.17/gettext0.26-iconv1.17-static-64.zip
+          7z x gettext.zip -o"C:/gettext"
+          echo "C:/gettext/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # Download and extract wxWidgets
+          curl -L -o wxWidgets.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxMSW-3.2.8_vc14x_x64_Dev.7z
+          7z x wxWidgets.7z -o"C:/wx" -y
+          curl -L -o wxHeaders.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxWidgets-3.2.8-headers.7z
+          7z x wxHeaders.7z -o"C:/wx" -y
       - name: Build
         run: |
           mkdir build
           cd build
-          cmake ${{ steps.vcpkg.outputs.vcpkg-cmake-config }} ..
+          cmake ${{ matrix.cmake_options }} ..
           cmake --build .
           cpack -V -C Debug
       - name: Archive Ubuntu Build Artifacts
