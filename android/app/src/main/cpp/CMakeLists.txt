@@ -14,7 +14,7 @@ elseif (CMAKE_ANDROID_ARCH STREQUAL "arm")
     set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} --target=arm-linux-androideabi${ANDROID_NATIVE_API_LEVEL}")
 endif ()
 
-# libjpeg from libjpeg-turbo
+# libjpeg-turbo
 ExternalProject_Add(ep-libjpeg-turbo
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../../../libjpeg-turbo
         BINARY_DIR ${CMAKE_BINARY_DIR}/libjpeg
@@ -29,13 +29,15 @@ ExternalProject_Add(ep-libjpeg-turbo
         -DCMAKE_ASM_FLAGS=${CMAKE_ASM_FLAGS} # as per https://github.com/libjpeg-turbo/libjpeg-turbo/blob/main/BUILDING.md#building-libjpeg-turbo-for-android
         -DENABLE_SHARED=OFF
 )
+# set these variables so FindJPEG can find the library
 ExternalProject_Get_property(ep-libjpeg-turbo INSTALL_DIR)
-add_library(libjpeg STATIC IMPORTED)
-set_target_properties(libjpeg PROPERTIES
-        IMPORTED_LOCATION "${INSTALL_DIR}/lib/libturbojpeg.a"
-        INTERFACE_INCLUDE_DIRECTORIES "${INSTALL_DIR}/include"
-)
-add_dependencies(libjpeg ep-libjpeg-turbo)
+set(JPEG_LIBRARY "${INSTALL_DIR}/lib/libturbojpeg.a" CACHE FILEPATH "")
+# LibVNC also does a test for libjpeg-turbo by looking at headers, in the configure phase these
+# are only available in its source dir.
+ExternalProject_Get_property(ep-libjpeg-turbo SOURCE_DIR)
+set(JPEG_INCLUDE_DIR ${SOURCE_DIR}  CACHE PATH "")
+# But: there are also generated headers needed in the build phase.
+include_directories(${INSTALL_DIR}/include)
 
 # build libressl
 message("-----LibreSSL-----")
@@ -81,20 +83,11 @@ include_directories(
 
 # build LibVNCClient
 message("-----LibVNCClient-----")
-# set these variables so FindJPEG can find the library
-get_target_property(JPEG_LIBRARY libjpeg IMPORTED_LOCATION)
-# LibVNC also does a test for libjpeg-turbo by looking at headers, in the configure phase these
-# are only available in its source dir.
-ExternalProject_Get_property(ep-libjpeg-turbo SOURCE_DIR)
-set(JPEG_INCLUDE_DIR ${SOURCE_DIR})
-# But: there are also generated headers needed in the build phase.
-get_target_property(INSTALLED_JPEG_INCLUDE_DIR libjpeg INTERFACE_INCLUDE_DIRECTORIES)
-include_directories(${INSTALLED_JPEG_INCLUDE_DIR})
 set(libvnc_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libvncserver)
 set(libvnc_build_DIR ${CMAKE_BINARY_DIR}/libvnc)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libvnc_src_DIR} ${libvnc_build_DIR})
-add_dependencies(vncclient libjpeg)
+add_dependencies(vncclient ep-libjpeg-turbo)
 # need to add the build dir to include dirs as well because of generated rfbconfig.h
 include_directories(
         ${libvnc_src_DIR}/include
