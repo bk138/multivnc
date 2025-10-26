@@ -7,7 +7,6 @@ This README mostly contains technical information about MultiVNC for Android.
 To prepare the source tree, do the following in the root of the repository:
 
 * `git submodule update --init`
-* `./prepareLibreSSL.sh`
 
 After that setup step, simply fire up Android Studio and build the app from
 the `android` directory.
