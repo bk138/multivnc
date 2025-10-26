@@ -40,7 +40,11 @@ ExternalProject_Add(ep-libjpeg-turbo
 )
 # set these variables so FindJPEG can find the library
 ExternalProject_Get_property(ep-libjpeg-turbo INSTALL_DIR)
-set(JPEG_LIBRARY "${INSTALL_DIR}/lib/libturbojpeg.a" CACHE FILEPATH "")
+if(MSVC)
+  set(JPEG_LIBRARY "${INSTALL_DIR}/lib/turbojpeg-static.lib" CACHE FILEPATH "")
+else()
+  set(JPEG_LIBRARY "${INSTALL_DIR}/lib/libturbojpeg.a" CACHE FILEPATH "")
+endif(MSVC)
 # LibVNC also does a test for libjpeg-turbo by looking at headers, in the configure phase these
 # are only available in its source dir.
 ExternalProject_Get_property(ep-libjpeg-turbo SOURCE_DIR)
