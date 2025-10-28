@@ -55,7 +55,7 @@ include_directories(${INSTALL_DIR}/include)
 # LibreSSL
 ExternalProject_Add(ep-libressl
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/libressl
-        PATCH_COMMAND test -x ./configure && echo "LibreSSL already prepared" || ./autogen.sh
+        PATCH_COMMAND bash -c "test -x ./configure && echo 'LibreSSL already prepared' || ./autogen.sh"
         BINARY_DIR ${CMAKE_BINARY_DIR}/libssl
         INSTALL_DIR ${CMAKE_BINARY_DIR}/libssl-install
         BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libcrypto.a <INSTALL_DIR>/lib/libssl.a
