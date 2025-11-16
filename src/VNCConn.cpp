@@ -912,12 +912,6 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
     {
       conn->updated_rect.Union(wxRect(x, y, w, h));
 
-      // single (partial) multicast updates are small, so when a big region is updated,
-      // the update notify receiver gets flooded, resulting in way too much cpu load.
-      // thus, when multicasting, we only notify for logic (whole) framebuffer updates.
-      if(!conn->isMulticast())
-	conn->thread_post_update_notify(x, y, w, h);
-
       if(conn->do_stats)
 	{
 	  wxCriticalSectionLocker lock(conn->mutex_stats);
@@ -953,10 +947,7 @@ void VNCConn::thread_update_finished(rfbClient* client)
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID);
   if(! conn->GetThread()->TestDestroy())
     {
-      // single (partial) multicast updates are small, so when a big region is updated,
-      // the update notify receiver gets flooded, resulting in way too much cpu load.
-      // thus, when multicasting, we only notify for logic (whole) framebuffer updates.
-      if(conn->isMulticast() && !conn->updated_rect.IsEmpty())
+      if(!conn->updated_rect.IsEmpty())
 	conn->thread_post_update_notify(conn->updated_rect.x, conn->updated_rect.y, conn->updated_rect.width, conn->updated_rect.height);
 
       conn->updated_rect = wxRect();
