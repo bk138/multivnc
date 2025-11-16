@@ -463,8 +463,10 @@ wxThread::ExitCode VNCConn::Entry()
 	    }
 
 
-	  // request update and handle response 
-	  if(!rfbProcessServerMessage(cl, 500))
+          // request update and handle response
+          {
+          wxCriticalSectionLocker lock(mutex_framebuffer);
+          if(!rfbProcessServerMessage(cl, 500))
 	    {
 	      if(errno == EINTR)
 		continue;
@@ -479,8 +481,8 @@ wxThread::ExitCode VNCConn::Entry()
               }
               return 0;
 	    }
+          }
 
-	  
 	  /*
 	    Compute nacked/loss ratio: We take a ratio sample every second and put it into a sample queue
 	    of size N. Action is taken when the average sample value of the whole buffer exceeds a per-action
@@ -1620,8 +1622,10 @@ bool VNCConn::recordUserInputStop(wxArrayString &dst)
   - we have an ordinary char array as framebuffer and copy the requested content into a
     wxBitmap (the return of its copy is cheap cause wxBitmaps use copy-on-write)
  */
-wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
+wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect)
 {
+  wxCriticalSectionLocker lock(mutex_framebuffer);
+
   // sanity check requested region and client
   if(rect.x < 0 || rect.x + rect.width > getFrameBufferWidth()
      || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight()
@@ -1667,8 +1671,10 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect) const
 
 
 
-bool VNCConn::getFrameBufferRegion(const wxRect& rect, wxBitmap& dst) const
+bool VNCConn::getFrameBufferRegion(const wxRect& rect, wxBitmap& dst)
 {
+  wxCriticalSectionLocker lock(mutex_framebuffer);
+
   // sanity check requested region against framebuffer
   if(rect.x < 0 || rect.x + rect.width > getFrameBufferWidth()
      || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight())
@@ -1715,8 +1721,9 @@ bool VNCConn::getFrameBufferRegion(const wxRect& rect, wxBitmap& dst) const
 
 
 
-int VNCConn::getFrameBufferWidth() const
+int VNCConn::getFrameBufferWidth()
 {
+  wxCriticalSectionLocker lock(mutex_framebuffer);
   if(cl)
     return cl->width;
   else 
@@ -1724,8 +1731,9 @@ int VNCConn::getFrameBufferWidth() const
 }
 
 
-int VNCConn::getFrameBufferHeight() const
+int VNCConn::getFrameBufferHeight()
 {
+  wxCriticalSectionLocker lock(mutex_framebuffer);
   if(cl)
     return cl->height;
   else 
@@ -1733,8 +1741,9 @@ int VNCConn::getFrameBufferHeight() const
 }
 
 
-int VNCConn::getFrameBufferDepth() const
+int VNCConn::getFrameBufferDepth()
 {
+  wxCriticalSectionLocker lock(mutex_framebuffer);
   if(cl)
     return cl->format.bitsPerPixel;
   else 
