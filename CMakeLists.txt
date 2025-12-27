@@ -31,7 +31,7 @@ ExternalProject_Add(ep-libjpeg-turbo
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/libjpeg-turbo
         BINARY_DIR ${CMAKE_BINARY_DIR}/libjpeg
         INSTALL_DIR ${CMAKE_BINARY_DIR}/libjpeg-install
-        BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libturbojpeg.a <INSTALL_DIR>/lib/turbojpeg-static.lib
+        BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libturbojpeg.a
         CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
         -DCMAKE_INSTALL_LIBDIR=<INSTALL_DIR>/lib
