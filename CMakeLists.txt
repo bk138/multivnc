@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(multivnc VERSION 0.10.3)
-
-include(ExternalProject)
-
 set (CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -26,28 +23,6 @@ configure_file(config.h.cmake_in config.h)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-# libjpeg-turbo
-ExternalProject_Add(ep-libjpeg-turbo
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/libjpeg-turbo
-        BINARY_DIR ${CMAKE_BINARY_DIR}/libjpeg
-        INSTALL_DIR ${CMAKE_BINARY_DIR}/libjpeg-install
-        BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libturbojpeg.a
-        CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        -DCMAKE_INSTALL_LIBDIR=<INSTALL_DIR>/lib
-        -DENABLE_SHARED=OFF
-        -DREQUIRE_SIMD=ON
-)
-# set these variables so FindJPEG can find the library
-ExternalProject_Get_property(ep-libjpeg-turbo INSTALL_DIR)
-set(JPEG_LIBRARY "${INSTALL_DIR}/lib/libturbojpeg.a" CACHE FILEPATH "")
-# LibVNC also does a test for libjpeg-turbo by looking at headers, in the configure phase these
-# are only available in its source dir.
-ExternalProject_Get_property(ep-libjpeg-turbo SOURCE_DIR)
-set(JPEG_INCLUDE_DIR ${SOURCE_DIR}  CACHE PATH "")
-# But: there are also generated headers needed in the build phase.
-include_directories(${INSTALL_DIR}/include)
-
 # wxservdisc
 message("-----wxServDisc-----")
 set(WXSERVDISC_INSTALL OFF CACHE BOOL "Set to OFF to not include wxservdisc artifacts in install")
@@ -58,7 +33,7 @@ message("-----LibVNCClient-----")
 set(LIBVNCSERVER_INSTALL OFF CACHE BOOL "Set to OFF to not include libvncserver artifacts in install")
 set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples")
 add_subdirectory(libvncserver)
-add_dependencies(vncclient ep-libjpeg-turbo)
+
 
 #
 # source proper
