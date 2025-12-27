@@ -2,7 +2,7 @@
 
 For the time being, we're building an Intel binary only. Universal builds to come later.
 
-- Install build tools: `brew install cmake gettext nasm autoconf automake`
+- Install build tools: `brew install cmake gettext nasm autoconf`
 - Install build dependencies: `brew install wxwidgets`
 - Building a release app bundle, [signing the app](https://developer.apple.com/documentation/xcode/creating-distribution-signed-code-for-the-mac),
   [building an installer package for App Store distribution](https://developer.apple.com/documentation/xcode/packaging-mac-software-for-distribution) as well as
