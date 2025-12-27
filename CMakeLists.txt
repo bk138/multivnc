@@ -52,27 +52,6 @@ set(JPEG_INCLUDE_DIR ${SOURCE_DIR}/src  CACHE PATH "")
 # But: there are also generated headers needed in the build phase.
 include_directories(${INSTALL_DIR}/include)
 
-# LibreSSL
-ExternalProject_Add(ep-libressl
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/libressl
-        PATCH_COMMAND test -x ./configure && echo "LibreSSL already prepared" || ./autogen.sh
-        BINARY_DIR ${CMAKE_BINARY_DIR}/libssl
-        INSTALL_DIR ${CMAKE_BINARY_DIR}/libssl-install
-        BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libcrypto.a <INSTALL_DIR>/lib/libssl.a
-        CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        -DCMAKE_INSTALL_LIBDIR=<INSTALL_DIR>/lib
-        -DLIBRESSL_APPS=OFF
-        -DLIBRESSL_TESTS=OFF
-        -DBUILD_SHARED_LIBS=OFF
-)
-# set these to cache variables so FindOpenSSL in subdirs can reliably find the library
-ExternalProject_Get_property(ep-libressl INSTALL_DIR)
-set(OPENSSL_SSL_LIBRARY "${INSTALL_DIR}/lib/libssl.a" CACHE FILEPATH "")
-set(OPENSSL_CRYPTO_LIBRARY "${INSTALL_DIR}/lib/libcrypto.a" CACHE FILEPATH "")
-set(OPENSSL_INCLUDE_DIR "${INSTALL_DIR}/include" CACHE PATH "")
-
-
 # wxservdisc
 message("-----wxServDisc-----")
 set(WXSERVDISC_INSTALL OFF CACHE BOOL "Set to OFF to not include wxservdisc artifacts in install")
@@ -81,13 +60,9 @@ add_subdirectory(libwxservdisc/src)
 # libvncclient
 message("-----LibVNCClient-----")
 set(LIBVNCSERVER_INSTALL OFF CACHE BOOL "Set to OFF to not include libvncserver artifacts in install")
-set(WITH_LIBVNCSERVER OFF CACHE BOOL "Set to OFF to not build the server lib")
-set(WITH_GNUTLS OFF CACHE BOOL "Set to OFF to not build with GnuTLS")
-set(WITH_GCRYPT OFF CACHE BOOL "Set to OFF to not build with Libgcrypt")
 set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples")
-set(WITH_TESTS OFF CACHE BOOL "Set to OFF to not build with tests")
 add_subdirectory(libvncserver)
-add_dependencies(vncclient ep-libjpeg-turbo ep-libressl)
+add_dependencies(vncclient ep-libjpeg-turbo)
 
 #
 # source proper
