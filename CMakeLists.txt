@@ -31,7 +31,11 @@ add_subdirectory(libwxservdisc/src)
 # libvncclient
 message("-----LibVNCClient-----")
 set(LIBVNCSERVER_INSTALL OFF CACHE BOOL "Set to OFF to not include libvncserver artifacts in install")
+set(WITH_LIBVNCSERVER OFF CACHE BOOL "Set to OFF to not build the server lib")
+set(WITH_GNUTLS OFF CACHE BOOL "Set to OFF to not build with GnuTLS")
+set(WITH_GCRYPT OFF CACHE BOOL "Set to OFF to not build with Libgcrypt")
 set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples")
+set(WITH_TESTS OFF CACHE BOOL "Set to OFF to not build with tests")
 add_subdirectory(libvncserver)
 
 
