@@ -8,6 +8,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/
     ${CMAKE_SOURCE_DIR}/libwxservdisc/src
+    ${CMAKE_SOURCE_DIR}/libsshtunnel/include
     ${CMAKE_SOURCE_DIR}/libvncserver/include
     ${CMAKE_BINARY_DIR}/libvncserver/include
 )
@@ -46,7 +47,7 @@ add_executable(${executable_name} WIN32 MACOSX_BUNDLE ${multivnc_SRCS})
 
 set_target_properties(${executable_name} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in)
 
-target_link_libraries(${executable_name} MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vncclient)
+target_link_libraries(${executable_name} MultiVNCgui ${wxWidgets_LIBRARIES} wxservdisc vncclient sshtunnel)
 
 
 

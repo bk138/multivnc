@@ -38,6 +38,11 @@ set(WITH_EXAMPLES OFF CACHE BOOL "Set to OFF to not build libvncserver examples"
 set(WITH_TESTS OFF CACHE BOOL "Set to OFF to not build with tests")
 add_subdirectory(libvncserver)
 
+# libsshtunnel
+message("-----libsshtunnel-----")
+set(LIBSSHTUNNEL_INSTALL OFF CACHE BOOL "Set to OFF to not include libsshtunnnel artifacts in install")
+add_subdirectory(libsshtunnel)
+
 
 #
 # source proper
