@@ -11,6 +11,20 @@ finish-args:
   - --talk-name=org.freedesktop.secrets
   - --filesystem=home # for saving screenshots and logs
 modules:
+  - name: libssh2
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_STATIC_LIBS=OFF
+    cleanup:
+      - /include
+      - /lib/cmake
+      - /lib/pkgconfig
+      - /share/man
+    sources:
+      - type: archive
+        url: https://github.com/libssh2/libssh2/releases/download/libssh2-1.11.1/libssh2-1.11.1.tar.bz2
+        sha256: 8ddbd698403a2c3a9987df48f2940c6f6a9bddce28d37eb201938dd7755646f0
   - name: wxwidgets
     rm-configure: true
     config-opts:
