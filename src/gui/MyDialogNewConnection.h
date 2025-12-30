@@ -1,30 +1,22 @@
 #ifndef MYDIALOGNEWCONNECTION_H
 #define MYDIALOGNEWCONNECTION_H
 
-#include <wx/valnum.h>
 #include "DialogNewConnection.h"
 
 class MyDialogNewConnection : public DialogNewConnection {
-public:
+  public:
     MyDialogNewConnection(wxWindow *parent, int id, const wxString &title,
                           const wxPoint &pos = wxDefaultPosition,
                           const wxSize &size = wxDefaultSize,
-                          long style = wxDEFAULT_DIALOG_STYLE)
-        : DialogNewConnection(parent, id, title, pos, size, style){
-        text_ctrl_repeater_id->SetValidator(wxIntegerValidator<int>());
-        text_ctrl_ssh_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535));
-    };
+                          long style = wxDEFAULT_DIALOG_STYLE);
 
-    wxString getHost() const { return text_ctrl_host->GetValue(); };
-    void setHost(const wxString &host) { text_ctrl_host->SetValue(host); };
+    wxString getHost() const;
+    void setHost(const wxString &host);
 
-    int getRepeaterId() const {
-        int value;
-        return text_ctrl_repeater_id->GetValue().ToInt(&value) ? value : -1;
-    };
+    int getRepeaterId() const;
 
-    void setShowAdvanced(bool yesno) { coll_pane_advanced->Collapse(!yesno); };
-    bool getShowAdvanced() { return coll_pane_advanced->IsExpanded(); };
+    void setShowAdvanced(bool yesno);
+    bool getShowAdvanced();
 };
 
 #endif
