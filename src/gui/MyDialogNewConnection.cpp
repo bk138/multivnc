@@ -9,6 +9,12 @@ MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
     : DialogNewConnection(parent, id, title, pos, size, style) {
     text_ctrl_repeater_id->SetValidator(wxIntegerValidator<int>());
     text_ctrl_ssh_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535));
+
+    // Bind radio button events
+    radio_btn_ssh_password->Bind(wxEVT_RADIOBUTTON,
+                                 &MyDialogNewConnection::OnPasswordPrivkeyRadioSelected, this);
+    radio_btn_ssh_privkey->Bind(wxEVT_RADIOBUTTON,
+                                &MyDialogNewConnection::OnPasswordPrivkeyRadioSelected, this);
 };
 
 wxString MyDialogNewConnection::getHost() const {
@@ -31,3 +37,28 @@ void MyDialogNewConnection::setShowAdvanced(bool yesno) {
 bool MyDialogNewConnection::getShowAdvanced() {
     return coll_pane_advanced->IsExpanded();
 };
+
+void MyDialogNewConnection::OnPasswordPrivkeyRadioSelected(wxCommandEvent &event) {
+    if (event.GetEventObject() == radio_btn_ssh_password) {
+        //password
+        label_ssh_password->Show();
+        text_ctrl_ssh_password->Show();
+        // privkey
+        button_ssh_privkey_import->Hide();
+        label_ssh_privkey_password->Hide();
+        text_ctrl_ssh_privkey_password->Hide();
+        button_ssh_privkey_import->Hide();
+    } else if (event.GetEventObject() == radio_btn_ssh_privkey) {
+        //password
+        label_ssh_password->Hide();
+        text_ctrl_ssh_password->Hide();
+        // privkey
+        button_ssh_privkey_import->Show();
+        label_ssh_privkey_password->Show();
+        text_ctrl_ssh_privkey_password->Show();
+        button_ssh_privkey_import->Show();
+    }
+    panel_advanced->GetSizer()->SetSizeHints(panel_advanced);
+    GetSizer()->SetSizeHints(this);
+    Layout();
+}

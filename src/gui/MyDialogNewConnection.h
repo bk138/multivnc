@@ -17,6 +17,9 @@ class MyDialogNewConnection : public DialogNewConnection {
 
     void setShowAdvanced(bool yesno);
     bool getShowAdvanced();
+
+  private:
+    void OnPasswordPrivkeyRadioSelected(wxCommandEvent& event);
 };
 
 #endif
