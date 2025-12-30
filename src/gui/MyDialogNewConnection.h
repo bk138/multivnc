@@ -12,6 +12,7 @@ public:
                           long style = wxDEFAULT_DIALOG_STYLE)
         : DialogNewConnection(parent, id, title, pos, size, style){
         text_ctrl_repeater_id->SetValidator(wxIntegerValidator<int>());
+        text_ctrl_ssh_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535));
     };
 
     wxString getHost() const { return text_ctrl_host->GetValue(); };
