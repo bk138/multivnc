@@ -15,6 +15,12 @@ class MyDialogNewConnection : public DialogNewConnection {
 
     int getRepeaterId() const;
 
+    wxString getSshServer() const;
+    int getSshPort() const;
+    wxString getSshUser() const;
+    wxString getSshPassword() const;
+    //TODO privkey
+
     void setShowAdvanced(bool yesno);
     bool getShowAdvanced();
 

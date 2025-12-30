@@ -30,6 +30,24 @@ int MyDialogNewConnection::getRepeaterId() const {
     return text_ctrl_repeater_id->GetValue().ToInt(&value) ? value : -1;
 };
 
+wxString MyDialogNewConnection::getSshServer() const {
+    return text_ctrl_ssh_server->GetValue();
+};
+
+int MyDialogNewConnection::getSshPort() const {
+    int value;
+    return text_ctrl_ssh_port->GetValue().ToInt(&value) ? value : -1;
+};
+
+wxString MyDialogNewConnection::getSshUser() const {
+    return text_ctrl_ssh_user->GetValue();
+};
+
+wxString MyDialogNewConnection::getSshPassword() const {
+    return text_ctrl_ssh_password->GetValue();
+};
+
+
 void MyDialogNewConnection::setShowAdvanced(bool yesno) {
     coll_pane_advanced->Collapse(!yesno);
 };
