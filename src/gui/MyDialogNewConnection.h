@@ -19,13 +19,17 @@ class MyDialogNewConnection : public DialogNewConnection {
     int getSshPort() const;
     wxString getSshUser() const;
     wxString getSshPassword() const;
-    //TODO privkey
+    std::vector<char> getSshPrivKey() const;
+    wxString getSshPrivkeyPassword() const;
 
     void setShowAdvanced(bool yesno);
     bool getShowAdvanced();
 
   private:
-    void OnPasswordPrivkeyRadioSelected(wxCommandEvent& event);
+    std::vector<char> mSshPrivKey;
+
+    void OnPasswordPrivkeyRadioSelected(wxCommandEvent &event);
+    void OnPrivkeyFileOpen(wxCommandEvent& event);
 };
 
 #endif

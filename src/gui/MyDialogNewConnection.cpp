@@ -1,5 +1,6 @@
 
 #include "MyDialogNewConnection.h"
+#include <wx/file.h>
 #include <wx/valnum.h>
 
 MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
@@ -15,6 +16,9 @@ MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
                                  &MyDialogNewConnection::OnPasswordPrivkeyRadioSelected, this);
     radio_btn_ssh_privkey->Bind(wxEVT_RADIOBUTTON,
                                 &MyDialogNewConnection::OnPasswordPrivkeyRadioSelected, this);
+
+    // and privkey open dialog
+    button_ssh_privkey_import->Bind(wxEVT_BUTTON, &MyDialogNewConnection::OnPrivkeyFileOpen, this);
 };
 
 wxString MyDialogNewConnection::getHost() const {
@@ -47,6 +51,13 @@ wxString MyDialogNewConnection::getSshPassword() const {
     return text_ctrl_ssh_password->GetValue();
 };
 
+std::vector<char> MyDialogNewConnection::getSshPrivKey() const {
+    return mSshPrivKey;
+}
+
+wxString MyDialogNewConnection::getSshPrivkeyPassword() const {
+    return text_ctrl_ssh_privkey_password->GetValue();
+}
 
 void MyDialogNewConnection::setShowAdvanced(bool yesno) {
     coll_pane_advanced->Collapse(!yesno);
@@ -79,4 +90,32 @@ void MyDialogNewConnection::OnPasswordPrivkeyRadioSelected(wxCommandEvent &event
     panel_advanced->GetSizer()->SetSizeHints(panel_advanced);
     GetSizer()->SetSizeHints(this);
     Layout();
+}
+
+void MyDialogNewConnection::OnPrivkeyFileOpen(wxCommandEvent &event) {
+    wxString filename = wxFileSelector("Choose an SSH private key file");
+
+    if (!filename.empty()) {
+        wxBusyCursor busy;
+        wxFile file;
+
+        if (!file.Open(filename)) {
+            wxMessageBox("Failed to open file: " + filename, "Error", wxOK | wxICON_ERROR);
+            return;
+        }
+
+        wxFileOffset fileSize = file.Length();
+        if (fileSize > 1024 * 1024) {
+            wxMessageBox("File is too large.", "Error", wxOK | wxICON_ERROR);
+            return;
+        }
+
+        mSshPrivKey.resize(fileSize);
+
+        if (file.Read(mSshPrivKey.data(), fileSize) != fileSize) {
+            wxMessageBox("Failed to read file: " + filename, "Error", wxOK | wxICON_ERROR);
+            mSshPrivKey.clear();
+            return;
+        }
+    }
 }
