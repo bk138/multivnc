@@ -32,8 +32,10 @@
 #else
 #include <arpa/inet.h>
 #endif
+#include <libsshtunnel.h>
 #include "VNCConn.h"
 
+bool VNCConn::libsshtunnel_initialized = false;
 
 // use some global address
 #define VNCCONN_OBJ_ID (void*)VNCConn::thread_got_update
@@ -84,6 +86,15 @@ VNCConn::VNCConn(void* p) : condition_auth(mutex_auth)
   latency = -1;
 
   rfbClientLog = rfbClientErr = thread_logger;
+
+  if (!libsshtunnel_initialized) {
+      // this is not thread-safe so run here once
+      if (ssh_tunnel_init() == 0) {
+          libsshtunnel_initialized = true;
+      } else  {
+          err.Printf(_("libsshtunnel initialization failed"));
+      }
+  }
 
   // statistics stuff
   do_stats = false;
