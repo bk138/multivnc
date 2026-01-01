@@ -69,58 +69,6 @@ BEGIN_EVENT_TABLE(VNCConn, wxEvtHandler)
 END_EVENT_TABLE();
 
 
-#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
-bool VNCConn::TLS_threading_initialized;
-extern "C" 
-{
-#include <gcrypt.h>
-#include <errno.h>
-  /*
-   * gcrypt thread option wx implementation
-   */
-  static int gcry_wx_mutex_init( void **p )
-  {
-    *p = new wxMutex();
-    return 0;
-  }
-
-  static int gcry_wx_mutex_destroy( void **p )
-  {
-    delete (wxMutex*)*p;
-    return 0;
-  }
-
-  static int gcry_wx_mutex_lock( void **p )
-  {
-    if(((wxMutex*)(*p))->Lock() == wxMUTEX_NO_ERROR)
-      return 0;
-    else
-      return 1;
-  }
-
-  static int gcry_wx_mutex_unlock( void **p )
-  {
-    if(((wxMutex*)(*p))->Unlock() == wxMUTEX_NO_ERROR)
-      return 0;
-    else
-      return 1;
-  }
-
-  static const struct gcry_thread_cbs gcry_threads_wx =
-    {
-      GCRY_THREAD_OPTION_USER,
-      NULL,
-      gcry_wx_mutex_init,
-      gcry_wx_mutex_destroy,
-      gcry_wx_mutex_lock,
-      gcry_wx_mutex_unlock
-    };
-}
-#endif
-
-
-
-
 /*
   constructor/destructor
 */
@@ -136,20 +84,6 @@ VNCConn::VNCConn(void* p) : condition_auth(mutex_auth)
   latency = -1;
 
   rfbClientLog = rfbClientErr = thread_logger;
-
-#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
-  /* we're using threads in here, tell libgcrypt before TLS 
-     gets initialized by libvncclient! */
-  if(! TLS_threading_initialized)
-    {
-      wxLogDebug(wxT("Initialized libgcrypt threading."));
-      gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_wx);
-      gcry_check_version (NULL);
-      gcry_control (GCRYCTL_DISABLE_SECMEM, 0);
-      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
-      TLS_threading_initialized = true;
-    }
-#endif
 
   // statistics stuff
   do_stats = false;

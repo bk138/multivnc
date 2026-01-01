@@ -222,11 +222,6 @@ private:
   wxCriticalSection mutex_multicastratio; // the fifos above are read by both the VNC and the GUI thread
   wxStopWatch  multicastratio_stopwatch;
 
-  
-#ifdef LIBVNCSERVER_WITH_CLIENT_TLS
-  static bool TLS_threading_initialized;
-#endif
-
   // this counts the ms since Init()
   wxStopWatch conn_stopwatch;
 
