@@ -170,24 +170,25 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     frame_main_menubar->Check(ID_BOOKMARKS, true);
   if(show_stats)
     frame_main_menubar->Check(ID_STATISTICS, true);
-      
-  switch(show_seamless)
-    {
-    case EDGE_NORTH:
-      frame_main_menubar->Check(ID_SEAMLESS_NORTH, true);
-      break;
-    case EDGE_EAST:
-      frame_main_menubar->Check(ID_SEAMLESS_EAST, true);
-      break;
-    case EDGE_WEST:
-      frame_main_menubar->Check(ID_SEAMLESS_WEST, true);
-      break;
-    case EDGE_SOUTH:
-      frame_main_menubar->Check(ID_SEAMLESS_SOUTH, true);
-      break;
-    default:
-      frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
-    }
+
+  if (VNCSeamlessConnector::isSupportedByCurrentPlatform()) {
+      switch (show_seamless) {
+      case EDGE_NORTH:
+          frame_main_menubar->Check(ID_SEAMLESS_NORTH, true);
+          break;
+      case EDGE_EAST:
+          frame_main_menubar->Check(ID_SEAMLESS_EAST, true);
+          break;
+      case EDGE_WEST:
+          frame_main_menubar->Check(ID_SEAMLESS_WEST, true);
+          break;
+      case EDGE_SOUTH:
+          frame_main_menubar->Check(ID_SEAMLESS_SOUTH, true);
+          break;
+      default:
+          frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
+      }
+  }
 
   if(show_1to1) {
       frame_main_menubar->Check(ID_ONE_TO_ONE, true);
