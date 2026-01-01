@@ -101,9 +101,7 @@ public:
   bool Init(const wxString& host,
             int repeaterId,
             const wxString& username,
-#if wxUSE_SECRETSTORE
 	    const wxSecretValue& password,
-#endif
 	    const wxString& encodings, int compresslevel = 1, int quality = 5, bool multicast = true, int multicastSocketRecvBuf = 5120, int multicastRecvBuf = 5120);
   void Shutdown();
 
@@ -167,13 +165,8 @@ public:
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);
-#if wxUSE_SECRETSTORE
   const wxSecretValue& getPassword() const;
   void setPassword(const wxSecretValue& password);
-#else
-  const wxString& getPassword() const;
-  void setPassword(const wxString& password);
-#endif
   const bool getRequireAuth() const;
 
 
@@ -237,11 +230,7 @@ private:
 
   // credentials
   wxString username;
-#if wxUSE_SECRETSTORE
   wxSecretValue password;
-#else
-  wxString password;
-#endif
   bool require_auth;
   wxMutex mutex_auth;
   wxCondition condition_auth;

@@ -787,11 +787,7 @@ char* VNCConn::thread_getpasswd(rfbClient *client) {
 
     conn->require_auth = true;
 
-#if wxUSE_SECRETSTORE
     if (!conn->getPassword().IsOk()) {
-#else
-    if (conn->getPassword().IsEmpty()) {
-#endif
         // get password from user
 	conn->thread_post_getpasswd_notify();
 	// wxMutexes are not recursive under Unix, so test first
@@ -803,11 +799,7 @@ char* VNCConn::thread_getpasswd(rfbClient *client) {
 	wxLogDebug("VNCConn %p: vncthread done waiting for password", conn);
 	// we get here once setPassword() was called
     }
-#if wxUSE_SECRETSTORE
     return strdup(conn->getPassword().GetAsString().char_str());
-#else
-    return strdup(conn->getPassword().char_str());
-#endif
 };
 
 
@@ -819,11 +811,7 @@ rfbCredential* VNCConn::thread_getcreds(rfbClient *client, int type) {
     if(type == rfbCredentialTypeUser) {
 
 	if(conn->getUserName().IsEmpty()
-#if wxUSE_SECRETSTORE
             || !conn->getPassword().IsOk()) {
-#else
-            || conn->getPassword().IsEmpty()) {
-#endif
 	    // username and/or password needed
             conn->thread_post_getcreds_notify(conn->getUserName().IsEmpty());
             // wxMutexes are not recursive under Unix, so test first
@@ -839,11 +827,7 @@ rfbCredential* VNCConn::thread_getcreds(rfbClient *client, int type) {
 
         rfbCredential *c = (rfbCredential *)calloc(1, sizeof(rfbCredential));
         c->userCredential.username = strdup(conn->getUserName().char_str());
-#if wxUSE_SECRETSTORE
         c->userCredential.password = strdup(conn->getPassword().GetAsString().char_str());
-#else
-        c->userCredential.password = strdup(conn->getPassword().char_str());
-#endif
         return c;
     }
 
@@ -1122,9 +1106,7 @@ void VNCConn::Listen(int port)
 bool VNCConn::Init(const wxString& host,
                    int repeaterId,
                    const wxString& username,
-#if wxUSE_SECRETSTORE
 		   const wxSecretValue& password,
-#endif
 		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug("VNCConn %p: Init() host '%s'", this, host);
@@ -1144,9 +1126,7 @@ bool VNCConn::Init(const wxString& host,
   cl->programName = "VNCConn";
   parseHostString(host.mb_str(), 5900, &cl->serverHost, &cl->serverPort);
   this->username = username;
-#if wxUSE_SECRETSTORE
   this->password = password;
-#endif
   // Support short-form (:0, :1) 
   if(cl->serverPort < 100)
     cl->serverPort += 5900;
@@ -1715,19 +1695,11 @@ void VNCConn::setUserName(const wxString& username) {
     this->username = username;
 }
 
-#if wxUSE_SECRETSTORE
 const wxSecretValue& VNCConn::getPassword() const {
-#else
-const wxString& VNCConn::getPassword() const {
-#endif
     return password;
 }
 
-#if wxUSE_SECRETSTORE
 void VNCConn::setPassword(const wxSecretValue& password) {
-#else
-void VNCConn::setPassword(const wxString& password) {
-#endif
     this->password = password;
     // tell worker thread to go on
     condition_auth.Signal();

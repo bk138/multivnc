@@ -349,11 +349,7 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
     case VNCConn::InitState::INITIALISE_FAIL:
         // error. only show error if this was not a auth case with empty password, i.e. a canceled ones
         if (c->getRequireAuth()
-#if wxUSE_SECRETSTORE
             && !c->getPassword().IsOk()) {
-#else
-            && c->getPassword().IsEmpty()) {
-#endif
             wxLogStatus(_("Authentication canceled."));
         } else {
             wxLogStatus(_("Connection failed."));
@@ -621,9 +617,7 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   if(!c->Init(wxEmptyString,
               -1,
               wxEmptyString,
-#if wxUSE_SECRETSTORE
               wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
-#endif
               encodings, compresslevel, quality)) {
       wxLogError(c->getErr());
   }
@@ -782,11 +776,7 @@ void MyFrameMain::onVNCConnGetPasswordNotify(wxCommandEvent &event)
     // Get password. We are only called if the password is needed!
     wxString pass = wxGetPasswordFromUser(_("Enter password:"), _("Password required!"));
     // And set password at conn.
-#if wxUSE_SECRETSTORE
     conn->setPassword(pass.IsEmpty() ? wxSecretValue() : wxSecretValue(pass));
-#else
-    conn->setPassword(pass);
-#endif
 }
 
 
@@ -800,28 +790,16 @@ void MyFrameMain::onVNCConnGetCredentialsNotify(wxCommandEvent &event)
 	wxString pass = wxGetPasswordFromUser(wxString::Format(_("Please enter password for user '%s'"), conn->getUserName()),
 					    _("Credentials required..."));
 	// And set password at conn.
-#if wxUSE_SECRETSTORE
 	conn->setPassword(wxSecretValue(pass));
-#else
-	conn->setPassword(pass);
-#endif
     } else {
 	// with user prompt
         wxCredentialEntryDialog formLogin(this, wxEmptyString, _("Credentials required..."));
         if (formLogin.ShowModal() == wxID_OK) {
             conn->setUserName(formLogin.GetCredentials().GetUser());
-#if wxUSE_SECRETSTORE
             conn->setPassword(formLogin.GetCredentials().GetPassword());
-#else
-            conn->setPassword(formLogin.GetCredentials().GetPassword().GetAsString());
-#endif
         } else {
 	    // canceled
-#if wxUSE_SECRETSTORE
             conn->setPassword(wxSecretValue());
-#else
-            conn->setPassword(wxEmptyString);
-#endif
         }
     }
 }
@@ -984,8 +962,8 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort, int repeaterId)
 
       wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
       wxString host = service.Contains("@") ? service.AfterFirst('@') : service;
-#if wxUSE_SECRETSTORE
       wxSecretValue password;
+#if wxUSE_SECRETSTORE
       wxSecretStore store = wxSecretStore::GetDefault();
       if (store.IsOk()) {
         wxString username; // this will not be used
@@ -996,9 +974,7 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort, int repeaterId)
       if(!c->Init(host,
                   repeaterId,
                   user,
-#if wxUSE_SECRETSTORE
                   password,
-#endif
                   encodings, compresslevel, quality, multicast,
                   multicast_socketrecvbuf, multicast_recvbuf)) {
           wxLogError(c->getErr());
