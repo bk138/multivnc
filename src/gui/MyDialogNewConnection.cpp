@@ -47,16 +47,16 @@ wxString MyDialogNewConnection::getSshUser() const {
     return text_ctrl_ssh_user->GetValue();
 };
 
-wxString MyDialogNewConnection::getSshPassword() const {
-    return text_ctrl_ssh_password->GetValue();
+wxSecretValue MyDialogNewConnection::getSshPassword() const {
+    return wxSecretValue(text_ctrl_ssh_password->GetValue());
 };
 
 std::vector<char> MyDialogNewConnection::getSshPrivKey() const {
     return mSshPrivKey;
 }
 
-wxString MyDialogNewConnection::getSshPrivkeyPassword() const {
-    return text_ctrl_ssh_privkey_password->GetValue();
+wxSecretValue MyDialogNewConnection::getSshPrivkeyPassword() const {
+    return wxSecretValue(text_ctrl_ssh_privkey_password->GetValue());
 }
 
 void MyDialogNewConnection::setShowAdvanced(bool yesno) {

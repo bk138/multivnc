@@ -2,6 +2,7 @@
 #define MYDIALOGNEWCONNECTION_H
 
 #include "DialogNewConnection.h"
+#include <wx/secretstore.h>
 
 class MyDialogNewConnection : public DialogNewConnection {
   public:
@@ -18,9 +19,9 @@ class MyDialogNewConnection : public DialogNewConnection {
     wxString getSshServer() const;
     int getSshPort() const;
     wxString getSshUser() const;
-    wxString getSshPassword() const;
+    wxSecretValue getSshPassword() const;
     std::vector<char> getSshPrivKey() const;
-    wxString getSshPrivkeyPassword() const;
+    wxSecretValue getSshPrivkeyPassword() const;
 
     void setShowAdvanced(bool yesno);
     bool getShowAdvanced();
