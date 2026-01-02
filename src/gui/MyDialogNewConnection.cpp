@@ -18,7 +18,7 @@ MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
                                 &MyDialogNewConnection::OnPasswordPrivkeyRadioSelected, this);
 
     // and privkey open dialog
-    button_ssh_privkey_import->Bind(wxEVT_BUTTON, &MyDialogNewConnection::OnPrivkeyFileOpen, this);
+    button_ssh_privkey_open->Bind(wxEVT_BUTTON, &MyDialogNewConnection::OnPrivkeyFileOpen, this);
 };
 
 wxString MyDialogNewConnection::getHost() const {
@@ -51,8 +51,8 @@ wxSecretValue MyDialogNewConnection::getSshPassword() const {
     return wxSecretValue(text_ctrl_ssh_password->GetValue());
 };
 
-std::vector<char> MyDialogNewConnection::getSshPrivKey() const {
-    return mSshPrivKey;
+wxString MyDialogNewConnection::getSshPrivKeyFilename() const {
+    return mSshPrivKeyFilename;
 }
 
 wxSecretValue MyDialogNewConnection::getSshPrivkeyPassword() const {
@@ -73,19 +73,19 @@ void MyDialogNewConnection::OnPasswordPrivkeyRadioSelected(wxCommandEvent &event
         label_ssh_password->Show();
         text_ctrl_ssh_password->Show();
         // privkey
-        button_ssh_privkey_import->Hide();
+        button_ssh_privkey_open->Hide();
         label_ssh_privkey_password->Hide();
         text_ctrl_ssh_privkey_password->Hide();
-        button_ssh_privkey_import->Hide();
+        button_ssh_privkey_open->Hide();
     } else if (event.GetEventObject() == radio_btn_ssh_privkey) {
         //password
         label_ssh_password->Hide();
         text_ctrl_ssh_password->Hide();
         // privkey
-        button_ssh_privkey_import->Show();
+        button_ssh_privkey_open->Show();
         label_ssh_privkey_password->Show();
         text_ctrl_ssh_privkey_password->Show();
-        button_ssh_privkey_import->Show();
+        button_ssh_privkey_open->Show();
     }
     panel_advanced->GetSizer()->SetSizeHints(panel_advanced);
     GetSizer()->SetSizeHints(this);
@@ -105,17 +105,17 @@ void MyDialogNewConnection::OnPrivkeyFileOpen(wxCommandEvent &event) {
         }
 
         wxFileOffset fileSize = file.Length();
-        if (fileSize > 1024 * 1024) {
+
+        if (fileSize == 0) {
+            wxMessageBox("File is empty.", "Error", wxOK | wxICON_ERROR);
+            return;
+        }
+
+        if (fileSize > 100 * 1024) {
             wxMessageBox("File is too large.", "Error", wxOK | wxICON_ERROR);
             return;
         }
 
-        mSshPrivKey.resize(fileSize);
-
-        if (file.Read(mSshPrivKey.data(), fileSize) != fileSize) {
-            wxMessageBox("Failed to read file: " + filename, "Error", wxOK | wxICON_ERROR);
-            mSshPrivKey.clear();
-            return;
-        }
+        mSshPrivKeyFilename = filename;
     }
 }
