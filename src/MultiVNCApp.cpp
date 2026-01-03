@@ -150,7 +150,16 @@ bool MultiVNCApp::OnInit()
   for(int i=1; i < wxApp::argc; ++i)
     {
       wxString arg(wxApp::argv[i]);
-      frame_main->cmdline_connect(arg);
+      if (arg.IsSameAs("-listen")) {
+          if (i < wxApp::argc - 1) {
+              int listenPort = -1;
+              wxApp::argv[i+1].ToInt(&listenPort);
+              frame_main->cmdline_conn_spawn(wxEmptyString, listenPort);
+          }
+          ++i;
+      } else {
+          frame_main->cmdline_conn_spawn(arg, -1);
+      }
     }
 
   SetTopWindow(frame_main);

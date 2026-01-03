@@ -144,7 +144,7 @@ public:
   void help_issue_list(wxCommandEvent &event);
 
   // to be called from the App
-  void cmdline_connect(wxString& hostarg);
+  void cmdline_conn_spawn(const wxString& service, int listenPort);
 
 };
 

@@ -2161,9 +2161,9 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
 
 
 
-void MyFrameMain::cmdline_connect(wxString& hostarg)
+void MyFrameMain::cmdline_conn_spawn(const wxString& service, int listenPort)
 {
-  conn_spawn(hostarg);
+    conn_spawn(wxString(service), listenPort);
 }
 
 
