@@ -10,6 +10,7 @@
 #include <wx/imaglist.h>
 #include <wx/richmsgdlg.h>
 #include <wx/secretstore.h>
+#include <wx/tokenzr.h>
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
 
@@ -856,9 +857,9 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-void MyFrameMain::conn_spawn(wxString service, int listenPort, int repeaterId)
+void MyFrameMain::conn_spawn(wxString service, int listenPort)
 {
-  wxLogDebug("%s: %s %d %d", __func__, service, listenPort, repeaterId);
+  wxLogDebug("%s: %s %d %d", __func__, service, listenPort);
 
   VNCConn* c = new VNCConn(this);
 
@@ -953,16 +954,24 @@ void MyFrameMain::conn_spawn(wxString service, int listenPort, int repeaterId)
     }
   else // normal init without previous listen
     {
-      wxLogStatus(_("Connecting to %s..."), service);
+      wxString user, host;
+      int repeaterId = -1;
 
-      // remove scheme component if present
-      wxString prefix = "vnc://";
-      if(service.substr(0, prefix.length()) == prefix) {
-          service = service.substr(prefix.length());
+      wxString vncUriScheme = "vnc://";
+      if (service.substr(0, vncUriScheme.length()) == vncUriScheme) {
+          // vnc:// URI
+          wxURI uri(service);
+          user = uri.GetUserInfo();
+          host = uri.GetServer();
+          getQueryValue(uri, "repeaterId").ToInt(&repeaterId);
+      } else {
+          // user@host:port notation
+          user = service.Contains("@") ? service.BeforeFirst('@') : "";
+          host = service.Contains("@") ? service.AfterFirst('@') : service;
       }
 
-      wxString user = service.Contains("@") ? service.BeforeFirst('@') : "";
-      wxString host = service.Contains("@") ? service.AfterFirst('@') : service;
+      wxLogStatus(_("Connecting to %s..."), host);
+
       wxSecretValue password;
 #if wxUSE_SECRETSTORE
       wxSecretStore store = wxSecretStore::GetDefault();
@@ -1275,7 +1284,25 @@ bool MyFrameMain::loadbookmarks()
 }
 
 
+wxString MyFrameMain::getQueryValue(const wxURI& wxUri, const wxString& key) {
+    wxString query = wxUri.GetQuery(); // Get everything after "?"
 
+    if (query.IsEmpty())
+        return wxEmptyString;
+
+    // Split into key-value pairs
+    wxStringTokenizer tokenizer(query, "&");
+    while (tokenizer.HasMoreTokens())
+    {
+        wxString pair = tokenizer.GetNextToken();
+        wxArrayString keyValue = wxSplit(pair, '=');
+        if (keyValue.size() == 2 && keyValue[0] == key)
+        {
+            return keyValue[1];
+        }
+    }
+    return wxEmptyString; // Key not found
+}
 
 
 /*
@@ -1295,7 +1322,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
     if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getHost() != wxEmptyString) {
         pConfig->Write(K_LASTHOST, dialog_new_connection.getHost());
-        conn_spawn(dialog_new_connection.getHost(), -1, dialog_new_connection.getRepeaterId());
+        conn_spawn("vnc://" + dialog_new_connection.getHost() + "?repeaterId=" + wxString::Format("%i",dialog_new_connection.getRepeaterId()), -1);
     }
 
     // save this in any case

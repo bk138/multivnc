@@ -6,7 +6,8 @@
 
 #include <vector>
 #include <set>
-#include <wx/process.h> 
+#include <wx/process.h>
+#include <wx/uri.h>
 #include "FrameMain.h"
 #include "MyFrameLog.h"
 #include "wxServDisc.h"
@@ -58,7 +59,8 @@ class MyFrameMain: public FrameMain
   wxArrayString bookmarks;
   bool loadbookmarks();
 
-  void conn_spawn(wxString service, int listenPort = -1, int repeaterId = -1);
+  // service can be user@host:port notation or a full vnc:// URI
+  void conn_spawn(wxString service, int listenPort = -1);
   void conn_setup(VNCConn *conn);
   void conn_terminate(int which);
 
@@ -66,6 +68,8 @@ class MyFrameMain: public FrameMain
   wxString windowshare_cmd_template;
   void onWindowshareTerminate(wxProcessEvent& event);
 
+  // helpers
+  wxString getQueryValue(const wxURI& wxUri, const wxString& key);
   
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
