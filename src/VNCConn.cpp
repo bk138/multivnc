@@ -1107,6 +1107,12 @@ bool VNCConn::Init(const wxString& host,
                    int repeaterId,
                    const wxString& username,
 		   const wxSecretValue& password,
+                   const wxString& ssh_host,
+                   int ssh_port,
+                   const wxString& ssh_user,
+                   const wxSecretValue& ssh_password,
+                   const std::vector<char>& ssh_priv_key,
+                   const wxSecretValue& ssh_priv_key_password,
 		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug("VNCConn %p: Init() host '%s'", this, host);

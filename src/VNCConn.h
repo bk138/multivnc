@@ -102,6 +102,12 @@ public:
             int repeaterId,
             const wxString& username,
 	    const wxSecretValue& password,
+            const wxString& ssh_host,
+            int ssh_port,
+            const wxString& ssh_user,
+            const wxSecretValue& ssh_password,
+            const std::vector<char>& ssh_priv_key,
+            const wxSecretValue& ssh_priv_key_password,
 	    const wxString& encodings, int compresslevel = 1, int quality = 5, bool multicast = true, int multicastSocketRecvBuf = 5120, int multicastRecvBuf = 5120);
   void Shutdown();
 

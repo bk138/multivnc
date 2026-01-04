@@ -620,6 +620,12 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
               -1,
               wxEmptyString,
               wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
+              wxEmptyString, // incoming connections cannot be SSH-tunneled
+              -1,
+              wxEmptyString,
+              wxSecretValue(),
+              {},
+              wxSecretValue(),
               encodings, compresslevel, quality)) {
       wxLogError(c->getErr());
   }
@@ -954,8 +960,10 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxString user, host;
-      int repeaterId = -1;
+      wxString user, host, ssh_user, ssh_host;
+      wxSecretValue ssh_password, ssh_priv_key_password;
+      int repeaterId = -1, ssh_port = -1;
+      std::vector<char> ssh_priv_key;
 
       wxString vncUriScheme = "vnc://";
       if (service.substr(0, vncUriScheme.length()) == vncUriScheme) {
@@ -963,7 +971,33 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
           wxURI uri(service);
           user = uri.GetUserInfo();
           host = uri.GetServer();
+
           getQueryValue(uri, "RepeaterId").ToInt(&repeaterId);
+
+          ssh_user = getQueryValue(uri, "SshUsername");   // RFC 7869
+          ssh_host = getQueryValue(uri, "SshHost");       // RFC 7869
+          getQueryValue(uri, "SshPort").ToInt(&ssh_port); // RFC 7869
+
+          wxSecretString sshPassword = getQueryValue(uri, "SshPassword"); // RFC 7869
+          if (!sshPassword.IsEmpty()) {
+              ssh_priv_key_password = wxSecretValue(sshPassword);
+          }
+
+          wxSecretString sshPrivKeyPassword = getQueryValue(uri, "SshPrivKeyPassword"); // not standardised
+          if (!sshPrivKeyPassword.IsEmpty()) {
+              ssh_priv_key_password = wxSecretValue(sshPrivKeyPassword);
+          }
+
+          wxString sshPrivKeyFilename = getQueryValue(uri, "SshPrivKeyFilename"); // not standardised
+          wxFile sshPrivKeyFile(sshPrivKeyFilename);
+          if (sshPrivKeyFile.IsOpened()) {
+              wxFileOffset fileSize = sshPrivKeyFile.Length();
+              ssh_priv_key.resize(fileSize);
+              if (sshPrivKeyFile.Read(ssh_priv_key.data(), fileSize) != fileSize) {
+                  wxLogError("Failed to read file %s", sshPrivKeyFilename);
+                  return;
+              }
+          }
       } else {
           // user@host:port notation
           user = service.Contains("@") ? service.BeforeFirst('@') : "";
@@ -985,6 +1019,12 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
                   repeaterId,
                   user,
                   password,
+                  ssh_host,
+                  ssh_port,
+                  ssh_user,
+                  ssh_password,
+                  ssh_priv_key,
+                  ssh_priv_key_password,
                   encodings, compresslevel, quality, multicast,
                   multicast_socketrecvbuf, multicast_recvbuf)) {
           wxLogError(c->getErr());
@@ -1264,6 +1304,7 @@ bool MyFrameMain::loadbookmarks()
 	 host = wxT("[") + host + wxT("]");
 
       // all fine, add it
+      //FIXME this saves kind of a VNC URI to later be loaded by spawn_conn()
       bookmarks.Add((user != wxEmptyString ? user + "@" : "") + host + wxT(":") + port);
 
       // and add to bookmarks menu
@@ -1322,6 +1363,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
     if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getHost() != wxEmptyString) {
         pConfig->Write(K_LASTHOST, dialog_new_connection.getHost());
+        //TODO use SSH stuff
         conn_spawn("vnc://" + dialog_new_connection.getHost() + "?RepeaterId=" + wxString::Format("%i",dialog_new_connection.getRepeaterId()), -1);
     }
 
@@ -2091,6 +2133,7 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 	  return;
   }
 
+  //FIXME how to handle SSH stuff
   conn_spawn(bookmarks[sel]);
 }
 
