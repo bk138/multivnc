@@ -963,7 +963,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
           wxURI uri(service);
           user = uri.GetUserInfo();
           host = uri.GetServer();
-          getQueryValue(uri, "repeaterId").ToInt(&repeaterId);
+          getQueryValue(uri, "RepeaterId").ToInt(&repeaterId);
       } else {
           // user@host:port notation
           user = service.Contains("@") ? service.BeforeFirst('@') : "";
@@ -1322,7 +1322,7 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
     if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getHost() != wxEmptyString) {
         pConfig->Write(K_LASTHOST, dialog_new_connection.getHost());
-        conn_spawn("vnc://" + dialog_new_connection.getHost() + "?repeaterId=" + wxString::Format("%i",dialog_new_connection.getRepeaterId()), -1);
+        conn_spawn("vnc://" + dialog_new_connection.getHost() + "?RepeaterId=" + wxString::Format("%i",dialog_new_connection.getRepeaterId()), -1);
     }
 
     // save this in any case
