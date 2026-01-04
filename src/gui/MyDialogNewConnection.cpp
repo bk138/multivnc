@@ -1,6 +1,7 @@
 
 #include "MyDialogNewConnection.h"
 #include <wx/file.h>
+#include <wx/log.h>
 #include <wx/valnum.h>
 
 MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
@@ -100,19 +101,19 @@ void MyDialogNewConnection::OnPrivkeyFileOpen(wxCommandEvent &event) {
         wxFile file;
 
         if (!file.Open(filename)) {
-            wxMessageBox("Failed to open file: " + filename, "Error", wxOK | wxICON_ERROR);
+            wxLogError(_("Failed to open file %s."), filename);
             return;
         }
 
         wxFileOffset fileSize = file.Length();
 
         if (fileSize == 0) {
-            wxMessageBox("File is empty.", "Error", wxOK | wxICON_ERROR);
+            wxLogError(_("File %s is empty."), filename);
             return;
         }
 
         if (fileSize > 100 * 1024) {
-            wxMessageBox("File is too large.", "Error", wxOK | wxICON_ERROR);
+            wxLogError("File %s is too large.", filename);
             return;
         }
 
