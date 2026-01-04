@@ -60,7 +60,7 @@ class MyFrameMain: public FrameMain
   bool loadbookmarks();
 
   // service can be user@host:port notation or a full vnc:// URI
-  void conn_spawn(wxString service, int listenPort = -1);
+  void conn_spawn(const wxString& service, int listenPort = -1);
   void conn_setup(VNCConn *conn);
   void conn_terminate(int which);
 

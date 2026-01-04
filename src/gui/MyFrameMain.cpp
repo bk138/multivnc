@@ -857,7 +857,7 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 
 
 // connection initiation and shutdown
-void MyFrameMain::conn_spawn(wxString service, int listenPort)
+void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
 {
   wxLogDebug("%s: %s %d %d", __func__, service, listenPort);
 
@@ -2163,7 +2163,7 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
 
 void MyFrameMain::cmdline_conn_spawn(const wxString& service, int listenPort)
 {
-    conn_spawn(wxString(service), listenPort);
+    conn_spawn(service, listenPort);
 }
 
 
