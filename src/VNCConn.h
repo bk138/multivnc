@@ -168,11 +168,17 @@ public:
   wxString getServerPort() const;
   wxString getListenPort() const;
   wxString getRepeaterId() const;
+  const wxString& getSshHost() const;
+  const wxString& getSshPort() const;
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);
   const wxSecretValue& getPassword() const;
   void setPassword(const wxSecretValue& password);
+  const wxString& getSshUserName() const;
+  const wxSecretValue& getSshPassword() const;
+  const wxString& getSshPrivKeyFilename() const;
+  const wxSecretValue& getSshPrivKeyPassword() const;
   const bool getRequireAuth() const;
 
 
@@ -240,6 +246,14 @@ private:
   bool require_auth;
   wxMutex mutex_auth;
   wxCondition condition_auth;
+
+  // SSH
+  wxString ssh_host;
+  wxString ssh_port;
+  wxString ssh_username;
+  wxSecretValue ssh_password;
+  wxString ssh_priv_key_filename;
+  wxSecretValue ssh_priv_key_password;
 
   // statistics
   bool do_stats;

@@ -1142,6 +1142,13 @@ bool VNCConn::Init(const wxString& host,
       cl->destPort = repeaterId;
   }
 
+  this->ssh_host = ssh_host;
+  this->ssh_port = wxString::Format(wxT("%i"), ssh_port);
+  this->ssh_username = ssh_user;
+  this->ssh_password = ssh_password;
+  this->ssh_priv_key_filename = ssh_priv_key_filename;
+  this->ssh_priv_key_password = ssh_priv_key_password;
+
   cl->appData.compressLevel = compresslevel;
   cl->appData.qualityLevel = quality;
   cl->appData.encodingsString = strdup(encodings.mb_str());
@@ -1711,6 +1718,21 @@ void VNCConn::setPassword(const wxSecretValue& password) {
     condition_auth.Signal();
 }
 
+const wxString& VNCConn::getSshUserName() const {
+    return ssh_username;
+}
+
+const wxSecretValue& VNCConn::getSshPassword() const {
+    return ssh_password;
+}
+
+const wxString& VNCConn::getSshPrivKeyFilename() const {
+    return ssh_priv_key_filename;
+}
+
+const wxSecretValue& VNCConn::getSshPrivKeyPassword() const {
+    return ssh_priv_key_password;
+}
 
 const bool VNCConn::getRequireAuth() const {
     return require_auth;
@@ -1758,7 +1780,13 @@ wxString VNCConn::getRepeaterId() const
     return wxEmptyString;
 }
 
+const wxString& VNCConn::getSshHost() const {
+    return ssh_host;
+}
 
+const wxString& VNCConn::getSshPort() const {
+    return ssh_port;
+}
 
 bool VNCConn::isMulticast() const
 {
