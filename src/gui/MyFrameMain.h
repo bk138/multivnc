@@ -55,9 +55,8 @@ class MyFrameMain: public FrameMain
 
   void splitwinlayout();
 
-  // array of bookmark strings
-  wxArrayString bookmarks;
   bool bookmarks_load();
+  wxSecretString bookmarks_entry_to_uri(int index);
 
   // service can be user@host:port notation or a full vnc:// URI
   void conn_spawn(const wxString& service, int listenPort = -1);

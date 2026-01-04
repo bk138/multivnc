@@ -957,7 +957,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
   else // normal init without previous listen
     {
       wxString user, host, ssh_user, ssh_host;
-      wxSecretValue ssh_password, ssh_priv_key_password;
+      wxSecretValue password, ssh_password, ssh_priv_key_password;
       int repeaterId = -1, ssh_port = -1;
       std::vector<char> ssh_priv_key;
 
@@ -969,6 +969,10 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
           user = getQueryValue(uri, "VncUsername"); // RFC 7869
           if (user.IsEmpty()) {
               user = uri.GetUserInfo(); // fallback
+          }
+          wxSecretString vncPassword = getQueryValue(uri, "VncPassword"); // RFC 7869
+          if (!vncPassword.IsEmpty()) {
+              password = wxSecretValue(vncPassword);
           }
 
           getQueryValue(uri, "RepeaterId").ToInt(&repeaterId);
@@ -1009,15 +1013,6 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
       notebook_connections->AddPage(win, wxString::Format(_("Connecting to %s..."), host), true);
       wxLogStatus(_("Connecting to %s..."), host);
 
-      wxSecretValue password;
-#if wxUSE_SECRETSTORE
-      wxSecretStore store = wxSecretStore::GetDefault();
-      if (store.IsOk()) {
-        wxString username; // this will not be used
-        store.Load("MultiVNC/Bookmarks/" + service, username,
-                   password); // if Load() fails, password will still be empty
-      }
-#endif
       if(!c->Init(host,
                   repeaterId,
                   user,
@@ -1271,7 +1266,6 @@ bool MyFrameMain::bookmarks_load()
 
 
   // clean up
-  bookmarks.Clear();
   wxMenu* bm_menu = frame_main_menubar->GetMenu(frame_main_menubar->FindMenu(_("Bookmarks")));
   for(int i = bm_menu->GetMenuItemCount()-1; i > 0; --i)
     bm_menu->Destroy(bm_menu->FindItemByPosition(i));
@@ -1281,41 +1275,11 @@ bool MyFrameMain::bookmarks_load()
   // then read in each bookmark value pair
   for(size_t i=0; i < bookmarknames.GetCount(); ++i)
     {
-      wxString host, port, user;
-
-      cfg->SetPath(G_BOOKMARKS + bookmarknames[i]);
-
-      if(!cfg->Read(K_BOOKMARKS_HOST, &host))
-	{
-	  wxLogError(_("Error reading hostname of bookmark '%s'!"), bookmarknames[i].c_str());
-	  cfg->SetPath(wxT("/"));
-	  return false;
-	}
-
-      if(!cfg->Read(K_BOOKMARKS_PORT, &port))
-	{
-	  wxLogError(_("Error reading port of bookmark '%s'!"), bookmarknames[i].c_str());
-	  cfg->SetPath(wxT("/"));
-	  return false;
-	}
-
-      // user is optional
-      cfg->Read(K_BOOKMARKS_USER, &user);
-
-      // add brackets if host is an IPv6 address
-      if(host.Freq(':') > 0)
-	 host = wxT("[") + host + wxT("]");
-
-      // all fine, add it
-      //FIXME this saves kind of a VNC URI to later be loaded by spawn_conn()
-      bookmarks.Add((user != wxEmptyString ? user + "@" : "") + host + wxT(":") + port);
-
       // and add to bookmarks menu
       int id = NewControlId();
       wxString* index_str = new wxString; // pack i into a wxObject, we use wxString here
       *index_str << i;
       bm_menu->Append(id, bookmarknames[i]);
-      bm_menu->SetHelpString(id, _("Bookmark") + " " + host + wxT(":") + port);
       Connect(id, wxEVT_COMMAND_MENU_SELECTED, 
 	      wxCommandEventHandler(FrameMain::listbox_bookmarks_dclick), (wxObject*)index_str);
      }
@@ -1325,6 +1289,75 @@ bool MyFrameMain::bookmarks_load()
   list_box_bookmarks->Set(bookmarknames);
 
   return true;
+}
+
+
+wxSecretString MyFrameMain::bookmarks_entry_to_uri(int index) {
+    wxConfigBase *cfg = wxConfigBase::Get();
+
+    /*
+      Find the subgroup at index
+    */
+    cfg->SetPath(G_BOOKMARKS);
+    wxString str;
+    long dummy;
+    int i = 0;
+    bool cont = cfg->GetFirstGroup(str, dummy);
+    while(cont && i < index) {
+        ++i;
+        cont = cfg->GetNextGroup(str, dummy);
+    }
+
+    /*
+      Read values from config
+    */
+    wxString host, port, user;
+    cfg->SetPath(G_BOOKMARKS + str);
+
+    if(!cfg->Read(K_BOOKMARKS_HOST, &host)) {
+        wxLogError(_("Error reading hostname of bookmark '%s'!"), str);
+        cfg->SetPath("/");
+        return wxString();
+    }
+
+    if(!cfg->Read(K_BOOKMARKS_PORT, &port)) {
+        wxLogError(_("Error reading port of bookmark '%s'!"), str);
+        cfg->SetPath("/");
+        return wxString();
+    }
+
+    // user is optional
+    cfg->Read(K_BOOKMARKS_USER, &user);
+
+    // done reading cfg
+    cfg->SetPath("/");
+
+    // add brackets if host is an IPv6 address
+    if(host.Freq(':') > 0) {
+        host = wxT("[") + host + wxT("]");
+    }
+
+    /*
+      Read values from secretstore
+    */
+    wxSecretValue password;
+#if wxUSE_SECRETSTORE
+    wxSecretStore store = wxSecretStore::GetDefault();
+    if (store.IsOk()) {
+        wxString username; // this will not be used
+        store.Load("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port,
+                   username,
+                   password); // if Load() fails, password will still be empty
+    }
+#endif
+
+    wxSecretString uri("vnc://");
+    uri += (host + ":" + port);
+    uri += ("?VncUsername=" + user);
+    uri += ("&VncPassword=" + password.GetAsString());
+    //TODO add SSH params
+
+    return uri;
 }
 
 
@@ -1935,19 +1968,22 @@ void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
       return;
     }
 
-  wxConfigBase *cfg = wxConfigBase::Get();
-  if(!cfg->DeleteGroup(G_BOOKMARKS + name))
-    wxLogError(_("No bookmark with this name!"));
-
 #if wxUSE_SECRETSTORE
   int sel = list_box_bookmarks->GetSelection();
   if(sel != wxNOT_FOUND) {
-      wxString service = bookmarks[sel];
+      wxURI uri(bookmarks_entry_to_uri(sel));
+      wxString host = uri.GetServer();
+      wxString port = uri.GetPort();
+      wxString user = getQueryValue(uri, "VncUsername"); // RFC 7869
       wxSecretStore store = wxSecretStore::GetDefault();
       if(store.IsOk())
-	  store.Delete("MultiVNC/Bookmarks/" + service);
+	  store.Delete("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port);
   }
 #endif
+
+  wxConfigBase *cfg = wxConfigBase::Get();
+  if(!cfg->DeleteGroup(G_BOOKMARKS + name))
+    wxLogError(_("No bookmark with this name!"));
 
   // and re-read
   bookmarks_load();
@@ -2125,7 +2161,7 @@ void MyFrameMain::listbox_bookmarks_select(wxCommandEvent &event)
 
   if(sel >= 0) // something selected
     {
-      wxLogStatus(_("Bookmark %s"), bookmarks[sel]);
+      wxLogStatus(_("Bookmark %s"), list_box_bookmarks->GetString(sel));
     }
 }
 
@@ -2142,8 +2178,7 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 	  return;
   }
 
-  //FIXME how to handle SSH stuff
-  conn_spawn(bookmarks[sel]);
+  conn_spawn(bookmarks_entry_to_uri(sel));
 }
 
 
