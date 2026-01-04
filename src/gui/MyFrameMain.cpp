@@ -163,7 +163,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   splitwinlayout();
 
-  loadbookmarks();
+  bookmarks_load();
 
   if(show_discovered)
     frame_main_menubar->Check(ID_DISCOVERED, true);
@@ -1247,7 +1247,7 @@ void MyFrameMain::splitwinlayout()
 }
 
 
-bool MyFrameMain::loadbookmarks()
+bool MyFrameMain::bookmarks_load()
 {
   wxConfigBase *cfg = wxConfigBase::Get();
 
@@ -1887,7 +1887,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
       cfg->SetPath(wxT("/"));
 
       // and load into listbox
-      loadbookmarks();
+      bookmarks_load();
     }
 }
 
@@ -1917,7 +1917,7 @@ void MyFrameMain::bookmarks_edit(wxCommandEvent &event)
   cfg->SetPath(wxT("/"));
   
   // and load into listbox
-  loadbookmarks();
+  bookmarks_load();
 }
 
 
@@ -1947,7 +1947,7 @@ void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
 #endif
 
   // and re-read
-  loadbookmarks();
+  bookmarks_load();
 }
 
 

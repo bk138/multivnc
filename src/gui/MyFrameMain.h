@@ -57,7 +57,7 @@ class MyFrameMain: public FrameMain
 
   // array of bookmark strings
   wxArrayString bookmarks;
-  bool loadbookmarks();
+  bool bookmarks_load();
 
   // service can be user@host:port notation or a full vnc:// URI
   void conn_spawn(const wxString& service, int listenPort = -1);
