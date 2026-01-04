@@ -1363,8 +1363,14 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
 
     if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getHost() != wxEmptyString) {
         pConfig->Write(K_LASTHOST, dialog_new_connection.getHost());
-        //TODO use SSH stuff
-        conn_spawn("vnc://" + dialog_new_connection.getHost() + "?RepeaterId=" + wxString::Format("%i",dialog_new_connection.getRepeaterId()), -1);
+        conn_spawn("vnc://" + dialog_new_connection.getHost()
+                   + "?RepeaterId=" + wxString::Format("%i", dialog_new_connection.getRepeaterId())
+                   + "&SshHost=" + dialog_new_connection.getSshServer()
+                   + "&SshUsername=" + dialog_new_connection.getSshUser()
+                   + "&SshPassword=" + dialog_new_connection.getSshPassword().GetAsString()
+                   + "&SshPrivKeyFilename=" + dialog_new_connection.getSshPrivKeyFilename()
+                   + "&SshPrivKeyPassword=" + dialog_new_connection.getSshPrivkeyPassword().GetAsString()
+                   , -1);
     }
 
     // save this in any case
