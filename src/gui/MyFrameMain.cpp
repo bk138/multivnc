@@ -895,12 +895,6 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
 
   connections.push_back(cb);
 
-  // add to notebook, needs to be after connections list add
-  if(listenPort > 0)
-      notebook_connections->AddPage(win, wxEmptyString, true);
-  else
-      notebook_connections->AddPage(win, wxString::Format(_("Connecting to %s..."), service), true);
-
   // enable "disconnect"
   frame_main_menubar->Enable(wxID_STOP, true);
   GetToolBar()->EnableTool(wxID_STOP, true);
@@ -955,6 +949,8 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
 
   if(listenPort > 0)
     {
+      // add to notebook, needs to be after connections list add
+      notebook_connections->AddPage(win, wxEmptyString, true);
       wxLogStatus(_("Listening on port") + " " + (wxString() << listenPort) + wxT(" ..."));
       c->Listen(listenPort);
     }
@@ -1004,6 +1000,8 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
           host = service.Contains("@") ? service.AfterFirst('@') : service;
       }
 
+      // add to notebook, needs to be after connections list add
+      notebook_connections->AddPage(win, wxString::Format(_("Connecting to %s..."), host), true);
       wxLogStatus(_("Connecting to %s..."), host);
 
       wxSecretValue password;
