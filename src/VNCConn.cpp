@@ -1111,7 +1111,7 @@ bool VNCConn::Init(const wxString& host,
                    int ssh_port,
                    const wxString& ssh_user,
                    const wxSecretValue& ssh_password,
-                   const std::vector<char>& ssh_priv_key,
+                   const wxString& ssh_priv_key_filename,
                    const wxSecretValue& ssh_priv_key_password,
 		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {

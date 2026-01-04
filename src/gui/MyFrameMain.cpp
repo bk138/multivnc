@@ -624,7 +624,7 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
               -1,
               wxEmptyString,
               wxSecretValue(),
-              {},
+              wxEmptyString,
               wxSecretValue(),
               encodings, compresslevel, quality)) {
       wxLogError(c->getErr());
@@ -956,7 +956,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxString user, host, ssh_user, ssh_host;
+      wxString user, host, ssh_user, ssh_host, ssh_priv_key_filename;
       wxSecretValue password, ssh_password, ssh_priv_key_password;
       int repeaterId = -1, ssh_port = -1;
       std::vector<char> ssh_priv_key;
@@ -991,18 +991,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
               ssh_priv_key_password = wxSecretValue(sshPrivKeyPassword);
           }
 
-          wxString sshPrivKeyFilename = getQueryValue(uri, "SshPrivKeyFilename"); // not standardised
-          if (!sshPrivKeyFilename.IsEmpty()) {
-              wxFile sshPrivKeyFile(sshPrivKeyFilename);
-              if (sshPrivKeyFile.IsOpened()) {
-                  wxFileOffset fileSize = sshPrivKeyFile.Length();
-                  ssh_priv_key.resize(fileSize);
-                  if (sshPrivKeyFile.Read(ssh_priv_key.data(), fileSize) != fileSize) {
-                      wxLogError("Failed to read file %s", sshPrivKeyFilename);
-                      return;
-                  }
-              }
-          }
+          ssh_priv_key_filename = getQueryValue(uri, "SshPrivKeyFilename"); // not standardised
       } else {
           // user@host:port notation
           user = service.Contains("@") ? service.BeforeFirst('@') : "";
@@ -1021,7 +1010,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
                   ssh_port,
                   ssh_user,
                   ssh_password,
-                  ssh_priv_key,
+                  ssh_priv_key_filename,
                   ssh_priv_key_password,
                   encodings, compresslevel, quality, multicast,
                   multicast_socketrecvbuf, multicast_recvbuf)) {
