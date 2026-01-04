@@ -988,13 +988,15 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
           }
 
           wxString sshPrivKeyFilename = getQueryValue(uri, "SshPrivKeyFilename"); // not standardised
-          wxFile sshPrivKeyFile(sshPrivKeyFilename);
-          if (sshPrivKeyFile.IsOpened()) {
-              wxFileOffset fileSize = sshPrivKeyFile.Length();
-              ssh_priv_key.resize(fileSize);
-              if (sshPrivKeyFile.Read(ssh_priv_key.data(), fileSize) != fileSize) {
-                  wxLogError("Failed to read file %s", sshPrivKeyFilename);
-                  return;
+          if (!sshPrivKeyFilename.IsEmpty()) {
+              wxFile sshPrivKeyFile(sshPrivKeyFilename);
+              if (sshPrivKeyFile.IsOpened()) {
+                  wxFileOffset fileSize = sshPrivKeyFile.Length();
+                  ssh_priv_key.resize(fileSize);
+                  if (sshPrivKeyFile.Read(ssh_priv_key.data(), fileSize) != fileSize) {
+                      wxLogError("Failed to read file %s", sshPrivKeyFilename);
+                      return;
+                  }
               }
           }
       } else {
