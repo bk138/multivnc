@@ -94,7 +94,12 @@ void MyDialogNewConnection::OnPasswordPrivkeyRadioSelected(wxCommandEvent &event
 }
 
 void MyDialogNewConnection::OnPrivkeyFileOpen(wxCommandEvent &event) {
-    wxString filename = wxFileSelector("Choose an SSH private key file");
+    wxString filename = wxFileSelector("Choose an SSH private key file",
+                                       wxEmptyString,
+                                       wxEmptyString,
+                                       wxEmptyString,
+                                       wxFileSelectorDefaultWildcardStr,
+                                       wxFD_SHOW_HIDDEN);
 
     if (!filename.empty()) {
         wxBusyCursor busy;
