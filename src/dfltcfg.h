@@ -102,6 +102,10 @@
 #define K_BOOKMARKS_HOST wxT("Host")
 #define K_BOOKMARKS_PORT wxT("Port")
 #define K_BOOKMARKS_USER "User"
+#define K_BOOKMARKS_SSH_HOST "SshHost"
+#define K_BOOKMARKS_SSH_PORT "SshPort"
+#define K_BOOKMARKS_SSH_USER "SshUsername"
+#define K_BOOKMARKS_SSH_PRIV_KEY_FILENAME "SshPrivKeyFilename"
 
 // collab features
 #define K_WINDOWSHARE _T("WindowShareCmd")

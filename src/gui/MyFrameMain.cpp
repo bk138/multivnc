@@ -1300,7 +1300,7 @@ wxSecretString MyFrameMain::bookmarks_entry_to_uri(int index) {
     /*
       Read values from config
     */
-    wxString host, port, user;
+    wxString host, port, user, ssh_host, ssh_user, ssh_port, ssh_priv_key_filename;
     cfg->SetPath(G_BOOKMARKS + str);
 
     if(!cfg->Read(K_BOOKMARKS_HOST, &host)) {
@@ -1315,8 +1315,12 @@ wxSecretString MyFrameMain::bookmarks_entry_to_uri(int index) {
         return wxString();
     }
 
-    // user is optional
+    // user and SSH are optional
     cfg->Read(K_BOOKMARKS_USER, &user);
+    cfg->Read(K_BOOKMARKS_SSH_HOST, &ssh_host);
+    cfg->Read(K_BOOKMARKS_SSH_USER, &ssh_user);
+    cfg->Read(K_BOOKMARKS_SSH_PORT, &ssh_port);
+    cfg->Read(K_BOOKMARKS_SSH_PRIV_KEY_FILENAME, &ssh_priv_key_filename);
 
     // done reading cfg
     cfg->SetPath("/");
@@ -1344,7 +1348,10 @@ wxSecretString MyFrameMain::bookmarks_entry_to_uri(int index) {
     uri += (host + ":" + port);
     uri += ("?VncUsername=" + user);
     uri += ("&VncPassword=" + password.GetAsString());
-    //TODO add SSH params
+    uri += ("&SshHost=" + ssh_host);
+    uri += ("&SshPort=" + ssh_port);
+    uri += ("&SshUsername=" + ssh_user);
+    uri += ("&SshPrivKeyFilename=" + ssh_priv_key_filename);
 
     return uri;
 }
@@ -1900,6 +1907,10 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
       cfg->Write(K_BOOKMARKS_HOST, c->getServerHost());
       cfg->Write(K_BOOKMARKS_PORT, c->getServerPort());
       cfg->Write(K_BOOKMARKS_USER, c->getUserName());
+      cfg->Write(K_BOOKMARKS_SSH_HOST, c->getServerHost());
+      cfg->Write(K_BOOKMARKS_SSH_PORT, c->getSshPort());
+      cfg->Write(K_BOOKMARKS_SSH_USER, c->getSshUserName());
+      cfg->Write( K_BOOKMARKS_SSH_PRIV_KEY_FILENAME, c->getSshPrivKeyFilename());
 
 #if wxUSE_SECRETSTORE
       wxSecretStore store = wxSecretStore::GetDefault();
