@@ -35,6 +35,7 @@
 #include <wx/thread.h>
 #include <wx/secretstore.h>
 #include <wx/msgqueue.h>
+#include "libsshtunnel.h"
 #include "rfb/rfbclient.h"
 
 
@@ -227,8 +228,6 @@ private:
   wxCriticalSection mutex_multicastratio; // the fifos above are read by both the VNC and the GUI thread
   wxStopWatch  multicastratio_stopwatch;
 
-  static bool libsshtunnel_initialized;
-
   // this counts the ms since Init()
   wxStopWatch conn_stopwatch;
 
@@ -254,6 +253,8 @@ private:
   wxSecretValue ssh_password;
   wxString ssh_priv_key_filename;
   wxSecretValue ssh_priv_key_password;
+  static bool libsshtunnel_initialized;
+  ssh_tunnel_t *ssh_tunnel;
 
   // statistics
   bool do_stats;
@@ -349,6 +350,12 @@ private:
   static void thread_logger(const char *format, ...);
   static char* thread_getpasswd(rfbClient* client);
   static rfbCredential* thread_getcreds(rfbClient* client, int type);
+  // libsshtunnel callbacks
+  static void thread_on_ssh_error(void *client, ssh_tunnel_error_t error_code,  const char *error_message);
+  static int thread_on_ssh_fingerprint_check(void *client,
+                                             const char *fingerprint,
+                                             int fingerprint_len,
+                                             const char *host);
 };
 
 

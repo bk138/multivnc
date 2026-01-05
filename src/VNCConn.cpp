@@ -24,6 +24,7 @@
 
 #include <cstdarg>
 #include <cerrno>
+#include <wx/file.h>
 #include <wx/intl.h>
 #include <wx/log.h>
 #include <wx/socket.h>
@@ -32,7 +33,6 @@
 #else
 #include <arpa/inet.h>
 #endif
-#include <libsshtunnel.h>
 #include "VNCConn.h"
 
 bool VNCConn::libsshtunnel_initialized = false;
@@ -95,6 +95,7 @@ VNCConn::VNCConn(void* p) : condition_auth(mutex_auth)
           err.Printf(_("libsshtunnel initialization failed"));
       }
   }
+  ssh_tunnel = NULL;
 
   // statistics stuff
   do_stats = false;
@@ -227,6 +228,60 @@ wxThread::ExitCode VNCConn::Entry()
 {
  // init connection before going into main loop if this is not a listening one
  if (!thread_listenmode) {
+     if (!ssh_host.IsEmpty()) {
+         // ssh-tunneling, check whether it's password- or key-based
+         if (ssh_password.IsOk()) {
+             // password-based
+             ssh_tunnel = ssh_tunnel_open_with_password(ssh_host.mb_str(),
+                                                        wxAtoi(ssh_port),
+                                                        ssh_username.mb_str(),
+                                                        ssh_password.GetAsString().mb_str(),
+                                                        cl->serverHost,
+                                                        cl->serverPort,
+                                                        this,
+                                                        thread_on_ssh_fingerprint_check,
+                                                        thread_on_ssh_error);
+         } else {
+             // key-based
+             std::vector<char> ssh_priv_key;
+             if (!ssh_priv_key_filename.IsEmpty()) {
+                 wxFile sshPrivKeyFile(ssh_priv_key_filename);
+                 if (sshPrivKeyFile.IsOpened()) {
+                     wxFileOffset fileSize = sshPrivKeyFile.Length();
+                     ssh_priv_key.resize(fileSize);
+                     sshPrivKeyFile.Read(ssh_priv_key.data(), fileSize);
+                 }
+             }
+             ssh_tunnel = ssh_tunnel_open_with_privkey(ssh_host.mb_str(),
+                                                       wxAtoi(ssh_port),
+                                                       ssh_username.mb_str(),
+                                                       ssh_priv_key.data(),
+                                                       ssh_priv_key.size(),
+                                                       ssh_priv_key_password.GetAsString().mb_str(),
+                                                       cl->serverHost,
+                                                       cl->serverPort,
+                                                       this,
+                                                       thread_on_ssh_fingerprint_check,
+                                                       thread_on_ssh_error);
+         }
+
+         if(ssh_tunnel) {
+             cl->serverHost = strdup("127.0.0.1");
+             cl->serverPort = ssh_tunnel_get_port(ssh_tunnel);
+         } else {
+             err.Printf(_("Failure connecting to SSH server at %s:%s!"), ssh_host, ssh_port);
+             if(thread_shutdown) {
+                 wxLogDebug("VNCConn %p: ssh_tunnel_open_* canceled.", this);
+                 thread_post_init_notify(InitState::CONNECT_CANCEL);
+             } else {
+                 wxLogDebug("VNCConn %p: ssh_tunnel_open_* failed.", this);
+                 thread_post_init_notify(InitState::CONNECT_FAIL);
+             }
+             wxLogDebug("VNCConn %p: vncthread done early", this);
+             return 0;
+         }
+     }
+
      rfbClientLog("About to connect to '%s', port %d\n", cl->serverHost, cl->serverPort);
 
      // save these for the error case
@@ -235,6 +290,10 @@ wxThread::ExitCode VNCConn::Entry()
 
      if (!rfbClientConnect(cl)) {
          err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
+         // There might be the case that the SSH tunnel got setup alright, but connecting to the VNC server failed.
+         // In this case we have to dispose of the tunnel explicitly here.
+         ssh_tunnel_close(ssh_tunnel);
+         ssh_tunnel = NULL;
          if(thread_shutdown) {
              wxLogDebug("VNCConn %p: rfbClientConnect() canceled.", this);
              thread_post_init_notify(InitState::CONNECT_CANCEL);
@@ -248,6 +307,10 @@ wxThread::ExitCode VNCConn::Entry()
          wxLogDebug("VNCConn %p: rfbClientConnect() succeeded.", this);
          thread_post_init_notify(InitState::CONNECT_SUCCESS);
          if (!rfbClientInitialise(cl)) {
+             // There might be the case that the SSH tunnel got setup alright, but auth at the VNC server failed.
+             // In this case we have to dispose of the tunnel explicitly here.
+             ssh_tunnel_close(ssh_tunnel);
+             ssh_tunnel = NULL;
              err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
              if(thread_shutdown) {
                  wxLogDebug("VNCConn %p: rfbClientInitialise() canceled.", this);
@@ -1030,7 +1093,22 @@ void VNCConn::thread_logger(const char *format, ...)
 }
 
 
+void VNCConn::thread_on_ssh_error(void *client, ssh_tunnel_error_t error_code,  const char *error_message) {
+    wxString msg = wxString::Format("SSH tunnel error: %d - %s",  error_code, error_message);
+    rfbClientErr(msg.mb_str());
+    VNCConn* conn = (VNCConn*) client;
+    conn->err.Printf(msg);
+}
 
+
+int VNCConn::thread_on_ssh_fingerprint_check(void *client,
+                                             const char *fingerprint,
+                                             int fingerprint_len,
+                                             const char *host) {
+    VNCConn* conn = (VNCConn*) client;
+    // TODO
+    return 0;
+}
 
 
 /*
@@ -1203,6 +1281,9 @@ void VNCConn::Shutdown()
       wxLogDebug(wxT( "VNCConn %p: Shutdown() closing connection"), this);
       rfbCloseSocket(cl->sock);
   }
+
+  ssh_tunnel_close(ssh_tunnel);
+  ssh_tunnel = NULL;
 
   // end vnc thread and wait for it to get done
   if(GetThread() && GetThread()->IsRunning())
