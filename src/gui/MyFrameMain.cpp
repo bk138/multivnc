@@ -1901,7 +1901,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
       cfg->Write(K_BOOKMARKS_HOST, c->getServerHost());
       cfg->Write(K_BOOKMARKS_PORT, c->getServerPort());
       cfg->Write(K_BOOKMARKS_USER, c->getUserName());
-      cfg->Write(K_BOOKMARKS_SSH_HOST, c->getServerHost());
+      cfg->Write(K_BOOKMARKS_SSH_HOST, c->getSshHost());
       cfg->Write(K_BOOKMARKS_SSH_PORT, c->getSshPort());
       cfg->Write(K_BOOKMARKS_SSH_USER, c->getSshUserName());
       cfg->Write( K_BOOKMARKS_SSH_PRIV_KEY_FILENAME, c->getSshPrivKeyFilename());
