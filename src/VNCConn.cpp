@@ -290,10 +290,6 @@ wxThread::ExitCode VNCConn::Entry()
 
      if (!rfbClientConnect(cl)) {
          err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
-         // There might be the case that the SSH tunnel got setup alright, but connecting to the VNC server failed.
-         // In this case we have to dispose of the tunnel explicitly here.
-         ssh_tunnel_close(ssh_tunnel);
-         ssh_tunnel = NULL;
          if(thread_shutdown) {
              wxLogDebug("VNCConn %p: rfbClientConnect() canceled.", this);
              thread_post_init_notify(InitState::CONNECT_CANCEL);
@@ -307,10 +303,6 @@ wxThread::ExitCode VNCConn::Entry()
          wxLogDebug("VNCConn %p: rfbClientConnect() succeeded.", this);
          thread_post_init_notify(InitState::CONNECT_SUCCESS);
          if (!rfbClientInitialise(cl)) {
-             // There might be the case that the SSH tunnel got setup alright, but auth at the VNC server failed.
-             // In this case we have to dispose of the tunnel explicitly here.
-             ssh_tunnel_close(ssh_tunnel);
-             ssh_tunnel = NULL;
              err.Printf(_("Failure connecting to server at %s:%d!"), host, port);
              if(thread_shutdown) {
                  wxLogDebug("VNCConn %p: rfbClientInitialise() canceled.", this);
@@ -1276,14 +1268,17 @@ void VNCConn::Shutdown()
 
   mutex_auth.Unlock();
 
+  if (ssh_tunnel) {
+      wxLogDebug(wxT( "VNCConn %p: Shutdown() closing SSH tunnel"), this);
+      ssh_tunnel_close(ssh_tunnel);
+      ssh_tunnel = NULL;
+  }
+
   // break any connection so that vnc thread moves over blocking calls
   if(cl) {
       wxLogDebug(wxT( "VNCConn %p: Shutdown() closing connection"), this);
       rfbCloseSocket(cl->sock);
   }
-
-  ssh_tunnel_close(ssh_tunnel);
-  ssh_tunnel = NULL;
 
   // end vnc thread and wait for it to get done
   if(GetThread() && GetThread()->IsRunning())
