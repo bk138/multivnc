@@ -217,6 +217,9 @@ private:
   rfbClient* cl;
   bool setupClient();
 
+  wxString serverHost;
+  wxString serverPort;
+
   wxRect updated_rect;
 
   wxCriticalSection mutex_framebuffer;

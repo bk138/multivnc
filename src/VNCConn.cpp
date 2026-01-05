@@ -1206,6 +1206,9 @@ bool VNCConn::Init(const wxString& host,
   // Support short-form (:0, :1) 
   if(cl->serverPort < 100)
     cl->serverPort += 5900;
+  // these might later get changed by the SSH tunneling setup so save them here
+  this->serverHost = wxString(cl->serverHost, wxConvUTF8);
+  this->serverPort = wxString() << cl->serverPort;
 
   if(repeaterId >= 0) {
       cl->destHost = strdup("ID");
@@ -1822,7 +1825,7 @@ wxString VNCConn::getServerHost() const
       if(cl->listenSpecified)
 	return wxEmptyString;
       else
-	return wxString(cl->serverHost, wxConvUTF8);
+	return serverHost;
     }
   else
     return wxEmptyString;
@@ -1833,7 +1836,7 @@ wxString VNCConn::getServerHost() const
 wxString VNCConn::getServerPort() const
 {
   if(cl)
-    return wxString() << cl->serverPort;
+    return serverPort;
   else
     return wxEmptyString;
 }
