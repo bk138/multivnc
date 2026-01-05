@@ -1943,7 +1943,7 @@ void MyFrameMain::bookmarks_edit(wxCommandEvent &event)
 
   wxString newname = wxGetTextFromUser(_("New bookmark name:"),
 				       _("Edit bookmark")); 
-  
+  newname.Trim();
   if(newname.IsEmpty())
     return;
     
