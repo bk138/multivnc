@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <wx/process.h>
+#include <wx/secretstore.h>
 #include <wx/uri.h>
 #include "FrameMain.h"
 #include "MyFrameLog.h"
@@ -57,6 +58,15 @@ class MyFrameMain: public FrameMain
 
   bool bookmarks_load_to_list();
   wxSecretString bookmarks_load_one(int index);
+  void bookmarks_secrets_save(const wxString& bookmarkName,
+                              const wxSecretValue& password,
+                              const wxSecretValue& sshPassword,
+                              const wxSecretValue& sshPrivKeyPassword);
+  void bookmarks_secrets_load(const wxString& bookmarkName,
+                              wxSecretValue& password,
+                              wxSecretValue& sshPassword,
+                              wxSecretValue& sshPrivKeyPassword);
+  void bookmarks_secrets_delete(const wxString& bookmarkName);
 
   // service can be user@host:port notation or a full vnc:// URI
   void conn_spawn(const wxString& service, int listenPort = -1);

@@ -1333,16 +1333,8 @@ wxSecretString MyFrameMain::bookmarks_load_one(int index) {
     /*
       Read values from secretstore
     */
-    wxSecretValue password;
-#if wxUSE_SECRETSTORE
-    wxSecretStore store = wxSecretStore::GetDefault();
-    if (store.IsOk()) {
-        wxString username; // this will not be used
-        store.Load("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port,
-                   username,
-                   password); // if Load() fails, password will still be empty
-    }
-#endif
+    wxSecretValue password, sshPassword, sshPrivKeyPassword;
+    bookmarks_secrets_load(str, password, sshPassword, sshPrivKeyPassword);
 
     wxSecretString uri("vnc://");
     uri += (host + ":" + port);
@@ -1351,7 +1343,9 @@ wxSecretString MyFrameMain::bookmarks_load_one(int index) {
     uri += ("&SshHost=" + ssh_host);
     uri += ("&SshPort=" + ssh_port);
     uri += ("&SshUsername=" + ssh_user);
+    uri += ("&SshPassword=" + sshPassword.GetAsString());
     uri += ("&SshPrivKeyFilename=" + ssh_priv_key_filename);
+    uri += ("&SshPrivKeyPassword=" + sshPrivKeyPassword.GetAsString());
 
     return uri;
 }
@@ -1913,13 +1907,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
       cfg->Write(K_BOOKMARKS_SSH_USER, c->getSshUserName());
       cfg->Write( K_BOOKMARKS_SSH_PRIV_KEY_FILENAME, c->getSshPrivKeyFilename());
 
-#if wxUSE_SECRETSTORE
-      wxSecretStore store = wxSecretStore::GetDefault();
-      if(store.IsOk() && c->getPassword().IsOk()) { //check if destination and source are ok
-	  if(!store.Save("MultiVNC/Bookmarks/" + wxString(c->getUserName().IsEmpty() ? "" : c->getUserName() + "@") + c->getServerHost() + ":" + c->getServerPort(), c->getUserName(), c->getPassword()))
-	      wxLogWarning(_("Failed to save credentials to the system secret store."));
-      }
-#endif
+      bookmarks_secrets_save(name, c->getPassword(), c->getSshPassword(), c->getSshPrivKeyPassword());
 
       //reset path
       cfg->SetPath(wxT("/"));
@@ -1949,11 +1937,17 @@ void MyFrameMain::bookmarks_edit(wxCommandEvent &event)
     
   wxConfigBase *cfg = wxConfigBase::Get();
 
+  wxSecretValue password, sshPassword, sshPrivKeyPassword;
+  bookmarks_secrets_load(sel, password, sshPassword, sshPrivKeyPassword);
+  bookmarks_secrets_delete(sel);
+
   cfg->SetPath(G_BOOKMARKS);
   cfg->RenameGroup(sel, newname);
   //reset path
   cfg->SetPath(wxT("/"));
-  
+
+  bookmarks_secrets_save(newname, password, sshPassword, sshPrivKeyPassword);
+
   // and load into listbox
   bookmarks_load_to_list();
 }
@@ -1970,18 +1964,7 @@ void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
       return;
     }
 
-#if wxUSE_SECRETSTORE
-  int sel = list_box_bookmarks->GetSelection();
-  if(sel != wxNOT_FOUND) {
-      wxURI uri(bookmarks_load_one(sel));
-      wxString host = uri.GetServer();
-      wxString port = uri.GetPort();
-      wxString user = getQueryValue(uri, "VncUsername"); // RFC 7869
-      wxSecretStore store = wxSecretStore::GetDefault();
-      if(store.IsOk())
-	  store.Delete("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port);
-  }
-#endif
+  bookmarks_secrets_delete(name);
 
   wxConfigBase *cfg = wxConfigBase::Get();
   if(!cfg->DeleteGroup(G_BOOKMARKS + name))
@@ -1992,7 +1975,112 @@ void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
 }
 
 
+void MyFrameMain::bookmarks_secrets_save(const wxString& bookmarkName,
+                              const wxSecretValue& password,
+                              const wxSecretValue& sshPassword,
+                              const wxSecretValue& sshPrivKeyPassword) {
+#if wxUSE_SECRETSTORE
+    wxSecretStore store = wxSecretStore::GetDefault();
+    if (store.IsOk()) {
+        if(password.IsOk()) {
+            if(!store.Save("MultiVNC/Bookmarks/" + bookmarkName + " VncPassword", wxEmptyString, password)) {
+                wxLogWarning(_("Failed to save credentials to the system secret store."));
+            }
+        }
 
+        if(sshPassword.IsOk()) {
+            if(!store.Save("MultiVNC/Bookmarks/" + bookmarkName + " SshPassword", wxEmptyString, sshPassword)) {
+                    wxLogWarning(_("Failed to save credentials to the system secret store."));
+            }
+        }
+
+        if(sshPrivKeyPassword.IsOk()) {
+            if(!store.Save("MultiVNC/Bookmarks/" + bookmarkName + " SshPrivKeyPassword", wxEmptyString, sshPrivKeyPassword)) {
+                wxLogWarning(_("Failed to save credentials to the system secret store."));
+            }
+        }
+    }
+#endif
+}
+
+
+void MyFrameMain::bookmarks_secrets_load(const wxString& bookmarkName,
+                              wxSecretValue& password,
+                              wxSecretValue& sshPassword,
+                              wxSecretValue& sshPrivKeyPassword) {
+    /*
+       Read stuff for pre-0.11 versions TODO remove with 0.12
+     */
+    wxConfigBase *cfg = wxConfigBase::Get();
+    wxString host, port, user;
+    cfg->SetPath(G_BOOKMARKS + bookmarkName);
+    if(!cfg->Read(K_BOOKMARKS_HOST, &host)) {
+        wxLogError(_("Error reading hostname of bookmark '%s'!"), bookmarkName);
+        cfg->SetPath("/");
+        return;
+    }
+    if(!cfg->Read(K_BOOKMARKS_PORT, &port)) {
+        wxLogError(_("Error reading port of bookmark '%s'!"), bookmarkName);
+        cfg->SetPath("/");
+        return;
+    }
+    // user is optional
+    cfg->Read(K_BOOKMARKS_USER, &user);
+    // done reading cfg
+    cfg->SetPath("/");
+
+#if wxUSE_SECRETSTORE
+    wxSecretStore store = wxSecretStore::GetDefault();
+    if (store.IsOk()) {
+        wxString username; // this will not be used
+        store.Load("MultiVNC/Bookmarks/" + bookmarkName + " VncPassword", username, password);
+        store.Load("MultiVNC/Bookmarks/" + bookmarkName + " SshPassword", username, sshPassword);
+        store.Load("MultiVNC/Bookmarks/" + bookmarkName + " SshPrivKeyPassword", username, sshPrivKeyPassword);
+
+        // still load saves from pre-0.11 versions TODO remove with 0.12
+        if (!password.IsOk()) {
+            store.Load("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port,
+                       username,
+                       password); // if Load() fails, password will still be empty
+        }
+    }
+#endif
+
+}
+
+void MyFrameMain::bookmarks_secrets_delete(const wxString& bookmarkName) {
+    /*
+       Read stuff for pre-0.11 versions TODO remove with 0.12
+     */
+    wxConfigBase *cfg = wxConfigBase::Get();
+    wxString host, port, user;
+    cfg->SetPath(G_BOOKMARKS + bookmarkName);
+    if(!cfg->Read(K_BOOKMARKS_HOST, &host)) {
+        wxLogError(_("Error reading hostname of bookmark '%s'!"), bookmarkName);
+        cfg->SetPath("/");
+        return;
+    }
+    if(!cfg->Read(K_BOOKMARKS_PORT, &port)) {
+        wxLogError(_("Error reading port of bookmark '%s'!"), bookmarkName);
+        cfg->SetPath("/");
+        return;
+    }
+    // user is optional
+    cfg->Read(K_BOOKMARKS_USER, &user);
+    // done reading cfg
+    cfg->SetPath("/");
+
+#if wxUSE_SECRETSTORE
+    wxSecretStore store = wxSecretStore::GetDefault();
+    if (store.IsOk()) {
+        store.Delete("MultiVNC/Bookmarks/" + bookmarkName + " VncPassword");
+        store.Delete("MultiVNC/Bookmarks/" + bookmarkName + " SshPassword");
+        store.Delete("MultiVNC/Bookmarks/" + bookmarkName + " SshPrivKeyPassword");
+        // still delete saves from pre-0.11 versions TODO remove with 0.12
+        store.Delete("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port);
+    }
+#endif
+}
 
 
 void MyFrameMain::help_about(wxCommandEvent &event)
