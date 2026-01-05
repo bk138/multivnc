@@ -163,7 +163,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   splitwinlayout();
 
-  bookmarks_load();
+  bookmarks_load_to_list();
 
   if(show_discovered)
     frame_main_menubar->Check(ID_DISCOVERED, true);
@@ -1234,7 +1234,7 @@ void MyFrameMain::splitwinlayout()
 }
 
 
-bool MyFrameMain::bookmarks_load()
+bool MyFrameMain::bookmarks_load_to_list()
 {
   wxConfigBase *cfg = wxConfigBase::Get();
 
@@ -1281,7 +1281,7 @@ bool MyFrameMain::bookmarks_load()
 }
 
 
-wxSecretString MyFrameMain::bookmarks_entry_to_uri(int index) {
+wxSecretString MyFrameMain::bookmarks_load_one(int index) {
     wxConfigBase *cfg = wxConfigBase::Get();
 
     /*
@@ -1925,7 +1925,7 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
       cfg->SetPath(wxT("/"));
 
       // and load into listbox
-      bookmarks_load();
+      bookmarks_load_to_list();
     }
 }
 
@@ -1955,7 +1955,7 @@ void MyFrameMain::bookmarks_edit(wxCommandEvent &event)
   cfg->SetPath(wxT("/"));
   
   // and load into listbox
-  bookmarks_load();
+  bookmarks_load_to_list();
 }
 
 
@@ -1973,7 +1973,7 @@ void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
 #if wxUSE_SECRETSTORE
   int sel = list_box_bookmarks->GetSelection();
   if(sel != wxNOT_FOUND) {
-      wxURI uri(bookmarks_entry_to_uri(sel));
+      wxURI uri(bookmarks_load_one(sel));
       wxString host = uri.GetServer();
       wxString port = uri.GetPort();
       wxString user = getQueryValue(uri, "VncUsername"); // RFC 7869
@@ -1988,7 +1988,7 @@ void MyFrameMain::bookmarks_delete(wxCommandEvent &event)
     wxLogError(_("No bookmark with this name!"));
 
   // and re-read
-  bookmarks_load();
+  bookmarks_load_to_list();
 }
 
 
@@ -2180,7 +2180,7 @@ void MyFrameMain::listbox_bookmarks_dclick(wxCommandEvent &event)
 	  return;
   }
 
-  conn_spawn(bookmarks_entry_to_uri(sel));
+  conn_spawn(bookmarks_load_one(sel));
 }
 
 
