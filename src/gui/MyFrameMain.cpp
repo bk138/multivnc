@@ -983,7 +983,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
 
           wxSecretString sshPassword = getQueryValue(uri, "SshPassword"); // RFC 7869
           if (!sshPassword.IsEmpty()) {
-              ssh_priv_key_password = wxSecretValue(sshPassword);
+              ssh_password = wxSecretValue(sshPassword);
           }
 
           wxSecretString sshPrivKeyPassword = getQueryValue(uri, "SshPrivKeyPassword"); // not standardised
