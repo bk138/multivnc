@@ -1893,7 +1893,8 @@ void MyFrameMain::bookmarks_add(wxCommandEvent &event)
   wxString name = wxGetTextFromUser(_("Enter bookmark name:"),
 				    _("Saving bookmark"),
 				    (! c->getUserName().IsEmpty() ? c->getUserName() + "@" : "") + c->getDesktopName());
-				
+  name.Trim();
+
   if(name != wxEmptyString)
     {
       if(cfg->Exists(G_BOOKMARKS + name))
