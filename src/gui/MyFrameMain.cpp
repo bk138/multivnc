@@ -959,7 +959,6 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
       wxString user, host, ssh_user, ssh_host, ssh_priv_key_filename;
       wxSecretValue password, ssh_password, ssh_priv_key_password;
       int repeaterId = -1, ssh_port = -1;
-      std::vector<char> ssh_priv_key;
 
       wxString vncUriScheme = "vnc://";
       if (service.substr(0, vncUriScheme.length()) == vncUriScheme) {
