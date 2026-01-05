@@ -964,7 +964,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
       if (service.substr(0, vncUriScheme.length()) == vncUriScheme) {
           // vnc:// URI
           wxURI uri(service);
-          host = uri.GetServer();
+          host = uri.GetServer() + ":" + uri.GetPort();
           user = getQueryValue(uri, "VncUsername"); // RFC 7869
           if (user.IsEmpty()) {
               user = uri.GetUserInfo(); // fallback
