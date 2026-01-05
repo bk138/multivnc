@@ -2042,6 +2042,11 @@ void MyFrameMain::bookmarks_secrets_load(const wxString& bookmarkName,
             store.Load("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port,
                        username,
                        password); // if Load() fails, password will still be empty
+            if (password.IsOk()) {
+                // side effect: if there was a password from the legacy location, move it to the new one
+                store.Delete("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port);
+                store.Save("MultiVNC/Bookmarks/" + bookmarkName + " VncPassword", wxEmptyString, password);
+            }
         }
     }
 #endif
