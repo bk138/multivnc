@@ -126,6 +126,8 @@ void MyDialogNewConnection::OnPrivkeyFileOpen(wxCommandEvent &event) {
 
         mSshPrivKeyFilename = filename;
         label_ssh_privkey->SetLabel(mSshPrivKeyFilename);
+        label_ssh_privkey_password->Enable();
+        text_ctrl_ssh_privkey_password->Enable();
         panel_advanced->GetSizer()->SetSizeHints(panel_advanced);
         GetSizer()->SetSizeHints(this);
         Layout();
