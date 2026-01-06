@@ -340,12 +340,23 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
     switch(event.GetInt()) {
     case VNCConn::InitState::CONNECT_SUCCESS:
         // update page label
-        if (!c->getRepeaterId().IsEmpty())
-            notebook_connections->SetPageText(index, wxString::Format(_("Connected to %s, waiting for peer %s"),
-                                                                      c->getServerHost(),
-                                                                      c->getRepeaterId()));
-        else
-            notebook_connections->SetPageText(index, wxString::Format(_("Connected to %s"),c->getServerHost()));
+        {
+            wxString label;
+            if (c->getSshHost().IsEmpty()) {
+                if (c->getRepeaterId().IsEmpty()) {
+                    label = wxString::Format(_("Connected to %s"),c->getServerHost());
+                } else {
+                    label = wxString::Format(_("Connected to %s, waiting for peer %s"), c->getServerHost(), c->getRepeaterId());
+                }
+            } else {
+                if (c->getRepeaterId().IsEmpty()) {
+                    label = wxString::Format(_("Connected to %s via %s"),c->getServerHost(), c->getSshHost());
+                } else {
+                    label = wxString::Format(_("Connected to %s via %s, waiting for peer %s"), c->getSshHost(), c->getServerHost(), c->getRepeaterId());
+                }
+            }
+            notebook_connections->SetPageText(index, label);
+        }
         break;
     case VNCConn::InitState::CONNECT_FAIL:
     case VNCConn::InitState::INITIALISE_FAIL:
@@ -1050,14 +1061,26 @@ void MyFrameMain::conn_setup(VNCConn *c) {
     c->doStats(true);
 
   // set page label
-  if(!c->getListenPort().IsEmpty())
-      notebook_connections->SetPageText(index, c->getDesktopName() + " " + _("(Reverse Connection)"));
-  else if (!c->getRepeaterId().IsEmpty())
-      notebook_connections->SetPageText(index, c->getDesktopName() + " " + wxString::Format(_("(peer %s on %s)"),
-                                                                                            c->getRepeaterId(),
-                                                                                            c->getServerHost()));
-  else
-      notebook_connections->SetPageText(index, c->getDesktopName() + wxT(" (") + c->getServerHost() + wxT(")"));
+  wxString label;
+  if(!c->getListenPort().IsEmpty()) {
+      label = c->getDesktopName() + " " + _("(Reverse Connection)");
+  } else {
+      if (c->getSshHost().IsEmpty()) {
+          if (c->getRepeaterId().IsEmpty()) {
+              label = wxString::Format("%s (%s)", c->getDesktopName(), c->getServerHost());
+          } else {
+              label = wxString::Format(_("%s (peer %s on %s)"), c->getDesktopName(), c->getRepeaterId(), c->getServerHost());
+          }
+      } else {
+          if (c->getRepeaterId().IsEmpty()) {
+              label = wxString::Format(_("%s (%s via %s)"), c->getDesktopName(), c->getServerHost(), c->getSshHost());
+          } else {
+              label = wxString::Format(_("%s (peer %s on %s via %s)"), c->getDesktopName(), c->getRepeaterId(), c->getServerHost(), c->getSshHost());
+          }
+      }
+  }
+  notebook_connections->SetPageText(index, label);
+
 
   if(c->isMulticast())
     notebook_connections->SetPageImage(index, 1);
