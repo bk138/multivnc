@@ -75,6 +75,7 @@ void MyDialogNewConnection::OnPasswordPrivkeyRadioSelected(wxCommandEvent &event
         text_ctrl_ssh_password->Show();
         // privkey
         button_ssh_privkey_open->Hide();
+        label_ssh_privkey->Hide();
         label_ssh_privkey_password->Hide();
         text_ctrl_ssh_privkey_password->Hide();
         button_ssh_privkey_open->Hide();
@@ -84,6 +85,7 @@ void MyDialogNewConnection::OnPasswordPrivkeyRadioSelected(wxCommandEvent &event
         text_ctrl_ssh_password->Hide();
         // privkey
         button_ssh_privkey_open->Show();
+        label_ssh_privkey->Show();
         label_ssh_privkey_password->Show();
         text_ctrl_ssh_privkey_password->Show();
         button_ssh_privkey_open->Show();
@@ -123,5 +125,9 @@ void MyDialogNewConnection::OnPrivkeyFileOpen(wxCommandEvent &event) {
         }
 
         mSshPrivKeyFilename = filename;
+        label_ssh_privkey->SetLabel(mSshPrivKeyFilename);
+        panel_advanced->GetSizer()->SetSizeHints(panel_advanced);
+        GetSizer()->SetSizeHints(this);
+        Layout();
     }
 }
