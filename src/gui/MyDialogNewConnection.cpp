@@ -39,9 +39,8 @@ wxString MyDialogNewConnection::getSshServer() const {
     return text_ctrl_ssh_server->GetValue();
 };
 
-int MyDialogNewConnection::getSshPort() const {
-    int value;
-    return text_ctrl_ssh_port->GetValue().ToInt(&value) ? value : -1;
+wxString MyDialogNewConnection::getSshPort() const {
+    return text_ctrl_ssh_port->GetValue();
 };
 
 wxString MyDialogNewConnection::getSshUser() const {

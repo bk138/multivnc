@@ -17,7 +17,7 @@ class MyDialogNewConnection : public DialogNewConnection {
     int getRepeaterId() const;
 
     wxString getSshServer() const;
-    int getSshPort() const;
+    wxString getSshPort() const;
     wxString getSshUser() const;
     wxSecretValue getSshPassword() const;
     wxString getSshPrivKeyFilename() const;
