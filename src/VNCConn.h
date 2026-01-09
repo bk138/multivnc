@@ -51,6 +51,9 @@ DECLARE_EVENT_TYPE(VNCConnInitNOTIFY, -1)
 wxDECLARE_EVENT(VNCConnGetPasswordNOTIFY, wxCommandEvent);
 /// Sent when this VNCConn wants a username and password. This blocks the VNCConn's internal worker thread until SetPassword() is called!
 wxDECLARE_EVENT(VNCConnGetCredentialsNOTIFY, wxCommandEvent);
+/// Sent when this VNCConn has received an SSH fingerprint and the saved value does not match.
+/// This blocks the VNCConn's internal worker thread until setSshFingerPrintMismatchAccept() is called!
+wxDECLARE_EVENT(VNCConnSshFingerprintMismatchNOTIFY, wxCommandEvent);
 // sent when an incoming connection is available
 DECLARE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY, -1)
 /// Sent on disconnect by local side (m_commandInt==0) or remote side (m_commandInt==1)
@@ -105,6 +108,7 @@ public:
 	    const wxSecretValue& password,
             const wxString& ssh_host,
             int ssh_port,
+            const wxString& ssh_fingerprint_hash,
             const wxString& ssh_user,
             const wxSecretValue& ssh_password,
             const wxString& ssh_priv_key_filename,
@@ -171,6 +175,8 @@ public:
   wxString getRepeaterId() const;
   const wxString& getSshHost() const;
   const wxString& getSshPort() const;
+  wxString getSshFingerprint() const;
+  void setSshFingerprintMismatchAccept(bool yesno);
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);
@@ -252,6 +258,8 @@ private:
   // SSH
   wxString ssh_host;
   wxString ssh_port;
+  wxString ssh_fingerprint_hash;
+  bool ssh_fingerprint_mismatch_accept;
   wxString ssh_username;
   wxSecretValue ssh_password;
   wxString ssh_priv_key_filename;
@@ -331,6 +339,7 @@ private:
   void thread_post_init_notify(int error);
   void thread_post_getpasswd_notify();
   void thread_post_getcreds_notify(bool withUserPrompt);
+  void thread_post_ssh_fingerprint_mismatch_notify(const wxString& remoteFingerprint);
   void thread_post_incomingconnection_notify();
   void thread_post_disconnect_notify(int reason);
   void thread_post_update_notify(int x, int y, int w, int h);

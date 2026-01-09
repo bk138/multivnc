@@ -43,6 +43,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnInitNOTIFY, MyFrameMain::onVNCConnInitNotify)
   EVT_COMMAND (wxID_ANY, VNCConnGetPasswordNOTIFY, MyFrameMain::onVNCConnGetPasswordNotify)
   EVT_COMMAND (wxID_ANY, VNCConnGetCredentialsNOTIFY, MyFrameMain::onVNCConnGetCredentialsNotify)
+  EVT_COMMAND (wxID_ANY, VNCConnSshFingerprintMismatchNOTIFY, MyFrameMain::onVNCConnSshFingerprintMismatchNotify)
   EVT_VNCCONNUPDATENOTIFY (wxID_ANY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnUniMultiChangedNOTIFY, MyFrameMain::onVNCConnUniMultiChangedNotify)
   EVT_COMMAND (wxID_ANY, VNCConnReplayFinishedNOTIFY, MyFrameMain::onVNCConnReplayFinishedNotify)
@@ -634,6 +635,7 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
               wxEmptyString, // incoming connections cannot be SSH-tunneled
               -1,
               wxEmptyString,
+              wxEmptyString,
               wxSecretValue(),
               wxEmptyString,
               wxSecretValue(),
@@ -824,6 +826,58 @@ void MyFrameMain::onVNCConnGetCredentialsNotify(wxCommandEvent &event)
 }
 
 
+void MyFrameMain::onVNCConnSshFingerprintMismatchNotify(wxCommandEvent &event) {
+    // get sender
+    VNCConn *conn = static_cast<VNCConn*>(event.GetEventObject());
+    wxString remoteFingerprint = event.GetString(); // comes as lowercase hex
+
+    if (conn->getSshFingerprint().IsEmpty()) {
+        // We don't want the optional "connect w/o saving fingerprint", SSH does not have it either
+        wxMessageDialog dialog(this,
+                               wxString::Format(_("This is the first time you are connecting to the SSH server '%s'.\n\n"
+                                                  "Please verify the server's fingerprint to ensure you are "
+                                                  "connecting to the correct server:\n\n"
+                                                  "SHA256:%s\n\n"
+                                                  "Do you want to trust this server and save its fingerprint for future connections?"),
+                                                conn->getSshHost() + ":" + conn->getSshPort(),
+                                                hex_to_base64(remoteFingerprint)),
+                               _("Verify SSH Server Identity"),
+                               wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+        if (dialog.ShowModal() == wxID_YES) {
+            ssh_known_hosts_save(conn->getSshHost(), conn->getSshPort(), remoteFingerprint);
+            conn->setSshFingerprintMismatchAccept(true);
+        } else {
+            conn->setSshFingerprintMismatchAccept(false);
+        }
+    } else {
+        wxMessageDialog dialog(this,
+                               wxString::Format(_("The fingerprint of the SSH server '%s' has changed since your last connection!"),
+                                                conn->getSshHost() + ":" + conn->getSshPort()),
+                               "Security Warning: SSH Fingerprint Mismatch",
+                               wxYES_NO | wxHELP | wxNO_DEFAULT | wxICON_WARNING);
+        dialog.SetExtendedMessage(wxString::Format(_( "This could indicate a security risk, such as a man-in-the-middle attack. "
+                                                      "It is also possible that a host key has just been changed.\n"
+                                                      " \n"
+                                                      "Expected fingerprint: SHA256:%s\n"
+                                                      "Received fingerprint: SHA256:%s\n"),
+                                                   hex_to_base64(ssh_known_hosts_load(conn->getSshHost(), conn->getSshPort())),
+                                                   hex_to_base64(remoteFingerprint)));
+        dialog.SetHelpLabel(_("Connect and update fingerprint"));
+        dialog.SetYesNoLabels(_("Connect without updating fingerprint"), _("Cancel"));
+        int result = dialog.ShowModal();
+        if (result == wxID_HELP) {
+            ssh_known_hosts_save(conn->getSshHost(), conn->getSshPort(), remoteFingerprint);
+            conn->setSshFingerprintMismatchAccept(true);
+        }
+        else if (result == wxID_YES) {
+            conn->setSshFingerprintMismatchAccept(true);
+        }
+        else {
+            conn->setSshFingerprintMismatchAccept(false);
+        }
+    }
+}
+
 
 bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave)
 {
@@ -967,7 +1021,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxString user, host, ssh_user, ssh_host, ssh_priv_key_filename;
+      wxString user, host, ssh_user, ssh_host, ssh_fingerprint, ssh_priv_key_filename;
       wxSecretValue password, ssh_password, ssh_priv_key_password;
       int repeaterId = -1, ssh_port = 22;
 
@@ -987,10 +1041,18 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
 
           getQueryValue(uri, "RepeaterId").ToInt(&repeaterId);
 
-          ssh_user = getQueryValue(uri, "SshUsername");   // RFC 7869
           ssh_host = getQueryValue(uri, "SshHost");       // RFC 7869
           getQueryValue(uri, "SshPort").ToInt(&ssh_port); // RFC 7869
 
+          ssh_fingerprint = getQueryValue(uri, "IdHash"); // RFC 7869 colon-seperated hex
+          ssh_fingerprint.Replace(":", "");
+          ssh_fingerprint.MakeLower();                    // now lowercase hex
+          if (ssh_fingerprint.IsEmpty()) {
+              // if no fingerprint given, use the one from our internal known_hosts
+              ssh_fingerprint = ssh_known_hosts_load(ssh_host, wxString() << ssh_port);
+          }
+
+          ssh_user = getQueryValue(uri, "SshUsername");   // RFC 7869
           wxSecretString sshPassword = getQueryValue(uri, "SshPassword"); // RFC 7869
           if (!sshPassword.IsEmpty()) {
               ssh_password = wxSecretValue(sshPassword);
@@ -1018,6 +1080,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
                   password,
                   ssh_host,
                   ssh_port,
+                  ssh_fingerprint,
                   ssh_user,
                   ssh_password,
                   ssh_priv_key_filename,
@@ -2107,6 +2170,51 @@ void MyFrameMain::bookmarks_secrets_delete(const wxString& bookmarkName) {
         store.Delete("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port);
     }
 #endif
+}
+
+
+void MyFrameMain::ssh_known_hosts_save(const wxString& host, const wxString& port, const wxString& fingerprint) {
+    wxConfigBase *cfg = wxConfigBase::Get();
+    wxString name = host + ":" + port;
+    if(name != wxEmptyString) {
+        cfg->SetPath(G_SSH_KNOWN_HOSTS + name);
+        cfg->Write(K_SSH_KNOWN_HOSTS_FINGERPRINT, fingerprint);
+        //reset path
+        cfg->SetPath("/");
+    }
+}
+
+
+wxString MyFrameMain::ssh_known_hosts_load(const wxString& host, const wxString& port) {
+    wxString fingerprint;
+    wxConfigBase *cfg = wxConfigBase::Get();
+    wxString name = host + ":" + port;
+    cfg->SetPath(G_SSH_KNOWN_HOSTS + name);
+    cfg->Read(K_SSH_KNOWN_HOSTS_FINGERPRINT, &fingerprint);
+    //reset path
+    cfg->SetPath("/");
+    return fingerprint;
+}
+
+wxString MyFrameMain::hex_to_base64(const wxString& hex) {
+    if (hex.size() % 2 != 0) {
+        return wxEmptyString;
+    }
+
+    std::vector<uint8_t> bytes;
+    bytes.reserve(hex.size() / 2);
+
+    for (size_t i = 0; i < hex.size(); i += 2) {
+        int raw = wxHexToDec(hex.substr(i, 2).MakeUpper());
+        if (raw < 0) { // -1 if input is not hex
+            return wxEmptyString;
+        }
+        bytes.push_back(raw);
+    }
+
+    wxString base64 = wxBase64Encode(bytes.data(), bytes.size());
+    base64.Replace("=", ""); // remove padding
+    return base64;
 }
 
 

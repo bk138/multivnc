@@ -56,6 +56,7 @@ DEFINE_EVENT_TYPE(VNCConnListenNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnInitNOTIFY)
 wxDEFINE_EVENT(VNCConnGetPasswordNOTIFY, wxCommandEvent);
 wxDEFINE_EVENT(VNCConnGetCredentialsNOTIFY, wxCommandEvent);
+wxDEFINE_EVENT(VNCConnSshFingerprintMismatchNOTIFY, wxCommandEvent);
 DEFINE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
@@ -96,6 +97,7 @@ VNCConn::VNCConn(void* p) : condition_auth(mutex_auth)
       }
   }
   ssh_tunnel = NULL;
+  ssh_fingerprint_mismatch_accept = false;
 
   // statistics stuff
   do_stats = false;
@@ -731,6 +733,14 @@ void VNCConn::thread_post_getcreds_notify(bool withUserPrompt) {
   wxPostEvent((wxEvtHandler*)parent, event);
 }
 
+void VNCConn::thread_post_ssh_fingerprint_mismatch_notify(const wxString& remoteFingerprint) {
+  wxLogDebug(wxT("VNCConn %p: post_ssh_fingerprint_notify()"), this);
+  wxCommandEvent event(VNCConnSshFingerprintMismatchNOTIFY, wxID_ANY);
+  event.SetEventObject(this); // set sender
+  event.SetString(remoteFingerprint);
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
 
 void VNCConn::thread_post_incomingconnection_notify() 
 {
@@ -1098,7 +1108,34 @@ int VNCConn::thread_on_ssh_fingerprint_check(void *client,
                                              int fingerprint_len,
                                              const char *host) {
     VNCConn* conn = (VNCConn*) client;
-    // TODO
+
+    /*
+       Compute hex from binary fingerprint
+     */
+    wxString hexFingerprint;
+    for (size_t i = 0; i < fingerprint_len; ++i) {
+        // Append each byte as two hex digits
+        hexFingerprint.Append(wxString::Format("%02x", static_cast<unsigned char>(fingerprint[i])));
+    }
+
+    /*
+       Now, compare fingerprints. If they don't match, ask user. Outside code can query for the empty
+       saved fingerprint case via getSshFingerprint().
+     */
+    if (hexFingerprint != conn->ssh_fingerprint_hash) {
+	conn->thread_post_ssh_fingerprint_mismatch_notify(hexFingerprint);
+        // wxMutexes are not recursive under Unix, so test first
+        if (conn->mutex_auth.TryLock() == wxMUTEX_NO_ERROR) {
+            conn->mutex_auth.Lock();
+        }
+	wxLogDebug("VNCConn %p: vncthread waiting for SSH fingerprint decision", conn);
+        conn->condition_auth.Wait();
+	wxLogDebug("VNCConn %p: vncthread done waiting for SSH fingerprint decision", conn);
+	// we get here once setSshFingerprintMismatchAccept() was called
+        return conn->ssh_fingerprint_mismatch_accept ? 0 : -1;
+    }
+
+    // fingerprints match
     return 0;
 }
 
@@ -1179,6 +1216,7 @@ bool VNCConn::Init(const wxString& host,
 		   const wxSecretValue& password,
                    const wxString& ssh_host,
                    int ssh_port,
+                   const wxString& ssh_fingerprint_hash,
                    const wxString& ssh_user,
                    const wxSecretValue& ssh_password,
                    const wxString& ssh_priv_key_filename,
@@ -1216,6 +1254,7 @@ bool VNCConn::Init(const wxString& host,
   }
 
   this->ssh_host = ssh_host;
+  this->ssh_fingerprint_hash = ssh_fingerprint_hash;
   this->ssh_port = wxString::Format(wxT("%i"), ssh_port);
   this->ssh_username = ssh_user;
   this->ssh_password = ssh_password;
@@ -1866,6 +1905,17 @@ const wxString& VNCConn::getSshHost() const {
 const wxString& VNCConn::getSshPort() const {
     return ssh_port;
 }
+
+wxString VNCConn::getSshFingerprint() const {
+    return ssh_fingerprint_hash;
+}
+
+void VNCConn::setSshFingerprintMismatchAccept(bool yesno) {
+    ssh_fingerprint_mismatch_accept = yesno;
+    // tell worker thread to go on
+    condition_auth.Signal();
+}
+
 
 bool VNCConn::isMulticast() const
 {

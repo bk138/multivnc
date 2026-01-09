@@ -107,6 +107,10 @@
 #define K_BOOKMARKS_SSH_USER "SshUsername"
 #define K_BOOKMARKS_SSH_PRIV_KEY_FILENAME "SshPrivKeyFilename"
 
+// SSH servers - fingerprints are stored as lowercase hex
+#define G_SSH_KNOWN_HOSTS "/SshKnownHosts/"
+#define K_SSH_KNOWN_HOSTS_FINGERPRINT "FingerprintSha256"
+
 // collab features
 #define K_WINDOWSHARE _T("WindowShareCmd")
 #ifdef __WIN32__
