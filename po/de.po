@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-10 13:53+0100\n"
-"PO-Revision-Date: 2026-01-10 14:32+0100\n"
+"PO-Revision-Date: 2026-01-10 14:44+0100\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -625,7 +625,7 @@ msgstr "Privater Schlüssel"
 
 #: ../src/gui/DialogNewConnection.cpp:70
 msgid "Private Key Password"
-msgstr "Password des Privaten Schlüssels"
+msgstr "Password für privaten Schlüssel"
 
 #: ../src/gui/DialogSettings.cpp:92
 msgid "Quality level for 'Tight' and 'ZYWRLE' encoding:"
