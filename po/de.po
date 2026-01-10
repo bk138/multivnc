@@ -1058,36 +1058,5 @@ msgstr "ZlibHex"
 msgid "libsshtunnel initialization failed"
 msgstr "libsshtunnel konnte nicht initialisiert werden"
 
-#~ msgid "Bookmark"
-#~ msgstr "Lesezeichen"
-
-#~ msgid "translator-credits"
-#~ msgstr "Christian Beier <multivnc@christianbeier.net>"
-
-#~ msgid "Login"
-#~ msgstr "Anmelden"
-
-#~ msgid "Username or password must not empty"
-#~ msgstr "Benutzername oder Passwort dürfen nicht leer sein"
-
-#~ msgid "Username:"
-#~ msgstr "Benutzername:"
-
-#~ msgid "Warning!"
-#~ msgstr "Warnung!"
-
 msgid "translator-credits"
 msgstr "Christian Beier <multivnc@christianbeier.net>"
-
-#, fuzzy
-#~| msgid "Window &Sharing"
-#~ msgid "Window Sharing"
-#~ msgstr "Fenster &Teilen"
-
-#, fuzzy
-#~| msgid "Connect to a specific host."
-#~ msgid "Connect to a specific host"
-#~ msgstr "Verbindung zu einem bestimmten Host."
-
-#~ msgid "Connect to specific host"
-#~ msgstr "Verbindung zu einem bestimmten Host"
