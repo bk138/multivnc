@@ -1038,20 +1038,6 @@ msgstr "ZlibHex"
 msgid "libsshtunnel initialization failed"
 msgstr "libsshtunnel-initieringen misslyckades"
 
-#~ msgid "Bookmark"
-#~ msgstr "Bokmärk"
+msgid "translator-credits"
+msgstr "Åke Engelbrektson <eson@svenskasprakfiler.se>"
 
-#~ msgid "translator-credits"
-#~ msgstr "Åke Engelbrektson <eson@svenskasprakfiler.se>"
-
-#~ msgid "Login"
-#~ msgstr "Inloggning"
-
-#~ msgid "Username or password must not empty"
-#~ msgstr "Användarnamn och lösenord kan inte vara tomt"
-
-#~ msgid "Username:"
-#~ msgstr "Användarnamn:"
-
-#~ msgid "Warning!"
-#~ msgstr "Varning!"
