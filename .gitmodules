@@ -5,13 +5,13 @@
 	path = libvncserver
 	url = https://github.com/LibVNC/libvncserver.git
 [submodule "libjpeg-turbo"]
-	path = libjpeg-turbo
+	path = android/libjpeg-turbo
 	url = https://github.com/libjpeg-turbo/libjpeg-turbo.git
 [submodule "libressl"]
-	path = libressl
+	path = android/libressl
 	url = https://github.com/libressl-portable/portable.git
 [submodule "libssh2"]
-	path = libssh2
+	path = android/libssh2
 	url = https://github.com/libssh2/libssh2.git
 [submodule "libsshtunnel"]
 	path = libsshtunnel

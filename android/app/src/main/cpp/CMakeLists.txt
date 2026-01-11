@@ -16,7 +16,7 @@ endif ()
 
 # libjpeg-turbo
 ExternalProject_Add(ep-libjpeg-turbo
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../../../libjpeg-turbo
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../../libjpeg-turbo
         BINARY_DIR ${CMAKE_BINARY_DIR}/libjpeg
         INSTALL_DIR ${CMAKE_BINARY_DIR}/libjpeg-install
         BUILD_BYPRODUCTS <INSTALL_DIR>/lib/libturbojpeg.a
@@ -41,7 +41,7 @@ include_directories(${INSTALL_DIR}/include)
 
 # LibreSSL
 ExternalProject_Add(ep-libressl
-        SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../../../libressl
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/../../../../libressl
         PATCH_COMMAND test -x ./configure && echo "LibreSSL already prepared" || ./autogen.sh
         BINARY_DIR ${CMAKE_BINARY_DIR}/libssl
         INSTALL_DIR ${CMAKE_BINARY_DIR}/libssl-install
@@ -66,7 +66,7 @@ set(OPENSSL_INCLUDE_DIR "${INSTALL_DIR}/include" CACHE PATH "")
 # build libssh2
 message("-----libssh2-----")
 SET(BUILD_TESTING OFF CACHE BOOL "Build libssh2 test suite")
-set(libssh2_src_DIR ${CMAKE_SOURCE_DIR}/../../../../../libssh2)
+set(libssh2_src_DIR ${CMAKE_SOURCE_DIR}/../../../../libssh2)
 set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
 # adds a source subdir with specifying a build output dir
 add_subdirectory(${libssh2_src_DIR} ${libssh2_build_DIR})
