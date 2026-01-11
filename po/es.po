@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-10 13:53+0100\n"
-"PO-Revision-Date: 2026-01-10 14:17+0100\n"
+"PO-Revision-Date: 2026-01-11 11:38+0100\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: es\n"
@@ -568,7 +568,7 @@ msgstr "¡Ningún marcador con este nombre!"
 
 #: ../src/gui/DialogNewConnection.cpp:67
 msgid "None selected"
-msgstr "Ninguno seleccionado"
+msgstr "Ninguna seleccionada"
 
 #: ../src/gui/FrameMain.cpp:63
 msgid "North"
@@ -1046,9 +1046,11 @@ msgstr "ZlibHex"
 msgid "libsshtunnel initialization failed"
 msgstr "Falló la inicialización de libsshtunnel"
 
+msgid "translator-credits"
+msgstr "Christian Beier <multivnc@christianbeier.net>"
+
 #~ msgid "Bookmark"
 #~ msgstr "Marcador"
-
 
 #~ msgid "Login"
 #~ msgstr "Inicio de sesión"
@@ -1061,6 +1063,3 @@ msgstr "Falló la inicialización de libsshtunnel"
 
 #~ msgid "Warning!"
 #~ msgstr "¡Atención!"
-
-msgid "translator-credits"
-msgstr "Christian Beier <multivnc@christianbeier.net>"
