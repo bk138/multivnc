@@ -2124,12 +2124,12 @@ void MyFrameMain::bookmarks_secrets_load(const wxString& bookmarkName,
 
         // still load saves from pre-0.11 versions TODO remove with 0.12
         if (!password.IsOk()) {
-            store.Load("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port,
+            store.Load("MultiVNC/Bookmarks/" + wxString(user.IsEmpty() ? "" : user + "@") + host + ":" + port,
                        username,
                        password); // if Load() fails, password will still be empty
             if (password.IsOk()) {
                 // side effect: if there was a password from the legacy location, move it to the new one
-                store.Delete("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port);
+                store.Delete("MultiVNC/Bookmarks/" + wxString(user.IsEmpty() ? "" : user + "@") + host + ":" + port);
                 store.Save("MultiVNC/Bookmarks/" + bookmarkName + " VncPassword", wxEmptyString, password);
             }
         }
@@ -2167,7 +2167,7 @@ void MyFrameMain::bookmarks_secrets_delete(const wxString& bookmarkName) {
         store.Delete("MultiVNC/Bookmarks/" + bookmarkName + " SshPassword");
         store.Delete("MultiVNC/Bookmarks/" + bookmarkName + " SshPrivKeyPassword");
         // still delete saves from pre-0.11 versions TODO remove with 0.12
-        store.Delete("MultiVNC/Bookmarks/" + (user.IsEmpty() ? "" : user + "@") + host + ":" + port);
+        store.Delete("MultiVNC/Bookmarks/" + wxString(user.IsEmpty() ? "" : user + "@") + host + ":" + port);
     }
 #endif
 }
