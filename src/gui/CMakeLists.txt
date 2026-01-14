@@ -45,7 +45,10 @@ if(UNIX AND NOT APPLE)
   target_link_directories(MultiVNCgui INTERFACE ${GTK3_LIBRARY_DIRS})
   target_link_libraries(MultiVNCgui ${GTK3_LIBRARIES})
 endif()
-
+if(WIN32)
+  # we include VNCConn.h which includes rfbclient.h which includes rfbproto.h which includes zlib.h
+  include_directories(${ZLIB_INCLUDE_DIRS})
+endif()
 
 #original Makefile.am contents follow:
 
