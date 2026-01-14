@@ -15,7 +15,7 @@ class MultiVNC(ConanFile):
                 "with_zlib": False
             })
             # only listing libtiff here so it uses libjpeg-turbo, it is actually a dep of wxwidgets
-            self.requires("libtiff/[>=4]", options = {
+            self.requires("libtiff/[~4.6]", options = {
                 "jpeg":  "libjpeg-turbo"
             })
             self.requires("wxwidgets/3.2.8", options = {
