@@ -4,6 +4,10 @@ class MultiVNC(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeToolchain", "CMakeDeps"
 
+    def build_requirements(self):
+        if self.settings.os in ["Windows"]:
+            self.tool_requires("gettext/0.26")
+
     def requirements(self):
         if self.settings.os in ["Windows"]:
             self.requires("zlib/1.3.1")
