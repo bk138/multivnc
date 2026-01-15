@@ -11,8 +11,10 @@ jobs:
           - macos-latest
           - windows-latest
         include:
+          - os: macos-latest
+            cmake_options: "-DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug"
           - os: windows-latest
-            cmake_options: "-DwxWidgets_ROOT_DIR=C:/wx"
+            cmake_options: "-DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -22,6 +24,10 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           for f in po/*.po; do grep -LE '^msgid "translator-credits"' $f ; done
+      - name: Install Conan
+        uses: conan-io/setup-conan@v1
+        with:
+          cache_packages: 'true'
       - name: Install Ubuntu Build Dependencies
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -30,25 +36,17 @@ jobs:
       - name: Install MacOS Build Dependencies
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
-          brew uninstall --ignore-dependencies gnutls libgcrypt
-          brew install wxwidgets@3.2
+          conan install . --output-folder=build --build=missing --settings=build_type=Debug
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           # nsis, for CPack
           choco install nsis
-          # gettext
-          curl -L -o gettext.zip https://github.com/mlocati/gettext-iconv-windows/releases/download/v0.26-v1.17/gettext0.26-iconv1.17-static-64.zip
-          7z x gettext.zip -o"C:/gettext"
-          echo "C:/gettext/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          # Download and extract wxWidgets
-          curl -L -o wxWidgets.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxMSW-3.2.8_vc14x_x64_Dev.7z
-          7z x wxWidgets.7z -o"C:/wx" -y
-          curl -L -o wxHeaders.7z https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8/wxWidgets-3.2.8-headers.7z
-          7z x wxHeaders.7z -o"C:/wx" -y
+          conan install . --output-folder=build --build=missing --settings=build_type=Debug
       - name: Build
+        shell: bash
         run: |
-          mkdir build
+          mkdir -p build
           cd build
           cmake ${{ matrix.cmake_options }} ..
           cmake --build .
