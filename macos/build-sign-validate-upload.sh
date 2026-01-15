@@ -20,26 +20,25 @@
     exit 1
 }
 
-# workaround until we're installing the whole framework https://github.com/bk138/multivnc/issues/244
-[ -z "$WX_LOCALES_PATH" ] && {
-    echo "Please set WX_LOCALES_PATH env var."
+[ -z "$MIN_MACOS_VERSION" ] && {
+    echo "Please set MIN_MACOS_VERSION env var."
     exit 1
 }
 
 set -e
 
 echo
+echo "Install build deps"
+echo
+conan install .. --output-folder=build-dir --build=missing -s os.version=$MIN_MACOS_VERSION -s build_type=Release
+
+echo
 echo "Build release app bundle"
 echo
-mkdir -p build-dir
 cd build-dir
-MACOSX_DEPLOYMENT_TARGET=10.15 cmake ../.. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=$(brew --prefix libressl)
+MACOSX_DEPLOYMENT_TARGET=$MIN_MACOS_VERSION cmake ../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
 make -j$(nproc)
 cmake --install . --prefix .
-# workaround until we're installing the whole framework https://github.com/bk138/multivnc/issues/244
-cp $WX_LOCALES_PATH/de/LC_MESSAGES/wxstd-3.2.mo MultiVNC.app/Contents/Resources/de.lproj/
-cp $WX_LOCALES_PATH/es/LC_MESSAGES/wxstd-3.2.mo MultiVNC.app/Contents/Resources/es.lproj/
-cp $WX_LOCALES_PATH/sv/LC_MESSAGES/wxstd-3.2.mo MultiVNC.app/Contents/Resources/sv.lproj/
 
 echo
 echo "Sign embedded libs"
