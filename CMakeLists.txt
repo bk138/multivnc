@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(multivnc VERSION 0.10.3)
+project(multivnc VERSION 0.11.0)
 set (CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
