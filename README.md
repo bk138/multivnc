@@ -21,6 +21,7 @@ The roadmap for future developments regarding the project can be found
 
 * Support for most VNC encodings including Tight.
 * TLS support, i.e. AnonTLS and VeNCrypt.
+* Support for SSH-Tunnelling with password- and privkey-based authentication.
 * Unicode copy & paste to and from the VNC server.
 * Discovery of VNC servers advertising themselves via ZeroConf.
 * Bookmarking of connections.
@@ -42,7 +43,6 @@ The roadmap for future developments regarding the project can be found
 
 ### Android-only Features
 
-* Support for SSH-Tunnelling with password- and privkey-based authentication.
 * Import and export of saved connections.
 * Virtual mouse button controls with haptic feedback.
 * Two-finger swipe gesture recognition.
