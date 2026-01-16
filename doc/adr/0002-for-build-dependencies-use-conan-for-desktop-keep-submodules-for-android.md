@@ -45,21 +45,21 @@ vendored-in dependecies approach:
 
 Use Conan for the Desktop version's dependencies _where applicable_, keep using vendored-in submodules for Android:
 
-|               | Android               | Linux (Flatpak)        | MacOS              | Windows            | Notes                  |
-| ------------- | --------------------- | ---------------------- | ------------------ | ------------------ | ---------------------- |
-| zlib          | from NDK              | from flatpak           | from MacOS         | Conan              |                        |
-| libjpeg-turbo | `ExternalProject_Add` | from flatpak           | Conan              | Conan              |                        |
-| Libre/OpenSSL | `ExternalProject_Add` | from flatpak (OpenSSL) | Conan              | Conan              |                        |
-| libssh2       | `add_subdirectory`    | via flatpak-build      | Conan              | Conan              |                        |
-| libsshtunnel  | `add_subdirectory`    | `add_subdirectory`     | `add_subdirectory` | `add_subdirectory` |                        |
-| libvncclient  | `add_subdirectory`    | `add_subdirectory`     | `add_subdirectory` | `add_subdirectory` | leave as-is for now ⏳ |
-| wxWidgets     | N/A                   | via flatpak-build      | Conan              | Conan              |                        |
-| libwxservdisc | N/A                   | `add_subdirectory`     | `add_subdirectory` | `add_subdirectory` | leave as-is for now ⏳ |
+|               | Android               | Linux (Flatpak)        | MacOS              | Windows            |
+| ------------- | --------------------- | ---------------------- | ------------------ | ------------------ |
+| zlib          | from NDK              | from flatpak           | from MacOS         | Conan              |
+| libjpeg-turbo | `ExternalProject_Add` | from flatpak           | Conan              | Conan              |
+| Libre/OpenSSL | `ExternalProject_Add` | from flatpak (OpenSSL) | Conan              | Conan              |
+| libssh2       | `add_subdirectory`    | via flatpak-build      | Conan              | Conan              |
+| libsshtunnel  | `add_subdirectory`    | `add_subdirectory`     | `add_subdirectory` | `add_subdirectory` |
+| libvncclient  | `add_subdirectory`    | `add_subdirectory`     | `add_subdirectory` | `add_subdirectory` |
+| wxWidgets     | N/A                   | via flatpak-build      | Conan              | Conan              |
+| libwxservdisc | N/A                   | `add_subdirectory`     | `add_subdirectory` | `add_subdirectory` |
 
 That is:
 
-- dependencies included via `add_subdirectory` are kept as-is
-- dependencies not available in Conan are vendored-in via simple `add_subdirectory`
+- dependencies included via `add_subdirectory` are kept as-is (libvncclient, libwxservdisc)
+- dependencies not available in Conan are vendored-in via simple `add_subdirectory` (libsshtunnel)
 - Conan is used to pull in dependencies where the above is not done
 - for the flatpak builds, flatpak-build YML is used instead of Conan, this can be revised at a later date 
 
