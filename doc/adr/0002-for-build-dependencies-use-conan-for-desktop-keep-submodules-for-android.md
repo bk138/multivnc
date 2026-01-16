@@ -65,6 +65,8 @@ That is:
 
 Conan and vcpkg were both evaluated, with Conan found to have more ergnomic handling.
 
+Both Conan and vcpkg were found to be pretty cumbersome for Android, so are not used there.
+
 ## Consequences
 
 For the Android version, nothing changes.
