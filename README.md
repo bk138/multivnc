@@ -76,21 +76,30 @@ select the last successful one and download the wanted artifact.
 After cloning the repo, do
 
 ```
-   git submodule init
-   git submodule update
+   git submodule update --init
 ```
+Depending on which OS you are on, you end up with a debug version packaged
+as a .deb, .dmg or .exe you can install:
 
-To build:
+#### Linux
 
 ```
    mkdir build
    cd build
-   cmake ..
+   cmake .. -DCMAKE_BUILD_TYPE=Debug
    cmake --build .
    cpack
 ```
 
-Depending on which OS you are on, you end up with a .deb, .dmg or .exe you can install.
+#### MacOS/Windows
+
+```
+   conan install . --output-folder=build --build=missing -s build_type=Debug
+   cd build
+   cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Debug
+   cmake --build .
+   cpack
+```
 
 ### MultiVNC for Android
 
