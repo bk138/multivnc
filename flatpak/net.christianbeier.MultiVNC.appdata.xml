@@ -4,7 +4,7 @@
   <id>net.christianbeier.MultiVNC</id>
   
   <name>MultiVNC</name>
-  <summary>Multicast-enabled VNC viewer</summary>
+  <summary>SSH-enabled VNC viewer</summary>
   
   <metadata_license>CC-BY-4.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
@@ -29,12 +29,14 @@
   
   <description>
     <p>
-      MultiVNC is a cross-platform Multicast-enabled VNC viewer.
+      MultiVNC is a cross-platform SSH-enabled VNC viewer.
     </p>
     <p>Key features include:</p>
     <ul>
       <li>Support for most encodings including Tight.</li>
       <li>TLS support, i.e. AnonTLS and VeNCrypt.</li>
+      <li>Support for SSH-Tunnelling with password- and privkey-based authentication.</li>
+      <li>Unicode copy and paste to and from the VNC server.</li>
       <li>Discovery of VNC servers advertising themselves via ZeroConf.</li>
       <li>Bookmarking of connections.</li>
       <li>UltraVNC Repeater support.</li>	    
