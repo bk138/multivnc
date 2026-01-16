@@ -28,15 +28,6 @@ The roadmap for future developments regarding the project can be found
 * Supports server framebuffer resize.
 * Experimental support for MulticastVNC.
 
-### Android-only Features
-
-* Support for SSH-Tunnelling with password- and privkey-based authentication.
-* Import and export of saved connections.
-* Virtual mouse button controls with haptic feedback.
-* Two-finger swipe gesture recognition.
-* A super fast touchpad mode for local use.
-* Hardware-accelerated OpenGL drawing and zooming.
-
 ### Desktop-only Features
 
 * Several connections with one viewer using tabs.
@@ -49,15 +40,17 @@ The roadmap for future developments regarding the project can be found
   ideas from x2x and code from vncviewer.
 * Simple, loggable statistics.  
 
-## How to get it
+### Android-only Features
 
-### MultiVNC for Android
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/)
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
+* Support for SSH-Tunnelling with password- and privkey-based authentication.
+* Import and export of saved connections.
+* Virtual mouse button controls with haptic feedback.
+* Two-finger swipe gesture recognition.
+* A super fast touchpad mode for local use.
+* Hardware-accelerated OpenGL drawing and zooming.
+
+
+## How to get it
 
 ### MultiVNC for Desktop
 
@@ -68,11 +61,15 @@ To get bleeding-edge packages built from the master development branch, navigate
 [the list of CI runs](https://github.com/bk138/multivnc/actions/workflows/ci.yml),
 select the last successful one and download the wanted artifact.
 
-## How to build
-
 ### MultiVNC for Android
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+     alt="Get it on F-Droid"
+     height="80">](https://f-droid.org/packages/com.coboltforge.dontmind.multivnc/)
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+     alt="Get it on Google Play"
+     height="80">](https://play.google.com/store/apps/details?id=com.coboltforge.dontmind.multivnc)
 
-See the [Android version's README](android/README.md).
+## How to build
 
 ### MultiVNC for Desktop
 
@@ -94,6 +91,11 @@ To build:
 ```
 
 Depending on which OS you are on, you end up with a .deb, .dmg or .exe you can install.
+
+### MultiVNC for Android
+
+See the [Android version's README](android/README.md).
+
 
 ## MulticastVNC notes
 
