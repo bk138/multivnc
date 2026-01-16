@@ -9,7 +9,7 @@
 
 ![MultiVNC logo](src/gui/res/net.christianbeier.MultiVNC.svg)
 
-MultiVNC is a cross-platform Multicast-enabled VNC viewer based on
+MultiVNC is a cross-platform SSH-enabled VNC viewer based on
 [LibVNCClient](https://github.com/LibVNC/libvncserver). The desktop version
 uses [wxWidgets](https://www.wxwidgets.org/) and runs on Unix, Mac OS X and
 Windows. There also is an [Android version](/android/).
