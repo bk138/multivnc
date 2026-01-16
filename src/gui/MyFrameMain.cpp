@@ -2224,7 +2224,7 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   wxIcon icon = bitmapBundleFromSVGResource("about").GetIcon(this->FromDIP(wxSize(128,128)));
 
   wxString desc = "\n";
-  desc += _("MultiVNC is a cross-platform Multicast-enabled VNC client.");
+  desc += _("MultiVNC is a cross-platform SSH-enabled VNC client.");
   desc += "\n\n";
   desc += _("Built with") + " " + (wxString() << wxVERSION_STRING);
   desc += "\n\n";

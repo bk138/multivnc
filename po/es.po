@@ -546,9 +546,9 @@ msgid "MultiVNC crashed"
 msgstr "MultiVNC se bloquea"
 
 #: ../src/gui/MyFrameMain.cpp:2227
-msgid "MultiVNC is a cross-platform Multicast-enabled VNC client."
+msgid "MultiVNC is a cross-platform SSH-enabled VNC client."
 msgstr ""
-"MultiVNC es un cliente VNC multiplataforma compatible con multidifusión."
+"MultiVNC es un cliente VNC multiplataforma compatible con SSH."
 
 #: ../src/gui/DialogSettings.cpp:42
 msgid "MulticastVNC"
