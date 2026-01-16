@@ -21,6 +21,7 @@ The roadmap for future developments regarding the project can be found
 
 * Support for most VNC encodings including Tight.
 * TLS support, i.e. AnonTLS and VeNCrypt.
+* Unicode copy & paste to and from the VNC server.
 * Discovery of VNC servers advertising themselves via ZeroConf.
 * Bookmarking of connections.
 * UltraVNC Repeater support.
@@ -35,7 +36,6 @@ The roadmap for future developments regarding the project can be found
 * Two-finger swipe gesture recognition.
 * A super fast touchpad mode for local use.
 * Hardware-accelerated OpenGL drawing and zooming.
-* Copy&paste to and from Android.
 
 ### Desktop-only Features
 
