@@ -9,6 +9,7 @@ MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
                                              const wxPoint &pos,
                                              const wxSize &size, long style)
     : DialogNewConnection(parent, id, title, pos, size, style) {
+    text_ctrl_vnc_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535));
     text_ctrl_repeater_id->SetValidator(wxIntegerValidator<int>());
     text_ctrl_ssh_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535));
 
@@ -22,12 +23,20 @@ MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
     button_ssh_privkey_open->Bind(wxEVT_BUTTON, &MyDialogNewConnection::OnPrivkeyFileOpen, this);
 };
 
-wxString MyDialogNewConnection::getHost() const {
-    return text_ctrl_host->GetValue();
+wxString MyDialogNewConnection::getVncServer() const {
+    return text_ctrl_vnc_server->GetValue();
 };
 
-void MyDialogNewConnection::setHost(const wxString &host) {
-    text_ctrl_host->SetValue(host);
+wxString MyDialogNewConnection::getVncPort() const {
+    return text_ctrl_vnc_port->GetValue();
+};
+
+void MyDialogNewConnection::setVncServer(const wxString &server) {
+    text_ctrl_vnc_server->SetValue(server);
+};
+
+void MyDialogNewConnection::setVncPort(const wxString &port) {
+    text_ctrl_vnc_port->SetValue(port);
 };
 
 int MyDialogNewConnection::getRepeaterId() const {

@@ -59,7 +59,8 @@
 #define V_QOS_EF true
 #define K_GRABKEYBOARD wxT("GrabKeyboard")
 #define V_GRABKEYBOARD false
-#define K_LASTHOST "LastHost"
+#define K_LASTSERVER "LastServer"
+#define K_LASTPORT "LastPort"
 #define K_NEW_CONN_SHOW_ADVANCED "NewConnShowAdvanced"
 #define V_NEW_CONN_SHOW_ADVANCED false
 

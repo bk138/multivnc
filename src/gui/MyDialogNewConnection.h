@@ -11,8 +11,10 @@ class MyDialogNewConnection : public DialogNewConnection {
                           const wxSize &size = wxDefaultSize,
                           long style = wxDEFAULT_DIALOG_STYLE);
 
-    wxString getHost() const;
-    void setHost(const wxString &host);
+    wxString getVncServer() const;
+    wxString getVncPort() const;
+    void setVncServer(const wxString &server);
+    void setVncPort(const wxString &port);
 
     int getRepeaterId() const;
 

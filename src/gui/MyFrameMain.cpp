@@ -1465,16 +1465,20 @@ wxString MyFrameMain::getQueryValue(const wxURI& wxUri, const wxString& key) {
 void MyFrameMain::machine_connect(wxCommandEvent &event)
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
-    wxString host;
-    pConfig->Read(K_LASTHOST, &host);
+    wxString server, port;
+    pConfig->Read(K_LASTSERVER, &server);
+    pConfig->Read(K_LASTPORT, &port);
 
     MyDialogNewConnection dialog_new_connection(this, wxID_ANY, _("Connect to a specific host."));
-    dialog_new_connection.setHost(host);
+    dialog_new_connection.setVncServer(server);
+    dialog_new_connection.setVncPort(port);
     dialog_new_connection.setShowAdvanced(pConfig->ReadBool(K_NEW_CONN_SHOW_ADVANCED, V_NEW_CONN_SHOW_ADVANCED));
 
-    if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getHost() != wxEmptyString) {
-        pConfig->Write(K_LASTHOST, dialog_new_connection.getHost());
-        conn_spawn("vnc://" + dialog_new_connection.getHost()
+    if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getVncServer() != wxEmptyString) {
+        pConfig->Write(K_LASTSERVER, dialog_new_connection.getVncServer());
+        pConfig->Write(K_LASTPORT, dialog_new_connection.getVncPort());
+        conn_spawn("vnc://" + dialog_new_connection.getVncServer()
+                   + wxString(dialog_new_connection.getVncPort().IsEmpty() ? "" : ":" + dialog_new_connection.getVncPort())
                    + "?RepeaterId=" + wxString::Format("%i", dialog_new_connection.getRepeaterId())
                    + "&SshHost=" + dialog_new_connection.getSshServer()
                    + "&SshPort=" + dialog_new_connection.getSshPort()
