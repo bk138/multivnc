@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MultiVNC\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-17 13:05+0100\n"
-"PO-Revision-Date: 2026-01-17 13:17+0100\n"
+"POT-Creation-Date: 2026-01-17 13:41+0100\n"
+"PO-Revision-Date: 2026-01-17 13:43+0100\n"
 "Last-Translator: Christian Beier <info@christianbeier.net>\n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -448,10 +448,6 @@ msgstr "Ta över tangentbordet"
 msgid "Hextile"
 msgstr "Hextile"
 
-#: ../src/gui/DialogNewConnection.cpp:88
-msgid "If connecting to a repeater, enter the session ID here:"
-msgstr "Om du ansluter till en repeater anger du sessions-ID här:"
-
 #: ../src/gui/MyFrameMain.cpp:2275
 msgid ""
 "If there are VNC servers advertising themselves via ZeroConf, you can select "
@@ -733,6 +729,10 @@ msgstr "Sparar %s statistik..."
 #: ../src/gui/MyFrameMain.cpp:1977
 msgid "Saving bookmark"
 msgstr "Sparar bokmärke"
+
+#: ../src/gui/DialogNewConnection.cpp:88
+msgid "Session ID"
+msgstr "Sessions-ID"
 
 #: ../src/gui/DialogSettings.cpp:54
 msgid ""
