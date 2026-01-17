@@ -9,9 +9,9 @@ MyDialogNewConnection::MyDialogNewConnection(wxWindow *parent, int id,
                                              const wxPoint &pos,
                                              const wxSize &size, long style)
     : DialogNewConnection(parent, id, title, pos, size, style) {
-    text_ctrl_vnc_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535));
+    text_ctrl_vnc_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535, wxNUM_VAL_ZERO_AS_BLANK));
     text_ctrl_repeater_id->SetValidator(wxIntegerValidator<int>());
-    text_ctrl_ssh_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535));
+    text_ctrl_ssh_port->SetValidator(wxIntegerValidator<int>(NULL, 0, 65535, wxNUM_VAL_ZERO_AS_BLANK));
 
     // Bind radio button events
     radio_btn_ssh_password->Bind(wxEVT_RADIOBUTTON,
