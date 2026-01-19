@@ -110,8 +110,13 @@ fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
 endif(APPLE)
 
 if(WIN32)
-  install(TARGETS multivnc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  install(FILES README.md AUTHORS CHANGELOG.md DESTINATION .)
+    install(TARGETS multivnc RUNTIME DESTINATION .)
+    install(FILES README.md AUTHORS CHANGELOG.md DESTINATION .)
+    install(DIRECTORY src/gui/res/dark DESTINATION .)
+    install(DIRECTORY src/gui/res/light DESTINATION .)
+    install(FILES src/gui/res/about.svg DESTINATION .)
+    install(FILES src/gui/res/unicast.svg DESTINATION .)
+    install(FILES src/gui/res/multicast.svg DESTINATION .)
 endif(WIN32)
 
 
