@@ -117,6 +117,9 @@ if(WIN32)
     install(FILES src/gui/res/about.svg DESTINATION .)
     install(FILES src/gui/res/unicast.svg DESTINATION .)
     install(FILES src/gui/res/multicast.svg DESTINATION .)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION de RENAME ${LOCALE_DOMAIN}.mo)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/es.gmo DESTINATION es RENAME ${LOCALE_DOMAIN}.mo)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sv.gmo DESTINATION sv RENAME ${LOCALE_DOMAIN}.mo)
 endif(WIN32)
 
 
