@@ -40,8 +40,8 @@ jobs:
       - name: Install Windows Build Dependencies
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          # nsis, for CPack
-          choco install nsis
+          # WIX, for CPack
+          choco install wixtoolset
           conan install . --output-folder=build --build=missing --settings=build_type=Debug
       - name: Build
         shell: bash
