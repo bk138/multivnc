@@ -128,9 +128,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   wxGetEnv("FLATPAK_ID", &flatpakId);
   // don't show for flatpak and wayland
   if(!flatpakId.IsEmpty() || !sessionType.IsSameAs("x11"))
-      frame_main_menubar->Remove(frame_main_menubar->FindMenu(_("Window &Sharing")));
-#elif defined __WXMSW__
-  // always on
+      frame_main_menubar->Remove(frame_main_menubar->FindMenu(_("Window &Sharing")))
 #else
   // always off so far
   frame_main_menubar->Remove(frame_main_menubar->FindMenu(_("Window &Sharing")));
