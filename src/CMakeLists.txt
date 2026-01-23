@@ -31,6 +31,10 @@ SET(multivnc_SRCS
    dfltcfg.h
 )
 
+if(WIN32)
+    list(APPEND multivnc_SRCS winres.rc)
+endif(WIN32)
+
 if(APPLE)
     set(executable_name MultiVNC)
     set(MACOSX_BUNDLE_BUNDLE_NAME "MultiVNC")
