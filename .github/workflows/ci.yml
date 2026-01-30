@@ -66,4 +66,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MultiVNC Windows Package
-          path: build/*.exe
+          path: build/*.msi
