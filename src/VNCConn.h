@@ -175,7 +175,7 @@ public:
   wxString getRepeaterId() const;
   const wxString& getSshHost() const;
   const wxString& getSshPort() const;
-  wxString getSshFingerprint() const;
+  wxString getSshFingerprintExpected() const;
   void setSshFingerprintMismatchAccept(bool yesno);
 
   const wxString& getUserName() const;

@@ -1906,7 +1906,7 @@ const wxString& VNCConn::getSshPort() const {
     return ssh_port;
 }
 
-wxString VNCConn::getSshFingerprint() const {
+wxString VNCConn::getSshFingerprintExpected() const {
     return ssh_fingerprint_hash;
 }
 

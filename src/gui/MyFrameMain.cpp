@@ -829,7 +829,7 @@ void MyFrameMain::onVNCConnSshFingerprintMismatchNotify(wxCommandEvent &event) {
     VNCConn *conn = static_cast<VNCConn*>(event.GetEventObject());
     wxString remoteFingerprint = event.GetString(); // comes as lowercase hex
 
-    if (conn->getSshFingerprint().IsEmpty()) {
+    if (conn->getSshFingerprintExpected().IsEmpty()) {
         // We don't want the optional "connect w/o saving fingerprint", SSH does not have it either
         wxMessageDialog dialog(this,
                                wxString::Format(_("This is the first time you are connecting to the SSH server '%s'.\n\n"
