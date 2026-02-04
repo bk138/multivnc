@@ -78,6 +78,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
   pConfig->Read(K_SHOWSEAMLESS, &show_seamless, V_SHOWSEAMLESS);
   pConfig->Read(K_SHOW1TO1, &show_1to1, V_SHOW1TO1);
+  pConfig->Read(K_MULTI_SYNC, &multi_sync, V_MULTI_SYNC);
   pConfig->Read(K_GRABKEYBOARD, &grab_keyboard, V_GRABKEYBOARD);
   pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
   pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
@@ -193,6 +194,10 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   if(show_1to1) {
       frame_main_menubar->Check(ID_ONE_TO_ONE, true);
       GetToolBar()->ToggleTool(ID_ONE_TO_ONE, true);
+  }
+
+  if(multi_sync) {
+      frame_main_menubar->Check(ID_MULTI_SYNC, true);
   }
 
   // setup clipboard
@@ -1917,6 +1922,43 @@ void MyFrameMain::view_toggle1to1(wxCommandEvent &event)
 
     wxConfigBase *pConfig = wxConfigBase::Get();
     pConfig->Write(K_SHOW1TO1, show_1to1);
+}
+
+
+void MyFrameMain::view_togglemultisync(wxCommandEvent &event)
+{
+    multi_sync = !multi_sync;
+    wxLogDebug("view_togglemultisync %d", multi_sync);
+
+    // keep menu entry in sync
+    frame_main_menubar->Check(ID_MULTI_SYNC, multi_sync);
+
+    wxConfigBase *pConfig = wxConfigBase::Get();
+    pConfig->Write(K_MULTI_SYNC, multi_sync);
+}
+
+
+void MyFrameMain::broadcastPointerEvent(VNCConn* source, wxMouseEvent &event)
+{
+    if (!multi_sync) return;
+
+    for (size_t i = 0; i < connections.size(); ++i) {
+        if (connections.at(i).conn != source) {
+            connections.at(i).conn->sendPointerEvent(event);
+        }
+    }
+}
+
+
+void MyFrameMain::broadcastKeyEvent(VNCConn* source, wxKeyEvent &event, bool down, bool isChar)
+{
+    if (!multi_sync) return;
+
+    for (size_t i = 0; i < connections.size(); ++i) {
+        if (connections.at(i).conn != source) {
+            connections.at(i).conn->sendKeyEvent(event, down, isChar);
+        }
+    }
 }
 
 

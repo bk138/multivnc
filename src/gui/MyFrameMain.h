@@ -50,6 +50,7 @@ class MyFrameMain: public FrameMain
   bool show_fullscreen;
   int  show_seamless;
   bool show_1to1;
+  bool multi_sync;
 
   // log window
   MyFrameLog* logwindow;
@@ -144,6 +145,7 @@ public:
   void view_togglestatistics(wxCommandEvent &event);
   void view_togglefullscreen(wxCommandEvent &event);
   void view_toggle1to1(wxCommandEvent &event);
+  void view_togglemultisync(wxCommandEvent &event);
   void view_seamless(wxCommandEvent &event);
 
   void bookmarks_add(wxCommandEvent &event); 
@@ -160,6 +162,9 @@ public:
   // to be called from the App
   void cmdline_conn_spawn(const wxString& service, int listenPort);
 
+  void broadcastPointerEvent(VNCConn* source, wxMouseEvent &event);
+  void broadcastKeyEvent(VNCConn* source, wxKeyEvent &event, bool down, bool isChar);
+  bool isMultiSync() const { return multi_sync; }
 };
 
 
