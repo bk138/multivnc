@@ -72,8 +72,8 @@ set(libssh2_build_DIR ${CMAKE_BINARY_DIR}/libssh2)
 add_subdirectory(${libssh2_src_DIR} ${libssh2_build_DIR})
 add_dependencies(libssh2 ep-libressl)
 # set these variables so FindLibSSH2 can find the library
-set(LIBSSH2_LIBRARY ${libssh2_build_DIR}/src/libssh2.a CACHE FILEPATH "")
-set(LIBSSH2_INCLUDE_DIR ${libssh2_src_DIR}/include CACHE PATH "")
+set(Libssh2_LIBRARIES ${libssh2_build_DIR}/src/libssh2.a CACHE FILEPATH "")
+set(Libssh2_INCLUDE_DIR ${libssh2_src_DIR}/include CACHE PATH "")
 # set include directories so dependent code can find the headers
 include_directories(
         ${libssh2_src_DIR}/include
