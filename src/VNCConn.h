@@ -54,6 +54,9 @@ wxDECLARE_EVENT(VNCConnGetCredentialsNOTIFY, wxCommandEvent);
 /// Sent when this VNCConn has received an SSH fingerprint and the saved value does not match.
 /// This blocks the VNCConn's internal worker thread until setSshFingerPrintMismatchAccept() is called!
 wxDECLARE_EVENT(VNCConnSshFingerprintMismatchNOTIFY, wxCommandEvent);
+/// Sent when this VNCConn has received a X509 TLS fingerprint and the saved value does not match.
+/// This blocks the VNCConn's internal worker thread until setX509FingerPrintMismatchAccept() is called!
+wxDECLARE_EVENT(VNCConnX509FingerprintMismatchNOTIFY, wxCommandEvent);
 // sent when an incoming connection is available
 DECLARE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY, -1)
 /// Sent on disconnect by local side (m_commandInt==0) or remote side (m_commandInt==1)
@@ -113,6 +116,7 @@ public:
             const wxSecretValue& ssh_password,
             const wxString& ssh_priv_key_filename,
             const wxSecretValue& ssh_priv_key_password,
+            const wxString& x509_fingerprint_hash,
 	    const wxString& encodings, int compresslevel = 1, int quality = 5, bool multicast = true, int multicastSocketRecvBuf = 5120, int multicastRecvBuf = 5120);
   void Shutdown();
 
@@ -177,6 +181,9 @@ public:
   const wxString& getSshPort() const;
   wxString getSshFingerprintExpected() const;
   void setSshFingerprintMismatchAccept(bool yesno);
+  /// The expected fingerprint of the server's X.509 certificate in lowercase hex without prefix or colons.
+  wxString getX509FingerprintExpected() const;
+  void setX509FingerprintMismatchAccept(bool yesno);
 
   const wxString& getUserName() const;
   void setUserName(const wxString& username);
@@ -267,6 +274,10 @@ private:
   static bool libsshtunnel_initialized;
   ssh_tunnel_t *ssh_tunnel;
 
+  // X509 for TLS
+  wxString x509_fingerprint_hash;
+  bool x509_fingerprint_mismatch_accept;
+
   // statistics
   bool do_stats;
   wxTimer stats_timer; // a timer that samples statistics every second
@@ -310,7 +321,8 @@ private:
 
   // utility functions
   static void parseHostString(const char *server, int defaultport, char **host, int *port);
- 
+  static int hexToBytes(const char *hex_str, uint8_t *bytes, size_t max_bytes);
+
   // messagequeues for posting events to the worker thread
   struct pointerEvent {
       int x;
@@ -340,6 +352,10 @@ private:
   void thread_post_getpasswd_notify();
   void thread_post_getcreds_notify(bool withUserPrompt);
   void thread_post_ssh_fingerprint_mismatch_notify(const wxString& remoteFingerprint);
+  void thread_post_x509_fingerprint_mismatch_notify(const wxString& remoteCertSubject,
+                                                    time_t remoteCertValidFrom,
+                                                    time_t remoteCertValidUntil,
+                                                    const wxString &remoteCertSha256Fingerprint);
   void thread_post_incomingconnection_notify();
   void thread_post_disconnect_notify(int reason);
   void thread_post_update_notify(int x, int y, int w, int h);
@@ -368,6 +384,12 @@ private:
                                              const char *fingerprint,
                                              int fingerprint_len,
                                              const char *host);
+  static rfbBool thread_on_x509_fingerprint_mismatch(rfbClient *client,
+                                                     const char *remote_cert_subject,
+                                                     time_t remote_cert_valid_from,
+                                                     time_t remote_cert_valid_until,
+                                                     const uint8_t *remote_cert_sha256_fingerprint,
+                                                     size_t remote_cert_sha256_fingerprint_len);
 };
 
 
@@ -406,6 +428,30 @@ typedef void (wxEvtHandler::*VNCConnUpdateNotifyEventFunction)(VNCConnUpdateNoti
 			    wxStaticCastEvent(VNCConnUpdateNotifyEventFunction, &fn ), (wxObject*) NULL ),
  
 
+class VNCConnX509FingerprintMismatchNotifyEvent : public wxCommandEvent {
+public:
+    VNCConnX509FingerprintMismatchNotifyEvent(wxEventType eventType = VNCConnX509FingerprintMismatchNOTIFY, int id = 0)
+        : wxCommandEvent(eventType, id) {}
+
+    wxString remoteCertSubject;
+    time_t remoteCertValidFrom;
+    time_t remoteCertValidUntil;
+    wxString remoteCertSha256Fingerprint; // in canonical hex
+
+    // Required for sending with wxPostEvent()
+    wxEvent* Clone() const override {
+        VNCConnX509FingerprintMismatchNotifyEvent* copy = new VNCConnX509FingerprintMismatchNotifyEvent(*this);
+        return copy;
+    }
+};
+
+typedef void (wxEvtHandler::*VNCConnX509FingerprintMismatchNotifyEventFunction)(VNCConnX509FingerprintMismatchNotifyEvent &);
+
+#define VNCConnX509FingerprintMismatchNotifyEventHandler(func) wxEVENT_HANDLER_CAST(VNCConnX509FingerprintMismatchNotifyEventFunction, func)
+
+// Optional: define an event table entry
+#define EVT_VNCCONNX509FINGERPRINTMISMATCHNOTIFY(id, func) \
+ 	wx__DECLARE_EVT1(VNCConnX509FingerprintMismatchNOTIFY, id, VNCConnX509FingerprintMismatchNotifyEventHandler(func))
 
 
 #endif

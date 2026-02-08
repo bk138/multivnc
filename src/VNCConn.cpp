@@ -57,6 +57,7 @@ DEFINE_EVENT_TYPE(VNCConnInitNOTIFY)
 wxDEFINE_EVENT(VNCConnGetPasswordNOTIFY, wxCommandEvent);
 wxDEFINE_EVENT(VNCConnGetCredentialsNOTIFY, wxCommandEvent);
 wxDEFINE_EVENT(VNCConnSshFingerprintMismatchNOTIFY, wxCommandEvent);
+wxDEFINE_EVENT(VNCConnX509FingerprintMismatchNOTIFY, wxCommandEvent);
 DEFINE_EVENT_TYPE(VNCConnIncomingConnectionNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnDisconnectNOTIFY)
 DEFINE_EVENT_TYPE(VNCConnUpdateNOTIFY)
@@ -98,6 +99,8 @@ VNCConn::VNCConn(void* p) : condition_auth(mutex_auth)
   }
   ssh_tunnel = NULL;
   ssh_fingerprint_mismatch_accept = false;
+
+  x509_fingerprint_mismatch_accept = false;
 
   // statistics stuff
   do_stats = false;
@@ -741,6 +744,20 @@ void VNCConn::thread_post_ssh_fingerprint_mismatch_notify(const wxString& remote
   wxPostEvent((wxEvtHandler*)parent, event);
 }
 
+void VNCConn::thread_post_x509_fingerprint_mismatch_notify(const wxString& remoteCertSubject,
+                                                           time_t remoteCertValidFrom,
+                                                           time_t remoteCertValidUntil,
+                                                           const wxString& remoteCertSha256Fingerprint) {
+  wxLogDebug(wxT("VNCConn %p: post_x509_fingerprint_notify()"), this);
+  VNCConnX509FingerprintMismatchNotifyEvent event(VNCConnX509FingerprintMismatchNOTIFY);
+  event.SetEventObject(this); // set sender
+  event.remoteCertSubject = remoteCertSubject;
+  event.remoteCertValidFrom = remoteCertValidFrom;
+  event.remoteCertValidUntil = remoteCertValidUntil;
+  event.remoteCertSha256Fingerprint = remoteCertSha256Fingerprint;
+  wxPostEvent((wxEvtHandler*)parent, event);
+}
+
 
 void VNCConn::thread_post_incomingconnection_notify() 
 {
@@ -873,8 +890,8 @@ rfbCredential* VNCConn::thread_getcreds(rfbClient *client, int type) {
 
     conn->require_auth = true;
 
-    if(type == rfbCredentialTypeUser) {
-
+    rfbCredential *c = (rfbCredential *)calloc(1, sizeof(rfbCredential));
+    if(c && type == rfbCredentialTypeUser) {
 	if(conn->getUserName().IsEmpty()
             || !conn->getPassword().IsOk()) {
 	    // username and/or password needed
@@ -890,9 +907,30 @@ rfbCredential* VNCConn::thread_getcreds(rfbClient *client, int type) {
             // we get here once setPassword() was called
         }
 
-        rfbCredential *c = (rfbCredential *)calloc(1, sizeof(rfbCredential));
         c->userCredential.username = strdup(conn->getUserName().char_str());
         c->userCredential.password = strdup(conn->getPassword().GetAsString().char_str());
+        return c;
+    }
+
+    if (c && type == rfbCredentialTypeX509) {
+        if (!conn->getX509FingerprintExpected().IsEmpty()) {
+            // We do intentionally not give any cert files here,
+            // only the fingerprint we expect in case there is a
+            // self-signed cert.
+            c->x509Credential.x509ExpectedFingerprint = (uint8_t*)malloc(32);
+            if (!c->x509Credential.x509ExpectedFingerprint) {
+                free(c);
+                return NULL;
+            }
+
+            // is a canonical hex string
+            if (hexToBytes(conn->getX509FingerprintExpected().char_str(), c->x509Credential.x509ExpectedFingerprint, 32) != 32) {
+                wxLogDebug("VNCConn %p: Expected X.509 fingerprint has wrong length %d", conn, conn->getX509FingerprintExpected().Len());
+                free(c->x509Credential.x509ExpectedFingerprint);
+                c->x509Credential.x509ExpectedFingerprint = NULL;
+            }
+        }
+
         return c;
     }
 
@@ -1140,6 +1178,38 @@ int VNCConn::thread_on_ssh_fingerprint_check(void *client,
 }
 
 
+rfbBool VNCConn::thread_on_x509_fingerprint_mismatch(rfbClient *client,
+                                                     const char *remote_cert_subject,
+                                                     time_t remote_cert_valid_from,
+                                                     time_t remote_cert_valid_until,
+                                                     const uint8_t *remote_cert_sha256_fingerprint,
+                                                     size_t remote_cert_sha256_fingerprint_len) {
+    VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+
+    // Compute canonical hex from binary fingerprint
+    wxString hexFingerprint;
+    for (size_t i = 0; i < remote_cert_sha256_fingerprint_len; ++i) {
+        // Append each byte as two hex digits
+        hexFingerprint.Append(wxString::Format("%02x", static_cast<unsigned char>(remote_cert_sha256_fingerprint[i])));
+    }
+
+    conn->thread_post_x509_fingerprint_mismatch_notify(remote_cert_subject,
+                                                       remote_cert_valid_from,
+                                                       remote_cert_valid_until,
+                                                       hexFingerprint);
+    // wxMutexes are not recursive under Unix, so test first
+    if (conn->mutex_auth.TryLock() == wxMUTEX_NO_ERROR) {
+        conn->mutex_auth.Lock();
+    }
+    wxLogDebug("VNCConn %p: vncthread waiting for X509 fingerprint decision", conn);
+    conn->condition_auth.Wait();
+    wxLogDebug("VNCConn %p: vncthread done waiting for X509 fingerprint decision", conn);
+    // we get here once setX509FingerprintMismatchAccept() was called
+    return conn->x509_fingerprint_mismatch_accept ? TRUE : FALSE;
+}
+
+
+
 /*
   public members
 */
@@ -1172,6 +1242,7 @@ bool VNCConn::setupClient()
   cl->GotXCutTextUTF8 = thread_got_cuttext_utf8;
   cl->Bell = thread_bell;
   cl->HandleXvpMsg = thread_handle_xvp;
+  cl->GetX509CertFingerprintMismatchDecision = thread_on_x509_fingerprint_mismatch;
 
   cl->canHandleNewFBSize = TRUE;
   cl->connectTimeout = 5;
@@ -1221,6 +1292,7 @@ bool VNCConn::Init(const wxString& host,
                    const wxSecretValue& ssh_password,
                    const wxString& ssh_priv_key_filename,
                    const wxSecretValue& ssh_priv_key_password,
+                   const wxString& x509_fingerprint_hash,
 		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
   wxLogDebug("VNCConn %p: Init() host '%s'", this, host);
@@ -1260,6 +1332,8 @@ bool VNCConn::Init(const wxString& host,
   this->ssh_password = ssh_password;
   this->ssh_priv_key_filename = ssh_priv_key_filename;
   this->ssh_priv_key_password = ssh_priv_key_password;
+
+  this->x509_fingerprint_hash = x509_fingerprint_hash;
 
   cl->appData.compressLevel = compresslevel;
   cl->appData.qualityLevel = quality;
@@ -1916,6 +1990,16 @@ void VNCConn::setSshFingerprintMismatchAccept(bool yesno) {
     condition_auth.Signal();
 }
 
+wxString VNCConn::getX509FingerprintExpected() const {
+    return x509_fingerprint_hash;
+}
+
+void VNCConn::setX509FingerprintMismatchAccept(bool yesno) {
+    x509_fingerprint_mismatch_accept = yesno;
+    // tell worker thread to go on
+    condition_auth.Signal();
+}
+
 
 bool VNCConn::isMulticast() const
 {
@@ -2054,6 +2138,26 @@ void VNCConn::parseHostString(const char *server, int defaultport, char **host, 
 		*host = str;
 	if (port)
 		*port = defaultport;
+}
+
+
+int VNCConn::hexToBytes(const char *hex_str, uint8_t *bytes, size_t max_bytes) {
+    size_t i = 0;
+    size_t byte_index = 0;
+
+    while (hex_str[i] != '\0' && byte_index < max_bytes) {
+        // Read two hex characters
+        char hex_byte[3] = {hex_str[i], hex_str[i+1], '\0'};
+
+        // Convert to byte
+        uint8_t byte = (uint8_t)strtol(hex_byte, NULL, 16);
+        bytes[byte_index++] = byte;
+
+        // Move to next pair
+        i += 2;
+    }
+
+    return byte_index;
 }
 
 

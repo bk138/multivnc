@@ -71,6 +71,9 @@ class MyFrameMain: public FrameMain
   void ssh_known_hosts_save(const wxString& host, const wxString& port, const wxString& fingerprint);
   wxString ssh_known_hosts_load(const wxString& host, const wxString& port);
   wxString hex_to_base64(const wxString& hex);
+  void x509_known_hosts_save(const wxString& host, const wxString& port, const wxString& fingerprint);
+  wxString x509_known_hosts_load(const wxString& host, const wxString& port);
+  wxString hex_to_colon_separated(const wxString& hex);
 
   // service can be user@host:port notation or a full vnc:// URI
   void conn_spawn(const wxString& service, int listenPort = -1);
@@ -91,6 +94,7 @@ class MyFrameMain: public FrameMain
   void onVNCConnGetPasswordNotify(wxCommandEvent& event);
   void onVNCConnGetCredentialsNotify(wxCommandEvent& event);
   void onVNCConnSshFingerprintMismatchNotify(wxCommandEvent &event);
+  void onVNCConnX509FingerprintMismatchNotify(VNCConnX509FingerprintMismatchNotifyEvent &event);
   void onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event);
   void onVNCConnUniMultiChangedNotify(wxCommandEvent& event);
   void onVNCConnReplayFinishedNotify(wxCommandEvent& event);

@@ -112,6 +112,10 @@
 #define G_SSH_KNOWN_HOSTS "/SshKnownHosts/"
 #define K_SSH_KNOWN_HOSTS_FINGERPRINT "FingerprintSha256"
 
+// TLS servers - X509 fingerprints are stored as lowercase hex
+#define G_X509_KNOWN_HOSTS "/X509KnownHosts/"
+#define K_X509_KNOWN_HOSTS_FINGERPRINT "FingerprintSha256"
+
 // collab features
 #define K_WINDOWSHARE _T("WindowShareCmd")
 #ifdef __WIN32__

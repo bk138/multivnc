@@ -44,6 +44,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnGetPasswordNOTIFY, MyFrameMain::onVNCConnGetPasswordNotify)
   EVT_COMMAND (wxID_ANY, VNCConnGetCredentialsNOTIFY, MyFrameMain::onVNCConnGetCredentialsNotify)
   EVT_COMMAND (wxID_ANY, VNCConnSshFingerprintMismatchNOTIFY, MyFrameMain::onVNCConnSshFingerprintMismatchNotify)
+  EVT_VNCCONNX509FINGERPRINTMISMATCHNOTIFY (wxID_ANY, MyFrameMain::onVNCConnX509FingerprintMismatchNotify)
   EVT_VNCCONNUPDATENOTIFY (wxID_ANY, MyFrameMain::onVNCConnUpdateNotify)
   EVT_COMMAND (wxID_ANY, VNCConnUniMultiChangedNOTIFY, MyFrameMain::onVNCConnUniMultiChangedNotify)
   EVT_COMMAND (wxID_ANY, VNCConnReplayFinishedNOTIFY, MyFrameMain::onVNCConnReplayFinishedNotify)
@@ -637,6 +638,7 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
               wxSecretValue(),
               wxEmptyString,
               wxSecretValue(),
+              wxEmptyString,
               encodings, compresslevel, quality)) {
       wxLogError(c->getErr());
   }
@@ -876,6 +878,81 @@ void MyFrameMain::onVNCConnSshFingerprintMismatchNotify(wxCommandEvent &event) {
     }
 }
 
+void MyFrameMain::onVNCConnX509FingerprintMismatchNotify(VNCConnX509FingerprintMismatchNotifyEvent &event) {
+    // get sender
+    VNCConn *conn = static_cast<VNCConn*>(event.GetEventObject());
+
+    char time_buf[128];
+    strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S UTC", gmtime(&event.remoteCertValidFrom));
+    wxString remoteCertValidFrom = wxString::FromUTF8(time_buf);
+    strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %H:%M:%S UTC", gmtime(&event.remoteCertValidUntil));
+    wxString remoteCertValidUntil = wxString::FromUTF8(time_buf);
+
+    if (conn->getX509FingerprintExpected().IsEmpty()) {
+        // We don't want the optional "connect w/o saving fingerprint"
+        wxMessageDialog dialog(this,
+                               wxString::Format(_("The server's identity could not be verified automatically.\n"
+                                                  "\n"
+                                                  "This may indicate a security risk (e.g., a man-in-the-middle attack) or the server may be using a self-signed or untrusted certificate.\n"
+                                                  "\n"
+                                                  "Certificate Details:\n"
+                                                  " - Subject: %s\n"
+                                                  " - Valid From: %s\n"
+                                                  " - Valid Until: %s\n"
+                                                  " - SHA-256 Fingerprint: %s\n"
+                                                  "\n"
+                                                  "Do you want to trust this certificate and continue? Select 'Yes' only if you are sure the fingerprint matches the expected server."),
+                                                event.remoteCertSubject,
+                                                remoteCertValidFrom,
+                                                remoteCertValidUntil,
+                                                hex_to_colon_separated(event.remoteCertSha256Fingerprint)),
+                               _("Unverified Server Certificate"),
+                               wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+        if (dialog.ShowModal() == wxID_YES) {
+            x509_known_hosts_save(conn->getServerHost(), conn->getServerPort(), event.remoteCertSha256Fingerprint);
+            conn->setX509FingerprintMismatchAccept(true);
+        } else {
+            conn->setX509FingerprintMismatchAccept(false);
+        }
+    } else {
+        wxMessageDialog dialog(this,
+                               _( "WARNING: The server's certificate does NOT match the expected fingerprint."),
+                               "Security Warning: Server Certificate Mismatch",
+                               wxYES_NO | wxHELP | wxNO_DEFAULT | wxICON_WARNING);
+        dialog.SetExtendedMessage(wxString::Format(_("This could indicate a security attack (e.g., a man-in-the-middle attack) or a misconfigured server.\n"
+                                                     "\n"
+                                                     "Expected Certificate:\n"
+                                                     "- SHA-256 Fingerprint: %s\n"
+                                                     "\n"
+                                                     "Server's Certificate:\n"
+                                                     "- Subject: %s\n"
+                                                     "- Valid From: %s\n"
+                                                     "- Valid Until: %s\n"
+                                                     "- SHA-256 Fingerprint: %s\n"
+                                                     "\n"
+                                                     "Connecting to this server is UNSAFE unless you explicitly trust this new certificate.\n"
+                                                     "\n"
+                                                     "Do you want to proceed anyway? Only select 'Yes' if you have manually verified the new fingerprint."),
+                                                   hex_to_colon_separated(conn->getX509FingerprintExpected()),
+                                                   event.remoteCertSubject,
+                                                   remoteCertValidFrom,
+                                                   remoteCertValidUntil,
+                                                   hex_to_colon_separated(event.remoteCertSha256Fingerprint)));
+        dialog.SetHelpLabel(_("Connect and update fingerprint"));
+        dialog.SetYesNoLabels(_("Connect without updating fingerprint"), _("Cancel"));
+        int result = dialog.ShowModal();
+        if (result == wxID_HELP) {
+            x509_known_hosts_save(conn->getServerHost(), conn->getServerPort(), event.remoteCertSha256Fingerprint);
+            conn->setX509FingerprintMismatchAccept(true);
+        }
+        else if (result == wxID_YES) {
+            conn->setX509FingerprintMismatchAccept(true);
+        }
+        else {
+            conn->setX509FingerprintMismatchAccept(false);
+        }
+    }
+}
 
 bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave)
 {
@@ -1019,7 +1096,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
     }
   else // normal init without previous listen
     {
-      wxString user, host, ssh_user, ssh_host, ssh_fingerprint, ssh_priv_key_filename;
+      wxString user, host, ssh_user, ssh_host, ssh_fingerprint, ssh_priv_key_filename, x509_fingerprint;
       wxSecretValue password, ssh_password, ssh_priv_key_password;
       int repeaterId = -1, ssh_port = 22;
 
@@ -1062,10 +1139,24 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
           }
 
           ssh_priv_key_filename = getQueryValue(uri, "SshPrivKeyFilename"); // not standardised
+
+          if(ssh_host.IsEmpty()) {
+              // if not using SSH, use this for TLS
+              x509_fingerprint = getQueryValue(uri, "IdHash"); // RFC 7869 colon-seperated hex
+              x509_fingerprint.Replace(":", "");
+              x509_fingerprint.MakeLower();                    // now lowercase hex
+              if (x509_fingerprint.IsEmpty()) {
+                  // if no fingerprint given, use the one from our internal known_hosts
+                  x509_fingerprint = x509_known_hosts_load(uri.GetServer(), uri.GetPort().IsEmpty() ? "5900" : uri.GetPort());
+              }
+          }
       } else {
           // user@host:port notation
           user = service.Contains("@") ? service.BeforeFirst('@') : "";
           host = service.Contains("@") ? service.AfterFirst('@') : service;
+
+          // this notation cannot give a fingerprint, use the one from our internal known_hosts
+          x509_fingerprint = x509_known_hosts_load(host.BeforeFirst(':'), host.Contains(':') ? host.AfterLast(':') : "5900");
       }
 
       // add to notebook, needs to be after connections list add
@@ -1083,6 +1174,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
                   ssh_password,
                   ssh_priv_key_filename,
                   ssh_priv_key_password,
+                  x509_fingerprint,
                   encodings, compresslevel, quality, multicast,
                   multicast_socketrecvbuf, multicast_recvbuf)) {
           wxLogError(c->getErr());
@@ -2219,6 +2311,37 @@ wxString MyFrameMain::hex_to_base64(const wxString& hex) {
     return base64;
 }
 
+void MyFrameMain::x509_known_hosts_save(const wxString& host, const wxString& port, const wxString& fingerprint) {
+    wxConfigBase *cfg = wxConfigBase::Get();
+    wxString name = host + ":" + port;
+    if(name != wxEmptyString) {
+        cfg->SetPath(G_X509_KNOWN_HOSTS + name);
+        cfg->Write(K_X509_KNOWN_HOSTS_FINGERPRINT, fingerprint);
+        //reset path
+        cfg->SetPath("/");
+    }
+}
+
+
+wxString MyFrameMain::x509_known_hosts_load(const wxString& host, const wxString& port) {
+    wxString fingerprint;
+    wxConfigBase *cfg = wxConfigBase::Get();
+    wxString name = host + ":" + port;
+    cfg->SetPath(G_X509_KNOWN_HOSTS + name);
+    cfg->Read(K_X509_KNOWN_HOSTS_FINGERPRINT, &fingerprint);
+    //reset path
+    cfg->SetPath("/");
+    return fingerprint;
+}
+
+wxString MyFrameMain::hex_to_colon_separated(const wxString& hex) {
+    wxString result;
+    for (size_t i = 0; i < hex.Length(); i += 2) {
+        if (i != 0) result += ":";
+        result += hex.Mid(i, 2).Upper();
+    }
+    return result;
+}
 
 void MyFrameMain::help_about(wxCommandEvent &event)
 {	
