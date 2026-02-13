@@ -112,6 +112,16 @@
     <string name="ssh_key_mismatch_continue">我相信这是合法的，继续</string>
     <string name="ssh_key_mismatch_abort">我会仔细检查正确的 SSH 服务器指纹，中止</string>
 
+    <string name="x509_key_new_title">未验证的服务器证书</string>
+    <string name="x509_key_new_message">无法自动验证服务器的身份。&lt;br/>&lt;br/>这可能表示存在安全风险（例如中间人攻击），或者服务器可能正在使用自签名或不受信任的证书。&lt;br/>&lt;br/>证书详情：&lt;br/> - 主题：%s&lt;br/> - 有效期自：%s&lt;br/> - 有效期至：%s&lt;br/> - SHA-256 指纹：&lt;b>%s&lt;/b>&lt;br/>&lt;br/>您是否要信任此证书并继续？仅在确认指纹与预期服务器匹配时选择“是”。</string>
+    <string name="x509_key_new_continue">是</string>
+    <string name="x509_key_new_abort">否</string>
+
+    <string name="x509_key_mismatch_title">安全警告：服务器证书不匹配</string>
+    <string name="x509_key_mismatch_message">警告：服务器的证书与预期指纹不匹配。&lt;br/>&lt;br/>这可能表示存在安全攻击（例如中间人攻击）或服务器配置错误。&lt;br/>&lt;br/>预期证书：&lt;br/> - SHA-256 指纹：&lt;b>%s&lt;/b>&lt;br/>&lt;br/>服务器的证书：&lt;br/> - 主题：%s&lt;br/> - 有效期自：%s&lt;br/> - 有效期至：%s&lt;br/> - SHA-256 指纹：&lt;b>%s&lt;/b>&lt;br/>&lt;br/>除非您明确信任此新证书，否则连接到此服务器不安全。&lt;br/>&lt;br/>您仍要继续吗？仅在手动验证新指纹后选择“是”。</string>
+    <string name="x509_key_mismatch_continue">是</string>
+    <string name="x509_key_mismatch_abort">否</string>
+
     <string name="notification_title">通知已禁用</string>
     <string name="notification_msg">为了能够显示客户端状态信息并提供更轻松地导航回客户端的方法，建议启用通知。</string>
 

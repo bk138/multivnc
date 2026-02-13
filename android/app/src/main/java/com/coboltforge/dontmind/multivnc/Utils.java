@@ -119,5 +119,16 @@ public class Utils {
 		}
 	}
 
+    public static String byteArrayToColonSeparatedHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = String.format("%02X", bytes[i]);
+            if (i != 0) {
+                hexString.append(":");
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 
 }

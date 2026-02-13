@@ -114,6 +114,16 @@
     <string name="ssh_key_mismatch_continue">Tenho certeza de que isso é legítimo, continue</string>
     <string name="ssh_key_mismatch_abort">Vou verificar novamente a impressão digital correta do servidor SSH, abortar</string>
 
+    <string name="x509_key_new_title">Certificado do servidor não verificado</string>
+    <string name="x509_key_new_message">A identidade do servidor não pôde ser verificada automaticamente.&lt;br/>&lt;br/>Isto pode indicar um risco de segurança (por exemplo, um ataque man-in-the-middle) ou o servidor pode estar a usar um certificado autoassinado ou não confiável.&lt;br/>&lt;br/>Detalhes do certificado:&lt;br/> - Assunto: %s&lt;br/> - Válido de: %s&lt;br/> - Válido até: %s&lt;br/> - Impressão digital SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Deseja confiar neste certificado e continuar? Selecione "Sim" apenas se tiver a certeza de que a impressão digital corresponde ao servidor esperado.</string>
+    <string name="x509_key_new_continue">Sim</string>
+    <string name="x509_key_new_abort">Não</string>
+
+    <string name="x509_key_mismatch_title">Aviso de segurança: Incompatibilidade de certificado do servidor</string>
+    <string name="x509_key_mismatch_message">AVISO: O certificado do servidor NÃO corresponde à impressão digital esperada.&lt;br/>&lt;br/>Isto pode indicar um ataque de segurança (por exemplo, um ataque man-in-the-middle) ou um servidor mal configurado.&lt;br/>&lt;br/>Certificado esperado:&lt;br/> - Impressão digital SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Certificado do servidor:&lt;br/> - Assunto: %s&lt;br/> - Válido de: %s&lt;br/> - Válido até: %s&lt;br/> - Impressão digital SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Ligar a este servidor NÃO É SEGURO a menos que confie explicitamente neste novo certificado.&lt;br/>&lt;br/>Deseja continuar mesmo assim? Selecione "Sim" apenas se tiver verificado manualmente a nova impressão digital.</string>
+    <string name="x509_key_mismatch_continue">Sim</string>
+    <string name="x509_key_mismatch_abort">Não</string>
+
     <string name="notification_title">Notificações desativadas</string>
     <string name="notification_msg">Para poder mostrar informações de status do cliente e fornecer um meio de navegar de volta ao cliente com mais facilidade, é recomendável ativar as notificações.</string>
 

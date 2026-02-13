@@ -113,6 +113,17 @@
     <string name="ssh_key_mismatch_continue">Sono fiducioso che sia legittimo, continua</string>
     <string name="ssh_key_mismatch_abort">Ricontrollerò l\'impronta digitale del server SSH corretta, abortisco</string>
 
+    <string name="x509_key_new_title">Certificato del server non verificato</string>
+    <string name="x509_key_new_message">L\'identità del server non può essere verificata automaticamente.&lt;br/>&lt;br/>Ciò potrebbe indicare un rischio per la sicurezza (ad esempio, un attacco man-in-the-middle) o il server potrebbe utilizzare un certificato autofirmato o non attendibile.&lt;br/>&lt;br/>Dettagli del certificato:&lt;br/> - Soggetto: %s&lt;br/> - Valido dal: %s&lt;br/> - Valido fino al: %s&lt;br/> - Impronta SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Vuoi fidarti di questo certificato e continuare? Seleziona "Sì" solo se sei sicuro che l\'impronta corrisponda al server atteso.</string>
+    <string name="x509_key_new_continue">Sì</string>
+    <string name="x509_key_new_abort">No</string>
+
+    <string name="x509_key_mismatch_title">Avviso di sicurezza: il certificato del server non corrisponde</string>
+    <string name="x509_key_mismatch_message">ATTENZIONE: Il certificato del server NON corrisponde all\'impronta attesa.&lt;br/>&lt;br/>Ciò potrebbe indicare un attacco alla sicurezza (ad esempio, un attacco man-in-the-middle) o una configurazione errata del server.&lt;br/>&lt;br/>Certificato atteso:&lt;br/> - Impronta SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Certificato del server:&lt;br/> - Soggetto: %s&lt;br/> - Valido dal: %s&lt;br/> - Valido fino al: %s&lt;br/> - Impronta SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>La connessione a questo server NON È SICURA a meno che non ti fidi esplicitamente di questo nuovo certificato.&lt;br/>&lt;br/>Vuoi procedere comunque? Seleziona "Sì" solo se hai verificato manualmente la nuova impronta.</string>
+    <string name="x509_key_mismatch_continue">Sì</string>
+    <string name="x509_key_mismatch_abort">No</string>
+
+
     <string name="notification_title">Notifiche disabilitate</string>
     <string name="notification_msg">Per poter mostrare le informazioni sullo stato del client e fornire un mezzo per tornare più facilmente al client, si consiglia di abilitare le notifiche.</string>
 

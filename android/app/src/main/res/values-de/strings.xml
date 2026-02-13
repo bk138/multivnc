@@ -116,6 +116,16 @@
     <string name="ssh_key_mismatch_continue">Ich bin zuversichtlich, dass dies legitim ist, fortfahren</string>
     <string name="ssh_key_mismatch_abort">Ich werde den korrekten Fingerabdruck des SSH-Servers noch einmal überprüfen, abbrechen</string>
 
+    <string name="x509_key_new_title">Nicht verifiziertes Server-Zertifikat</string>
+    <string name="x509_key_new_message">Die Identität des Servers konnte nicht automatisch überprüft werden.&lt;br/>&lt;br/>Dies kann ein Sicherheitsrisiko (z. B. einen Man-in-the-Middle-Angriff) anzeigen oder der Server verwendet möglicherweise ein selbstsigniertes oder nicht vertrauenswürdiges Zertifikat.&lt;br/>&lt;br/>Zertifikatsdetails:&lt;br/> - Betreff: %s&lt;br/> - Gültig von: %s&lt;br/> - Gültig bis: %s&lt;br/> - SHA-256-Fingerabdruck: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Möchten Sie diesem Zertifikat vertrauen und fortfahren? Wählen Sie nur "Ja", wenn Sie sicher sind, dass der Fingerabdruck mit dem erwarteten Server übereinstimmt.</string>
+    <string name="x509_key_new_continue">Ja</string>
+    <string name="x509_key_new_abort">Nein</string>
+
+    <string name="x509_key_mismatch_title">Sicherheitswarnung: Server-Zertifikat stimmt nicht überein</string>
+    <string name="x509_key_mismatch_message">WARNUNG: Das Zertifikat des Servers stimmt NICHT mit dem erwarteten Fingerabdruck überein.&lt;br/>&lt;br/>Dies könnte auf einen Sicherheitsangriff (z. B. einen Man-in-the-Middle-Angriff) oder eine falsche Serverkonfiguration hinweisen.&lt;br/>&lt;br/>Erwartetes Zertifikat:&lt;br/> - SHA-256-Fingerabdruck: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Zertifikat des Servers:&lt;br/> - Subjekt: %s&lt;br/> - Gültig von: %s&lt;br/> - Gültig bis: %s&lt;br/> - SHA-256-Fingerabdruck: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Die Verbindung zu diesem Server ist UNSICHER, es sei denn, Sie vertrauen diesem neuen Zertifikat ausdrücklich.&lt;br/>&lt;br/>Möchten Sie trotzdem fortfahren? Wählen Sie nur "Ja", wenn Sie den neuen Fingerabdruck manuell überprüft haben.</string>
+    <string name="x509_key_mismatch_continue">Ja</string>
+    <string name="x509_key_mismatch_abort">Nein</string>
+
     <string name="notification_title">Benachrichtigungen deaktiviert</string>
     <string name="notification_msg">Um Client-Statusinformationen anzeigen zu können und einfacher zum Client zurücknavigieren zu können, wird empfohlen, Benachrichtigungen zu aktivieren.</string>
 

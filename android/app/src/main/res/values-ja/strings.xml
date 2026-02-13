@@ -112,6 +112,16 @@
     <string name="ssh_key_mismatch_continue">これは合法であると確信しています。続行してください</string>
     <string name="ssh_key_mismatch_abort">正しい SSH サーバーのフィンガープリントを再確認し、中止します</string>
 
+    <string name="x509_key_new_title">未確認のサーバー証明書</string>
+    <string name="x509_key_new_message">サーバーの身元を自動的に確認できませんでした。&lt;br/>&lt;br/>これはセキュリティリスク（例：中間者攻撃）またはサーバーが自己署名証明書または信頼されていない証明書を使用している可能性があります。&lt;br/>&lt;br/>証明書の詳細:&lt;br/> - サブジェクト: %s&lt;br/> - 有効期限（開始）: %s&lt;br/> - 有効期限（終了）: %s&lt;br/> - SHA-256 フィンガープリント: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>この証明書を信頼して続行しますか？「はい」を選択するのは、フィンガープリントが期待されるサーバーと一致していると確信している場合のみとしてください。</string>
+    <string name="x509_key_new_continue">はい</string>
+    <string name="x509_key_new_abort">いいえ</string>
+
+    <string name="x509_key_mismatch_title">セキュリティ警告：サーバー証明書の不一致</string>
+    <string name="x509_key_mismatch_message">警告：サーバーの証明書は期待されるフィンガープリントと一致しません。&lt;br/>&lt;br/>これはセキュリティ攻撃（例：中間者攻撃）またはサーバーの設定ミスの可能性があります。&lt;br/>&lt;br/>期待される証明書:&lt;br/> - SHA-256 フィンガープリント: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>サーバーの証明書:&lt;br/> - サブジェクト: %s&lt;br/> - 有効期限（開始）: %s&lt;br/> - 有効期限（終了）: %s&lt;br/> - SHA-256 フィンガープリント: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>このサーバーへの接続は、明示的にこの新しい証明書を信頼しない限り安全ではありません。&lt;br/>&lt;br/>それでも続行しますか？「はい」を選択するのは、新しいフィンガープリントを手動で確認した場合のみとしてください。</string>
+    <string name="x509_key_mismatch_continue">はい</string>
+    <string name="x509_key_mismatch_abort">いいえ</string>
+
     <string name="notification_title">通知が無効になっています</string>
     <string name="notification_msg">クライアントのステータス情報を表示し、より簡単にクライアントに戻る手段を提供できるようにするには、通知を有効にすることをお勧めします。</string>
 

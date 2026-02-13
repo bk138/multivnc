@@ -117,6 +117,17 @@
     <string name="ssh_key_mismatch_continue">Estic segur que això és legítim, continua</string>
     <string name="ssh_key_mismatch_abort">Comprovaré l\'empremta correcta del servidor SSH, avortaré</string>
 
+    <string name="x509_key_new_title">Certificat del servidor no verificat</string>
+    <string name="x509_key_new_message">No s\'ha pogut verificar automàticament la identitat del servidor.&lt;br/>&lt;br/>Això pot indicar un risc de seguretat (per exemple, un atac d\'home al mig) o que el servidor està utilitzant un certificat autofirmat o no de confiança.&lt;br/>&lt;br/>Detalls del certificat:&lt;br/> - Subjecte: %s&lt;br/> - Vàlid des de: %s&lt;br/> - Vàlid fins a: %s&lt;br/> - Empremta SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Voleu confiar en aquest certificat i continuar? Seleccioneu \'Sí\' només si esteu segurs que l\'empremta coincideix amb la del servidor esperat.</string>
+    <string name="x509_key_new_continue">Sí</string>
+    <string name="x509_key_new_abort">No</string>
+
+    <string name="x509_key_mismatch_title">Avís de seguretat: No coincideix el certificat del servidor</string>
+    <string name="x509_key_mismatch_message">AVÍS: El certificat del servidor NO coincideix amb l\'empremta esperada.&lt;br/>&lt;br/>Això podria indicar un atac de seguretat (per exemple, un atac d\'home al mig) o un servidor mal configurat.&lt;br/>&lt;br/>Certificat esperat:&lt;br/> - Empremta SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Certificat del servidor:&lt;br/> - Subjecte: %s&lt;br/> - Vàlid des de: %s&lt;br/> - Vàlid fins a: %s&lt;br/> - Empremta SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Connectar-se a aquest servidor NO ÉS SEGUR llevat que confieu explícitament en aquest nou certificat.&lt;br/>&lt;br/>Voleu continuar igualment? Seleccioneu \'Sí\' només si heu verificat manualment la nova empremta.</string>
+    <string name="x509_key_mismatch_continue">Sí</string>
+    <string name="x509_key_mismatch_abort">No</string>
+
+
     <string name="notification_title">Notificacions desactivades</string>
     <string name="notification_msg">Per poder mostrar la informació de l\'estat del client i proporcionar un mitjà per tornar al client més fàcilment, es recomana habilitar les notificacions.</string>
 

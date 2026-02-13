@@ -50,7 +50,8 @@ public class VNCConn {
 	public interface OnAuthEventListener {
 		void onRequestCredsFromUser(final ConnectionBean conn, boolean isUserNameNeeded);
 		void onRequestSshFingerprintCheck(String host, byte[] fingerprint, final AtomicBoolean doContinue);
-	}
+        void onRequestX509FingerprintMismatchDecision(String subject, String validFrom, String validUntil, byte[] fingerprint, final AtomicBoolean decision);
+    }
 
 	private final OnFramebufferEventListener onFramebufferEventCallback;
 	private final OnAuthEventListener onAuthEventCallback;
@@ -68,6 +69,7 @@ public class VNCConn {
 	@Keep
 	public long rfbClient;
 	private ConnectionBean connSettings;
+	byte[] x509ExpectedFingerprint;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 
 	// Runtime control flags
@@ -454,13 +456,14 @@ public class VNCConn {
 	 * @param initCallback Callback that's called after init has succeeded or failed
 	 * @param disconnectCallback Callback that's called when an established connection disconnects
 	 */
-	public void init(ConnectionBean bean, OnInitListener initCallback, OnDisconnectListener disconnectCallback) {
+	public void init(ConnectionBean bean, byte[] x509ExpectedFingerprint, OnInitListener initCallback, OnDisconnectListener disconnectCallback) {
 
 		Log.d(TAG, "initializing");
 
 		maintainConnection = true;
 
 		connSettings = bean;
+		this.x509ExpectedFingerprint = x509ExpectedFingerprint;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
 		inputThread = new ServerToClientThread(initCallback, disconnectCallback);
@@ -819,6 +822,25 @@ public class VNCConn {
 		return creds;
 	}
 
+    /**
+     * This class is used for returning X.509 credentials from onGetCredential() to native
+     */
+    @Keep
+    private static class X509Credential {
+        // We do intentionally not give any cert files here,
+        // only the fingerprint we expect in case there is a
+        // self-signed cert.
+        public byte[] expectedFingerprint;
+    }
+
+    // called from native via worker thread context
+    @Keep
+    private X509Credential onGetX509Credential() {
+        X509Credential creds = new X509Credential();
+        creds.expectedFingerprint = x509ExpectedFingerprint;
+        return creds;
+    }
+
 	// called from native via worker thread context
 	@Keep
 	private void onNewFramebufferSize(int w, int h) {
@@ -847,5 +869,22 @@ public class VNCConn {
 		}
 		return -1;
 	}
+
+    // called from native via worker thread context
+    @Keep
+    private boolean onX509FingerprintMismatch(String subject, String validFrom, String validUntil, byte[] fingerprint) {
+        if(onAuthEventCallback != null) {
+            AtomicBoolean decision = new AtomicBoolean();
+            onAuthEventCallback.onRequestX509FingerprintMismatchDecision(subject, validFrom, validUntil, fingerprint, decision);
+            synchronized (VNCConn.this) {
+                try {
+                    VNCConn.this.wait();  // wait for user input to finish
+                } catch (InterruptedException ignored) {
+                }
+            }
+            return decision.get();
+        }
+        return false;
+    }
 }
 

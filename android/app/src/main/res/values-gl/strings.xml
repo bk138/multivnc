@@ -117,6 +117,16 @@
     <string name="ssh_key_mismatch_continue">Confío en que isto é lexítimo, continúa</string>
     <string name="ssh_key_mismatch_abort">Comprobarei dúas veces a pegada dixital correcta do servidor SSH, abortarei</string>
 
+    <string name="x509_key_new_title">Certificado do servidor non verificado</string>
+    <string name="x509_key_new_message">Non se puido verificar automaticamente a identidade do servidor.&lt;br/>&lt;br/>Isto pode indicar un risco de seguridade (por exemplo, un ataque de home no medio) ou que o servidor está a usar un certificado autofirmado ou non de confianza.&lt;br/>&lt;br/>Detalles do certificado:&lt;br/> - Asunto: %s&lt;br/> - Válido desde: %s&lt;br/> - Válido ata: %s&lt;br/> - Pegada SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Quere confiar neste certificado e continuar? Seleccione "Sí" só se está seguro de que a pegada coincide co servidor esperado.</string>
+    <string name="x509_key_new_continue">Sí</string>
+    <string name="x509_key_new_abort">Non</string>
+
+    <string name="x509_key_mismatch_title">Aviso de seguridade: o certificado do servidor non coincide</string>
+    <string name="x509_key_mismatch_message">AVISO: O certificado do servidor NON coincide coa pegada esperada.&lt;br/>&lt;br/>Isto podería indicar un ataque de seguridade (por exemplo, un ataque de home no medio) ou un servidor mal configurado.&lt;br/>&lt;br/>Certificado esperado:&lt;br/> - Pegada SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Certificado do servidor:&lt;br/> - Asunto: %s&lt;br/> - Válido desde: %s&lt;br/> - Válido ata: %s&lt;br/> - Pegada SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Conectarse a este servidor NON É SEGURO a menos que confíe explicitamente neste novo certificado.&lt;br/>&lt;br/>Quere continuar de todos os xeitos? Seleccione "Sí" só se verificou manualmente a nova pegada.</string>
+    <string name="x509_key_mismatch_continue">Sí</string>
+    <string name="x509_key_mismatch_abort">Non</string>
+
     <string name="notification_title">Notificacións desactivadas</string>
     <string name="notification_msg">Para poder mostrar a información do estado do cliente e proporcionar un medio para volver ao cliente máis facilmente, recoméndase habilitar as notificacións.</string>
 

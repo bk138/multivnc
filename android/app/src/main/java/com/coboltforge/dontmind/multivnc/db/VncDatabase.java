@@ -16,10 +16,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 /**
  * Note: Version before migration to Room = 12
  */
-@Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class, SshKnownHost.class}, version = VncDatabase.VERSION, exportSchema = false)
+@Database(entities = {ConnectionBean.class, MetaKeyBean.class, MetaList.class, SshKnownHost.class, X509KnownHost.class}, version = VncDatabase.VERSION, exportSchema = false)
 public abstract class VncDatabase extends RoomDatabase {
 
-    public static final int VERSION = 16;
+    public static final int VERSION = 17;
     public static final String NAME = "VncDatabase";
 
     public abstract MetaListDao getMetaListDao();
@@ -30,6 +30,7 @@ public abstract class VncDatabase extends RoomDatabase {
 
     public abstract SshKnownHostDao getSshKnownHostDao();
 
+    public abstract X509KnownHostDao getX509KnownHostDao();
 
     private static VncDatabase instance = null;
 
@@ -41,6 +42,7 @@ public abstract class VncDatabase extends RoomDatabase {
                     .addMigrations(MIGRATION_13_14)
                     .addMigrations(MIGRATION_14_15)
                     .addMigrations(MIGRATION_15_16)
+                    .addMigrations(MIGRATION_16_17)
                     .build();
 
             setupDefaultMetaList(instance);
@@ -176,6 +178,21 @@ public abstract class VncDatabase extends RoomDatabase {
 
             // add new SEND_EXTENDED_KEYS column to CONNECTION_BEAN with default value false
             database.execSQL("ALTER TABLE CONNECTION_BEAN ADD COLUMN SEND_EXTENDED_KEYS INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
+    // add X509 fingerprint storing
+    private static final Migration MIGRATION_16_17 = new Migration(16, 17) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Log.i("VncDatabase", "Migrating to Room [16 -> 17]");
+
+            // create new table
+            database.execSQL("CREATE TABLE X509_KNOWN_HOST (" +
+                    "_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    "HOST TEXT NOT NULL," +
+                    "FINGERPRINT BLOB NOT NULL" +
+                    ")");
         }
     };
 }

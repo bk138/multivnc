@@ -117,6 +117,17 @@
     <string name="ssh_key_mismatch_continue">Estoy seguro de que esto es legítimo, continuar</string>
     <string name="ssh_key_mismatch_abort">Verificaré dos veces la huella digital correcta del servidor SSH, cancelaré</string>
 
+    <string name="x509_key_new_title">Certificado del servidor no verificado</string>
+    <string name="x509_key_new_message">No se pudo verificar automáticamente la identidad del servidor.&lt;br/>&lt;br/>Esto puede indicar un riesgo de seguridad (por ejemplo, un ataque de intermediario) o que el servidor está usando un certificado autofirmado o no confiable.&lt;br/>&lt;br/>Detalles del certificado:&lt;br/> - Asunto: %s&lt;br/> - Válido desde: %s&lt;br/> - Válido hasta: %s&lt;br/> - Huella SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>¿Desea confiar en este certificado y continuar? Seleccione "Sí" solo si está seguro de que la huella coincide con el servidor esperado.</string>
+    <string name="x509_key_new_continue">Sí</string>
+    <string name="x509_key_new_abort">No</string>
+
+    <string name="x509_key_mismatch_title">Advertencia de seguridad: el certificado del servidor no coincide</string>
+    <string name="x509_key_mismatch_message">ADVERTENCIA: El certificado del servidor NO coincide con la huella esperada.&lt;br/>&lt;br/>Esto podría indicar un ataque de seguridad (por ejemplo, un ataque de intermediario) o un servidor mal configurado.&lt;br/>&lt;br/>Certificado esperado:&lt;br/> - Huella SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Certificado del servidor:&lt;br/> - Asunto: %s&lt;br/> - Válido desde: %s&lt;br/> - Válido hasta: %s&lt;br/> - Huella SHA-256: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Conectarse a este servidor NO ES SEGURO a menos que confíe explícitamente en este nuevo certificado.&lt;br/>&lt;br/>¿Desea continuar de todos modos? Seleccione "Sí" solo si ha verificado manualmente la nueva huella.</string>
+    <string name="x509_key_mismatch_continue">Sí</string>
+    <string name="x509_key_mismatch_abort">No</string>
+
+
     <string name="notification_title">Notificaciones deshabilitadas</string>
     <string name="notification_msg">Para poder mostrar información del estado del cliente y proporcionar un medio para volver al cliente más fácilmente, se recomienda habilitar las notificaciones.</string>
 

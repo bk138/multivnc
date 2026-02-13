@@ -65,6 +65,7 @@ import com.coboltforge.dontmind.multivnc.db.ConnectionBean;
 import com.coboltforge.dontmind.multivnc.db.MetaKeyBean;
 import com.coboltforge.dontmind.multivnc.db.SshKnownHost;
 import com.coboltforge.dontmind.multivnc.db.VncDatabase;
+import com.coboltforge.dontmind.multivnc.db.X509KnownHost;
 
 
 public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEventListener, VNCConn.OnAuthEventListener {
@@ -970,7 +971,71 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 		});
 	}
 
-	@Override
+    @Override
+    public void onRequestX509FingerprintMismatchDecision(String subject, String validFrom, String validUntil, byte[] fingerprint, final AtomicBoolean decision) {
+        // this method is probably called from the vnc thread
+        post(() -> {
+            X509KnownHost knownHost = VncDatabase.getInstance(getContext()).getX509KnownHostDao().get(vncConn.getConnSettings().address + ":" + vncConn.getConnSettings().port);
+            if (knownHost == null) {
+                // no fingerprint expected
+                AlertDialog dialog = new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.x509_key_new_title)
+                        .setMessage(Html.fromHtml(getContext().getString(R.string.x509_key_new_message,
+                                subject,
+                                validFrom,
+                                validUntil,
+                                Utils.byteArrayToColonSeparatedHex(fingerprint))))
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.x509_key_new_continue, (dialog12, whichButton) -> {
+                            VncDatabase.getInstance(getContext()).getX509KnownHostDao().insert(new X509KnownHost(0, vncConn.getConnSettings().address + ":" + vncConn.getConnSettings().port, fingerprint));
+                            decision.set(true);
+                            synchronized (vncConn) {
+                                vncConn.notify();
+                            }
+                        })
+                        .setNegativeButton(R.string.x509_key_new_abort, (dialog1, whichButton) -> {
+                            decision.set(false);
+                            synchronized (vncConn) {
+                                vncConn.notify();
+                            }
+                        })
+                        .create();
+                dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+                dialog.show();
+            } else {
+                // fingerprint expected and no match
+                AlertDialog dialog = new AlertDialog.Builder(getContext())
+                        .setTitle(R.string.x509_key_mismatch_title)
+                        .setMessage(Html.fromHtml(getContext().getString(R.string.x509_key_mismatch_message,
+                                Utils.byteArrayToColonSeparatedHex(knownHost.fingerprint),
+                                subject,
+                                validFrom,
+                                validUntil,
+                                Utils.byteArrayToColonSeparatedHex(fingerprint))))
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.x509_key_mismatch_continue, (dialog12, whichButton) -> {
+                            // update/insert fingerprint of known host
+                            X509KnownHost updatedHost = new X509KnownHost(knownHost.id, vncConn.getConnSettings().address + ":" + vncConn.getConnSettings().port, fingerprint);
+                            VncDatabase.getInstance(getContext()).getX509KnownHostDao().update(updatedHost);
+                            decision.set(true);
+                            synchronized (vncConn) {
+                                vncConn.notify();
+                            }
+                        })
+                        .setNegativeButton(R.string.x509_key_mismatch_abort, (dialog1, whichButton) -> {
+                            decision.set(false);
+                            synchronized (vncConn) {
+                                vncConn.notify();
+                            }
+                        })
+                        .create();
+                dialog.show();
+            }
+        });
+    }
+
+    @Override
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
 		Log.d(TAG, "onCreateInputConnection"); // only called when focusableInTouchMode==true
 		outAttrs.imeOptions = EditorInfo.IME_FLAG_NO_FULLSCREEN; // need to set this for some keyboards in landscape mode

@@ -117,6 +117,16 @@
     <string name="ssh_key_mismatch_continue">I\'m confident this is legit, continue</string>
     <string name="ssh_key_mismatch_abort">I\'ll double-check the correct SSH server fingerprint, abort</string>
 
+    <string name="x509_key_new_title">Unverified Server Certificate</string>
+    <string name="x509_key_new_message">The server\'s identity could not be verified automatically.&lt;br/>&lt;br/>This may indicate a security risk (e.g., a man-in-the-middle attack) or the server may be using a self-signed or untrusted certificate.&lt;br/>&lt;br/>Certificate Details:&lt;br/> - Subject: %s&lt;br/> - Valid From: %s&lt;br/> - Valid Until: %s&lt;br/> - SHA-256 Fingerprint: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Do you want to trust this certificate and continue? Select \'Yes\' only if you are sure the fingerprint matches the expected server.</string>
+    <string name="x509_key_new_continue">Yes</string>
+    <string name="x509_key_new_abort">No</string>
+
+    <string name="x509_key_mismatch_title">Security Warning: Server Certificate Mismatch</string>
+    <string name="x509_key_mismatch_message">WARNING: The server\'s certificate does NOT match the expected fingerprint.&lt;br/>&lt;br/>This could indicate a security attack (e.g., a man-in-the-middle attack) or a misconfigured server.&lt;br/>&lt;br/>Expected Certificate:&lt;br/> - SHA-256 Fingerprint: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Server\'s Certificate:&lt;br/> - Subject: %s&lt;br/> - Valid From: %s&lt;br/> - Valid Until: %s&lt;br/> - SHA-256 Fingerprint: &lt;b>%s&lt;/b>&lt;br/>&lt;br/>Connecting to this server is UNSAFE unless you explicitly trust this new certificate.&lt;br/>&lt;br/>Do you want to proceed anyway? Only select \'Yes\' if you have manually verified the new fingerprint.</string>
+    <string name="x509_key_mismatch_continue">Yes</string>
+    <string name="x509_key_mismatch_abort">No</string>
+
     <string name="notification_title">Notifications disabled</string>
     <string name="notification_msg">To be able to show client status information and provide a means of navigating back to the client more easily, it is recommended to enable notifications.</string>
 

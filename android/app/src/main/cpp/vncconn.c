@@ -251,12 +251,6 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
         return NULL;
     }
 
-    if (credentialType != rfbCredentialTypeUser) {
-        //Only user credentials (i.e. username & password) are currently supported
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to unsupported credential type %d requested", credentialType);
-        return NULL;
-    }
-
     jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
     JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
 
@@ -265,41 +259,83 @@ static rfbCredential *onGetCredential(rfbClient *client, int credentialType)
         return NULL;
     }
 
-    // Retrieve credentials
-    jclass cls = (*env)->GetObjectClass(env, obj);
-    jmethodID mid = (*env)->GetMethodID(env, cls, "onGetUserCredential", "()Lcom/coboltforge/dontmind/multivnc/VNCConn$UserCredential;");
-    jobject jCredential = (*env)->CallObjectMethod(env, obj, mid);
-
-    // Extract username & password
-    jclass jCredentialCls = (*env)->GetObjectClass(env, jCredential);
-    jfieldID usernameField = (*env)->GetFieldID(env, jCredentialCls, "username", "Ljava/lang/String;");
-    jstring jUsername = (*env)->GetObjectField(env, jCredential, usernameField);
-
-    jfieldID passwordField = (*env)->GetFieldID(env, jCredentialCls, "password", "Ljava/lang/String;");
-    jstring jPassword = (*env)->GetObjectField(env, jCredential, passwordField);
-
     // Create native rfbCredential, this is free()'d by FreeUserCredential() in LibVNCClient
-    rfbCredential *credential = malloc(sizeof(rfbCredential));
+    rfbCredential *credential = calloc(1, sizeof(rfbCredential));
     if(!credential) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to credential NULL");
         return NULL;
     }
 
-    const char *cUsername = (*env)->GetStringUTFChars(env, jUsername, NULL);
-    if(!cUsername) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to cUsername NULL");
-        return NULL;
-    }
-    credential->userCredential.username = strdup(cUsername);
-    (*env)->ReleaseStringUTFChars(env, jUsername, cUsername);
+    if (credentialType == rfbCredentialTypeUser) {
+        // Retrieve credentials
+        jclass cls = (*env)->GetObjectClass(env, obj);
+        jmethodID mid = (*env)->GetMethodID(env, cls, "onGetUserCredential", "()Lcom/coboltforge/dontmind/multivnc/VNCConn$UserCredential;");
+        jobject jCredential = (*env)->CallObjectMethod(env, obj, mid);
 
-    const char *cPassword = (*env)->GetStringUTFChars(env, jPassword, NULL);
-    if(!cPassword) {
-        __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to cPassword NULL");
-        return NULL;
+        // Extract username & password
+        jclass jCredentialCls = (*env)->GetObjectClass(env, jCredential);
+        jfieldID usernameField = (*env)->GetFieldID(env, jCredentialCls, "username", "Ljava/lang/String;");
+        jstring jUsername = (*env)->GetObjectField(env, jCredential, usernameField);
+
+        jfieldID passwordField = (*env)->GetFieldID(env, jCredentialCls, "password", "Ljava/lang/String;");
+        jstring jPassword = (*env)->GetObjectField(env, jCredential, passwordField);
+
+        const char *cUsername = (*env)->GetStringUTFChars(env, jUsername, NULL);
+        if(!cUsername) {
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to cUsername NULL");
+            free(credential);
+            return NULL;
+        }
+        credential->userCredential.username = strdup(cUsername);
+        (*env)->ReleaseStringUTFChars(env, jUsername, cUsername);
+
+        const char *cPassword = (*env)->GetStringUTFChars(env, jPassword, NULL);
+        if(!cPassword) {
+            __android_log_print(ANDROID_LOG_ERROR, TAG, "onGetCredential failed due to cPassword NULL");
+            free(credential);
+            return NULL;
+        }
+        credential->userCredential.password = strdup(cPassword);
+        (*env)->ReleaseStringUTFChars(env, jPassword, cPassword);
     }
-    credential->userCredential.password = strdup(cPassword);
-    (*env)->ReleaseStringUTFChars(env, jPassword, cPassword);
+
+    if (credentialType == rfbCredentialTypeX509) {
+        // Retrieve credentials
+        jclass cls = (*env)->GetObjectClass(env, obj);
+        jmethodID mid = (*env)->GetMethodID(env, cls, "onGetX509Credential", "()Lcom/coboltforge/dontmind/multivnc/VNCConn$X509Credential;");
+        jobject jCredential = (*env)->CallObjectMethod(env, obj, mid);
+
+        // Extract expected fingerprint
+        jclass jCredentialCls = (*env)->GetObjectClass(env, jCredential);
+        jfieldID expectedFingerprintField = (*env)->GetFieldID(env, jCredentialCls, "expectedFingerprint", "[B");
+        jbyteArray fingerprintArray = (*env)->GetObjectField(env, jCredential, expectedFingerprintField);
+
+        if (fingerprintArray) {
+            jbyte *fingerprintBytes = (*env)->GetByteArrayElements(env, fingerprintArray, NULL);
+            jsize fingerPrintLen = (*env)->GetArrayLength(env, fingerprintArray);
+
+            if (fingerPrintLen != 32) {
+                __android_log_print(ANDROID_LOG_ERROR, TAG,
+                                    "onGetCredential failed due to expected fingerprint wrong length %d",
+                                    fingerPrintLen);
+                free(credential);
+                return NULL;
+            }
+
+            credential->x509Credential.x509ExpectedFingerprint = (uint8_t *) malloc(32);
+            if (!credential->x509Credential.x509ExpectedFingerprint) {
+                __android_log_print(ANDROID_LOG_ERROR, TAG,
+                                    "onGetCredential failed due to credential.x509ExpectedFingerprint alloc NULL");
+                free(credential);
+                return NULL;
+            }
+
+            memcpy(credential->x509Credential.x509ExpectedFingerprint, fingerprintBytes, fingerPrintLen);
+
+            (*env)->ReleaseByteArrayElements(env, fingerprintArray, fingerprintBytes, JNI_ABORT);
+        }
+
+    }
 
     return credential;
 }
@@ -372,6 +408,66 @@ static int onSshFingerprintCheck(void *client,
 }
 
 
+static rfbBool onX509FingerprintMismatch(rfbClient *client,
+                                         const char *remote_cert_subject,
+                                         time_t remote_cert_valid_from,
+                                         time_t remote_cert_valid_until,
+                                         const uint8_t *remote_cert_sha256_fingerprint,
+                                         size_t remote_cert_sha256_fingerprint_len) {
+    if(!client) {
+        __android_log_print(ANDROID_LOG_ERROR, TAG, "onX509FingerprintMismatch failed due to client NULL");
+        return -1;
+    }
+
+    jobject obj = rfbClientGetClientData(client, VNCCONN_OBJ_ID);
+    JNIEnv *env = rfbClientGetClientData(client, VNCCONN_ENV_ID);
+
+    // Convert time_t to strings
+    char valid_from_str[32];
+    strftime(valid_from_str, sizeof(valid_from_str), "%Y-%m-%d %H:%M:%S UTC", gmtime(&remote_cert_valid_from));
+    char valid_until_str[32];
+    strftime(valid_until_str, sizeof(valid_until_str), "%Y-%m-%d %H:%M:%S UTC", gmtime(&remote_cert_valid_until));
+
+    // Convert C types to JNI types
+    jstring jSubject = (*env)->NewStringUTF(env, remote_cert_subject);
+    jstring jValidFrom = (*env)->NewStringUTF(env, valid_from_str);
+    jstring jValidUntil = (*env)->NewStringUTF(env, valid_until_str);
+    jbyteArray jFingerprint = (*env)->NewByteArray(env, (jsize)remote_cert_sha256_fingerprint_len);
+    (*env)->SetByteArrayRegion(
+            env,
+            jFingerprint,
+            0,
+            (jsize)remote_cert_sha256_fingerprint_len,
+            (jbyte *)remote_cert_sha256_fingerprint
+    );
+
+    // Call the Java method
+    jclass clazz = (*env)->GetObjectClass(env, obj);
+    jmethodID methodID = (*env)->GetMethodID(
+            env,
+            clazz,
+            "onX509FingerprintMismatch",
+            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)Z"
+    );
+    jboolean decision = (*env)->CallBooleanMethod(
+            env,
+            obj,
+            methodID,
+            jSubject,
+            jValidFrom,
+            jValidUntil,
+            jFingerprint
+    );
+
+    // Clean up local references
+    (*env)->DeleteLocalRef(env, jSubject);
+    (*env)->DeleteLocalRef(env, jValidFrom);
+    (*env)->DeleteLocalRef(env, jValidUntil);
+    (*env)->DeleteLocalRef(env, jFingerprint);
+
+    return decision ? TRUE : FALSE;
+}
+
 /**
  * Allocates and sets up the VNCConn's rfbClient.
  * @param env
@@ -422,6 +518,7 @@ static jboolean setupClient(JNIEnv *env, jobject obj, jint bytesPerPixel) {
     cl->GotXCutTextUTF8 = onGotCutTextUTF8;
     cl->GetPassword = onGetPassword;
     cl->GetCredential = onGetCredential;
+    cl->GetX509CertFingerprintMismatchDecision = onX509FingerprintMismatch;
     defaultMallocFramebuffer = cl->MallocFrameBuffer; // save default one
     cl->MallocFrameBuffer = onNewFBSize; // set new one
 

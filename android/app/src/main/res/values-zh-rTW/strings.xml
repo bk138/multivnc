@@ -117,6 +117,16 @@
     <string name="ssh_key_mismatch_continue">我相信这是合法的，继续</string>
     <string name="ssh_key_mismatch_abort">我会仔细检查正确的 SSH 服务器指纹，中止</string>
 
+    <string name="x509_key_new_title">未經驗證的伺服器憑證</string>
+    <string name="x509_key_new_message">無法自動驗證伺服器的身份。&lt;br/>&lt;br/>這可能表示存在安全風險（例如中間人攻擊），或者伺服器可能正在使用自簽名或不受信任的憑證。&lt;br/>&lt;br/>憑證詳情：&lt;br/> - 主題：%s&lt;br/> - 有效期自：%s&lt;br/> - 有效期至：%s&lt;br/> - SHA-256 指紋：&lt;b>%s&lt;/b>&lt;br/>&lt;br/>您是否要信任此憑證並繼續？僅在確認指紋與預期伺服器匹配時選擇「是」。</string>
+    <string name="x509_key_new_continue">是</string>
+    <string name="x509_key_new_abort">否</string>
+
+    <string name="x509_key_mismatch_title">安全警告：伺服器憑證不匹配</string>
+    <string name="x509_key_mismatch_message">警告：伺服器的憑證與預期指紋不匹配。&lt;br/>&lt;br/>這可能表示存在安全攻擊（例如中間人攻擊）或伺服器配置錯誤。&lt;br/>&lt;br/>預期憑證：&lt;br/> - SHA-256 指紋：&lt;b>%s&lt;/b>&lt;br/>&lt;br/>伺服器的憑證：&lt;br/> - 主題：%s&lt;br/> - 有效期自：%s&lt;br/> - 有效期至：%s&lt;br/> - SHA-256 指紋：&lt;b>%s&lt;/b>&lt;br/>&lt;br/>除非您明確信任此新憑證，否則連接到此伺服器不安全。&lt;br/>&lt;br/>您仍要繼續嗎？僅在手動驗證新指紋後選擇「是」。</string>
+    <string name="x509_key_mismatch_continue">是</string>
+    <string name="x509_key_mismatch_abort">否</string>
+
     <string name="notification_title">通知已禁用</string>
     <string name="notification_msg">为了能够显示客户端状态信息并提供更轻松地导航回客户端的方法，建议启用通知。</string>
 
