@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -49,7 +50,7 @@ public class VNCConn {
 
 	public interface OnAuthEventListener {
 		void onRequestCredsFromUser(final ConnectionBean conn, boolean isUserNameNeeded);
-		void onRequestSshFingerprintCheck(String host, byte[] fingerprint, final AtomicBoolean doContinue);
+		void onRequestSshFingerprintMismatchDecision(String host, byte[] fingerprint, final AtomicBoolean doContinue);
         void onRequestX509FingerprintMismatchDecision(String subject, String validFrom, String validUntil, byte[] fingerprint, final AtomicBoolean decision);
     }
 
@@ -69,6 +70,7 @@ public class VNCConn {
 	@Keep
 	public long rfbClient;
 	private ConnectionBean connSettings;
+	byte[] sshExpectedFingerprint;
 	byte[] x509ExpectedFingerprint;
 	private COLORMODEL pendingColorModel = COLORMODEL.C24bit;
 
@@ -456,13 +458,14 @@ public class VNCConn {
 	 * @param initCallback Callback that's called after init has succeeded or failed
 	 * @param disconnectCallback Callback that's called when an established connection disconnects
 	 */
-	public void init(ConnectionBean bean, byte[] x509ExpectedFingerprint, OnInitListener initCallback, OnDisconnectListener disconnectCallback) {
+	public void init(ConnectionBean bean, byte[] sshExpectedFingerprint, byte[] x509ExpectedFingerprint, OnInitListener initCallback, OnDisconnectListener disconnectCallback) {
 
 		Log.d(TAG, "initializing");
 
 		maintainConnection = true;
 
 		connSettings = bean;
+		this.sshExpectedFingerprint = sshExpectedFingerprint;
 		this.x509ExpectedFingerprint = x509ExpectedFingerprint;
 		this.pendingColorModel = COLORMODEL.valueOf(bean.colorModel);
 
@@ -852,9 +855,15 @@ public class VNCConn {
 	// called from native via worker thread context
 	@Keep
 	private int onSshFingerprintCheck(String host, byte[] fingerprint) {
+
+		if (Arrays.equals(fingerprint, sshExpectedFingerprint)) {
+			return 0;
+		}
+
+		// mismatch, ask!
 		if(onAuthEventCallback != null) {
 			AtomicBoolean doContinue = new AtomicBoolean();
-			onAuthEventCallback.onRequestSshFingerprintCheck(host, fingerprint, doContinue);
+			onAuthEventCallback.onRequestSshFingerprintMismatchDecision(host, fingerprint, doContinue);
 			synchronized (VNCConn.this) {
 				try {
 					VNCConn.this.wait();  // wait for user input to finish

@@ -30,7 +30,6 @@
 
 package com.coboltforge.dontmind.multivnc.ui;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -903,12 +902,12 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	}
 
 	@Override
-	public void onRequestSshFingerprintCheck(String host, byte[] fingerprint, AtomicBoolean doContinue) {
+	public void onRequestSshFingerprintMismatchDecision(String host, byte[] fingerprint, AtomicBoolean doContinue) {
 		// this method is probably called from the vnc thread
 		post(() -> {
-			// look for host, if not found create entry and return ok
 			SshKnownHost knownHost = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(host);
 			if(knownHost == null) {
+				// not yet known
 				AlertDialog dialog = new AlertDialog.Builder(getContext())
 						.setTitle(R.string.ssh_key_new_title)
 						// always using SHA256 in native part, ok to hardcode this here
@@ -932,15 +931,6 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 
 				dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 				dialog.show();
-				return;
-			}
-
-			// host found, check if fingerprint matches
-			if(Arrays.equals(knownHost.fingerprint, fingerprint)) {
-				doContinue.set(true);
-				synchronized (vncConn) {
-					vncConn.notify();
-				}
 			} else {
 				// not matching, ask user!
 				AlertDialog dialog = new AlertDialog.Builder(getContext())

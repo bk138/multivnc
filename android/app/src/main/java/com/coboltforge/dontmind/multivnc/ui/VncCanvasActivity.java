@@ -262,6 +262,7 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		firstFrameWaitDialog = pd;
 		vncCanvas.initializeVncCanvas(pd, inputHandler, conn); // add conn to canvas
 		conn.init(connection,
+				database.getSshKnownHostDao().get(connection.sshHost) != null ? database.getSshKnownHostDao().get(connection.sshHost).fingerprint : null,
 				database.getX509KnownHostDao().get(connection.address + ":" + connection.port) != null ? database.getX509KnownHostDao().get(connection.address + ":" + connection.port).fingerprint : null,
 				// onInit
 				initError -> runOnUiThread(() -> {
