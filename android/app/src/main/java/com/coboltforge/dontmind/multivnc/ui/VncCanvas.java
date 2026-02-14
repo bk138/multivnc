@@ -902,10 +902,14 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	}
 
 	@Override
-	public void onRequestSshFingerprintMismatchDecision(String host, byte[] fingerprint, AtomicBoolean doContinue) {
+	public void onRequestSshFingerprintMismatchDecision(String host, int port, byte[] fingerprint, AtomicBoolean doContinue) {
 		// this method is probably called from the vnc thread
 		post(() -> {
-			SshKnownHost knownHost = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(host);
+			SshKnownHost maybeFound = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(host + ":" + port);
+			if (maybeFound == null) { // fallback for saves without port
+				maybeFound = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(host);
+			}
+			SshKnownHost knownHost = maybeFound;
 			if(knownHost == null) {
 				// not yet known
 				AlertDialog dialog = new AlertDialog.Builder(getContext())
@@ -915,7 +919,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 								"SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP))))
 						.setCancelable(false)
 						.setPositiveButton(R.string.ssh_key_new_continue, (dialog12, whichButton) -> {
-							VncDatabase.getInstance(getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, host, fingerprint));
+							VncDatabase.getInstance(getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, host + ":" + port, fingerprint));
 							doContinue.set(true);
 							synchronized (vncConn) {
 								vncConn.notify();
@@ -940,7 +944,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 								"SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP))))
 						.setCancelable(false)
 						.setPositiveButton(R.string.ssh_key_mismatch_continue, (dialog12, whichButton) -> {
-							SshKnownHost updatedHost = new SshKnownHost(knownHost.id, host, fingerprint);
+							SshKnownHost updatedHost = new SshKnownHost(knownHost.id, host + ":" + port, fingerprint);
 							VncDatabase.getInstance(getContext()).getSshKnownHostDao().update(updatedHost);
 							doContinue.set(true);
 							synchronized (vncConn) {

@@ -384,7 +384,8 @@ static void onSshError(void *client, ssh_tunnel_error_t error_code,  const char 
 static int onSshFingerprintCheck(void *client,
                                  const char *fingerprint,
                                  int fingerprint_len,
-                                 const char *host)
+                                 const char *host,
+                                 int port)
 {
     if(!client) {
         __android_log_print(ANDROID_LOG_ERROR, TAG, "onSshFingerprintCheck failed due to client NULL");
@@ -403,8 +404,8 @@ static int onSshFingerprintCheck(void *client,
     (*env)->SetByteArrayRegion(env, jFingerprint, 0, (jsize)fingerprint_len, (jbyte *) fingerprint);
 
     jclass cls = (*env)->GetObjectClass(env, obj);
-    jmethodID mid = (*env)->GetMethodID(env, cls, "onSshFingerprintCheck", "(Ljava/lang/String;[B)I");
-    return  (*env)->CallIntMethod(env, obj, mid, (*env)->NewStringUTF(env, host), jFingerprint);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "onSshFingerprintCheck", "(Ljava/lang/String;I[B)I");
+    return  (*env)->CallIntMethod(env, obj, mid, (*env)->NewStringUTF(env, host), port, jFingerprint);
 }
 
 

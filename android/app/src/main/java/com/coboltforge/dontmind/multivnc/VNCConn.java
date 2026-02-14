@@ -50,7 +50,7 @@ public class VNCConn {
 
 	public interface OnAuthEventListener {
 		void onRequestCredsFromUser(final ConnectionBean conn, boolean isUserNameNeeded);
-		void onRequestSshFingerprintMismatchDecision(String host, byte[] fingerprint, final AtomicBoolean doContinue);
+		void onRequestSshFingerprintMismatchDecision(String host, int port, byte[] fingerprint, final AtomicBoolean doContinue);
         void onRequestX509FingerprintMismatchDecision(String subject, String validFrom, String validUntil, byte[] fingerprint, final AtomicBoolean decision);
     }
 
@@ -854,7 +854,7 @@ public class VNCConn {
 
 	// called from native via worker thread context
 	@Keep
-	private int onSshFingerprintCheck(String host, byte[] fingerprint) {
+	private int onSshFingerprintCheck(String host, int port, byte[] fingerprint) {
 
 		if (Arrays.equals(fingerprint, sshExpectedFingerprint)) {
 			return 0;
@@ -863,7 +863,7 @@ public class VNCConn {
 		// mismatch, ask!
 		if(onAuthEventCallback != null) {
 			AtomicBoolean doContinue = new AtomicBoolean();
-			onAuthEventCallback.onRequestSshFingerprintMismatchDecision(host, fingerprint, doContinue);
+			onAuthEventCallback.onRequestSshFingerprintMismatchDecision(host, port, fingerprint, doContinue);
 			synchronized (VNCConn.this) {
 				try {
 					VNCConn.this.wait();  // wait for user input to finish
