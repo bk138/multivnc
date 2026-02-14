@@ -1144,7 +1144,8 @@ void VNCConn::thread_on_ssh_error(void *client, ssh_tunnel_error_t error_code,  
 int VNCConn::thread_on_ssh_fingerprint_check(void *client,
                                              const char *fingerprint,
                                              int fingerprint_len,
-                                             const char *host) {
+                                             const char *host,
+                                             int port) {
     VNCConn* conn = (VNCConn*) client;
 
     /*

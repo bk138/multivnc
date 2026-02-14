@@ -383,7 +383,8 @@ private:
   static int thread_on_ssh_fingerprint_check(void *client,
                                              const char *fingerprint,
                                              int fingerprint_len,
-                                             const char *host);
+                                             const char *host,
+                                             int port);
   static rfbBool thread_on_x509_fingerprint_mismatch(rfbClient *client,
                                                      const char *remote_cert_subject,
                                                      time_t remote_cert_valid_from,
