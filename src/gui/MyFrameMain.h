@@ -86,7 +86,8 @@ class MyFrameMain: public FrameMain
 
   // helpers
   wxString getQueryValue(const wxURI& wxUri, const wxString& key);
-  
+  void parseHostString(const char *server, int defaultport, char **host, int *port);
+
   // private handlers
   void onMyFrameLogCloseNotify(wxCommandEvent& event);
   void onVNCConnListenNotify(wxCommandEvent& event);

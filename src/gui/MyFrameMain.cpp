@@ -1549,6 +1549,53 @@ wxString MyFrameMain::getQueryValue(const wxURI& wxUri, const wxString& key) {
 
 
 /*
+  parse ipv4 or ipv6 address string.
+  taken from remmina, thanks!
+*/
+void MyFrameMain::parseHostString(const char *server, int defaultport, char **host, int *port)
+{
+	char *str, *ptr, *ptr2;
+
+	str = strdup(server);
+
+	/* [server]:port format */
+	ptr = strchr(str, '[');
+	if (ptr)
+	{
+		ptr++;
+		ptr2 = strchr(ptr, ']');
+		if (ptr2)
+			*ptr2++ = '\0';
+		if (*ptr2 == ':')
+			defaultport = atoi(ptr2 + 1);
+		if (host)
+			*host = strdup(ptr);
+		if (port)
+			*port = defaultport;
+		free(str);
+		return;
+	}
+
+	/* server:port format, IPv6 cannot use this format */
+	ptr = strchr(str, ':');
+	if (ptr)
+	{
+		ptr2 = strchr(ptr + 1, ':');
+		if (ptr2 == NULL)
+		{
+			*ptr++ = '\0';
+			defaultport = atoi(ptr);
+		}
+		/* More than one ':' means this is IPv6 address. Treat it as a whole address */
+	}
+	if (host)
+		*host = str;
+	if (port)
+		*port = defaultport;
+}
+
+
+/*
   public members
 */
 
