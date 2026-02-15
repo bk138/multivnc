@@ -905,7 +905,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	public void onRequestSshFingerprintMismatchDecision(String host, int port, byte[] fingerprint, AtomicBoolean doContinue) {
 		// this method is probably called from the vnc thread
 		post(() -> {
-			SshKnownHost maybeFound = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(host + ":" + port);
+			SshKnownHost maybeFound = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(Utils.uriFormatHostWithPort(host, port));
 			if (maybeFound == null) { // fallback for saves without port
 				maybeFound = VncDatabase.getInstance(getContext()).getSshKnownHostDao().get(host);
 			}
@@ -919,7 +919,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 								"SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP))))
 						.setCancelable(false)
 						.setPositiveButton(R.string.ssh_key_new_continue, (dialog12, whichButton) -> {
-							VncDatabase.getInstance(getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, host + ":" + port, fingerprint));
+							VncDatabase.getInstance(getContext()).getSshKnownHostDao().insert(new SshKnownHost(0, Utils.uriFormatHostWithPort(host, port), fingerprint));
 							doContinue.set(true);
 							synchronized (vncConn) {
 								vncConn.notify();
@@ -944,7 +944,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 								"SHA256:" + Base64.encodeToString(fingerprint,Base64.NO_PADDING|Base64.NO_WRAP))))
 						.setCancelable(false)
 						.setPositiveButton(R.string.ssh_key_mismatch_continue, (dialog12, whichButton) -> {
-							SshKnownHost updatedHost = new SshKnownHost(knownHost.id, host + ":" + port, fingerprint);
+							SshKnownHost updatedHost = new SshKnownHost(knownHost.id, Utils.uriFormatHostWithPort(host, port), fingerprint);
 							VncDatabase.getInstance(getContext()).getSshKnownHostDao().update(updatedHost);
 							doContinue.set(true);
 							synchronized (vncConn) {
@@ -969,7 +969,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
     public void onRequestX509FingerprintMismatchDecision(String subject, String validFrom, String validUntil, byte[] fingerprint, final AtomicBoolean decision) {
         // this method is probably called from the vnc thread
         post(() -> {
-            X509KnownHost knownHost = VncDatabase.getInstance(getContext()).getX509KnownHostDao().get(vncConn.getConnSettings().address + ":" + vncConn.getConnSettings().port);
+            X509KnownHost knownHost = VncDatabase.getInstance(getContext()).getX509KnownHostDao().get(Utils.uriFormatHostWithPort(vncConn.getConnSettings().address, vncConn.getConnSettings().port));
             if (knownHost == null) {
                 // no fingerprint expected
                 AlertDialog dialog = new AlertDialog.Builder(getContext())
@@ -981,7 +981,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
                                 Utils.byteArrayToColonSeparatedHex(fingerprint))))
                         .setCancelable(false)
                         .setPositiveButton(R.string.x509_key_new_continue, (dialog12, whichButton) -> {
-                            VncDatabase.getInstance(getContext()).getX509KnownHostDao().insert(new X509KnownHost(0, vncConn.getConnSettings().address + ":" + vncConn.getConnSettings().port, fingerprint));
+                            VncDatabase.getInstance(getContext()).getX509KnownHostDao().insert(new X509KnownHost(0, Utils.uriFormatHostWithPort(vncConn.getConnSettings().address, vncConn.getConnSettings().port), fingerprint));
                             decision.set(true);
                             synchronized (vncConn) {
                                 vncConn.notify();
@@ -1010,7 +1010,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
                         .setCancelable(false)
                         .setPositiveButton(R.string.x509_key_mismatch_continue, (dialog12, whichButton) -> {
                             // update/insert fingerprint of known host
-                            X509KnownHost updatedHost = new X509KnownHost(knownHost.id, vncConn.getConnSettings().address + ":" + vncConn.getConnSettings().port, fingerprint);
+                            X509KnownHost updatedHost = new X509KnownHost(knownHost.id, Utils.uriFormatHostWithPort(vncConn.getConnSettings().address, vncConn.getConnSettings().port), fingerprint);
                             VncDatabase.getInstance(getContext()).getX509KnownHostDao().update(updatedHost);
                             decision.set(true);
                             synchronized (vncConn) {

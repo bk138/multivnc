@@ -261,13 +261,13 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		pd.show();
 		firstFrameWaitDialog = pd;
 		vncCanvas.initializeVncCanvas(pd, inputHandler, conn); // add conn to canvas
-		byte[] sshFingerprint = database.getSshKnownHostDao().get(connection.sshHost + ":" + connection.sshPort) != null ? database.getSshKnownHostDao().get(connection.sshHost  + ":" + connection.sshPort).fingerprint : null;
+		byte[] sshFingerprint = database.getSshKnownHostDao().get(Utils.uriFormatHostWithPort(connection.sshHost, connection.sshPort)) != null ? database.getSshKnownHostDao().get(Utils.uriFormatHostWithPort(connection.sshHost, connection.sshPort)).fingerprint : null;
 		if (sshFingerprint == null) { // fallback for saves without port
 			sshFingerprint = database.getSshKnownHostDao().get(connection.sshHost) != null ? database.getSshKnownHostDao().get(connection.sshHost).fingerprint : null;
 		}
 		conn.init(connection,
 				sshFingerprint,
-				database.getX509KnownHostDao().get(connection.address + ":" + connection.port) != null ? database.getX509KnownHostDao().get(connection.address + ":" + connection.port).fingerprint : null,
+				database.getX509KnownHostDao().get(Utils.uriFormatHostWithPort(connection.address, connection.port)) != null ? database.getX509KnownHostDao().get(Utils.uriFormatHostWithPort(connection.address, connection.port)).fingerprint : null,
 				// onInit
 				initError -> runOnUiThread(() -> {
 					if(isFinishing()) {

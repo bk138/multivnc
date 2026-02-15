@@ -131,4 +131,27 @@ public class Utils {
         return hexString.toString();
     }
 
+	/**
+	 * Formats host and port into a standard URI format that properly handles both IPv4 and IPv6 addresses.
+	 */
+	public static String uriFormatHostWithPort(String host, int port) {
+		// Handle null or empty host
+		if (host == null || host.isEmpty()) {
+			return "";
+		}
+
+		// Check if already properly bracketed (e.g., "[2001:db8::1]")
+		if (host.startsWith("[") && host.endsWith("]")) {
+			return host + ":" + port;
+		}
+
+		if (host.contains(":")) {
+			// Likely IPv6 address - bracket it
+			return "[" + host + "]:" + port;
+		}  else {
+			// IPv4 address or regular hostname
+			return host + ":" + port;
+		}
+	}
+
 }
