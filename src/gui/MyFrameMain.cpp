@@ -629,6 +629,7 @@ void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
   encodings = encodings.AfterFirst(' '); 
 
   if(!c->Init(wxEmptyString,
+              5900,
               -1,
               wxEmptyString,
               wxSecretValue(), // Creates an empty secret value (not the same as an empty password).
@@ -1099,13 +1100,14 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
     {
       wxString user, host, ssh_user, ssh_host, ssh_fingerprint, ssh_priv_key_filename, x509_fingerprint;
       wxSecretValue password, ssh_password, ssh_priv_key_password;
-      int repeaterId = -1, ssh_port = 22;
+      int repeaterId = -1, port = 5900, ssh_port = 22;
 
       wxString vncUriScheme = "vnc://";
       if (service.substr(0, vncUriScheme.length()) == vncUriScheme) {
           // vnc:// URI
           wxURI uri(service);
-          host = uri.GetServer() + ":" + uri.GetPort();
+          host = uri.GetServer();
+          uri.GetPort().ToInt(&port);
           user = getQueryValue(uri, "VncUsername"); // RFC 7869
           if (user.IsEmpty()) {
               user = uri.GetUserInfo(); // fallback
@@ -1148,16 +1150,19 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
               x509_fingerprint.MakeLower();                    // now lowercase hex
               if (x509_fingerprint.IsEmpty()) {
                   // if no fingerprint given, use the one from our internal known_hosts
-                  x509_fingerprint = x509_known_hosts_load(uri.GetServer(), uri.GetPort().IsEmpty() ? "5900" : uri.GetPort());
+                  x509_fingerprint = x509_known_hosts_load(uri.GetServer(), wxString() << port);
               }
           }
       } else {
           // user@host:port notation
           user = service.Contains("@") ? service.BeforeFirst('@') : "";
-          host = service.Contains("@") ? service.AfterFirst('@') : service;
+          char *tmp;
+          parseHostString((service.Contains("@") ? service.AfterFirst('@') : service).mb_str(), 5900, &tmp, &port);
+          host = wxString(tmp);
+          free(tmp);
 
           // this notation cannot give a fingerprint, use the one from our internal known_hosts
-          x509_fingerprint = x509_known_hosts_load(host.BeforeFirst(':'), host.Contains(':') ? host.AfterLast(':') : "5900");
+          x509_fingerprint = x509_known_hosts_load(host, wxString() << port);
       }
 
       // add to notebook, needs to be after connections list add
@@ -1165,6 +1170,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
       wxLogStatus(_("Connecting to %s..."), host);
 
       if(!c->Init(host,
+                  port,
                   repeaterId,
                   user,
                   password,
@@ -1615,7 +1621,12 @@ void MyFrameMain::machine_connect(wxCommandEvent &event)
     if(dialog_new_connection.ShowModal() == wxID_OK && dialog_new_connection.getVncServer() != wxEmptyString) {
         pConfig->Write(K_LASTSERVER, dialog_new_connection.getVncServer());
         pConfig->Write(K_LASTPORT, dialog_new_connection.getVncPort());
-        conn_spawn("vnc://" + dialog_new_connection.getVncServer()
+        wxString server = dialog_new_connection.getVncServer();
+        if (server.Contains(":")) {
+            // IPv6 address, need brackets as per RFC 2732
+            server = "[" + server + "]";
+        }
+        conn_spawn("vnc://" + server
                    + wxString(dialog_new_connection.getVncPort().IsEmpty() ? "" : ":" + dialog_new_connection.getVncPort())
                    + "?RepeaterId=" + wxString::Format("%i", dialog_new_connection.getRepeaterId())
                    + "&SshHost=" + dialog_new_connection.getSshServer()
