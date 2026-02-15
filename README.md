@@ -20,7 +20,7 @@ The roadmap for future developments regarding the project can be found
 ## Features
 
 * Support for most VNC encodings including Tight.
-* TLS support, i.e. AnonTLS and VeNCrypt.
+* TLS support, i.e. AnonTLS and VeNCrypt, including support for self-signed certificates.
 * Support for SSH-Tunnelling with password- and privkey-based authentication.
 * Unicode copy & paste to and from the VNC server.
 * Discovery of VNC servers advertising themselves via ZeroConf.
