@@ -1,6 +1,7 @@
 
 #include "gui/bitmapFromMem.h"
 #include "gui/evtids.h"
+#include "uri.h"
 #include <fstream>
 #include <wx/aboutdlg.h>
 #include <wx/textctrl.h>
