@@ -2328,7 +2328,12 @@ void MyFrameMain::bookmarks_secrets_delete(const wxString& bookmarkName) {
 
 void MyFrameMain::ssh_known_hosts_save(const wxString& host, const wxString& port, const wxString& fingerprint) {
     wxConfigBase *cfg = wxConfigBase::Get();
-    wxString name = host + ":" + port;
+    wxString name;
+    if (host.Contains(':')) {
+        name = "[" + host + "]" + ":" + port;
+    } else {
+        name = host + ":" + port;
+    }
     if(name != wxEmptyString) {
         cfg->SetPath(G_SSH_KNOWN_HOSTS + name);
         cfg->Write(K_SSH_KNOWN_HOSTS_FINGERPRINT, fingerprint);
@@ -2341,7 +2346,12 @@ void MyFrameMain::ssh_known_hosts_save(const wxString& host, const wxString& por
 wxString MyFrameMain::ssh_known_hosts_load(const wxString& host, const wxString& port) {
     wxString fingerprint;
     wxConfigBase *cfg = wxConfigBase::Get();
-    wxString name = host + ":" + port;
+    wxString name;
+    if (host.Contains(':')) {
+        name = "[" + host + "]" + ":" + port;
+    } else {
+        name = host + ":" + port;
+    }
     cfg->SetPath(G_SSH_KNOWN_HOSTS + name);
     cfg->Read(K_SSH_KNOWN_HOSTS_FINGERPRINT, &fingerprint);
     //reset path
@@ -2372,7 +2382,12 @@ wxString MyFrameMain::hex_to_base64(const wxString& hex) {
 
 void MyFrameMain::x509_known_hosts_save(const wxString& host, const wxString& port, const wxString& fingerprint) {
     wxConfigBase *cfg = wxConfigBase::Get();
-    wxString name = host + ":" + port;
+    wxString name;
+    if (host.Contains(':')) {
+        name = "[" + host + "]" + ":" + port;
+    } else {
+        name = host + ":" + port;
+    }
     if(name != wxEmptyString) {
         cfg->SetPath(G_X509_KNOWN_HOSTS + name);
         cfg->Write(K_X509_KNOWN_HOSTS_FINGERPRINT, fingerprint);
@@ -2385,7 +2400,12 @@ void MyFrameMain::x509_known_hosts_save(const wxString& host, const wxString& po
 wxString MyFrameMain::x509_known_hosts_load(const wxString& host, const wxString& port) {
     wxString fingerprint;
     wxConfigBase *cfg = wxConfigBase::Get();
-    wxString name = host + ":" + port;
+    wxString name;
+    if (host.Contains(':')) {
+        name = "[" + host + "]" + ":" + port;
+    } else {
+        name = host + ":" + port;
+    }
     cfg->SetPath(G_X509_KNOWN_HOSTS + name);
     cfg->Read(K_X509_KNOWN_HOSTS_FINGERPRINT, &fingerprint);
     //reset path
