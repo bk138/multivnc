@@ -363,10 +363,22 @@ static rfbBool onNewFBSize(rfbClient *client)
     }
 
     jclass cls = (*env)->GetObjectClass(env, obj);
-    jmethodID mid = (*env)->GetMethodID(env, cls, "onNewFramebufferSize", "(II)V");
-    (*env)->CallVoidMethod(env, obj, mid, client->width, client->height);
 
-    return defaultMallocFramebuffer(client);
+    // lock out other framebuffer accessors
+    jmethodID mid_lockFramebuffer = (*env)->GetMethodID(env, cls, "lockFramebuffer", "()V");
+    (*env)->CallVoidMethod(env, obj, mid_lockFramebuffer);
+
+    // tell the managed VNCConn about the new framebuffer size
+    jmethodID mid_onNewFramebufferSize = (*env)->GetMethodID(env, cls, "onNewFramebufferSize", "(II)V");
+    (*env)->CallVoidMethod(env, obj, mid_onNewFramebufferSize, client->width, client->height);
+    // alloc new framebuffer
+    rfbBool status = defaultMallocFramebuffer(client);
+
+    // allow framebuffer access again
+    jmethodID mid_unlockFramebuffer = (*env)->GetMethodID(env, cls, "unlockFramebuffer", "()V");
+    (*env)->CallVoidMethod(env, obj, mid_unlockFramebuffer);
+
+    return status;
 }
 
 static void onSshError(void *client, ssh_tunnel_error_t error_code,  const char *error_message) {
@@ -547,10 +559,19 @@ JNIEXPORT void JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbShutdow
 
         ssh_tunnel_close(rfbClientGetClientData(cl, VNCCONN_SSH_ID));
 
+        jclass cls = (*env)->GetObjectClass(env, obj);
+        // lock out other framebuffer accessors
+        jmethodID mid_lockFramebuffer = (*env)->GetMethodID(env, cls, "lockFramebuffer", "()V");
+        (*env)->CallVoidMethod(env, obj, mid_lockFramebuffer);
+
         if(cl->frameBuffer) {
             free(cl->frameBuffer);
             cl->frameBuffer = 0;
         }
+
+        // allow framebuffer access again
+        jmethodID mid_unlockFramebuffer = (*env)->GetMethodID(env, cls, "unlockFramebuffer", "()V");
+        (*env)->CallVoidMethod(env, obj, mid_unlockFramebuffer);
 
         rfbClientCleanup(cl);
         // rfbClientCleanup does not zero the pointer
