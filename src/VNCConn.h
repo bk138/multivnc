@@ -106,6 +106,7 @@ public:
       INITIALISE_CANCEL,   ///< Initialise canceled, terminal state.
   };
   bool Init(const wxString& host,
+            int port,
             int repeaterId,
             const wxString& username,
 	    const wxSecretValue& password,
@@ -320,7 +321,6 @@ private:
   static bool do_logfile;
 
   // utility functions
-  static void parseHostString(const char *server, int defaultport, char **host, int *port);
   static int hexToBytes(const char *hex_str, uint8_t *bytes, size_t max_bytes);
 
   // messagequeues for posting events to the worker thread

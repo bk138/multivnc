@@ -1283,6 +1283,7 @@ void VNCConn::Listen(int port)
 
 
 bool VNCConn::Init(const wxString& host,
+                   int port,
                    int repeaterId,
                    const wxString& username,
 		   const wxSecretValue& password,
@@ -1296,7 +1297,7 @@ bool VNCConn::Init(const wxString& host,
                    const wxString& x509_fingerprint_hash,
 		   const wxString& encodings, int compresslevel, int quality, bool multicast, int multicast_socketrecvbuf, int multicast_recvbuf)
 {
-  wxLogDebug("VNCConn %p: Init() host '%s'", this, host);
+  wxLogDebug("VNCConn %p: Init() host '%s' port %d", this, host, port);
 
   if(!cl)
       setupClient();
@@ -1311,7 +1312,8 @@ bool VNCConn::Init(const wxString& host,
   resetStats();
 
   cl->programName = "VNCConn";
-  parseHostString(host.mb_str(), 5900, &cl->serverHost, &cl->serverPort);
+  cl->serverHost = strdup(host.mb_str());
+  cl->serverPort = port;
   this->username = username;
   this->password = password;
   // Support short-form (:0, :1) 
@@ -2092,53 +2094,6 @@ int VNCConn::getMaxSocketRecvBufSize()
   rfbCloseSocket(sock);
 
   return recv_buf_got/1024;
-}
-
-
-/*
-  parse ipv4 or ipv6 address string.
-  taken from remmina, thanks!
-*/
-void VNCConn::parseHostString(const char *server, int defaultport, char **host, int *port)
-{
-	char *str, *ptr, *ptr2;
-
-	str = strdup(server);
-
-	/* [server]:port format */
-	ptr = strchr(str, '[');
-	if (ptr)
-	{
-		ptr++;
-		ptr2 = strchr(ptr, ']');
-		if (ptr2)
-			*ptr2++ = '\0';
-		if (*ptr2 == ':')
-			defaultport = atoi(ptr2 + 1);
-		if (host)
-			*host = strdup(ptr);
-		if (port)
-			*port = defaultport;
-		free(str);
-		return;
-	}
-
-	/* server:port format, IPv6 cannot use this format */
-	ptr = strchr(str, ':');
-	if (ptr)
-	{
-		ptr2 = strchr(ptr + 1, ':');
-		if (ptr2 == NULL)
-		{
-			*ptr++ = '\0';
-			defaultport = atoi(ptr);
-		}
-		/* More than one ':' means this is IPv6 address. Treat it as a whole address */
-	}
-	if (host)
-		*host = str;
-	if (port)
-		*port = defaultport;
 }
 
 
