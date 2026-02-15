@@ -30,6 +30,8 @@ SET(MultiVNCgui_SRCS
    res/multivnc.xpm
    res/vnccursor-mask.xbm
    res/vnccursor.xbm
+   uri.h
+   uri.cpp
 )
 
 add_library(MultiVNCgui STATIC ${MultiVNCgui_SRCS})
