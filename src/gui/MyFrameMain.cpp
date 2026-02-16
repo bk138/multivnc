@@ -160,10 +160,11 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       frame_main_toolbar->Show(false);
     }
 
-
-  splitwinlayout();
-
-  bookmarks_load_to_list();
+  // Side pane setup - use CallAfter to ensure it happens after window is fully created
+  CallAfter([this]() {
+      splitwinlayout();
+      bookmarks_load_to_list();
+  });
 
   if(show_discovered)
     frame_main_menubar->Check(ID_DISCOVERED, true);
