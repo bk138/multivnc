@@ -1,3 +1,18 @@
+# Version 2.3.x:
+
+## 2.3.0
+
+### ⚡ Features
+
+* Added optional sending of QEMU Extended Key events.
+* Added handling of self-signed TLS certs. This means that connections to Rasperry Pi and the like
+  are now possible.
+
+### 🛠  Fixes
+
+* Fixed a possible crash when the remote framebuffer would change dimensions or rotate.
+
+
 # Version 2.2.x:
 
 ## 2.2.0
