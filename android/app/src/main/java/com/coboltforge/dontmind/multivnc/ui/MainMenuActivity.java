@@ -361,8 +361,9 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 
 
 
-	protected void onStart() {
-		super.onStart();
+	@Override
+	protected void onResume() {
+		super.onResume();
 		updateBookmarkView();
 	}
 
