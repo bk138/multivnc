@@ -3,6 +3,7 @@
 #ifndef VIEWERWINDOW_H
 #define VIEWERWINDOW_H
 
+#include <vector>
 #include <wx/wx.h>
 #include <wx/scrolwin.h>
 #include <wx/log.h>
@@ -27,6 +28,8 @@ public:
   void showOneToOne(bool show_1to1);
   void grabKeyboard(bool yesno);
 
+  void setSyncTargets(const std::vector<VNCConn*>& targets);
+  VNCConn* getConn() const;
 
 protected:
   wxStaticText* label_updrawbytes;
