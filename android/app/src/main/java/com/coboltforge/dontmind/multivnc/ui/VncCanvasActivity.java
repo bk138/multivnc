@@ -261,7 +261,10 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		pd.show();
 		firstFrameWaitDialog = pd;
 		vncCanvas.initializeVncCanvas(pd, inputHandler, conn); // add conn to canvas
-		byte[] sshFingerprint = database.getSshKnownHostDao().get(Utils.uriFormatHostWithPort(connection.sshHost, connection.sshPort)) != null ? database.getSshKnownHostDao().get(Utils.uriFormatHostWithPort(connection.sshHost, connection.sshPort)).fingerprint : null;
+		byte[] sshFingerprint = null;
+		if (connection.sshHost != null && connection.sshPort != null) {
+			sshFingerprint = database.getSshKnownHostDao().get(Utils.uriFormatHostWithPort(connection.sshHost, connection.sshPort)) != null ? database.getSshKnownHostDao().get(Utils.uriFormatHostWithPort(connection.sshHost, connection.sshPort)).fingerprint : null;
+		}
 		if (sshFingerprint == null) { // fallback for saves without port
 			sshFingerprint = database.getSshKnownHostDao().get(connection.sshHost) != null ? database.getSshKnownHostDao().get(connection.sshHost).fingerprint : null;
 		}
