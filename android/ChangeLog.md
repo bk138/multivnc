@@ -1,5 +1,11 @@
 # Version 2.3.x:
 
+## 2.3.1
+
+### 🛠  Fixes
+
+* Fixed crash on loading non-SSH bookmarks.
+
 ## 2.3.0
 
 ### ⚡ Features
