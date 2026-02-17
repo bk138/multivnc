@@ -11,7 +11,7 @@
 ### ⚡ Features
 
 * Added optional sending of QEMU Extended Key events.
-* Added handling of self-signed TLS certs. This means that connections to Rasperry Pi and the like
+* Added handling of self-signed TLS certs. This means that connections to Raspberry Pi and the like
   are now possible.
 
 ### 🛠  Fixes
