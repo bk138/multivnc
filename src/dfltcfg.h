@@ -39,6 +39,8 @@
 #define V_SHOWSEAMLESS EDGE_NONE
 #define K_SHOW1TO1 "Show1To1"
 #define V_SHOW1TO1 false
+#define K_MULTISYNC_INPUT "MultiSyncInput"
+#define V_MULTISYNC_INPUT false
 #define K_SIZE_X _T("SizeX")
 #define V_SIZE_X 1024
 #define K_SIZE_Y _T("SizeY")

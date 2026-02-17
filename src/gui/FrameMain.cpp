@@ -76,6 +76,8 @@ FrameMain::FrameMain(wxWindow* parent, wxWindowID id, const wxString& title, con
     Bind(wxEVT_MENU, &FrameMain::view_togglefullscreen, this, ID_FULLSCREEN);
     wxglade_tmp_menu->Append(ID_ONE_TO_ONE, _("View 1:1"), wxEmptyString, wxITEM_CHECK);
     Bind(wxEVT_MENU, &FrameMain::view_toggle1to1, this, ID_ONE_TO_ONE);
+    wxglade_tmp_menu->Append(ID_MULTISYNC_INPUT, _("Multi-Sync Input"), _("Forward keyboard and mouse input to all open connections."), wxITEM_CHECK);
+    Bind(wxEVT_MENU, &FrameMain::view_togglemultisyncinput, this, ID_MULTISYNC_INPUT);
     frame_main_menubar->Append(wxglade_tmp_menu, _("&View"));
     wxglade_tmp_menu = new wxMenu();
     wxglade_tmp_menu->Append(wxID_ADD, _("&Add Bookmark"), wxEmptyString);
@@ -300,6 +302,13 @@ void FrameMain::view_toggle1to1(wxCommandEvent &event)  // wxGlade: FrameMain.<e
     event.Skip();
     // notify the user that he hasn't implemented the event handler yet
     wxLogDebug(wxT("Event handler (FrameMain::view_toggle1to1) not implemented yet"));
+}
+
+void FrameMain::view_togglemultisyncinput(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>
+{
+    event.Skip();
+    // notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::view_togglemultisyncinput) not implemented yet"));
 }
 
 void FrameMain::bookmarks_add(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>

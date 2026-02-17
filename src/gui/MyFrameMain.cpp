@@ -79,6 +79,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
   pConfig->Read(K_SHOWSEAMLESS, &show_seamless, V_SHOWSEAMLESS);
   pConfig->Read(K_SHOW1TO1, &show_1to1, V_SHOW1TO1);
+  pConfig->Read(K_MULTISYNC_INPUT, &multi_sync_input, V_MULTISYNC_INPUT);
   pConfig->Read(K_GRABKEYBOARD, &grab_keyboard, V_GRABKEYBOARD);
   pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
   pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
@@ -197,6 +198,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       GetToolBar()->ToggleTool(ID_ONE_TO_ONE, true);
   }
 
+  frame_main_menubar->Check(ID_MULTISYNC_INPUT, multi_sync_input);
+
   // setup clipboard
 #ifdef __WXGTK__
   // always use middle mouse button paste
@@ -216,6 +219,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   // right click handler for bookmarks
   list_box_bookmarks->Bind(wxEVT_CONTEXT_MENU, &MyFrameMain::listbox_bookmarks_context, this);
+
+  updateMultiSyncInputTargets();
 }
 
 
@@ -231,6 +236,7 @@ MyFrameMain::~MyFrameMain()
 #ifdef MULTIVNC_GRABKEYBOARD
   pConfig->Write(K_GRABKEYBOARD, frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
 #endif
+  pConfig->Write(K_MULTISYNC_INPUT, multi_sync_input);
 
   // this has to be from end to start in order for stats autosave to assign right connection numbers!
   for(int i = connections.size()-1; i >= 0; --i)
@@ -1001,7 +1007,17 @@ bool MyFrameMain::saveStats(VNCConn* c, int conn_index, const wxArrayString& sta
 }
 
 
-
+void MyFrameMain::updateMultiSyncInputTargets()
+{
+  std::vector<VNCConn*> targets;
+  targets.reserve(connections.size());
+  for(const ConnBlob& cb : connections)
+    {
+      if(cb.conn)
+        targets.push_back(cb.conn);
+    }
+  setMultiSyncInputState(multi_sync_input, targets);
+}
 
 
 // connection initiation and shutdown
@@ -1036,6 +1052,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
   cb.windowshare_proc_pid = 0;
 
   connections.push_back(cb);
+  updateMultiSyncInputTargets();
 
   // enable "disconnect"
   frame_main_menubar->Enable(wxID_STOP, true);
@@ -1339,6 +1356,7 @@ void MyFrameMain::conn_terminate(int which)
     }
   // erase the ConnBlob
   connections.erase(connections.begin() + which);
+  updateMultiSyncInputTargets();
 
   if(connections.size() == 0) // nothing to end
     {
@@ -2071,6 +2089,19 @@ void MyFrameMain::view_toggle1to1(wxCommandEvent &event)
 }
 
 
+
+
+void MyFrameMain::view_togglemultisyncinput(wxCommandEvent &event)
+{
+  multi_sync_input = !multi_sync_input;
+  frame_main_menubar->Check(ID_MULTISYNC_INPUT, multi_sync_input);
+  updateMultiSyncInputTargets();
+
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  pConfig->Write(K_MULTISYNC_INPUT, multi_sync_input);
+
+  wxLogStatus(multi_sync_input ? _("Multi-sync input enabled.") : _("Multi-sync input disabled."));
+}
 
 
 void MyFrameMain::view_seamless(wxCommandEvent &event)

@@ -50,6 +50,7 @@ class MyFrameMain: public FrameMain
   bool show_fullscreen;
   int  show_seamless;
   bool show_1to1;
+  bool multi_sync_input;
 
   // log window
   MyFrameLog* logwindow;
@@ -109,6 +110,7 @@ class MyFrameMain: public FrameMain
   void onSysColourChanged(wxSysColourChangedEvent& event);
 
   bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
+  void updateMultiSyncInputTargets();
 
   
 protected:
@@ -149,6 +151,7 @@ public:
   void view_togglestatistics(wxCommandEvent &event);
   void view_togglefullscreen(wxCommandEvent &event);
   void view_toggle1to1(wxCommandEvent &event);
+  void view_togglemultisyncinput(wxCommandEvent &event);
   void view_seamless(wxCommandEvent &event);
 
   void bookmarks_add(wxCommandEvent &event); 

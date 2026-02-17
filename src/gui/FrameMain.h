@@ -83,6 +83,7 @@ public:
     virtual void view_seamless(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglefullscreen(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_toggle1to1(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void view_togglemultisyncinput(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void bookmarks_add(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void windowshare_start(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void windowshare_stop(wxCommandEvent &event); // wxGlade: <event_handler>

@@ -35,6 +35,7 @@ The roadmap for future developments regarding the project can be found
 * Listen mode (Reverse VNC). Via tabs it's possible to listen 
   for and serve multiple incoming connections.
 * Record and replay of user input macros.
+* Optional “Multi-Sync Input” mode (View menu) to forward keyboard/mouse events from the active tab to all open connections.
 * Under X11, seamless control of the remote side by moving pointer over the
   (default upper) screen edge. Borrows heavily from x2vnc by
   Fredrik Hübinette <hubbe@hubbe.net>, which in turn was based on

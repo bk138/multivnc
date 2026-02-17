@@ -3,12 +3,15 @@
 #ifndef VIEWERWINDOW_H
 #define VIEWERWINDOW_H
 
+#include <vector>
 #include <wx/wx.h>
 #include <wx/scrolwin.h>
 #include <wx/log.h>
 #include "VNCConn.h"
 
 class VNCCanvas;
+
+void setMultiSyncInputState(bool enabled, const std::vector<VNCConn*>& targets);
 
 /*
   consists of two scrollable windows, one a container for a VNCCanvas 

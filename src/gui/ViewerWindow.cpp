@@ -19,7 +19,44 @@
 #include "MultiVNCApp.h"
 #include "ViewerWindow.h"
 
+namespace {
+bool g_multi_sync_input_enabled = false;
+std::vector<VNCConn*> g_multi_sync_targets;
 
+void sendPointerEventToTargets(VNCConn* source, wxMouseEvent& event)
+{
+  source->sendPointerEvent(event);
+  if(!g_multi_sync_input_enabled)
+    return;
+
+  for(VNCConn* target : g_multi_sync_targets)
+    {
+      if(!target || target == source)
+        continue;
+      target->sendPointerEvent(event);
+    }
+}
+
+void sendKeyEventToTargets(VNCConn* source, wxKeyEvent& event, bool keyDown, bool isCharEvent)
+{
+  source->sendKeyEvent(event, keyDown, isCharEvent);
+  if(!g_multi_sync_input_enabled)
+    return;
+
+  for(VNCConn* target : g_multi_sync_targets)
+    {
+      if(!target || target == source)
+        continue;
+      target->sendKeyEvent(event, keyDown, isCharEvent);
+    }
+}
+}
+
+void setMultiSyncInputState(bool enabled, const std::vector<VNCConn*>& targets)
+{
+  g_multi_sync_input_enabled = enabled;
+  g_multi_sync_targets = targets;
+}
 
 /********************************************
 
@@ -308,25 +345,25 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
   event.m_x = std::round(event.m_x / scale_factor);
   event.m_y = std::round(event.m_y / scale_factor);
 
-  conn->sendPointerEvent(event);
+  sendPointerEventToTargets(conn, event);
 }
 
 
 void VNCCanvas::onKeyDown(wxKeyEvent &event)
 {
-  conn->sendKeyEvent(event, true, false);
+  sendKeyEventToTargets(conn, event, true, false);
 }
 
 
 void VNCCanvas::onKeyUp(wxKeyEvent &event)
 {
-  conn->sendKeyEvent(event, false, false);
+  sendKeyEventToTargets(conn, event, false, false);
 }
 
 
 void VNCCanvas::onChar(wxKeyEvent &event)
 {
-  conn->sendKeyEvent(event, true, true);
+  sendKeyEventToTargets(conn, event, true, true);
 }
 
 
@@ -343,11 +380,11 @@ void VNCCanvas::onFocusLoss(wxFocusEvent &event)
   wxKeyEvent key_event;
 
   key_event.m_keyCode = WXK_SHIFT;
-  conn->sendKeyEvent(key_event, false, false);
+  sendKeyEventToTargets(conn, key_event, false, false);
   key_event.m_keyCode = WXK_ALT;
-  conn->sendKeyEvent(key_event, false, false);
+  sendKeyEventToTargets(conn, key_event, false, false);
   key_event.m_keyCode = WXK_CONTROL;
-  conn->sendKeyEvent(key_event, false, false);
+  sendKeyEventToTargets(conn, key_event, false, false);
 }
 
 
