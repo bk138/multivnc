@@ -2430,26 +2430,14 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   wxString desc = "\n";
   desc += _("MultiVNC is a cross-platform SSH-enabled VNC client.");
   desc += "\n\n";
-  desc += _("Built with") + " " + (wxString() << wxVERSION_STRING);
-  desc += "\n\n";
   desc += _("Supported Security Types:");
-  desc += "\n";
-  desc += _("VNC Authentication");
+  desc += " ";
+  desc += "VNC";
 #if defined LIBVNCSERVER_HAVE_GNUTLS || defined LIBVNCSERVER_HAVE_LIBSSL
-  desc += wxT(", Anonymous TLS, VeNCrypt");
+  desc += ", AnonTLS, VeNCrypt";
 #endif
 #if defined LIBVNCSERVER_HAVE_LIBGCRYPT || defined LIBVNCSERVER_HAVE_LIBSSL
   desc += wxT(", Apple Remote Desktop");
-#endif
-  desc += "\n\n";
-  desc += _("Supported Encodings:");
-  desc += "\n";
-  desc += wxT("Raw, RRE, coRRE, CopyRect, Hextile, Ultra");
-#ifdef LIBVNCSERVER_HAVE_LIBZ 
-  desc += wxT(", UltraZip, Zlib, ZlibHex, ZRLE, ZYWRLE");
-#ifdef LIBVNCSERVER_HAVE_LIBJPEG 
-  desc += wxT(", Tight");
-#endif
 #endif
 
 #ifndef __WXMAC__
