@@ -28,7 +28,7 @@
 
 <string name="info">"Informazioni di connessione"</string>
 <string name="meta_key_title">"Invia chiave combinata"</string>
-<string name="send_qemu_extended_keys_title">Tasti estesi di QEMU</string>
+<string name="send_qemu_extended_keys_title">Tasti est. di QEMU</string>
 <string name="new_connection">"Nuova connessione"</string>
 <string name="nickname_caption">"Segnalibro"</string>
 <string name="discovered_servers">"Server scoperti"</string>
