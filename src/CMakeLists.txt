@@ -1,8 +1,6 @@
 #
 # dependencies
 #
-find_package(wxWidgets 3.1.6 REQUIRED core base qa)
-include(UsewxWidgets)
 include_directories(
     ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}
