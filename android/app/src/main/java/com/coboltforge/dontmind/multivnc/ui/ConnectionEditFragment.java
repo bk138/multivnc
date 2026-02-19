@@ -295,8 +295,6 @@ public class ConnectionEditFragment extends Fragment {
             conn.sshPassword = null;
         conn.sshPrivkey = sshPrivkey;
         conn.sshPrivkeyPassword = sshPrivkeyPasswordText.getText().toString().trim();
-        if(conn.sshPrivkeyPassword.isEmpty())
-            conn.sshPrivkeyPassword = null;
 
         return conn;
     }
