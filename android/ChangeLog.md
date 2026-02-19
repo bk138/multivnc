@@ -1,5 +1,12 @@
 # Version 2.3.x:
 
+## 2.3.2
+
+### 🛠  Fixes
+
+* Fixed main menu layout by shortening some labels.
+* Fixed handling of SSH private keys with no password.
+
 ## 2.3.1
 
 ### 🛠  Fixes
