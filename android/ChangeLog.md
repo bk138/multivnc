@@ -1,5 +1,11 @@
 # Version 2.3.x:
 
+## 2.3.3
+
+### 🛠  Fixes
+
+* Fixed SSH auth method reset on editing bookmark.
+
 ## 2.3.2
 
 ### 🛠  Fixes
