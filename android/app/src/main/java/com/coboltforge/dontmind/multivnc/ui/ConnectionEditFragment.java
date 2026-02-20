@@ -177,11 +177,14 @@ public class ConnectionEditFragment extends Fragment {
                 sshPrivkeyImportButton.setVisibility(View.GONE);
                 sshPrivkeyPasswordText.setVisibility(View.GONE);
                 sshPrivkeyPasswordText.setText("");
-                sshPrivkey = null;
             } else {
                 sshPasswordText.setVisibility(View.GONE);
                 sshPasswordText.setText("");
-                sshPrivkeyImportButton.setText(R.string.ssh_privkey_import);
+                if(sshPrivkey == null) {
+                    sshPrivkeyImportButton.setText(R.string.ssh_privkey_import);
+                } else {
+                    sshPrivkeyImportButton.setText(R.string.ssh_privkey_import_other);
+                }
                 sshPrivkeyImportButton.setVisibility(View.VISIBLE);
                 sshPrivkeyPasswordText.setVisibility(View.VISIBLE);
             }
@@ -227,6 +230,7 @@ public class ConnectionEditFragment extends Fragment {
                         byteBuffer.write(buffer, 0, len);
                     }
                     sshPrivkey = byteBuffer.toByteArray();
+                    sshPrivkeyImportButton.setText(R.string.ssh_privkey_import_other);
                     Toast.makeText(getContext(), R.string.ssh_privkey_import_success, Toast.LENGTH_LONG).show();
                 } catch(Exception e) {
                     Toast.makeText(getContext(), R.string.ssh_privkey_import_fail, Toast.LENGTH_LONG).show();
@@ -290,11 +294,17 @@ public class ConnectionEditFragment extends Fragment {
         conn.sshUsername = sshUsernameText.getText().toString().trim();
         if(conn.sshUsername.isEmpty())
             conn.sshUsername = null;
-        conn.sshPassword = sshPasswordText.getText().toString().trim();
-        if(conn.sshPassword.isEmpty())
-            conn.sshPassword = null;
-        conn.sshPrivkey = sshPrivkey;
-        conn.sshPrivkeyPassword = sshPrivkeyPasswordText.getText().toString().trim();
+
+        // fill SSH password vs. privkey+privkeypass based on radio button selection
+        if (sshCredentialsRadioGroup.getCheckedRadioButtonId() == R.id.ssh_password_radiobutton) {
+            conn.sshPassword = sshPasswordText.getText().toString().trim();
+            if(conn.sshPassword.isEmpty())
+                conn.sshPassword = null;
+        }
+        if (sshCredentialsRadioGroup.getCheckedRadioButtonId() == R.id.ssh_privkey_radiobutton) {
+            conn.sshPrivkey = sshPrivkey;
+            conn.sshPrivkeyPassword = sshPrivkeyPasswordText.getText().toString().trim();
+        }
 
         return conn;
     }
@@ -365,6 +375,7 @@ public class ConnectionEditFragment extends Fragment {
             sshPortText.setText(Integer.toString(conn.sshPort));
         sshUsernameText.setText(conn.sshUsername);
         if(conn.sshPrivkey != null) {
+            sshPrivkey = conn.sshPrivkey;
             sshCredentialsRadioGroup.check(R.id.ssh_privkey_radiobutton);
             sshPrivkeyPasswordText.setText(conn.sshPrivkeyPassword);
             sshPrivkeyImportButton.setText(R.string.ssh_privkey_import_other);
