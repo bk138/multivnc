@@ -10,8 +10,8 @@ android {
         applicationId "com.coboltforge.dontmind.multivnc"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 105
-        versionName "2.3.2"
+        versionCode 106
+        versionName "2.3.3"
         externalNativeBuild {
             cmake {
                 // specify explicit target list to exclude examples, tests, utils. etc from used libraries
