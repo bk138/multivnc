@@ -107,6 +107,7 @@ class MyFrameMain: public FrameMain
   void onSDNotify(wxCommandEvent& event);
   void onFullScreenChanged(wxFullScreenEvent &event);
   void onSysColourChanged(wxSysColourChangedEvent& event);
+  void onSize(wxSizeEvent& event);
 
   bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
 

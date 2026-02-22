@@ -56,6 +56,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_END_PROCESS (ID_WINDOWSHARE_PROC_END, MyFrameMain::onWindowshareTerminate)
   EVT_FULLSCREEN (MyFrameMain::onFullScreenChanged)
   EVT_SYS_COLOUR_CHANGED(MyFrameMain::onSysColourChanged)
+  EVT_SIZE(MyFrameMain::onSize)
 END_EVENT_TABLE()
 
 
@@ -789,6 +790,29 @@ void MyFrameMain::onSysColourChanged(wxSysColourChangedEvent& event)
     GetToolBar()->SetToolNormalBitmap(ID_ONE_TO_ONE, bitmapBundleFromSVGResource(prefix + "/" + "one-to-one"));
 }
 
+
+
+void MyFrameMain::onSize(wxSizeEvent& event)
+{
+#ifdef __WXMAC__
+    // Force proper layout calculation by temporarily adjusting sash positions
+    // This mimics what happens when user manually moves the sash
+    CallAfter([this]() {
+        if (splitwin_main->IsSplit() && splitwin_left->IsSplit()) {
+            // Store current sash position
+            int current_sash = splitwin_left->GetSashPosition();
+
+            // Force layout recalculation by temporarily moving the sash
+            splitwin_left->SetSashPosition(current_sash + 1);
+            splitwin_left->SetSashPosition(current_sash);
+
+            // Ensure proper layout
+            splitwin_left->Layout();
+        }
+    });
+#endif
+    event.Skip(); // Allow the event to propagate
+}
 
 
 void MyFrameMain::onVNCConnGetPasswordNotify(wxCommandEvent &event)
