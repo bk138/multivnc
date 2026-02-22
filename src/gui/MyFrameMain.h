@@ -111,7 +111,11 @@ class MyFrameMain: public FrameMain
 
   bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
 
-  
+  // multi-sync input
+  bool multi_sync_enabled;
+  void updateMultiSyncTargets();
+
+
 protected:
   DECLARE_EVENT_TABLE();
  
@@ -142,6 +146,7 @@ public:
   void machine_save_stats(wxCommandEvent &event); 
   void machine_input_record(wxCommandEvent &event);
   void machine_input_replay(wxCommandEvent &event);
+  void machine_multisync(wxCommandEvent &event);
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);

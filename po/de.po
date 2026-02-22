@@ -538,6 +538,22 @@ msgstr "Paketverlustverhältnis:"
 msgid "Lossy Encodings Settings"
 msgstr "Einstellungen für verlustbehaftete VNC-Kodierungen"
 
+#: ../src/gui/MyFrameMain.cpp
+msgid "Multi-Sync Input\tCtrl-M"
+msgstr "Multi-Sync Eingabe\tCtrl-M"
+
+#: ../src/gui/MyFrameMain.cpp
+msgid "Multi-Sync Input disabled."
+msgstr "Multi-Sync Eingabe deaktiviert."
+
+#: ../src/gui/MyFrameMain.cpp
+msgid "Multi-Sync Input enabled: input is replicated to all connections."
+msgstr "Multi-Sync Eingabe aktiviert: Eingaben werden an alle Verbindungen gesendet."
+
+#: ../src/gui/MyFrameMain.cpp
+msgid "Replicate mouse and keyboard input to all connections."
+msgstr "Maus- und Tastatureingaben an alle Verbindungen senden."
+
 #: ../src/gui/FrameMain.cpp:24
 msgid "MultiVNC"
 msgstr "MultiVNC"
