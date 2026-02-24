@@ -16,7 +16,7 @@
 }
 
 [ -z "$APPLE_ID_PASSWORD" ] && {
-    echo "Please set APPLE_ID_PASSWORD env var.  Might need an app-specific password if using 2FA, which you can create at https://appstoreconnect.apple.com/apps"
+    echo "Please set APPLE_ID_PASSWORD env var.  Might need an app-specific password if using 2FA, which you can create at https://account.apple.com/account/manage"
     exit 1
 }
 
