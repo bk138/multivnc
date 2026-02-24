@@ -34,7 +34,7 @@
     <p>Key features include:</p>
     <ul>
       <li>Support for most encodings including Tight.</li>
-      <li>TLS support, i.e. AnonTLS and VeNCrypt.</li>
+      <li>TLS support, i.e. AnonTLS and VeNCrypt, including support for self-signed certificates.</li>
       <li>Support for SSH-Tunnelling with password- and privkey-based authentication.</li>
       <li>Unicode copy and paste to and from the VNC server.</li>
       <li>Discovery of VNC servers advertising themselves via ZeroConf.</li>
