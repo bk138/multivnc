@@ -202,6 +202,8 @@ rfbBool VNCConn::thread_alloc_framebuffer(rfbClient* client)
 
   wxLogDebug(wxT("VNCConn %p: alloc'ing framebuffer w:%i, h:%i"), conn, client->width, client->height);
 
+  wxCriticalSectionLocker lock(conn->mutex_framebuffer);
+
   // assert 32bpp, as requested with GetClient() in Init()
   if(client->format.bitsPerPixel != 32)
     {
@@ -1762,7 +1764,8 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect)
   // sanity check requested region and client
   if(rect.x < 0 || rect.x + rect.width > getFrameBufferWidth()
      || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight()
-     || !cl)
+     || !cl
+     || !cl->frameBuffer)
        return wxBitmap();
 
   /*
