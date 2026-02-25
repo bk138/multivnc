@@ -1,5 +1,6 @@
 
 
+#include <vector>
 #include <wx/gdicmn.h>
 #include <wx/log.h>
 #include <wx/math.h>
@@ -63,6 +64,7 @@ public:
   wxRegion updated_area;
   double scale_factor = 1.0;
   bool do_keyboard_grab;
+  std::vector<VNCConn*> sync_targets;
 };
 	
 
@@ -309,24 +311,49 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
   event.m_y = std::round(event.m_y / scale_factor);
 
   conn->sendPointerEvent(event);
+
+  // multi-sync: replicate to other connections
+  for (VNCConn* target : sync_targets) {
+    int tw = target->getFrameBufferWidth();
+    int th = target->getFrameBufferHeight();
+    if (tw <= 0 || th <= 0)
+      continue;
+    wxMouseEvent sync_event(event);
+    int sw = conn->getFrameBufferWidth();
+    int sh = conn->getFrameBufferHeight();
+    if (sw > 0 && sh > 0) {
+      sync_event.m_x = std::round(event.m_x * (double)tw / sw);
+      sync_event.m_y = std::round(event.m_y * (double)th / sh);
+    }
+    target->sendPointerEvent(sync_event);
+  }
 }
 
 
 void VNCCanvas::onKeyDown(wxKeyEvent &event)
 {
   conn->sendKeyEvent(event, true, false);
+
+  for (VNCConn* target : sync_targets)
+    target->sendKeyEvent(event, true, false);
 }
 
 
 void VNCCanvas::onKeyUp(wxKeyEvent &event)
 {
   conn->sendKeyEvent(event, false, false);
+
+  for (VNCConn* target : sync_targets)
+    target->sendKeyEvent(event, false, false);
 }
 
 
 void VNCCanvas::onChar(wxKeyEvent &event)
 {
   conn->sendKeyEvent(event, true, true);
+
+  for (VNCConn* target : sync_targets)
+    target->sendKeyEvent(event, true, true);
 }
 
 
@@ -339,7 +366,7 @@ void VNCCanvas::onFocusGain(wxFocusEvent &event)
 void VNCCanvas::onFocusLoss(wxFocusEvent &event)
 {
   wxLogDebug(wxT("VNCCanvas %p: lost focus, upping key modifiers"), this);
-  
+
   wxKeyEvent key_event;
 
   key_event.m_keyCode = WXK_SHIFT;
@@ -348,6 +375,16 @@ void VNCCanvas::onFocusLoss(wxFocusEvent &event)
   conn->sendKeyEvent(key_event, false, false);
   key_event.m_keyCode = WXK_CONTROL;
   conn->sendKeyEvent(key_event, false, false);
+
+  for (VNCConn* target : sync_targets) {
+    wxKeyEvent sync_key;
+    sync_key.m_keyCode = WXK_SHIFT;
+    target->sendKeyEvent(sync_key, false, false);
+    sync_key.m_keyCode = WXK_ALT;
+    target->sendKeyEvent(sync_key, false, false);
+    sync_key.m_keyCode = WXK_CONTROL;
+    target->sendKeyEvent(sync_key, false, false);
+  }
 }
 
 
@@ -662,4 +699,15 @@ void ViewerWindow::grabKeyboard(bool grabit)
   if(canvas)
     // grab later on enter/leave
     canvas->do_keyboard_grab = grabit;
+}
+
+void ViewerWindow::setSyncTargets(const std::vector<VNCConn*>& targets)
+{
+  if(canvas)
+    canvas->sync_targets = targets;
+}
+
+VNCConn* ViewerWindow::getConn() const
+{
+  return canvas ? canvas->conn : nullptr;
 }

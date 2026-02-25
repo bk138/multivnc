@@ -530,6 +530,22 @@ msgstr "Förlustkvot:"
 msgid "Lossy Encodings Settings"
 msgstr "Inställningar för förstörande kodningar"
 
+#: ../src/gui/MyFrameMain.cpp
+msgid "Multi-Sync Input\tCtrl-M"
+msgstr ""
+
+#: ../src/gui/MyFrameMain.cpp
+msgid "Multi-Sync Input disabled."
+msgstr ""
+
+#: ../src/gui/MyFrameMain.cpp
+msgid "Multi-Sync Input enabled: input is replicated to all connections."
+msgstr ""
+
+#: ../src/gui/MyFrameMain.cpp
+msgid "Replicate mouse and keyboard input to all connections."
+msgstr ""
+
 #: ../src/gui/FrameMain.cpp:24
 msgid "MultiVNC"
 msgstr "MultiVNC"

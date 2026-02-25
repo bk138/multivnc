@@ -23,6 +23,7 @@ enum
     ID_INPUT_RECORD,
     ID_INPUT_REPLAY,
     ID_ISSUE_LIST,
+    ID_MULTISYNC,
   };
 
 
