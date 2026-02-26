@@ -2,6 +2,8 @@
 #include "gui/bitmapFromMem.h"
 #include "gui/evtids.h"
 #include <fstream>
+#include <algorithm>
+#include <cmath>
 #include <wx/aboutdlg.h>
 #include <wx/textctrl.h>
 #include <wx/creddlg.h>
@@ -55,6 +57,7 @@ BEGIN_EVENT_TABLE(MyFrameMain, FrameMain)
   EVT_COMMAND (wxID_ANY, VNCConnIncomingConnectionNOTIFY, MyFrameMain::onVNCConnIncomingConnectionNotify)
   EVT_END_PROCESS (ID_WINDOWSHARE_PROC_END, MyFrameMain::onWindowshareTerminate)
   EVT_FULLSCREEN (MyFrameMain::onFullScreenChanged)
+  EVT_ACTIVATE (MyFrameMain::onActivate)
   EVT_SYS_COLOUR_CHANGED(MyFrameMain::onSysColourChanged)
   EVT_SIZE(MyFrameMain::onSize)
 END_EVENT_TABLE()
@@ -87,6 +90,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   bool do_log;
   pConfig->Read(K_LOGSAVETOFILE, &do_log, V_LOGSAVETOFILE);
   VNCConn::doLogfile(do_log);
+  multi_sync_input_enabled = false;
 
   // windowshare template
   windowshare_cmd_template = pConfig->Read(K_WINDOWSHARE, V_DFLTWINDOWSHARE);
@@ -112,6 +116,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   */
   // "disconnect"
   frame_main_menubar->Enable(wxID_STOP, false);
+  frame_main_menubar->Check(ID_MULTI_SYNC_INPUT, false);
   // "screenshot"
   frame_main_menubar->Enable(wxID_SAVE, false);
   // stats
@@ -812,6 +817,124 @@ void MyFrameMain::onSize(wxSizeEvent& event)
     });
 #endif
     event.Skip(); // Allow the event to propagate
+}
+
+void MyFrameMain::onActivate(wxActivateEvent& event)
+{
+  if(!event.GetActive())
+    {
+      for(size_t i = 0; i < connections.size(); ++i)
+        releaseModifierKeys(connections.at(i).conn);
+
+      if(multi_sync_input_enabled)
+        {
+          setMultiSyncInputEnabled(false);
+          wxLogStatus(_("Multi-Sync Input disabled due to focus loss."));
+        }
+    }
+  event.Skip();
+}
+
+bool MyFrameMain::isActiveConnection(VNCConn* conn) const
+{
+  int sel = notebook_connections->GetSelection();
+  if(sel == wxNOT_FOUND || sel >= static_cast<int>(connections.size()))
+    return false;
+  return connections.at(sel).conn == conn;
+}
+
+void MyFrameMain::releaseModifierKeys(VNCConn* conn)
+{
+  if(!conn)
+    return;
+
+  wxKeyEvent key_event;
+  key_event.m_keyCode = WXK_SHIFT;
+  conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_ALT;
+  conn->sendKeyEvent(key_event, false, false);
+  key_event.m_keyCode = WXK_CONTROL;
+  conn->sendKeyEvent(key_event, false, false);
+}
+
+void MyFrameMain::setMultiSyncInputEnabled(bool enabled)
+{
+  multi_sync_input_enabled = enabled;
+  frame_main_menubar->Check(ID_MULTI_SYNC_INPUT, enabled);
+}
+
+void MyFrameMain::dispatchPointerEvent(VNCConn* source_conn, wxMouseEvent &event)
+{
+  if(!source_conn)
+    return;
+
+  source_conn->sendPointerEvent(event);
+
+  if(!multi_sync_input_enabled || !isActiveConnection(source_conn) || connections.size() < 2)
+    return;
+
+  const int source_w = source_conn->getFrameBufferWidth();
+  const int source_h = source_conn->getFrameBufferHeight();
+
+  for(size_t i = 0; i < connections.size(); ++i)
+    {
+      VNCConn* target_conn = connections.at(i).conn;
+      if(target_conn == source_conn)
+        continue;
+
+      const int target_w = target_conn->getFrameBufferWidth();
+      const int target_h = target_conn->getFrameBufferHeight();
+      if(source_w <= 0 || source_h <= 0 || target_w <= 0 || target_h <= 0)
+        continue;
+
+      wxMouseEvent mirrored_event(event);
+      mirrored_event.m_x = std::round((static_cast<double>(event.m_x) * target_w) / source_w);
+      mirrored_event.m_y = std::round((static_cast<double>(event.m_y) * target_h) / source_h);
+      mirrored_event.m_x = std::clamp(mirrored_event.m_x, 0, target_w - 1);
+      mirrored_event.m_y = std::clamp(mirrored_event.m_y, 0, target_h - 1);
+      target_conn->sendPointerEvent(mirrored_event);
+    }
+}
+
+void MyFrameMain::dispatchKeyEvent(VNCConn* source_conn, wxKeyEvent &event, bool down, bool isChar)
+{
+  if(!source_conn)
+    return;
+
+  if(!source_conn->sendKeyEvent(event, down, isChar))
+    return;
+
+  if(!multi_sync_input_enabled || !isActiveConnection(source_conn) || connections.size() < 2)
+    return;
+
+  for(size_t i = 0; i < connections.size(); ++i)
+    {
+      VNCConn* target_conn = connections.at(i).conn;
+      if(target_conn == source_conn)
+        continue;
+
+      wxKeyEvent mirrored_event(event);
+      target_conn->sendKeyEvent(mirrored_event, down, isChar);
+    }
+}
+
+void MyFrameMain::dispatchFocusLoss(VNCConn* source_conn)
+{
+  if(!source_conn)
+    return;
+
+  releaseModifierKeys(source_conn);
+
+  if(!multi_sync_input_enabled || !isActiveConnection(source_conn) || connections.size() < 2)
+    return;
+
+  for(size_t i = 0; i < connections.size(); ++i)
+    {
+      VNCConn* target_conn = connections.at(i).conn;
+      if(target_conn == source_conn)
+        continue;
+      releaseModifierKeys(target_conn);
+    }
 }
 
 
@@ -1974,6 +2097,15 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
     }
 }
 
+void MyFrameMain::machine_multisync_input(wxCommandEvent &event)
+{
+  setMultiSyncInputEnabled(event.IsChecked());
+  if(multi_sync_input_enabled)
+    wxLogStatus(_("Multi-Sync Input enabled."));
+  else
+    wxLogStatus(_("Multi-Sync Input disabled."));
+}
+
 
 
 void MyFrameMain::machine_exit(wxCommandEvent &event)
@@ -2488,7 +2620,9 @@ void MyFrameMain::help_contents(wxCommandEvent &e)
 If there are VNC servers advertising themselves via ZeroConf, you can select a host in the\
 'Available VNC Servers' list. Otherwise, use the 'Connect' button or menu item.\
 \n\nWhen connected, a blue or green icon on the tab label shows if you are running in unicast \
-or multicast mode."));
+or multicast mode.\
+\n\nUse Machine -> Multi-Sync Input (Ctrl+Shift+M) to mirror keyboard and mouse input from the \
+active tab to all other open connections."));
 }
 
 
