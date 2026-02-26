@@ -50,6 +50,7 @@ class MyFrameMain: public FrameMain
   bool show_fullscreen;
   int  show_seamless;
   bool show_1to1;
+  bool multi_sync_input_enabled;
 
   // log window
   MyFrameLog* logwindow;
@@ -108,6 +109,11 @@ class MyFrameMain: public FrameMain
   void onFullScreenChanged(wxFullScreenEvent &event);
   void onSysColourChanged(wxSysColourChangedEvent& event);
   void onSize(wxSizeEvent& event);
+  void onActivate(wxActivateEvent& event);
+
+  bool isActiveConnection(VNCConn* conn) const;
+  void releaseModifierKeys(VNCConn* conn);
+  void setMultiSyncInputEnabled(bool enabled);
 
   bool saveStats(VNCConn* c, int conn_index, const wxArrayString& stats, wxString desc, bool autosave);
 
@@ -142,6 +148,7 @@ public:
   void machine_save_stats(wxCommandEvent &event); 
   void machine_input_record(wxCommandEvent &event);
   void machine_input_replay(wxCommandEvent &event);
+  void machine_multisync_input(wxCommandEvent &event);
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);
@@ -165,6 +172,9 @@ public:
 
   // to be called from the App
   void cmdline_conn_spawn(const wxString& service, int listenPort);
+  void dispatchPointerEvent(VNCConn* source_conn, wxMouseEvent &event);
+  void dispatchKeyEvent(VNCConn* source_conn, wxKeyEvent &event, bool down, bool isChar);
+  void dispatchFocusLoss(VNCConn* source_conn);
 
 };
 
