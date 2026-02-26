@@ -17,6 +17,7 @@
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 #include "MultiVNCApp.h"
+#include "MyFrameMain.h"
 #include "ViewerWindow.h"
 
 
@@ -309,24 +310,48 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
   event.m_y = std::round(event.m_y / scale_factor);
 
   conn->sendPointerEvent(event);
+
+  // broadcast
+  MyFrameMain* main = static_cast<MyFrameMain*>(wxGetApp().GetTopWindow());
+  if (main && main->isMultiSync()) {
+      main->broadcastPointerEvent(conn, event);
+  }
 }
 
 
 void VNCCanvas::onKeyDown(wxKeyEvent &event)
 {
   conn->sendKeyEvent(event, true, false);
+
+  // broadcast
+  MyFrameMain* main = static_cast<MyFrameMain*>(wxGetApp().GetTopWindow());
+  if (main && main->isMultiSync()) {
+      main->broadcastKeyEvent(conn, event, true, false);
+  }
 }
 
 
 void VNCCanvas::onKeyUp(wxKeyEvent &event)
 {
   conn->sendKeyEvent(event, false, false);
+
+  // broadcast
+  MyFrameMain* main = static_cast<MyFrameMain*>(wxGetApp().GetTopWindow());
+  if (main && main->isMultiSync()) {
+      main->broadcastKeyEvent(conn, event, false, false);
+  }
 }
 
 
 void VNCCanvas::onChar(wxKeyEvent &event)
 {
   conn->sendKeyEvent(event, true, true);
+
+  // broadcast
+  MyFrameMain* main = static_cast<MyFrameMain*>(wxGetApp().GetTopWindow());
+  if (main && main->isMultiSync()) {
+      main->broadcastKeyEvent(conn, event, true, true);
+  }
 }
 
 
