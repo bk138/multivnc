@@ -46,6 +46,8 @@ FrameMain::FrameMain(wxWindow* parent, wxWindowID id, const wxString& title, con
     Bind(wxEVT_MENU, &FrameMain::machine_input_record, this, ID_INPUT_RECORD);
     wxglade_tmp_menu->Append(ID_INPUT_REPLAY, _("Replay Input"), wxEmptyString);
     Bind(wxEVT_MENU, &FrameMain::machine_input_replay, this, ID_INPUT_REPLAY);
+    wxglade_tmp_menu->Append(ID_MULTI_SYNC_INPUT, _("Multi-Sync Input\tCtrl-Shift-M"), _("Replicate mouse and keyboard input from the active tab to all other open connections."), wxITEM_CHECK);
+    Bind(wxEVT_MENU, &FrameMain::machine_multisync_input, this, ID_MULTI_SYNC_INPUT);
     wxglade_tmp_menu->AppendSeparator();
     wxglade_tmp_menu->Append(wxID_EXIT, _("Quit"), _("Exit MultiVNC."));
     Bind(wxEVT_MENU, &FrameMain::machine_exit, this, wxID_EXIT);
@@ -244,6 +246,13 @@ void FrameMain::machine_input_replay(wxCommandEvent &event)  // wxGlade: FrameMa
     event.Skip();
     // notify the user that he hasn't implemented the event handler yet
     wxLogDebug(wxT("Event handler (FrameMain::machine_input_replay) not implemented yet"));
+}
+
+void FrameMain::machine_multisync_input(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>
+{
+    event.Skip();
+    // notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::machine_multisync_input) not implemented yet"));
 }
 
 void FrameMain::machine_exit(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>

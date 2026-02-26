@@ -26,6 +26,9 @@ public:
   void showStats(bool yesno);
   void showOneToOne(bool show_1to1);
   void grabKeyboard(bool yesno);
+  void dispatchPointerEvent(wxMouseEvent &event);
+  void dispatchKeyEvent(wxKeyEvent &event, bool down, bool isChar);
+  void dispatchFocusLoss();
 
 
 protected:
