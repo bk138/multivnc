@@ -83,6 +83,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
   pConfig->Read(K_SHOWSEAMLESS, &show_seamless, V_SHOWSEAMLESS);
   pConfig->Read(K_SHOW1TO1, &show_1to1, V_SHOW1TO1);
+  pConfig->Read(K_MULTI_SYNC_INPUT, &multi_sync_input_enabled, V_MULTI_SYNC_INPUT);
   pConfig->Read(K_GRABKEYBOARD, &grab_keyboard, V_GRABKEYBOARD);
   pConfig->Read(K_SIZE_X, &x, V_SIZE_X);
   pConfig->Read(K_SIZE_Y, &y, V_SIZE_Y);
@@ -90,7 +91,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   bool do_log;
   pConfig->Read(K_LOGSAVETOFILE, &do_log, V_LOGSAVETOFILE);
   VNCConn::doLogfile(do_log);
-  multi_sync_input_enabled = false;
 
   // windowshare template
   windowshare_cmd_template = pConfig->Read(K_WINDOWSHARE, V_DFLTWINDOWSHARE);
@@ -116,7 +116,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   */
   // "disconnect"
   frame_main_menubar->Enable(wxID_STOP, false);
-  frame_main_menubar->Check(ID_MULTI_SYNC_INPUT, false);
+  frame_main_menubar->Check(ID_MULTI_SYNC_INPUT, multi_sync_input_enabled);
   // "screenshot"
   frame_main_menubar->Enable(wxID_SAVE, false);
   // stats
@@ -234,6 +234,7 @@ MyFrameMain::~MyFrameMain()
   GetSize(&x, &y);
   pConfig->Write(K_SIZE_X, x);
   pConfig->Write(K_SIZE_Y, y);
+  pConfig->Write(K_MULTI_SYNC_INPUT, multi_sync_input_enabled);
 #ifdef MULTIVNC_GRABKEYBOARD
   pConfig->Write(K_GRABKEYBOARD, frame_main_toolbar->GetToolState(ID_GRABKEYBOARD));
 #endif
@@ -2100,6 +2101,7 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 void MyFrameMain::machine_multisync_input(wxCommandEvent &event)
 {
   setMultiSyncInputEnabled(event.IsChecked());
+  wxConfigBase::Get()->Write(K_MULTI_SYNC_INPUT, multi_sync_input_enabled);
   if(multi_sync_input_enabled)
     wxLogStatus(_("Multi-Sync Input enabled."));
   else
