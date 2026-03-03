@@ -234,6 +234,7 @@ private:
 
   wxRect updated_rect;
 
+  uint8_t* framebuffer_front; // framebuffer for UI reading
   wxCriticalSection mutex_framebuffer;
 
   int multicastStatus;

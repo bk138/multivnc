@@ -84,6 +84,7 @@ VNCConn::VNCConn(void* p) : condition_auth(mutex_auth)
   parent = p;
   
   cl = 0;
+  framebuffer_front = 0;
   multicastStatus = 0;
   latency = -1;
 
@@ -222,10 +223,17 @@ rfbBool VNCConn::thread_alloc_framebuffer(rfbClient* client)
   // alloc, zeroed
   client->frameBuffer = (uint8_t*)calloc(1, client->width*client->height*client->format.bitsPerPixel/8);
 
+  // free front framebuffer
+  if(conn->framebuffer_front)
+    free(conn->framebuffer_front);
+
+  // alloc, zeroed
+  conn->framebuffer_front = (uint8_t*)calloc(1, client->width*client->height*client->format.bitsPerPixel/8);
+
   // notify our parent
   conn->thread_post_fbresize_notify();
  
-  return client->frameBuffer ? TRUE : FALSE;
+  return (client->frameBuffer && conn->framebuffer_front) ? TRUE : FALSE;
 }
 
 
@@ -471,8 +479,6 @@ wxThread::ExitCode VNCConn::Entry()
 
 
           // request update and handle response
-          {
-          wxCriticalSectionLocker lock(mutex_framebuffer);
           if(!rfbProcessServerMessage(cl, 500))
 	    {
 	      if(errno == EINTR)
@@ -488,7 +494,7 @@ wxThread::ExitCode VNCConn::Entry()
               }
               return 0;
 	    }
-          }
+
 
 	  /*
 	    Compute nacked/loss ratio: We take a ratio sample every second and put it into a sample queue
@@ -983,6 +989,20 @@ void VNCConn::thread_update_finished(rfbClient* client)
   VNCConn* conn = (VNCConn*) rfbClientGetClientData(client, VNCCONN_OBJ_ID);
   if(! conn->GetThread()->TestDestroy())
     {
+      {
+          wxCriticalSectionLocker lock(conn->mutex_framebuffer);
+          if(client->frameBuffer && conn->framebuffer_front) {
+              // Copy framebuffer to front buffer for UI display
+#ifndef NDEBUG
+              wxStopWatch copy_timer;
+#endif
+              memcpy(conn->framebuffer_front, client->frameBuffer, client->width * client->height * client->format.bitsPerPixel / 8);
+#ifndef NDEBUG
+              wxLogDebug(wxT("VNCConn %p: copying %dx%d framebuffer took %ldms"), conn, client->width, client->height, copy_timer.Time());
+#endif
+          }
+      }
+
       if(!conn->updated_rect.IsEmpty())
 	conn->thread_post_update_notify(conn->updated_rect.x, conn->updated_rect.y, conn->updated_rect.width, conn->updated_rect.height);
 
@@ -1430,6 +1450,12 @@ void VNCConn::Shutdown()
       rfbClientCleanup(cl);
       cl = 0;
     }
+
+    // Clean up front framebuffer
+    if(framebuffer_front) {
+        free(framebuffer_front);
+        framebuffer_front = 0;
+    }
 }
 
 
@@ -1765,11 +1791,11 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect)
   if(rect.x < 0 || rect.x + rect.width > getFrameBufferWidth()
      || rect.y < 0 || rect.y + rect.height > getFrameBufferHeight()
      || !cl
-     || !cl->frameBuffer)
+     || !framebuffer_front)
        return wxBitmap();
 
   /*
-    copy directly from framebuffer into a new bitmap
+    copy directly from front framebuffer into a new bitmap
   */
 
   wxBitmap region(rect.width, rect.height, cl->format.bitsPerPixel);
@@ -1777,7 +1803,7 @@ wxBitmap VNCConn::getFrameBufferRegion(const wxRect& rect)
   wxAlphaPixelData::Iterator region_it(region_data);
 
   int bytesPerPixel = cl->format.bitsPerPixel/8;
-  uint8_t *fbsub_it = cl->frameBuffer + rect.y*cl->width*bytesPerPixel + rect.x*bytesPerPixel;
+  uint8_t *fbsub_it = framebuffer_front + rect.y*cl->width*bytesPerPixel + rect.x*bytesPerPixel;
 
   for( int y = 0; y < rect.height; ++y )
     {
