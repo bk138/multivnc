@@ -167,8 +167,6 @@ public:
 
   // returns a wxBitmap (this uses COW, so is okay)
   wxBitmap getFrameBufferRegion(const wxRect& region);
-  // writes requested region directly into dst bitmap which must have the same dimensions as the framebuffer
-  bool getFrameBufferRegion(const wxRect& rect, wxBitmap& dst);
   int getFrameBufferWidth();
   int getFrameBufferHeight();
   int getFrameBufferDepth();
