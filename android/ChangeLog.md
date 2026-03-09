@@ -1,5 +1,11 @@
 # Version 2.3.x:
 
+## 2.3.4
+
+### 🛠  Fixes
+
+* Fixed longstanding issue where the client might get stuck in certain conditions.
+
 ## 2.3.3
 
 ### 🛠  Fixes
