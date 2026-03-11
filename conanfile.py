@@ -14,7 +14,9 @@ class MultiVNC(ConanFile):
 
         if self.settings.os in ["Windows", "Macos"]:
             self.requires("libjpeg-turbo/3.1.2")
-            self.requires("openssl/3.5.4")
+            self.requires("openssl/3.5.4", options = {
+                "no_module": True
+            })
             self.requires("libssh2/1.11.1", options = {
                 "with_zlib": False
             })
