@@ -198,17 +198,6 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
       GetToolBar()->ToggleTool(ID_ONE_TO_ONE, true);
   }
 
-  // setup clipboard
-#ifdef __WXGTK__
-  // always use middle mouse button paste
-  if(wxTheClipboard->Open())
-    {
-      wxTheClipboard->UsePrimarySelection(true);
-      wxTheClipboard->Close();
-    }
-#endif  
-  
-
   // theres no log window at startup
   logwindow = 0;
 
