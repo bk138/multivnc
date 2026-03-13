@@ -18,6 +18,7 @@
 #include "res/vnccursor-mask.xbm"
 #include "MultiVNCApp.h"
 #include "ViewerWindow.h"
+#include "MyFrameMain.h"
 
 
 
@@ -55,10 +56,11 @@ protected:
 
 public:
   /// Creates a new canvas with 0,0 size. Need to call adjustCanvasSize()!
-  VNCCanvas(wxWindow* parent, VNCConn* c);
+  VNCCanvas(wxWindow* parent, ViewerWindow* owner, VNCConn* c);
   void grab_keyboard();
   void ungrab_keyboard();
 
+  ViewerWindow* owner;
   VNCConn* conn;
   wxRegion updated_area;
   double scale_factor = 1.0;
@@ -89,9 +91,10 @@ END_EVENT_TABLE();
   paint events in listen mode)
 */
 
-VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
+VNCCanvas::VNCCanvas(wxWindow* parent, ViewerWindow* owner, VNCConn* c):
   wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(0,0), wxWANTS_CHARS)
 {
+  this->owner = owner;
   conn = c;
 
   keyboard_grabbed = do_keyboard_grab = false;
@@ -308,25 +311,25 @@ void VNCCanvas::onMouseAction(wxMouseEvent &event)
   event.m_x = std::round(event.m_x / scale_factor);
   event.m_y = std::round(event.m_y / scale_factor);
 
-  conn->sendPointerEvent(event);
+  owner->dispatchPointerEvent(event);
 }
 
 
 void VNCCanvas::onKeyDown(wxKeyEvent &event)
 {
-  conn->sendKeyEvent(event, true, false);
+  owner->dispatchKeyEvent(event, true, false);
 }
 
 
 void VNCCanvas::onKeyUp(wxKeyEvent &event)
 {
-  conn->sendKeyEvent(event, false, false);
+  owner->dispatchKeyEvent(event, false, false);
 }
 
 
 void VNCCanvas::onChar(wxKeyEvent &event)
 {
-  conn->sendKeyEvent(event, true, true);
+  owner->dispatchKeyEvent(event, true, true);
 }
 
 
@@ -339,15 +342,7 @@ void VNCCanvas::onFocusGain(wxFocusEvent &event)
 void VNCCanvas::onFocusLoss(wxFocusEvent &event)
 {
   wxLogDebug(wxT("VNCCanvas %p: lost focus, upping key modifiers"), this);
-  
-  wxKeyEvent key_event;
-
-  key_event.m_keyCode = WXK_SHIFT;
-  conn->sendKeyEvent(key_event, false, false);
-  key_event.m_keyCode = WXK_ALT;
-  conn->sendKeyEvent(key_event, false, false);
-  key_event.m_keyCode = WXK_CONTROL;
-  conn->sendKeyEvent(key_event, false, false);
+  owner->dispatchFocusLoss();
 }
 
 
@@ -416,7 +411,7 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   // set some default for now
   this->show_1to1  = false;
   canvas_container->SetSizer(new wxBoxSizer(wxHORIZONTAL));
-  canvas = new VNCCanvas(canvas_container, conn);
+  canvas = new VNCCanvas(canvas_container, this, conn);
   adjustCanvasSize();
   wxBoxSizer* sizer_vert_canvas = new wxBoxSizer(wxVERTICAL);
   sizer_vert_canvas->Add(canvas, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
@@ -662,4 +657,41 @@ void ViewerWindow::grabKeyboard(bool grabit)
   if(canvas)
     // grab later on enter/leave
     canvas->do_keyboard_grab = grabit;
+}
+
+
+void ViewerWindow::dispatchPointerEvent(wxMouseEvent &event)
+{
+  if (!canvas || !canvas->conn)
+    return;
+
+  MyFrameMain* frame = dynamic_cast<MyFrameMain*>(wxGetTopLevelParent(this));
+  if (frame)
+    frame->dispatchPointerEvent(canvas->conn, event);
+  else
+    canvas->conn->sendPointerEvent(event);
+}
+
+
+void ViewerWindow::dispatchKeyEvent(wxKeyEvent &event, bool down, bool isChar)
+{
+  if (!canvas || !canvas->conn)
+    return;
+
+  MyFrameMain* frame = dynamic_cast<MyFrameMain*>(wxGetTopLevelParent(this));
+  if (frame)
+    frame->dispatchKeyEvent(canvas->conn, event, down, isChar);
+  else
+    canvas->conn->sendKeyEvent(event, down, isChar);
+}
+
+
+void ViewerWindow::dispatchFocusLoss()
+{
+  if (!canvas || !canvas->conn)
+    return;
+
+  MyFrameMain* frame = dynamic_cast<MyFrameMain*>(wxGetTopLevelParent(this));
+  if (frame)
+    frame->dispatchFocusLoss(canvas->conn);
 }
