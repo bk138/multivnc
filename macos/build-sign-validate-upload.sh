@@ -43,7 +43,7 @@ cmake --install . --prefix .
 echo
 echo "Sign embedded libs"
 echo
-codesign -s $CODESIGN_ID_DISTRIBUTION -f -i net.christianbeier.MultiVNC.libs MultiVNC.app/Contents/Frameworks/*
+test -d MultiVNC.app/Contents/Frameworks && codesign -s $CODESIGN_ID_DISTRIBUTION -f -i net.christianbeier.MultiVNC.libs MultiVNC.app/Contents/Frameworks/*
 
 echo
 echo "Sign app"
