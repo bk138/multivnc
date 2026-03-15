@@ -59,12 +59,13 @@
 
   <releases>
 
-    <release version="0.11.0" date="2026-02-xx">
+    <release version="0.11.0" date="2026-03-15">
       <description>
 	<ul>
 	  <li>Added support for SSH tunnelling of VNC connections.</li>
           <li>Added support for servers with self-signed TLS certificates. This means that connections to Raspberry Pi and the like are now possible.</li>
           <li>Added tear-free display rendering.</li>
+          <li>Updated clipboard handling to contemporary standards.</li>
           <li>Fixed various small UI layout issues.</li>
 	</ul>
       </description>
