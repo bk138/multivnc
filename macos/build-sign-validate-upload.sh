@@ -1,12 +1,12 @@
 #!/bin/sh
 
 [ -z "$CODESIGN_ID_DISTRIBUTION" ] && {
-    echo "Please set CODESIGN_ID_DISTRIBUTION env var. You can get it via 'security find-identity -p codesigning -v'"
+    echo "Please set CODESIGN_ID_DISTRIBUTION env var. You can get it via 'security find-identity -p codesigning -v | grep Distribution'"
     exit 1
 }
 
 [ -z "$CODESIGN_ID_INSTALLER" ] && {
-    echo "Please set CODESIGN_ID_INSTALLER env var. You can get it via 'security find-identity -v'"
+    echo "Please set CODESIGN_ID_INSTALLER env var. You can get it via 'security find-identity -v | grep Installer'"
     exit 1
 }
 
