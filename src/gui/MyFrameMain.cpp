@@ -2745,8 +2745,7 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
     frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
 
   // update multi-sync targets when active tab changes
-  if (multi_sync_enabled)
-    updateMultiSyncTargets();
+  updateMultiSyncTargets();
 }
 
 
