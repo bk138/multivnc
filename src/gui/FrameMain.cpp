@@ -248,6 +248,13 @@ void FrameMain::machine_input_replay(wxCommandEvent &event)  // wxGlade: FrameMa
     wxLogDebug(wxT("Event handler (FrameMain::machine_input_replay) not implemented yet"));
 }
 
+void FrameMain::machine_multisync(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>
+{
+    event.Skip();
+    // notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::machine_multisync) not implemented yet"));
+}
+
 void FrameMain::machine_exit(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>
 {
     event.Skip();
