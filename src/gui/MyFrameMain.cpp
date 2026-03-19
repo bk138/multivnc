@@ -120,14 +120,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->Enable(ID_INPUT_REPLAY, false);
   // multi-sync input
   multi_sync_enabled = false;
-  {
-    wxMenu* machineMenu = frame_main_menubar->GetMenu(0);
-    machineMenu->InsertCheckItem(9, ID_MULTISYNC,
-      _("Multi-Sync Input\tCtrl-M"),
-      _("Replicate mouse and keyboard input to all connections."));
-    Bind(wxEVT_MENU, &MyFrameMain::machine_multisync, this, ID_MULTISYNC);
-    frame_main_menubar->Enable(ID_MULTISYNC, false);
-  }
+  frame_main_menubar->Enable(ID_MULTISYNC, false);
   // bookmarks
   frame_main_menubar->Enable(wxID_ADD, false);
   // window sharing
@@ -1284,11 +1277,8 @@ void MyFrameMain::conn_setup(VNCConn *c) {
       GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
     }
 
-  // multi-sync: enable when 2+ connections, update targets if already active
-  if (connections.size() >= 2)
-    frame_main_menubar->Enable(ID_MULTISYNC, true);
-  if (multi_sync_enabled)
-    updateMultiSyncTargets();
+  // multi-sync: update targets if already active
+  updateMultiSyncTargets();
 
 }
 
@@ -1362,8 +1352,6 @@ void MyFrameMain::conn_terminate(int which)
     frame_main_menubar->Check(ID_MULTISYNC, false);
   }
   updateMultiSyncTargets();
-  if (connections.size() < 2)
-    frame_main_menubar->Enable(ID_MULTISYNC, false);
 
   if(connections.size() == 0) // nothing to end
     {
@@ -1990,6 +1978,8 @@ void MyFrameMain::machine_multisync(wxCommandEvent &event)
 
 void MyFrameMain::updateMultiSyncTargets()
 {
+  frame_main_menubar->Enable(ID_MULTISYNC, connections.size() >= 2);
+
   const wxString syncPrefix = "[Sync] ";
 
   if (!multi_sync_enabled || connections.size() < 2) {

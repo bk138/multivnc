@@ -66,6 +66,12 @@
                         <handler>machine_input_replay</handler>
                     </item>
                     <item>
+                        <label>Multi-Sync Input	Ctrl-M</label>
+                        <id>ID_MULTISYNC</id>
+                        <checkable>1</checkable>
+                        <handler>machine_multisync</handler>
+                    </item>
+                    <item>
                         <label>---</label>
                         <id>---</id>
                         <name>---</name>
