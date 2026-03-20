@@ -121,7 +121,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   frame_main_menubar->Enable(ID_INPUT_REPLAY, false);
   // multi-sync input
   multi_sync_enabled = false;
-  frame_main_menubar->Enable(ID_MULTISYNC, false);
+  frame_main_menubar->Enable(ID_INPUT_MULTISYNC, false);
   // bookmarks
   frame_main_menubar->Enable(wxID_ADD, false);
   // window sharing
@@ -1362,7 +1362,7 @@ void MyFrameMain::conn_terminate(int which)
   // multi-sync: auto-disable if fewer than 2 connections remain
   if (multi_sync_enabled && connections.size() < 2) {
     multi_sync_enabled = false;
-    frame_main_menubar->Check(ID_MULTISYNC, false);
+    frame_main_menubar->Check(ID_INPUT_MULTISYNC, false);
   }
   updateMultiSyncTargets();
 
@@ -1991,7 +1991,7 @@ void MyFrameMain::machine_multisync(wxCommandEvent &event)
 
 void MyFrameMain::updateMultiSyncTargets()
 {
-  frame_main_menubar->Enable(ID_MULTISYNC, connections.size() >= 2);
+  frame_main_menubar->Enable(ID_INPUT_MULTISYNC, connections.size() >= 2);
 
   const wxString syncPrefix = "[Sync] ";
 

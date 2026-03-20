@@ -67,7 +67,7 @@
                     </item>
                     <item>
                         <label>Multi-Sync Input	Ctrl-M</label>
-                        <id>ID_MULTISYNC</id>
+                        <id>ID_INPUT_MULTISYNC</id>
                         <checkable>1</checkable>
                         <handler>machine_multisync</handler>
                     </item>

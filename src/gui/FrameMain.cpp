@@ -46,8 +46,8 @@ FrameMain::FrameMain(wxWindow* parent, wxWindowID id, const wxString& title, con
     Bind(wxEVT_MENU, &FrameMain::machine_input_record, this, ID_INPUT_RECORD);
     wxglade_tmp_menu->Append(ID_INPUT_REPLAY, _("Replay Input"), wxEmptyString);
     Bind(wxEVT_MENU, &FrameMain::machine_input_replay, this, ID_INPUT_REPLAY);
-    wxglade_tmp_menu->Append(ID_MULTISYNC, _("Multi-Sync Input\tCtrl-M"), wxEmptyString, wxITEM_CHECK);
-    Bind(wxEVT_MENU, &FrameMain::machine_multisync, this, ID_MULTISYNC);
+    wxglade_tmp_menu->Append(ID_INPUT_MULTISYNC, _("Multi-Sync Input\tCtrl-M"), wxEmptyString, wxITEM_CHECK);
+    Bind(wxEVT_MENU, &FrameMain::machine_multisync, this, ID_INPUT_MULTISYNC);
     wxglade_tmp_menu->AppendSeparator();
     wxglade_tmp_menu->Append(wxID_EXIT, _("Quit"), _("Exit MultiVNC."));
     Bind(wxEVT_MENU, &FrameMain::machine_exit, this, wxID_EXIT);
