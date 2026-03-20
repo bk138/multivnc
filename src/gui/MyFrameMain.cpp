@@ -119,6 +119,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // record/replay
   frame_main_menubar->Enable(ID_INPUT_RECORD, false);
   frame_main_menubar->Enable(ID_INPUT_REPLAY, false);
+  // multi-sync input
+  multi_sync_enabled = false;
+  frame_main_menubar->Enable(ID_MULTISYNC, false);
   // bookmarks
   frame_main_menubar->Enable(wxID_ADD, false);
   // window sharing
@@ -1287,6 +1290,9 @@ void MyFrameMain::conn_setup(VNCConn *c) {
       GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
     }
 
+  // multi-sync: update targets if already active
+  updateMultiSyncTargets();
+
 }
 
 
@@ -1352,6 +1358,13 @@ void MyFrameMain::conn_terminate(int which)
     }
   // erase the ConnBlob
   connections.erase(connections.begin() + which);
+
+  // multi-sync: auto-disable if fewer than 2 connections remain
+  if (multi_sync_enabled && connections.size() < 2) {
+    multi_sync_enabled = false;
+    frame_main_menubar->Check(ID_MULTISYNC, false);
+  }
+  updateMultiSyncTargets();
 
   if(connections.size() == 0) // nothing to end
     {
@@ -1963,6 +1976,63 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
     }
 }
 
+
+void MyFrameMain::machine_multisync(wxCommandEvent &event)
+{
+  multi_sync_enabled = event.IsChecked();
+  updateMultiSyncTargets();
+
+  if (multi_sync_enabled)
+    wxLogStatus(_("Multi-Sync Input enabled: input is replicated to all connections."));
+  else
+    wxLogStatus(_("Multi-Sync Input disabled."));
+}
+
+
+void MyFrameMain::updateMultiSyncTargets()
+{
+  frame_main_menubar->Enable(ID_MULTISYNC, connections.size() >= 2);
+
+  const wxString syncPrefix = "[Sync] ";
+
+  if (!multi_sync_enabled || connections.size() < 2) {
+    // clear all sync targets and restore tab titles
+    for (size_t i = 0; i < connections.size(); ++i) {
+      connections[i].viewerwindow->setSyncTargets({});
+      wxString label = notebook_connections->GetPageText(i);
+      if (label.StartsWith(syncPrefix))
+        notebook_connections->SetPageText(i, label.Mid(syncPrefix.length()));
+    }
+    return;
+  }
+
+  int sel = notebook_connections->GetSelection();
+  if (sel == wxNOT_FOUND)
+    return;
+
+  // build target list: all connections except the active one
+  std::vector<VNCConn*> targets;
+  for (size_t i = 0; i < connections.size(); ++i) {
+    if ((int)i != sel)
+      targets.push_back(connections[i].conn);
+  }
+
+  // only the active tab's ViewerWindow gets sync targets
+  for (size_t i = 0; i < connections.size(); ++i) {
+    wxString label = notebook_connections->GetPageText(i);
+    if ((int)i == sel) {
+      connections[i].viewerwindow->setSyncTargets(targets);
+      // master tab: strip prefix if present
+      if (label.StartsWith(syncPrefix))
+        notebook_connections->SetPageText(i, label.Mid(syncPrefix.length()));
+    } else {
+      connections[i].viewerwindow->setSyncTargets({});
+      // slave tab: add prefix if not present
+      if (!label.StartsWith(syncPrefix))
+        notebook_connections->SetPageText(i, syncPrefix + label);
+    }
+  }
+}
 
 
 void MyFrameMain::machine_exit(wxCommandEvent &event)
@@ -2674,6 +2744,9 @@ void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
     }
   else // no object, i.e. disabled
     frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
+
+  // update multi-sync targets when active tab changes
+  updateMultiSyncTargets();
 }
 
 

@@ -75,6 +75,7 @@ public:
     virtual void machine_save_stats(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_input_record(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_input_replay(wxCommandEvent &event); // wxGlade: <event_handler>
+    virtual void machine_multisync(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void machine_exit(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_toggletoolbar(wxCommandEvent &event); // wxGlade: <event_handler>
     virtual void view_togglediscovered(wxCommandEvent &event); // wxGlade: <event_handler>
