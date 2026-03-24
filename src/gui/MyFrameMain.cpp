@@ -154,6 +154,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     {
       frame_main_toolbar->EnableTool(wxID_STOP, false); // disconnect
       frame_main_toolbar->EnableTool(wxID_SAVE, false); // screenshot
+      frame_main_toolbar->EnableTool(ID_INPUT_MULTISYNC, false);
       frame_main_toolbar->EnableTool(ID_INPUT_REPLAY, false);
       frame_main_toolbar->EnableTool(ID_INPUT_RECORD, false);
 
@@ -1363,6 +1364,9 @@ void MyFrameMain::conn_terminate(int which)
   if (multi_sync_enabled && connections.size() < 2) {
     multi_sync_enabled = false;
     frame_main_menubar->Check(ID_INPUT_MULTISYNC, false);
+    if(GetToolBar()) {
+        GetToolBar()->EnableTool(ID_INPUT_MULTISYNC, false);
+    }
   }
   updateMultiSyncTargets();
 
@@ -1986,12 +1990,23 @@ void MyFrameMain::machine_multisync(wxCommandEvent &event)
     wxLogStatus(_("Multi-Sync Input enabled: input is replicated to all connections."));
   else
     wxLogStatus(_("Multi-Sync Input disabled."));
+
+  // Sync both menu and toolbar states
+  frame_main_menubar->Check(ID_INPUT_MULTISYNC, multi_sync_enabled);
+  if(GetToolBar()) {
+      GetToolBar()->ToggleTool(ID_INPUT_MULTISYNC, multi_sync_enabled);
+  }
 }
 
 
 void MyFrameMain::updateMultiSyncTargets()
 {
-  frame_main_menubar->Enable(ID_INPUT_MULTISYNC, connections.size() >= 2);
+  bool enable = connections.size() >= 2;
+
+  frame_main_menubar->Enable(ID_INPUT_MULTISYNC, enable);
+  if(GetToolBar()) {
+      GetToolBar()->EnableTool(ID_INPUT_MULTISYNC, enable);
+  }
 
   const wxString syncPrefix = "[Sync] ";
 
