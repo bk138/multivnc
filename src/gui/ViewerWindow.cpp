@@ -437,13 +437,13 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
 #endif
 
   canvas_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
-  GetSizer()->Add(canvas_container, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 3);
+  GetSizer()->Add(canvas_container, 1, wxEXPAND|wxALL, 3);
 
 
   // the lower subwindow
   stats_container = new wxScrolledWindow(this);
   stats_container->SetScrollRate(VIEWERWINDOW_SCROLL_RATE, VIEWERWINDOW_SCROLL_RATE);
-  GetSizer()->Add(stats_container, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+  GetSizer()->Add(stats_container, 0, wxEXPAND|wxALL, 3);
 
 
 
@@ -498,8 +498,8 @@ ViewerWindow::ViewerWindow(wxWindow* parent, VNCConn* conn):
   grid_sizer_stats_multi->Add(text_ctrl_lossratio, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
   grid_sizer_stats_multi->Add(gauge_recvbuf, 0, wxLEFT|wxRIGHT|wxBOTTOM, 3);
   // insert grid sizer into static box sizer
-  sizer_stats->Add(grid_sizer_stats_uni, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxALL, 0);
-  sizer_stats->Add(grid_sizer_stats_multi, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM|wxALL, 0);
+  sizer_stats->Add(grid_sizer_stats_uni, 0, wxALIGN_BOTTOM|wxALL, 0);
+  sizer_stats->Add(grid_sizer_stats_multi, 0, wxALIGN_BOTTOM|wxALL, 0);
 
   // IMPORTANT: make sizer obey to size hints!
   stats_container->GetSizer()->SetSizeHints(stats_container);
