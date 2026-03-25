@@ -975,7 +975,7 @@ void VNCConn::thread_got_update(rfbClient* client,int x,int y,int w,int h)
 	      conn->latency = conn->latency_stopwatch.Time();
 	      conn->latency_test_rect_sent = false;
 
-	      wxLogDebug(wxT("VNCConn %p: got update containing latency test rect, took %ims"), conn, conn->latency_stopwatch.Time());
+	      wxLogDebug("VNCConn %p: got update containing latency test rect, took %ld ms", conn, conn->latency_stopwatch.Time());
 	    }
 	}
     }
