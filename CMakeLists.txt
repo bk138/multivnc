@@ -44,7 +44,7 @@ set(LIBSSHTUNNEL_INSTALL OFF CACHE BOOL "Set to OFF to not include libsshtunnnel
 add_subdirectory(libsshtunnel)
 
 # wxWidgets
-find_package(wxWidgets 3.1.6 REQUIRED core base qa)
+find_package(wxWidgets 3.1.6 REQUIRED core base qa aui)
 include(UsewxWidgets)
 
 
