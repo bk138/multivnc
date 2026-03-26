@@ -210,6 +210,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   // right click handler for bookmarks
   list_box_bookmarks->Bind(wxEVT_CONTEXT_MENU, &MyFrameMain::listbox_bookmarks_context, this);
+
+  // wxAuiNotebook event handlers
+  Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &MyFrameMain::notebook_connections_pagechanged, this, wxID_ANY);
 }
 
 
@@ -2721,7 +2724,7 @@ void MyFrameMain::listbox_bookmarks_context(wxContextMenuEvent &event)
     }
 }
 
-void MyFrameMain::notebook_connections_pagechanged(wxNotebookEvent &event)
+void MyFrameMain::notebook_connections_pagechanged(wxAuiNotebookEvent &event)
 {
   ConnBlob* cb;
   if(connections.size())
