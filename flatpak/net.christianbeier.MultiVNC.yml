@@ -31,7 +31,6 @@ modules:
       - --with-gtk=3
       - --enable-secretstore
       - --enable-debug=no
-      - --enable-aui=no
       - --enable-html=no
       - --enable-mediactrl=no
       - --enable-propgrid=no
@@ -47,8 +46,8 @@ modules:
       - /share/aclocal
     sources:
       - type: archive
-        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.9/wxWidgets-3.2.9.tar.bz2
-        sha256: fb90f9538bffd6a02edbf80037a0c14c2baf9f509feac8f76ab2a5e4321f112b
+        url: https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.2/wxWidgets-3.3.2.tar.bz2
+        sha256: 50a28cb668de47b0e006cd6ebed8cf4f76c1cac6116fb3c978c44478219103f2
   - name: multivnc
     buildsystem: cmake-ninja
     config-opts:
