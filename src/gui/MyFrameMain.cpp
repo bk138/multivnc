@@ -402,14 +402,19 @@ void MyFrameMain::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
 {
   VNCConn* sending_conn = static_cast<VNCConn*>(event.GetEventObject());
 
-  // only draw something for the currently selected connection
-  int sel;
-  if((sel = notebook_connections->GetSelection()) != -1) 
+  // find index of this connection
+  vector<ConnBlob>::iterator it = connections.begin();
+  size_t index = 0;
+  while(it != connections.end() && it->conn != sending_conn)
     {
-      VNCConn* selected_conn = connections.at(sel).conn;
-      if(selected_conn == sending_conn)
-	wxPostEvent((wxEvtHandler*)connections.at(sel).viewerwindow, event);
+      ++it;
+      ++index;
     }
+
+  if(index < connections.size()) { // found
+      wxPostEvent((wxEvtHandler*)connections.at(index).viewerwindow, event);
+  }
+
 }
 
 
