@@ -134,6 +134,7 @@ public:
   void listbox_bookmarks_dclick(wxCommandEvent &event); 
   void listbox_bookmarks_context(wxContextMenuEvent &event);
 
+  void notebook_connections_pageclose(wxAuiNotebookEvent &event);
   void notebook_connections_pagechanged(wxAuiNotebookEvent &event);
 
   void machine_connect(wxCommandEvent &event);

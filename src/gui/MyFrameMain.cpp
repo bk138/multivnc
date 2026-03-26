@@ -213,6 +213,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   // wxAuiNotebook event handlers
   Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &MyFrameMain::notebook_connections_pagechanged, this, wxID_ANY);
+  Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MyFrameMain::notebook_connections_pageclose, this, wxID_ANY);
 }
 
 
@@ -2726,6 +2727,17 @@ void MyFrameMain::listbox_bookmarks_context(wxContextMenuEvent &event)
         menu.Append(wxID_DELETE, _("&Delete Bookmark"));
         menu.Bind(wxEVT_MENU, &MyFrameMain::bookmarks_delete, this, wxID_DELETE);
         PopupMenu(&menu);
+    }
+}
+
+void MyFrameMain::notebook_connections_pageclose(wxAuiNotebookEvent &event)
+{
+    // shut down reported connection (might not be the one currently selected!)
+    int sel;
+    if((sel = event.GetSelection()) != -1) {
+        connections.at(sel).conn->Shutdown();
+        // don't close ourselves, the internal logic takes care of page remove
+        event.Veto();
     }
 }
 
