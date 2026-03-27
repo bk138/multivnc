@@ -24,7 +24,7 @@ class MultiVNC(ConanFile):
             self.requires("libtiff/[~4.6]", options = {
                 "jpeg":  "libjpeg-turbo"
             })
-            self.requires("wxwidgets/3.2.8", options = {
+            self.requires("wxwidgets/3.3.1", options = {
                 "jpeg":  "libjpeg-turbo"
             })
 
