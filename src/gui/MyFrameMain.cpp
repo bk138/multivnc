@@ -214,6 +214,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // wxAuiNotebook event handlers
   Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &MyFrameMain::notebook_connections_pagechanged, this, wxID_ANY);
   Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MyFrameMain::notebook_connections_pageclose, this, wxID_ANY);
+  Bind(wxEVT_AUINOTEBOOK_TAB_RIGHT_DOWN, &MyFrameMain::notebook_connections_tab_right_down, this, wxID_ANY);
 }
 
 
@@ -2784,6 +2785,41 @@ void MyFrameMain::notebook_connections_pagechanged(wxAuiNotebookEvent &event)
 
   // update multi-sync targets when active tab changes
   updateMultiSyncTargets();
+}
+
+
+void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
+{
+  int sel = event.GetSelection();
+  if (sel == wxNOT_FOUND || connections.size() < 1)
+    return;
+
+  wxMenu menu;
+
+  // Per-tab actions
+  menu.Append(ID_LAYOUT_SPLIT_LEFT, _("Split left"));
+  menu.Append(ID_LAYOUT_SPLIT_RIGHT, _("Split right"));
+  menu.Append(ID_LAYOUT_SPLIT_TOP, _("Split to top"));
+  menu.Append(ID_LAYOUT_SPLIT_BOTTOM, _("Split to bottom"));
+
+  menu.AppendSeparator();
+
+  // Global actions (operate on all connections)
+  menu.Append(ID_LAYOUT_TILE, _("Arrange all as grid"));
+  menu.Append(ID_LAYOUT_UNTILE, _("Reset all to tabs"));
+
+  // Enable/disable based on connection count
+  bool hasMultipleConnections = connections.size() >= 2;
+  menu.Enable(ID_LAYOUT_SPLIT_LEFT, hasMultipleConnections);
+  menu.Enable(ID_LAYOUT_SPLIT_RIGHT, hasMultipleConnections);
+  menu.Enable(ID_LAYOUT_SPLIT_TOP, hasMultipleConnections);
+  menu.Enable(ID_LAYOUT_SPLIT_BOTTOM, hasMultipleConnections);
+  menu.Enable(ID_LAYOUT_TILE, hasMultipleConnections);
+  //TODO also disable when all tabs in one tabctrl
+  menu.Enable(ID_LAYOUT_UNTILE, hasMultipleConnections);
+
+  // Show context menu
+  PopupMenu(&menu);
 }
 
 
