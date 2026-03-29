@@ -24,6 +24,8 @@ enum
     ID_INPUT_REPLAY,
     ID_ISSUE_LIST,
     ID_INPUT_MULTISYNC,
+    ID_LAYOUT_TILE,
+    ID_LAYOUT_UNTILE,
   };
 
 
