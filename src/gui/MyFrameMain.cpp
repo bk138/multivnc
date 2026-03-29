@@ -2217,7 +2217,35 @@ void MyFrameMain::view_seamless(wxCommandEvent &event)
 }
 
 
+void MyFrameMain::view_layout(wxCommandEvent &event)
+{
+  int sel = notebook_connections->GetSelection();
 
+  if (sel == wxNOT_FOUND || connections.size() < 2)
+    return;
+
+  switch (event.GetId())
+    {
+    case ID_LAYOUT_SPLIT_LEFT:
+      notebook_connections->Split(sel, wxLEFT);
+      break;
+    case ID_LAYOUT_SPLIT_RIGHT:
+      notebook_connections->Split(sel, wxRIGHT);
+      break;
+    case ID_LAYOUT_SPLIT_TOP:
+      notebook_connections->Split(sel, wxTOP);
+      break;
+    case ID_LAYOUT_SPLIT_BOTTOM:
+      notebook_connections->Split(sel, wxBOTTOM);
+      break;
+    case ID_LAYOUT_TILE:
+      // TODO: Implement arrange all as grid
+      break;
+    case ID_LAYOUT_UNTILE:
+        //TODO wire up UNsplitall
+      break;
+    }
+}
 
 
 void MyFrameMain::bookmarks_add(wxCommandEvent &event)
@@ -2807,6 +2835,14 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   // Global actions (operate on all connections)
   menu.Append(ID_LAYOUT_TILE, _("Arrange all as grid"));
   menu.Append(ID_LAYOUT_UNTILE, _("Reset all to tabs"));
+
+  // Bind event handlers to centralized view_layout handler
+  menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_SPLIT_LEFT);
+  menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_SPLIT_RIGHT);
+  menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_SPLIT_TOP);
+  menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_SPLIT_BOTTOM);
+  menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_TILE);
+  menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_UNTILE);
 
   // Enable/disable based on connection count
   bool hasMultipleConnections = connections.size() >= 2;

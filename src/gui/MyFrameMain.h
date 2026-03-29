@@ -158,6 +158,7 @@ public:
   void view_togglefullscreen(wxCommandEvent &event);
   void view_toggle1to1(wxCommandEvent &event);
   void view_seamless(wxCommandEvent &event);
+  void view_layout(wxCommandEvent &event);
 
   void bookmarks_add(wxCommandEvent &event); 
   void bookmarks_edit(wxCommandEvent &event); 
