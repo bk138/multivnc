@@ -2242,7 +2242,11 @@ void MyFrameMain::view_layout(wxCommandEvent &event)
       // TODO: Implement arrange all as grid
       break;
     case ID_LAYOUT_UNTILE:
-        //TODO wire up UNsplitall
+#if wxCHECK_VERSION(3, 3, 0)
+      notebook_connections->UnsplitAll();
+      // reset selection, otherwise tabs are not selectable
+      notebook_connections->SetSelection(0);
+#endif
       break;
     }
 }
