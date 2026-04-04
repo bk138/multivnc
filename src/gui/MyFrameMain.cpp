@@ -2893,6 +2893,9 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   menu.Append(ID_LAYOUT_TILE, _("Arrange all as grid"));
   menu.Append(ID_LAYOUT_UNTILE, _("Reset all to tabs"));
 
+  menu.AppendSeparator();
+  menu.Append(wxID_STOP, _("Disconnect"));
+
   // Bind event handlers to centralized view_layout handler
   menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_SPLIT_LEFT);
   menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_SPLIT_RIGHT);
@@ -2900,6 +2903,11 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_SPLIT_BOTTOM);
   menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_TILE);
   menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_UNTILE);
+  // more Bind()s
+  menu.Bind(wxEVT_MENU, [this, sel](wxCommandEvent&) {
+    connections.at(sel).conn->Shutdown();
+  }, wxID_STOP);
+
 
   // Enable/disable based on connection count
   bool hasMultipleConnections = connections.size() >= 2;
