@@ -129,6 +129,9 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // window sharing
   frame_main_menubar->Enable(wxID_UP, false);
   frame_main_menubar->Enable(wxID_CANCEL, false);
+  // layout (need >= 2 connections)
+  frame_main_menubar->Enable(ID_LAYOUT_TILE, false);
+  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, false);
 #ifdef __WXGTK__
   wxString sessionType, flatpakId;
   wxGetEnv("XDG_SESSION_TYPE", &sessionType);
@@ -1296,6 +1299,9 @@ void MyFrameMain::conn_setup(VNCConn *c) {
   // window sharing
   frame_main_menubar->Enable(wxID_UP, true);
   frame_main_menubar->Enable(wxID_CANCEL, false);
+  // layout (need >= 2 connections)
+  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2);
+  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2);
 
   if(GetToolBar())
     {
@@ -1372,6 +1378,10 @@ void MyFrameMain::conn_terminate(int which)
     }
   // erase the ConnBlob
   connections.erase(connections.begin() + which);
+
+  // layout: requires >= 2 connections
+  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2);
+  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2);
 
   // multi-sync: auto-disable if fewer than 2 connections remain
   if (multi_sync_enabled && connections.size() < 2) {
