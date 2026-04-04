@@ -79,6 +79,7 @@ class MyFrameMain: public FrameMain
   void conn_spawn(const wxString& service, int listenPort = -1);
   void conn_setup(VNCConn *conn);
   void conn_terminate(int which);
+  void conn_screenshot(int index);
 
   // collab features
   wxString windowshare_cmd_template;

@@ -1423,8 +1423,31 @@ void MyFrameMain::conn_terminate(int which)
 }
 
 
+void MyFrameMain::conn_screenshot(int index)
+{
+    VNCConn* c = connections.at(index).conn;
 
+    wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
+    if(rect.IsEmpty())
+        return;
+    wxBitmap screenshot = c->getFrameBufferRegion(rect);
 
+    wxString desktopname = c->getDesktopName();
+#ifdef __WIN32__
+    // windows doesn't like ':'s
+    desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
+#endif
+    wxString filename = wxFileSelector(_("Save screenshot..."),
+                                       wxEmptyString,
+                                       desktopname + wxT("-Screenshot.png"),
+                                       wxT(".png"),
+                                       _("PNG files|*.png"),
+                                       wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+    if(!filename.empty()) {
+        wxBusyCursor busy;
+        screenshot.SaveFile(filename, wxBITMAP_TYPE_PNG);
+    }
+}
 
 
 void MyFrameMain::splitwinlayout()
@@ -1781,32 +1804,7 @@ void MyFrameMain::machine_preferences(wxCommandEvent &event)
 void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 {
   if(connections.size())
-    {
-      VNCConn* c = connections.at(notebook_connections->GetSelection()).conn;
-
-      wxRect rect(0, 0, c->getFrameBufferWidth(), c->getFrameBufferHeight());
-      if(rect.IsEmpty())
-	return;
-      wxBitmap screenshot = c->getFrameBufferRegion(rect);
-      
-      wxString desktopname =  c->getDesktopName();
-#ifdef __WIN32__
-      // windows doesn't like ':'s
-      desktopname.Replace(wxString(wxT(":")), wxString(wxT("-")));
-#endif
-      wxString filename = wxFileSelector(_("Save screenshot..."), 
-					 wxEmptyString,
-					 desktopname + wxT("-Screenshot.png"), 
-					 wxT(".png"), 
-					 _("PNG files|*.png"), 
-					 wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-      
-      if(!filename.empty())
-	{
-	  wxBusyCursor busy;
-    	  screenshot.SaveFile(filename, wxBITMAP_TYPE_PNG);
-	}
-    }
+    conn_screenshot(notebook_connections->GetSelection());
 }
 
 
