@@ -2892,6 +2892,7 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   menu.Append(ID_LAYOUT_UNTILE, _("Reset all to tabs"));
 
   menu.AppendSeparator();
+  menu.Append(wxID_SAVE, _("Take Screenshot"));
   menu.Append(wxID_STOP, _("Disconnect"));
 
   // Bind event handlers to centralized view_layout handler
@@ -2902,6 +2903,9 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_TILE);
   menu.Bind(wxEVT_MENU, &MyFrameMain::view_layout, this, ID_LAYOUT_UNTILE);
   // more Bind()s
+  menu.Bind(wxEVT_MENU, [this, sel](wxCommandEvent&) {
+    conn_screenshot(sel);
+  }, wxID_SAVE);
   menu.Bind(wxEVT_MENU, [this, sel](wxCommandEvent&) {
     connections.at(sel).conn->Shutdown();
   }, wxID_STOP);
