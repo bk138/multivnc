@@ -2,6 +2,8 @@
 #include "gui/bitmapFromMem.h"
 #include "gui/evtids.h"
 #include <fstream>
+#include <vector>
+#include <cmath>
 #include <wx/aboutdlg.h>
 #include <wx/textctrl.h>
 #include <wx/creddlg.h>
@@ -2239,7 +2241,48 @@ void MyFrameMain::view_layout(wxCommandEvent &event)
       notebook_connections->Split(sel, wxBOTTOM);
       break;
     case ID_LAYOUT_TILE:
-      // TODO: Implement arrange all as grid
+      {
+        // First unsplit all to have all pages in one tab control
+#if wxCHECK_VERSION(3, 3, 0)
+        notebook_connections->UnsplitAll();
+#endif
+        size_t page_count = notebook_connections->GetPageCount();
+        if (page_count < 2)
+          break;
+
+        // Calculate columns and rows to create a balanced layout,
+        // not really square due to wxAuiNotebook API constraints
+        size_t cols = static_cast<size_t>(std::ceil(std::sqrt(page_count)));
+        size_t rows = static_cast<size_t>(std::ceil(static_cast<double>(page_count) / cols));
+
+        // First, split the first (cols-1) pages to the right
+        for (size_t i = 1; i < cols && i < page_count; i++)
+        {
+          notebook_connections->Split(i, wxRIGHT);
+        }
+
+        // Then, for each additional row, split the first page of that row to bottom
+        // and then split the remaining pages in that row to the right
+        for (size_t row = 1; row < rows; row++)
+        {
+          size_t first_page_in_row = row * cols;
+          if (first_page_in_row >= page_count)
+            break;
+
+          // Split the first page of this row to bottom to create the row
+          notebook_connections->Split(first_page_in_row, wxBOTTOM);
+
+          // Split the remaining pages in this row to the right
+          for (size_t col = 1; col < cols; col++)
+          {
+            size_t page_to_split = first_page_in_row + col;
+            if (page_to_split >= page_count)
+              break;
+
+            notebook_connections->Split(page_to_split, wxRIGHT);
+          }
+        }
+      }
       break;
     case ID_LAYOUT_UNTILE:
 #if wxCHECK_VERSION(3, 3, 0)
