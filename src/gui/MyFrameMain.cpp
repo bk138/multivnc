@@ -1299,8 +1299,8 @@ void MyFrameMain::conn_setup(VNCConn *c) {
   // window sharing
   frame_main_menubar->Enable(wxID_UP, true);
   frame_main_menubar->Enable(wxID_CANCEL, false);
-  // layout (need >= 2 connections)
-  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2);
+  // layout (need >= 2 connections, grid limited to <= 8)
+  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2 && connections.size() <= 8);
   frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2);
 
   if(GetToolBar())
@@ -1379,8 +1379,8 @@ void MyFrameMain::conn_terminate(int which)
   // erase the ConnBlob
   connections.erase(connections.begin() + which);
 
-  // layout: requires >= 2 connections
-  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2);
+  // layout: requires >= 2 connections, grid limited to <= 8
+  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2 && connections.size() <= 8);
   frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2);
 
   // multi-sync: auto-disable if fewer than 2 connections remain
@@ -2917,7 +2917,7 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   menu.Enable(ID_LAYOUT_SPLIT_RIGHT, hasMultipleConnections);
   menu.Enable(ID_LAYOUT_SPLIT_TOP, hasMultipleConnections);
   menu.Enable(ID_LAYOUT_SPLIT_BOTTOM, hasMultipleConnections);
-  menu.Enable(ID_LAYOUT_TILE, hasMultipleConnections);
+  menu.Enable(ID_LAYOUT_TILE, hasMultipleConnections && connections.size() <= 8);
   //TODO also disable when all tabs in one tabctrl
   menu.Enable(ID_LAYOUT_UNTILE, hasMultipleConnections);
 
