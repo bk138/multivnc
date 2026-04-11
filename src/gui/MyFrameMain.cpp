@@ -2865,30 +2865,29 @@ void MyFrameMain::notebook_connections_pagechanged(wxAuiNotebookEvent &event)
       frame_main_menubar->Enable(wxID_CANCEL, isSharing);
   }
 
-  if(cb->seamlessconnector) 
-    {
-      switch(cb->seamlessconnector->getEdge())
-	{
-	case EDGE_NORTH:
-	  frame_main_menubar->Check(ID_SEAMLESS_NORTH, true);
-	  break;
-	case EDGE_EAST:
-	  frame_main_menubar->Check(ID_SEAMLESS_EAST, true);
-	  break;
-	case EDGE_WEST:
-	  frame_main_menubar->Check(ID_SEAMLESS_WEST, true);
-	  break;
-	case EDGE_SOUTH:
-	  frame_main_menubar->Check(ID_SEAMLESS_SOUTH, true);
-	  break;
-	default:
-	  frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
-	}
+  if (VNCSeamlessConnector::isSupportedByCurrentPlatform()) {
+      if (cb->seamlessconnector) {
+          switch (cb->seamlessconnector->getEdge()) {
+          case EDGE_NORTH:
+              frame_main_menubar->Check(ID_SEAMLESS_NORTH, true);
+              break;
+          case EDGE_EAST:
+              frame_main_menubar->Check(ID_SEAMLESS_EAST, true);
+              break;
+          case EDGE_WEST:
+              frame_main_menubar->Check(ID_SEAMLESS_WEST, true);
+              break;
+          case EDGE_SOUTH:
+              frame_main_menubar->Check(ID_SEAMLESS_SOUTH, true);
+              break;
+          default:
+              frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
+          }
 
-      cb->seamlessconnector->Raise();
-    }
-  else // no object, i.e. disabled
-    frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
+          cb->seamlessconnector->Raise();
+      } else // no object, i.e. disabled
+          frame_main_menubar->Check(ID_SEAMLESS_DISABLED, true);
+  }
 
   // update multi-sync targets when active tab changes
   updateMultiSyncTargets();
