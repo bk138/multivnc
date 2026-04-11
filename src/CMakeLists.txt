@@ -43,6 +43,20 @@ if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE icon.icns)
     set(multivnc_SRCS ${multivnc_SRCS} icon.icns)
     set_source_files_properties(icon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+    # SVG toolbar icons — required at runtime via wxBitmapBundle::FromSVGFile(GetResourcesDir()).
+    # Without these the app crashes immediately on launch (null bitmap in wxToolBarTool::UpdateImages).
+    file(GLOB multivnc_SVG_LIGHT "${CMAKE_CURRENT_SOURCE_DIR}/gui/res/light/*.svg")
+    file(GLOB multivnc_SVG_DARK  "${CMAKE_CURRENT_SOURCE_DIR}/gui/res/dark/*.svg")
+    file(GLOB multivnc_SVG_ROOT  "${CMAKE_CURRENT_SOURCE_DIR}/gui/res/about.svg"
+                                  "${CMAKE_CURRENT_SOURCE_DIR}/gui/res/unicast.svg"
+                                  "${CMAKE_CURRENT_SOURCE_DIR}/gui/res/multicast.svg")
+
+    set_source_files_properties(${multivnc_SVG_LIGHT} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/light")
+    set_source_files_properties(${multivnc_SVG_DARK}  PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/dark")
+    set_source_files_properties(${multivnc_SVG_ROOT}  PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+    list(APPEND multivnc_SRCS ${multivnc_SVG_LIGHT} ${multivnc_SVG_DARK} ${multivnc_SVG_ROOT})
 endif(APPLE)
 
 add_executable(${executable_name} WIN32 MACOSX_BUNDLE ${multivnc_SRCS})
