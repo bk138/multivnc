@@ -138,6 +138,7 @@ public:
   void notebook_connections_pageclose(wxAuiNotebookEvent &event);
   void notebook_connections_pagechanged(wxAuiNotebookEvent &event);
   void notebook_connections_tab_right_down(wxAuiNotebookEvent &event);
+  void notebook_connections_drag_done(wxAuiNotebookEvent &event);
 
   void machine_connect(wxCommandEvent &event);
   void machine_listen(wxCommandEvent &event);

@@ -220,6 +220,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   Bind(wxEVT_AUINOTEBOOK_PAGE_CHANGED, &MyFrameMain::notebook_connections_pagechanged, this, wxID_ANY);
   Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MyFrameMain::notebook_connections_pageclose, this, wxID_ANY);
   Bind(wxEVT_AUINOTEBOOK_TAB_RIGHT_DOWN, &MyFrameMain::notebook_connections_tab_right_down, this, wxID_ANY);
+  Bind(wxEVT_AUINOTEBOOK_DRAG_DONE, &MyFrameMain::notebook_connections_drag_done, this, wxID_ANY);
 }
 
 
@@ -1301,7 +1302,8 @@ void MyFrameMain::conn_setup(VNCConn *c) {
   frame_main_menubar->Enable(wxID_CANCEL, false);
   // layout (need >= 2 connections, grid limited to <= 8)
   frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2 && connections.size() <= 8);
-  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2);
+  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2
+                             && notebook_connections->GetPagesInDisplayOrder(notebook_connections->GetMainTabCtrl()).size() != connections.size());
 
   if(GetToolBar())
     {
@@ -1381,7 +1383,8 @@ void MyFrameMain::conn_terminate(int which)
 
   // layout: requires >= 2 connections, grid limited to <= 8
   frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2 && connections.size() <= 8);
-  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2);
+  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2
+                             && notebook_connections->GetPagesInDisplayOrder(notebook_connections->GetMainTabCtrl()).size() != connections.size());
 
   // multi-sync: auto-disable if fewer than 2 connections remain
   if (multi_sync_enabled && connections.size() < 2) {
@@ -2300,6 +2303,11 @@ void MyFrameMain::view_layout(wxCommandEvent &event)
 #endif
       break;
     }
+
+  // update menu bar layout items after any split/unsplit operation
+  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2 && connections.size() <= 8);
+  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2
+                             && notebook_connections->GetPagesInDisplayOrder(notebook_connections->GetMainTabCtrl()).size() != connections.size());
 }
 
 
@@ -2871,6 +2879,14 @@ void MyFrameMain::notebook_connections_pagechanged(wxAuiNotebookEvent &event)
 }
 
 
+void MyFrameMain::notebook_connections_drag_done(wxAuiNotebookEvent &event)
+{
+  frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2 && connections.size() <= 8);
+  frame_main_menubar->Enable(ID_LAYOUT_UNTILE, connections.size() >= 2
+                             && notebook_connections->GetPagesInDisplayOrder(notebook_connections->GetMainTabCtrl()).size() != connections.size());
+}
+
+
 void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
 {
   int sel = event.GetSelection();
@@ -2918,8 +2934,8 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   menu.Enable(ID_LAYOUT_SPLIT_TOP, hasMultipleConnections);
   menu.Enable(ID_LAYOUT_SPLIT_BOTTOM, hasMultipleConnections);
   menu.Enable(ID_LAYOUT_TILE, hasMultipleConnections && connections.size() <= 8);
-  //TODO also disable when all tabs in one tabctrl
-  menu.Enable(ID_LAYOUT_UNTILE, hasMultipleConnections);
+  menu.Enable(ID_LAYOUT_UNTILE, hasMultipleConnections
+              && notebook_connections->GetPagesInDisplayOrder(notebook_connections->GetMainTabCtrl()).size() != connections.size());
 
   // Show context menu
   PopupMenu(&menu);
