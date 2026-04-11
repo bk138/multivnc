@@ -107,6 +107,10 @@ msgstr "Acerca de"
 msgid "Advanced"
 msgstr "Avanzado"
 
+#: ../src/gui/FrameMain.cpp:77
+msgid "Arrange all open connections in a tiled layout"
+msgstr "Organizar todas las conexiones abiertas en un diseño en mosaico"
+
 #: ../src/gui/MyFrameMain.cpp:366
 msgid "Authentication canceled."
 msgstr "Autenticación cancelada."
@@ -157,6 +161,10 @@ msgstr "Cambiar preferencias."
 #: ../src/gui/DialogSettings.cpp:69
 msgid "CoRRE"
 msgstr "CoRRE"
+
+#: ../src/gui/FrameMain.cpp:79
+msgid "Collapse all connections back into a single tab strip"
+msgstr "Contraer todas las conexiones en una única barra de pestañas"
 
 #: ../src/gui/DialogSettings.cpp:87
 msgid "Compression level for 'Tight' and 'Zlib' encodings:"
@@ -708,6 +716,7 @@ msgstr "Solicitar una función / Informar de un error"
 msgid "Reverse connection terminated."
 msgstr "Conexión entrante terminada."
 
+
 #: ../src/gui/FrameMain.cpp:87
 msgid "S&top Sharing Window"
 msgstr "Finalizar Compartir Ventana"
@@ -809,6 +818,22 @@ msgstr "Tamaño del búfer de recepción del socket (kB):"
 #: ../src/gui/FrameMain.cpp:69
 msgid "South"
 msgstr "Sur"
+
+#: ../src/gui/MyFrameMain.cpp:2899
+msgid "Split left"
+msgstr "Dividir a la izquierda"
+
+#: ../src/gui/MyFrameMain.cpp:2900
+msgid "Split right"
+msgstr "Dividir a la derecha"
+
+#: ../src/gui/MyFrameMain.cpp:2902
+msgid "Split to bottom"
+msgstr "Dividir hacia abajo"
+
+#: ../src/gui/MyFrameMain.cpp:2901
+msgid "Split to top"
+msgstr "Dividir hacia arriba"
 
 #: ../src/gui/FrameMain.cpp:60 ../src/gui/ViewerWindow.cpp:431
 msgid "Statistics"
@@ -1021,9 +1046,17 @@ msgstr "Alterna la vista de pantalla completa."
 msgid "Toolbar"
 msgstr "Barra de herramientas"
 
+#: ../src/gui/MyFrameMain.cpp:2907
+msgid "Tile all connections"
+msgstr "Mosaico de todas las conexiones"
+
 #: ../src/gui/DialogSettings.cpp:79
 msgid "Ultra"
 msgstr "Ultra"
+
+#: ../src/gui/MyFrameMain.cpp:909
+msgid "Untile all connections"
+msgstr "Deshacer mosaico de todas las conexiones"
 
 #: ../src/gui/MyFrameMain.cpp:909
 msgid "Unverified Server Certificate"

@@ -107,6 +107,10 @@ msgstr "Über"
 msgid "Advanced"
 msgstr "Erweitert"
 
+#: ../src/gui/FrameMain.cpp:77
+msgid "Arrange all open connections in a tiled layout"
+msgstr "Alle offenen Verbindungen in einem gekachelten Layout anordnen"
+
 #: ../src/gui/MyFrameMain.cpp:366
 msgid "Authentication canceled."
 msgstr "Anmeldung abgebrochen."
@@ -157,6 +161,10 @@ msgstr "Einstellungen ändern."
 #: ../src/gui/DialogSettings.cpp:69
 msgid "CoRRE"
 msgstr "CoRRE"
+
+#: ../src/gui/FrameMain.cpp:79
+msgid "Collapse all connections back into a single tab strip"
+msgstr "Alle Verbindungen in eine einzelne Tableiste zusammenführen"
 
 #: ../src/gui/DialogSettings.cpp:87
 msgid "Compression level for 'Tight' and 'Zlib' encodings:"
@@ -713,6 +721,7 @@ msgstr "Feature wünschen / Bug melden"
 msgid "Reverse connection terminated."
 msgstr "Eingehende Verbindung abgebrochen."
 
+
 #: ../src/gui/FrameMain.cpp:87
 msgid "S&top Sharing Window"
 msgstr "Teilen eines Fensters &beenden"
@@ -814,6 +823,22 @@ msgstr "Größe des Socket-Empfangspuffers (kB):"
 #: ../src/gui/FrameMain.cpp:69
 msgid "South"
 msgstr "Süd"
+
+#: ../src/gui/MyFrameMain.cpp:2899
+msgid "Split left"
+msgstr "Nach links aufteilen"
+
+#: ../src/gui/MyFrameMain.cpp:2900
+msgid "Split right"
+msgstr "Nach rechts aufteilen"
+
+#: ../src/gui/MyFrameMain.cpp:2902
+msgid "Split to bottom"
+msgstr "Nach unten aufteilen"
+
+#: ../src/gui/MyFrameMain.cpp:2901
+msgid "Split to top"
+msgstr "Nach oben aufteilen"
 
 #: ../src/gui/FrameMain.cpp:60 ../src/gui/ViewerWindow.cpp:431
 msgid "Statistics"
@@ -1036,9 +1061,17 @@ msgstr "Vollbildansicht umschalten."
 msgid "Toolbar"
 msgstr "Symbolleiste"
 
+#: ../src/gui/MyFrameMain.cpp:2907
+msgid "Tile all connections"
+msgstr "Gekachelte Ansicht für alle Verbindungen"
+
 #: ../src/gui/DialogSettings.cpp:79
 msgid "Ultra"
 msgstr "Ultra"
+
+#: ../src/gui/MyFrameMain.cpp:909
+msgid "Untile all connections"
+msgstr "Tab-Ansicht für alle Verbindungen"
 
 #: ../src/gui/MyFrameMain.cpp:909
 msgid "Unverified Server Certificate"

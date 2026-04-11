@@ -107,6 +107,10 @@ msgstr "Om"
 msgid "Advanced"
 msgstr "Avancerad"
 
+#: ../src/gui/FrameMain.cpp:77
+msgid "Arrange all open connections in a tiled layout"
+msgstr "Ordna alla öppna anslutningar i ett rutmönster"
+
 #: ../src/gui/MyFrameMain.cpp:366
 msgid "Authentication canceled."
 msgstr "Autentiseringen avbröts."
@@ -157,6 +161,10 @@ msgstr "Ändra inställningar."
 #: ../src/gui/DialogSettings.cpp:69
 msgid "CoRRE"
 msgstr "CoRRE"
+
+#: ../src/gui/FrameMain.cpp:79
+msgid "Collapse all connections back into a single tab strip"
+msgstr "Dra ihop alla anslutningar till en enda flikrad"
 
 #: ../src/gui/DialogSettings.cpp:87
 msgid "Compression level for 'Tight' and 'Zlib' encodings:"
@@ -705,6 +713,7 @@ msgstr "Begär en funktion / Rapportera ett fel"
 msgid "Reverse connection terminated."
 msgstr "Omvänd anslutning avslutad."
 
+
 #: ../src/gui/FrameMain.cpp:87
 msgid "S&top Sharing Window"
 msgstr "Stoppa fönsterdelning"
@@ -806,6 +815,22 @@ msgstr "Storlek på mottagningsbuffert för socket (kB):"
 #: ../src/gui/FrameMain.cpp:69
 msgid "South"
 msgstr "Syd"
+
+#: ../src/gui/MyFrameMain.cpp:2899
+msgid "Split left"
+msgstr "Dela vänster"
+
+#: ../src/gui/MyFrameMain.cpp:2900
+msgid "Split right"
+msgstr "Dela höger"
+
+#: ../src/gui/MyFrameMain.cpp:2902
+msgid "Split to bottom"
+msgstr "Dela nedåt"
+
+#: ../src/gui/MyFrameMain.cpp:2901
+msgid "Split to top"
+msgstr "Dela uppåt"
 
 #: ../src/gui/FrameMain.cpp:60 ../src/gui/ViewerWindow.cpp:431
 msgid "Statistics"
@@ -1016,9 +1041,17 @@ msgstr "Växlar helskärmsvy."
 msgid "Toolbar"
 msgstr "Verktygsfält"
 
+#: ../src/gui/MyFrameMain.cpp:2907
+msgid "Tile all connections"
+msgstr "Visa alla anslutningar som rutor"
+
 #: ../src/gui/DialogSettings.cpp:79
 msgid "Ultra"
 msgstr "Ultra"
+
+#: ../src/gui/MyFrameMain.cpp:909
+msgid "Untile all connections"
+msgstr "Återställ alla anslutningar från rutor"
 
 #: ../src/gui/MyFrameMain.cpp:909
 msgid "Unverified Server Certificate"
