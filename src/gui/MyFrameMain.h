@@ -82,6 +82,7 @@ class MyFrameMain: public FrameMain
   void conn_screenshot(int index);
 
   // collab features
+  bool windowshare_supported;
   wxString windowshare_cmd_template;
   void onWindowshareTerminate(wxProcessEvent& event);
 

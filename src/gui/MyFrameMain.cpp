@@ -92,6 +92,19 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
 
   // windowshare template
   windowshare_cmd_template = pConfig->Read(K_WINDOWSHARE, V_DFLTWINDOWSHARE);
+  windowshare_supported = true;
+#ifdef __WXGTK__
+  wxString sessionType, flatpakId;
+  wxGetEnv("XDG_SESSION_TYPE", &sessionType);
+  wxGetEnv("FLATPAK_ID", &flatpakId);
+  // don't show for flatpak and wayland
+  if(!flatpakId.IsEmpty() || !sessionType.IsSameAs("x11")) {
+      windowshare_supported = false;
+  }
+#else
+  // always off so far
+  windowshare_supported = false;
+#endif
 
 
   // window size
@@ -132,17 +145,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // layout (need >= 2 connections)
   frame_main_menubar->Enable(ID_LAYOUT_TILE, false);
   frame_main_menubar->Enable(ID_LAYOUT_UNTILE, false);
-#ifdef __WXGTK__
-  wxString sessionType, flatpakId;
-  wxGetEnv("XDG_SESSION_TYPE", &sessionType);
-  wxGetEnv("FLATPAK_ID", &flatpakId);
-  // don't show for flatpak and wayland
-  if(!flatpakId.IsEmpty() || !sessionType.IsSameAs("x11"))
+  if(!windowshare_supported)
       frame_main_menubar->Remove(frame_main_menubar->FindMenu(_("Window &Sharing")));
-#else
-  // always off so far
-  frame_main_menubar->Remove(frame_main_menubar->FindMenu(_("Window &Sharing")));
-#endif
   // edge connector
   if(!VNCSeamlessConnector::isSupportedByCurrentPlatform())
       frame_main_menubar->FindItem(ID_SEAMLESS)->GetMenu()->Delete(ID_SEAMLESS);
@@ -1298,8 +1302,10 @@ void MyFrameMain::conn_setup(VNCConn *c) {
   // bookmarks
   frame_main_menubar->Enable(wxID_ADD, true);
   // window sharing
-  frame_main_menubar->Enable(wxID_UP, true);
-  frame_main_menubar->Enable(wxID_CANCEL, false);
+  if (windowshare_supported) {
+      frame_main_menubar->Enable(wxID_UP, true);
+      frame_main_menubar->Enable(wxID_CANCEL, false);
+  }
   // layout (need >= 2 connections, grid limited to <= 8)
   frame_main_menubar->Enable(ID_LAYOUT_TILE, connections.size() >= 2 && connections.size() <= 8);
 #if wxCHECK_VERSION(3, 3, 0)
@@ -1414,8 +1420,10 @@ void MyFrameMain::conn_terminate(int which)
       // bookmarks
       frame_main_menubar->Enable(wxID_ADD, false);
       // window sharing
-      frame_main_menubar->Enable(wxID_UP, false);
-      frame_main_menubar->Enable(wxID_CANCEL, false);
+      if (windowshare_supported) {
+          frame_main_menubar->Enable(wxID_UP, false);
+          frame_main_menubar->Enable(wxID_CANCEL, false);
+      }
 
       if(GetToolBar())
 	{
@@ -2851,9 +2859,11 @@ void MyFrameMain::notebook_connections_pagechanged(wxAuiNotebookEvent &event)
   bool isSharing = cb->windowshare_proc ? true : false;
   wxLogDebug(wxT("notebook_connections_pagechanged(): VNCConn %p sharing is %d"), cb->conn, isSharing);
   // this is "share window"
-  frame_main_menubar->Enable(wxID_UP, !isSharing);
-  // this is "stop share window"
-  frame_main_menubar->Enable(wxID_CANCEL, isSharing);
+  if (windowshare_supported) {
+      frame_main_menubar->Enable(wxID_UP, !isSharing);
+      // this is "stop share window"
+      frame_main_menubar->Enable(wxID_CANCEL, isSharing);
+  }
 
   if(cb->seamlessconnector) 
     {
