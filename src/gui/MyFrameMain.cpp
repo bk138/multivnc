@@ -2904,8 +2904,8 @@ void MyFrameMain::notebook_connections_tab_right_down(wxAuiNotebookEvent &event)
   menu.AppendSeparator();
 
   // Global actions (operate on all connections)
-  menu.Append(ID_LAYOUT_TILE, _("Arrange all as grid"));
-  menu.Append(ID_LAYOUT_UNTILE, _("Reset all to tabs"));
+  menu.Append(ID_LAYOUT_TILE, _("Tile all connections"));
+  menu.Append(ID_LAYOUT_UNTILE, _("Untile all connections"));
 
   menu.AppendSeparator();
   menu.Append(wxID_SAVE, _("Take Screenshot"));

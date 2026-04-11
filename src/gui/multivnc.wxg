@@ -146,13 +146,13 @@
                         <name>---</name>
                     </item>
                     <item>
-                        <label>Arrange all as grid</label>
+                        <label>Tile all connections</label>
                         <id>ID_LAYOUT_TILE</id>
-                        <help_str>Arrange all open connections in a tiled grid</help_str>
+                        <help_str>Arrange all open connections in a tiled layout</help_str>
                         <handler>view_layout</handler>
                     </item>
                     <item>
-                        <label>Reset all to tabs</label>
+                        <label>Untile all connections</label>
                         <id>ID_LAYOUT_UNTILE</id>
                         <help_str>Collapse all connections back into a single tab strip</help_str>
                         <handler>view_layout</handler>
