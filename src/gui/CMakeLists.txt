@@ -38,13 +38,9 @@ add_library(MultiVNCgui STATIC ${MultiVNCgui_SRCS})
 #
 # dependencies
 #
-if(UNIX AND NOT APPLE)
-  FIND_PACKAGE(PkgConfig)
-  PKG_CHECK_MODULES(GTK3 REQUIRED gtk+-3.0)
-  include_directories(${GTK3_INCLUDE_DIRS})
-  target_link_directories(MultiVNCgui INTERFACE ${GTK3_LIBRARY_DIRS})
-  target_link_libraries(MultiVNCgui ${GTK3_LIBRARIES})
-endif()
+add_subdirectory(keyboardgrab)
+target_link_libraries(MultiVNCgui keyboardgrab)
+
 if(WIN32)
   # we include VNCConn.h which includes rfbclient.h which includes rfbproto.h which includes zlib.h
   include_directories(${ZLIB_INCLUDE_DIRS})

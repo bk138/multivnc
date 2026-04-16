@@ -12,6 +12,7 @@
 #include <wx/panel.h>
 #include <wx/timer.h>
 #include "VNCConn.h"
+#include "keyboardgrab/KeyboardGrabber.h"
 
 #define EDGE_NONE -1
 #define EDGE_EAST  0
@@ -60,7 +61,7 @@ private:
 
   wxPoint multiscreen_offset;
 
-  bool grabbed;
+  KeyboardGrabber m_grabber;
   
   wxPoint origo1, origo2;
   wxPoint * next_origo;

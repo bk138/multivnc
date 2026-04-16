@@ -48,8 +48,6 @@ VNCSeamlessConnector::VNCSeamlessConnector(wxWindow* parent, VNCConn* c, int e, 
   pointer_warp_threshold=5;
 
   pointer_speed = 0.0;
-  grabbed = false;
-
   /*
   // init all x2vnc stuff start
   grabCursor=0;
@@ -303,7 +301,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
       if(display_size != wxDisplay(display_index).GetGeometry().GetSize())
 	adjustSize();
 
-      if(!grabbed)
+      if(!m_grabber.isGrabbed())
 	{
 	  wxLogDebug(wxT("VNCSeamlessConnector %p: mouse entering, grabbing!"), this);
 	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (evt_root_pos.x - multiscreen_offset.x)),
@@ -317,7 +315,7 @@ void VNCSeamlessConnector::handleMouse(wxMouseEvent& event)
   if(event.Moving() || event.Dragging())
     {
       wxLogDebug(wxT("VNCSeamlessConnector %p: mouse moving/dragging!"), this);
-      if(grabbed)
+      if(m_grabber.isGrabbed())
 	{
 	  wxLogDebug(wxT("VNCSeamlessConnector %p: mouse moving/dragging while grabbed!"), this);
 	  int d=0;
@@ -473,7 +471,7 @@ void VNCSeamlessConnector::handleCaptureLoss()
 
 void VNCSeamlessConnector::doWarp(void)
 {
-  if(grabbed)
+  if(m_grabber.isGrabbed())
     {
       if(next_origo) return;
       if(current_origo &&
@@ -540,9 +538,7 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
     {
       canvas->CaptureMouse();
       canvas->SetFocus();
-#ifdef __WXGTK__     
-      gdk_keyboard_grab(gtk_widget_get_window(canvas->GetHandle()), False, GDK_CURRENT_TIME);
-#endif
+      m_grabber.grab(canvas);
     }
     /*
   else
@@ -557,7 +553,6 @@ void VNCSeamlessConnector::grabit(int x, int y, int state)
     }
     */
 
-  grabbed=1;
   next_origo=NULL;
   current_origo=NULL;
 
@@ -632,9 +627,7 @@ void VNCSeamlessConnector::ungrabit(int x, int y)
     }
     else*/
     {
-#ifdef __WXGTK__    
-      gdk_keyboard_ungrab(GDK_CURRENT_TIME);
-#endif
+      m_grabber.ungrab();
       canvas->ReleaseMouse();
     }
 
@@ -666,8 +659,6 @@ void VNCSeamlessConnector::ungrabit(int x, int y)
 
 
     //if(!edge_width) hidewindow();
-  
-  grabbed=0;
 }
 
 
@@ -1279,7 +1270,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
        * - GRM
        */
     case EnterNotify:
-      if(!grabbed && ev->xcrossing.mode==NotifyNormal)
+      if(!m_grabber.isGrabbed() && ev->xcrossing.mode==NotifyNormal)
 	{
 	  grabit(enter_translate(EDGE_EW,display_size.GetWidth() , (ev->xcrossing.x_root - multiscreen_offset.x)),
 		 enter_translate(EDGE_NS,display_size.GetHeight(), (ev->xcrossing.y_root - multiscreen_offset.y)),
@@ -1289,7 +1280,7 @@ Bool VNCSeamlessConnector::HandleTopLevelEvent(XEvent *ev)
       
     case MotionNotify:
       
-      if(grabbed)
+      if(m_grabber.isGrabbed())
 	{
 	  int i, d=0;
 	  Window warpWindow;
@@ -1513,7 +1504,7 @@ Bool VNCSeamlessConnector::HandleRootEvent(XEvent *ev)
       }
       
       grab = 0;
-      if(!grabbed)
+      if(!m_grabber.isGrabbed())
 	{
 	  nowOnScreen =  ev->xcrossing.same_screen;
 	  if (mouseOnScreen != nowOnScreen) {

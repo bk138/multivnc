@@ -1,0 +1,28 @@
+#define GSocket GlibGSocket
+#include <gdk/gdkx.h>
+#include <gtk/gtk.h>
+#undef GSocket
+
+#include <wx/log.h>
+#include "KeyboardGrabber.h"
+
+
+void KeyboardGrabber::grab(wxWindow* window)
+{
+  if(m_grabbed)
+    return;
+
+  gdk_keyboard_grab(gtk_widget_get_window(window->GetHandle()), True, GDK_CURRENT_TIME);
+
+  m_grabbed = true;
+  wxLogDebug("%s", __func__);
+}
+
+
+void KeyboardGrabber::ungrab()
+{
+  gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+
+  m_grabbed = false;
+  wxLogDebug("%s", __func__);
+}

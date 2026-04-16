@@ -15,6 +15,7 @@
 #include <gtk/gtk.h>
 #undef GSocket
 #endif
+#include "keyboardgrab/KeyboardGrabber.h"
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
 #include "MultiVNCApp.h"
@@ -36,10 +37,10 @@
 */
 class VNCCanvas: public wxPanel
 {
+  KeyboardGrabber m_grabber;
   bool saved_enable_mnemonics;
   bool saved_enable_accels;
   char *saved_menubar_accel;
-  bool keyboard_grabbed;
 
   wxTimer update_timer;
   void onUpdateTimer(wxTimerEvent& event);
@@ -96,7 +97,7 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 {
   conn = c;
 
-  keyboard_grabbed = do_keyboard_grab = false;
+  do_keyboard_grab = false;
  
   // this kinda cursor creation works everywhere
   wxBitmap vnccursor_bitmap((char*)vnccursor_bits, 16, 16);
@@ -124,25 +125,22 @@ VNCCanvas::VNCCanvas(wxWindow* parent, VNCConn* c):
 
 void VNCCanvas::grab_keyboard()
 {
-  if(!keyboard_grabbed)
+  if(!m_grabber.isGrabbed())
     {
+      m_grabber.grab(this);
 #ifdef __WXGTK__
-      // grab
-      gdk_keyboard_grab(gtk_widget_get_window(GetHandle()), True, GDK_CURRENT_TIME);
-
       // save previous settings
       GtkSettings *settings = gtk_settings_get_for_screen(gdk_screen_get_default());
       g_object_get(settings, "gtk-enable-mnemonics", &saved_enable_mnemonics, NULL);
       g_object_get(settings, "gtk-enable-accels", &saved_enable_accels, NULL);
       g_object_get(settings, "gtk-menu-bar-accel", &saved_menubar_accel, NULL);
- 
+
       // and disable keyboard shortcuts
       g_object_set(settings, "gtk-enable-mnemonics", false, NULL);
       g_object_set(settings, "gtk-enable-accels", false, NULL);
       g_object_set(settings, "gtk-menu-bar-accel", NULL, NULL);
 #endif
 
-      keyboard_grabbed = true;
       wxLogDebug(wxT("VNCCanvas %p: grabbed keyboard"), this);
     }
 }
@@ -151,9 +149,9 @@ void VNCCanvas::grab_keyboard()
 
 void VNCCanvas::ungrab_keyboard()
 {
-#ifdef __WXGTK__
   // ungrab
-  gdk_keyboard_ungrab(GDK_CURRENT_TIME);
+  m_grabber.ungrab();
+#ifdef __WXGTK__
   // restore to saved values
   GtkSettings *settings = gtk_settings_get_for_screen(gdk_screen_get_default());
   g_object_set(settings, "gtk-enable-mnemonics", saved_enable_mnemonics, NULL);
@@ -162,7 +160,6 @@ void VNCCanvas::ungrab_keyboard()
 
 #endif
 
-  keyboard_grabbed = false;
   wxLogDebug(wxT("VNCCanvas %p: ungrabbed keyboard"), this);
 }
 

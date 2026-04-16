@@ -1,0 +1,14 @@
+add_library(keyboardgrab STATIC KeyboardGrabber.h)
+
+if(UNIX AND NOT APPLE)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+  target_sources(keyboardgrab PRIVATE KeyboardGrabberGtk.cpp)
+  target_include_directories(keyboardgrab PUBLIC ${GTK3_INCLUDE_DIRS})
+  target_link_directories(keyboardgrab PUBLIC ${GTK3_LIBRARY_DIRS})
+  target_link_libraries(keyboardgrab ${GTK3_LIBRARIES})
+else()
+  target_sources(keyboardgrab PRIVATE KeyboardGrabberNull.cpp)
+endif()
+
+target_include_directories(keyboardgrab PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
