@@ -7,6 +7,17 @@
 #include "KeyboardGrabber.h"
 
 
+bool KeyboardGrabber::hasPermission()
+{
+  return true;
+}
+
+
+void KeyboardGrabber::showPermissionDialog()
+{
+}
+
+
 void KeyboardGrabber::grab(wxWindow* window)
 {
   if(m_grabbed)
