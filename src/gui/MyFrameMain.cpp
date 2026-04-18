@@ -17,6 +17,7 @@
 #include <wx/txtstrm.h>
 
 #include "MyFrameMain.h"
+#include "keyboardgrab/KeyboardGrabber.h"
 #include "MyDialogSettings.h"
 #include "MyDialogNewConnection.h"
 #include "../dfltcfg.h"
@@ -1814,6 +1815,13 @@ void MyFrameMain::machine_screenshot(wxCommandEvent &event)
 
 void MyFrameMain::machine_grabkeyboard(wxCommandEvent &event)
 {
+  if(event.IsChecked() && !KeyboardGrabber::hasPermission())
+    {
+      KeyboardGrabber::showPermissionDialog();
+      frame_main_toolbar->ToggleTool(ID_GRABKEYBOARD, false);
+      return;
+    }
+
   if(connections.size())
     connections.at(notebook_connections->GetSelection()).viewerwindow->grabKeyboard(event.IsChecked());
 }
