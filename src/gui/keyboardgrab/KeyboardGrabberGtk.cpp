@@ -20,12 +20,12 @@ void KeyboardGrabber::showPermissionDialog()
 
 void KeyboardGrabber::grab(wxWindow* window)
 {
-  if(m_grabbed)
+  if(m_grab)
     return;
 
   gdk_keyboard_grab(gtk_widget_get_window(window->GetHandle()), True, GDK_CURRENT_TIME);
 
-  m_grabbed = true;
+  m_grab = (void*)0x1; // Grab active
   wxLogDebug("%s", __func__);
 }
 
@@ -34,6 +34,6 @@ void KeyboardGrabber::ungrab()
 {
   gdk_keyboard_ungrab(GDK_CURRENT_TIME);
 
-  m_grabbed = false;
+  m_grab = nullptr;
   wxLogDebug("%s", __func__);
 }

@@ -14,11 +14,11 @@ void KeyboardGrabber::showPermissionDialog()
 
 void KeyboardGrabber::grab(wxWindow*)
 {
-  m_grabbed = true;
+  m_grab = (void*)0x1; // Grab active
 }
 
 
 void KeyboardGrabber::ungrab()
 {
-  m_grabbed = false;
+  m_grab = nullptr;
 }
