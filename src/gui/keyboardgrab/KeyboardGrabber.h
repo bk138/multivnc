@@ -8,6 +8,8 @@ public:
   static bool hasPermission();
   static void showPermissionDialog();
 
+  ~KeyboardGrabber() { ungrab(); }
+
   void grab(wxWindow* window);
   void ungrab();
   bool isGrabbed() const { return m_grab != nullptr; }
