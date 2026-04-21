@@ -1633,8 +1633,13 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 	  //case WXK_RSHIFT: kev.keysym = XK_Shift_R; break;
 	case WXK_SHIFT: kev.keysym = XK_Shift_L; break;
 	  //case WXK_RCTRL: kev.keysym = XK_Control_R; break;
+#if defined __APPLE__
+	case WXK_RAW_CONTROL: kev.keysym = XK_Control_L; break; // Mac Ctrl Key
+	case WXK_CONTROL: kev.keysym = XK_Super_L; break; // Mac Command Key
+#else
 	case WXK_CONTROL: kev.keysym = XK_Control_L; break;
-	  //    case WXK_RALT: kev.keysym = XK_Alt_R; break;
+#endif
+          //    case WXK_RALT: kev.keysym = XK_Alt_R; break;
 	case WXK_ALT: kev.keysym = XK_Alt_L; break;
 	  // case WXK_RMETA: kev.keysym = XK_Meta_R; break;
 	  // case WXK_META: kev.keysym = XK_Meta_L; break;
