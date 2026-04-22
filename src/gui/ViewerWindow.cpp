@@ -9,12 +9,6 @@
 #include <wx/dataobj.h>
 #include <wx/dcclient.h>
 #include <wx/tokenzr.h>
-#ifdef __WXGTK__
-#define GSocket GlibGSocket
-#include <gdk/gdkx.h>
-#include <gtk/gtk.h>
-#undef GSocket
-#endif
 #include "keyboardgrab/KeyboardGrabber.h"
 #include "res/vnccursor.xbm"
 #include "res/vnccursor-mask.xbm"
@@ -128,19 +122,6 @@ void VNCCanvas::grab_keyboard()
   if(!m_grabber.isGrabbed())
     {
       m_grabber.grab(this);
-#ifdef __WXGTK__
-      // save previous settings
-      GtkSettings *settings = gtk_settings_get_for_screen(gdk_screen_get_default());
-      g_object_get(settings, "gtk-enable-mnemonics", &saved_enable_mnemonics, NULL);
-      g_object_get(settings, "gtk-enable-accels", &saved_enable_accels, NULL);
-      g_object_get(settings, "gtk-menu-bar-accel", &saved_menubar_accel, NULL);
-
-      // and disable keyboard shortcuts
-      g_object_set(settings, "gtk-enable-mnemonics", false, NULL);
-      g_object_set(settings, "gtk-enable-accels", false, NULL);
-      g_object_set(settings, "gtk-menu-bar-accel", NULL, NULL);
-#endif
-
       wxLogDebug(wxT("VNCCanvas %p: grabbed keyboard"), this);
     }
 }
@@ -151,15 +132,6 @@ void VNCCanvas::ungrab_keyboard()
 {
   // ungrab
   m_grabber.ungrab();
-#ifdef __WXGTK__
-  // restore to saved values
-  GtkSettings *settings = gtk_settings_get_for_screen(gdk_screen_get_default());
-  g_object_set(settings, "gtk-enable-mnemonics", saved_enable_mnemonics, NULL);
-  g_object_set(settings, "gtk-enable-accels", saved_enable_accels, NULL);
-  g_object_set(settings, "gtk-menu-bar-accel", saved_menubar_accel, NULL);
-
-#endif
-
   wxLogDebug(wxT("VNCCanvas %p: ungrabbed keyboard"), this);
 }
 
