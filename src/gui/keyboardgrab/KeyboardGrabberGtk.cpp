@@ -1,8 +1,5 @@
-#define GSocket GlibGSocket
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
-#undef GSocket
-
 #include <wx/log.h>
 #include "KeyboardGrabber.h"
 
