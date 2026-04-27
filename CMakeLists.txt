@@ -48,7 +48,7 @@ find_package(wxWidgets 3.1.6 REQUIRED core base qa aui)
 include(UsewxWidgets)
 
 # Extract major.minor version from wxWidgets_VERSION for locale file names
-string(REGEX REPLACE "([0-9]+\\.[0-9]+).*" "\\1" WX_VERSION_MAJOR_MINOR ${wxWidgets_VERSION})
+string(REGEX REPLACE "([0-9]+\\.[0-9]+).*" "\\1" WX_VERSION_MAJOR_MINOR ${wxWidgets_VERSION_STRING})
 
 
 #
