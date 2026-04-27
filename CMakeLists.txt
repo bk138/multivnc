@@ -47,6 +47,9 @@ add_subdirectory(libsshtunnel)
 find_package(wxWidgets 3.1.6 REQUIRED core base qa aui)
 include(UsewxWidgets)
 
+# Extract major.minor version from wxWidgets_VERSION for locale file names
+string(REGEX REPLACE "([0-9]+\\.[0-9]+).*" "\\1" WX_VERSION_MAJOR_MINOR ${wxWidgets_VERSION})
+
 
 #
 # source proper
@@ -110,9 +113,9 @@ fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sv.gmo DESTINATION MultiVNC.app/Contents/Resources/sv.lproj RENAME ${LOCALE_DOMAIN}.mo)
     if (wxwidgets_PACKAGE_FOLDER_RELEASE)
       # Conan install here
-      install(FILES ${wxwidgets_PACKAGE_FOLDER_RELEASE}/share/locale/de/LC_MESSAGES/wxstd-3.2.mo DESTINATION MultiVNC.app/Contents/Resources/de.lproj)
-      install(FILES ${wxwidgets_PACKAGE_FOLDER_RELEASE}/share/locale/es/LC_MESSAGES/wxstd-3.2.mo DESTINATION MultiVNC.app/Contents/Resources/es.lproj)
-      install(FILES ${wxwidgets_PACKAGE_FOLDER_RELEASE}/share/locale/sv/LC_MESSAGES/wxstd-3.2.mo DESTINATION MultiVNC.app/Contents/Resources/sv.lproj)
+      install(FILES ${wxwidgets_PACKAGE_FOLDER_RELEASE}/share/locale/de/LC_MESSAGES/wxstd-${WX_VERSION_MAJOR_MINOR}.mo DESTINATION MultiVNC.app/Contents/Resources/de.lproj)
+      install(FILES ${wxwidgets_PACKAGE_FOLDER_RELEASE}/share/locale/es/LC_MESSAGES/wxstd-${WX_VERSION_MAJOR_MINOR}.mo DESTINATION MultiVNC.app/Contents/Resources/es.lproj)
+      install(FILES ${wxwidgets_PACKAGE_FOLDER_RELEASE}/share/locale/sv/LC_MESSAGES/wxstd-${WX_VERSION_MAJOR_MINOR}.mo DESTINATION MultiVNC.app/Contents/Resources/sv.lproj)
     endif()
     install(FILES po/InfoPlist.strings.de DESTINATION MultiVNC.app/Contents/Resources/de.lproj RENAME InfoPlist.strings)
     install(FILES po/InfoPlist.strings.es DESTINATION MultiVNC.app/Contents/Resources/es.lproj RENAME InfoPlist.strings)
