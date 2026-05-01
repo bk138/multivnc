@@ -75,6 +75,13 @@ GETTEXT_PROCESS_PO_FILES(sv ALL PO_FILES po/sv.po)
 # install directives
 #
 
+# wx install location when using Conan
+if (wxwidgets_PACKAGE_FOLDER_RELEASE)
+  set(WXWIDGETS_PACKAGE_FOLDER ${wxwidgets_PACKAGE_FOLDER_RELEASE})
+elseif (wxwidgets_PACKAGE_FOLDER_DEBUG)
+  set(WXWIDGETS_PACKAGE_FOLDER ${wxwidgets_PACKAGE_FOLDER_DEBUG})
+endif()
+
 if(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
     install(TARGETS multivnc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -111,11 +118,6 @@ fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION MultiVNC.app/Contents/Resources/de.lproj RENAME ${LOCALE_DOMAIN}.mo)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/es.gmo DESTINATION MultiVNC.app/Contents/Resources/es.lproj RENAME ${LOCALE_DOMAIN}.mo)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sv.gmo DESTINATION MultiVNC.app/Contents/Resources/sv.lproj RENAME ${LOCALE_DOMAIN}.mo)
-    if (wxwidgets_PACKAGE_FOLDER_RELEASE)
-      set(WXWIDGETS_PACKAGE_FOLDER ${wxwidgets_PACKAGE_FOLDER_RELEASE})
-    elseif (wxwidgets_PACKAGE_FOLDER_DEBUG)
-      set(WXWIDGETS_PACKAGE_FOLDER ${wxwidgets_PACKAGE_FOLDER_DEBUG})
-    endif()
     if (WXWIDGETS_PACKAGE_FOLDER)
       # Conan install here
       install(FILES ${WXWIDGETS_PACKAGE_FOLDER}/share/locale/de/LC_MESSAGES/wxstd-${WX_VERSION_MAJOR_MINOR}.mo DESTINATION MultiVNC.app/Contents/Resources/de.lproj)
@@ -138,6 +140,12 @@ if(WIN32)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/de.gmo DESTINATION de RENAME ${LOCALE_DOMAIN}.mo)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/es.gmo DESTINATION es RENAME ${LOCALE_DOMAIN}.mo)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sv.gmo DESTINATION sv RENAME ${LOCALE_DOMAIN}.mo)
+    if (WXWIDGETS_PACKAGE_FOLDER)
+      # Conan install here
+      install(FILES ${WXWIDGETS_PACKAGE_FOLDER}/share/locale/de/LC_MESSAGES/wxstd-${WX_VERSION_MAJOR_MINOR}.mo DESTINATION de)
+      install(FILES ${WXWIDGETS_PACKAGE_FOLDER}/share/locale/es/LC_MESSAGES/wxstd-${WX_VERSION_MAJOR_MINOR}.mo DESTINATION es)
+      install(FILES ${WXWIDGETS_PACKAGE_FOLDER}/share/locale/sv/LC_MESSAGES/wxstd-${WX_VERSION_MAJOR_MINOR}.mo DESTINATION sv)
+    endif()
 endif(WIN32)
 
 
