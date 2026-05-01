@@ -40,7 +40,6 @@
                         <handler>machine_showlog</handler>
                     </item>
                     <item>
-                        <label>Preferences</label>
                         <id>wxID_PREFERENCES</id>
                         <help_str>Change preferences.</help_str>
                         <handler>machine_preferences</handler>
@@ -208,7 +207,6 @@
                         <handler>help_issue_list</handler>
                     </item>
                     <item>
-                        <label>About</label>
                         <id>wxID_ABOUT</id>
                         <handler>help_about</handler>
                     </item>
