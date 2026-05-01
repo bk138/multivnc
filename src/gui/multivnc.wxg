@@ -77,7 +77,6 @@
                         <name>---</name>
                     </item>
                     <item>
-                        <label>Quit</label>
                         <id>wxID_EXIT</id>
                         <help_str>Exit MultiVNC.</help_str>
                         <handler>machine_exit</handler>
