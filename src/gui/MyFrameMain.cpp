@@ -745,6 +745,7 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 #else
         // hide whole menu
 	frame_main_menubar->Show(false);
+        SetMenuBar(nullptr);
 #endif
 	// hide bookmarks and discovered servers
 	show_bookmarks = show_discovered = false;
@@ -764,6 +765,7 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
         frame_main_menubar->Enable(ID_DISCOVERED, true);
 #else
         // show whole menu again
+        SetMenuBar(frame_main_menubar);
 	frame_main_menubar->Show(true);
 #endif
 	// restore bookmarks and discovered servers to saved state
