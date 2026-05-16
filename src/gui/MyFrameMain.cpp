@@ -1629,7 +1629,7 @@ wxString MyFrameMain::getQueryValue(const wxURI& wxUri, const wxString& key) {
         wxArrayString keyValue = wxSplit(pair, '=');
         if (keyValue.size() == 2 && keyValue[0] == key)
         {
-            return keyValue[1];
+            return wxURI::Unescape(keyValue[1]);
         }
     }
     return wxEmptyString; // Key not found
