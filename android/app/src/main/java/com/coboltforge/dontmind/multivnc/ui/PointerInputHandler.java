@@ -287,7 +287,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     public boolean onScaleBegin(ScaleGestureDetector detector) {
         xInitialFocus = detector.getFocusX();
         yInitialFocus = detector.getFocusY();
-        inScaling = false;
+        inScaling = isJumpInputMode();
         //Log.i(TAG,"scale begin ("+xInitialFocus+","+yInitialFocus+")");
         return true;
     }
@@ -391,6 +391,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         if (e2.getPointerCount() > 1)
         {
             if(Utils.DEBUG()) Log.d(TAG, "Input: scroll multitouch");
+
+            if (isJumpInputMode() && e2.getPointerCount() == 2 && scaleGestures.isInProgress())
+                return false;
 
             if (inScaling)
                 return false;

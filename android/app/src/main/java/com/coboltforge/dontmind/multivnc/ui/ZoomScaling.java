@@ -27,7 +27,7 @@ class ZoomScaling {
 	/**
 	 * Updates scale to given value.
 	 */
-	private void updateScale(float newScale) {
+	private float updateScale(float newScale) {
 		float oldScale = currentScale;
 
 		//Clamp scale to min/max limits
@@ -42,8 +42,10 @@ class ZoomScaling {
 		activity.vncCanvas.pan(0, 0);
 
 		//Notify user
-		if (newScale != oldScale)
+		if (currentScale != oldScale)
 			activity.showZoomLevel();
+
+		return currentScale / oldScale;
 	}
 	
 	void zoomIn() {
@@ -59,11 +61,13 @@ class ZoomScaling {
 	}
 
 	void adjust(float scaleFactor, float fx, float fy) {
-		updateScale(currentScale * scaleFactor);
+		float actualScaleFactor = updateScale(currentScale * scaleFactor);
+		if (actualScaleFactor == 1.0f)
+			return;
 
 		//Keep the focal point fixed.
-		int focusShiftX = (int) (fx * (1 - scaleFactor));
-		int focusShiftY = (int) (fy * (1 - scaleFactor));
+		int focusShiftX = (int) (fx * (1 - actualScaleFactor));
+		int focusShiftY = (int) (fy * (1 - actualScaleFactor));
 		activity.vncCanvas.pan(-focusShiftX, -focusShiftY);
 	}
 
