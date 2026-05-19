@@ -77,6 +77,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	private final static float JUMP_TARGET_RADIUS_DP = 30.0f;
 	private final static float JUMP_TARGET_CURSOR_HEIGHT_DP = 24.0f;
 	private final static float JUMP_TARGET_CURSOR_GAP_DP = 28.0f;
+	private final static int REMOTE_CURSOR_REFRESH_RADIUS = 64;
 
 	ZoomScaling scaling;
 
@@ -184,6 +185,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 		int pointerY = (int)(absoluteYPosition +
 				(targetCenterY - getJumpTargetCursorHeightPx() - getJumpTargetCursorGapPx() - getJumpTargetRadiusPx()) / scale);
 		processMouseEvent(VNCConn.MOUSE_BUTTON_NONE, false, pointerX, pointerY);
+		refreshRemoteCursor();
 	}
 
 	void dragMouseButtonForJumpTargetCenter(int button, float targetCenterX, float targetCenterY) {
@@ -192,6 +194,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 		int pointerY = (int)(absoluteYPosition +
 				(targetCenterY - getJumpTargetCursorHeightPx() - getJumpTargetCursorGapPx() - getJumpTargetRadiusPx()) / scale);
 		processMouseEvent(button, true, pointerX, pointerY);
+		refreshRemoteCursor();
 	}
 
 
@@ -417,6 +420,31 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 		reDraw(); // update local pointer position
 		panToMouse();
 		vncConn.sendPointerEvent(x, y, 0, VNCConn.MOUSE_BUTTON_NONE);
+	}
+
+	public void warpMouseAndRefreshRemoteCursor(int x, int y) {
+		int oldX = mouseX;
+		int oldY = mouseY;
+		warpMouse(x, y);
+		requestRemoteCursorRefresh(oldX, oldY);
+		requestRemoteCursorRefresh(mouseX, mouseY);
+	}
+
+	public void refreshRemoteCursor() {
+		requestRemoteCursorRefresh(mouseX, mouseY);
+	}
+
+	private void requestRemoteCursorRefresh(int centerX, int centerY) {
+		if (vncConn == null)
+			return;
+
+		int size = REMOTE_CURSOR_REFRESH_RADIUS * 2;
+		vncConn.requestFramebufferUpdate(
+				centerX - REMOTE_CURSOR_REFRESH_RADIUS,
+				centerY - REMOTE_CURSOR_REFRESH_RADIUS,
+				size,
+				size,
+				false);
 	}
 
 

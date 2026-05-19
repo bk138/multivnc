@@ -313,13 +313,13 @@ public class VNCConn {
     					sendKeyEvent(ev.key);
     				if(ev.ffur != null)
 						try {
-							// bitmapData.writeFullUpdateRequest(ev.ffur.incremental);
+							rfbSendFramebufferUpdateRequest(0, 0, getFramebufferWidth(), getFramebufferHeight(), ev.ffur.incremental);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					if(ev.fur != null)
 						try {
-							// rfb.writeFramebufferUpdateRequest(ev.fur.x, ev.fur.y, ev.fur.w, ev.fur.h, ev.fur.incremental);
+							rfbSendFramebufferUpdateRequest(ev.fur.x, ev.fur.y, ev.fur.w, ev.fur.h, ev.fur.incremental);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -429,6 +429,7 @@ public class VNCConn {
   private native void rfbShutdown();
 	private native boolean rfbProcessServerMessage();
 	private native boolean rfbSetFramebufferUpdatesEnabled(boolean enable);
+	private native boolean rfbSendFramebufferUpdateRequest(int x, int y, int w, int h, boolean incremental);
 	private native String rfbGetDesktopName();
 	private native int rfbGetFramebufferWidth();
 	private native int rfbGetFramebufferHeight();
@@ -693,6 +694,17 @@ public class VNCConn {
 		}
 	}
 
+	public void requestFramebufferUpdate(int x, int y, int w, int h, boolean incremental) {
+		if(!framebufferUpdatesEnabled)
+			return;
+
+		w = Math.max(1, Math.min(w, getFramebufferWidth()));
+		h = Math.max(1, Math.min(h, getFramebufferHeight()));
+		x = Math.max(0, Math.min(x, getFramebufferWidth() - w));
+		y = Math.max(0, Math.min(y, getFramebufferHeight() - h));
+		sendFramebufferUpdateRequest(x, y, w, h, incremental);
+	}
+
 
 	public void setColorModel(COLORMODEL cm) {
 		// Only update if color model changes
@@ -896,4 +908,3 @@ public class VNCConn {
         return false;
     }
 }
-

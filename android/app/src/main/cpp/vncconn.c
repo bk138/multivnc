@@ -762,6 +762,14 @@ JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSet
 }
 #pragma clang diagnostic pop
 
+JNIEXPORT jboolean JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbSendFramebufferUpdateRequest(JNIEnv *env, jobject obj, jint x, jint y, jint w, jint h, jboolean incremental) {
+    rfbClient *cl = getRfbClient(env, obj);
+    if(cl)
+        return (jboolean) SendFramebufferUpdateRequest(cl, x, y, w, h, incremental);
+    else
+        return JNI_FALSE;
+}
+
 JNIEXPORT jstring JNICALL Java_com_coboltforge_dontmind_multivnc_VNCConn_rfbGetDesktopName(JNIEnv *env, jobject obj) {
     rfbClient *cl = getRfbClient(env, obj);
     if(cl)
