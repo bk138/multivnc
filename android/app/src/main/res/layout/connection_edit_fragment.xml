@@ -137,6 +137,22 @@
             android:prompt="@string/colormode_caption" />
     </TableRow>
 
+    <TableRow
+        android:id="@+id/input_mode_row"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_gravity="right|center_vertical"
+            android:paddingRight="10dip"
+            android:text="@string/input_mode_caption"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/jump_mode_switch"
+            android:layout_weight="1"
+            android:text="" />
+    </TableRow>
+
     <TableRow>
 
         <TextView

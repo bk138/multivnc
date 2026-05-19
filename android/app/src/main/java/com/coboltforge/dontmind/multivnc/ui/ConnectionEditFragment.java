@@ -57,6 +57,7 @@ public class ConnectionEditFragment extends Fragment {
     private boolean[] encodingChecksEdit = new boolean[ENCODING_NAMES.length];
     private Spinner compressSpinner;
     private Spinner qualitySpinner;
+    private SwitchMaterial jumpModeSwitch;
     private EditText textUsername;
     private SwitchMaterial sendExtendedKeysSwitch;
     private SwitchMaterial sshSwitch;
@@ -145,6 +146,8 @@ public class ConnectionEditFragment extends Fragment {
         qualitySpinner = (Spinner)view.findViewById(R.id.spinnerQuality);
         ArrayAdapter<QUALITYMODEL> qualitySpinnerAdapter = new ArrayAdapter<QUALITYMODEL>(requireContext(), android.R.layout.simple_spinner_item, QUALITYMODEL.values());
         qualitySpinner.setAdapter(qualitySpinnerAdapter);
+
+        jumpModeSwitch = view.findViewById(R.id.jump_mode_switch);
 
         repeaterText = (TextView)view.findViewById(R.id.textRepeaterId);
 
@@ -265,6 +268,7 @@ public class ConnectionEditFragment extends Fragment {
         conn.colorModel = ((COLORMODEL)colorSpinner.getSelectedItem()).nameString();
         conn.compressModel = ((COMPRESSMODEL)compressSpinner.getSelectedItem()).nameString();
         conn.qualityModel = ((QUALITYMODEL)qualitySpinner.getSelectedItem()).nameString();
+        conn.inputMode = jumpModeSwitch.isChecked() ? InputMode.JUMP.value() : InputMode.DEFAULT.value();
         if (repeaterText.getText().length() > 0)
         {
             conn.repeaterId = repeaterText.getText().toString().trim();
@@ -345,6 +349,8 @@ public class ConnectionEditFragment extends Fragment {
         setSpinnerByEnum(colorSpinner, COLORMODEL.values(), COLORMODEL.valueOf(conn.colorModel));
         setSpinnerByEnum(compressSpinner, COMPRESSMODEL.values(), COMPRESSMODEL.valueOf(conn.compressModel));
         setSpinnerByEnum(qualitySpinner, QUALITYMODEL.values(), QUALITYMODEL.valueOf(conn.qualityModel));
+        jumpModeSwitch.setChecked(InputMode.JUMP == InputMode.fromValue(conn.inputMode));
+        view.findViewById(R.id.input_mode_row).setVisibility(View.VISIBLE);
 
         // if this is a connection that was not bookmarked, stop here
         if (conn.id == 0)
