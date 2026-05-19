@@ -99,6 +99,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	private PointerInputHandler inputHandler;
 
 	private VNCGLRenderer glRenderer;
+	private boolean jumpTargetPressed = false;
 
 	//whether to do pointer highlighting
 	boolean doPointerHighLight = true;
@@ -167,6 +168,30 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 		float dy = y - getJumpTargetCenterY();
 		float radius = getJumpTargetRadiusPx();
 		return dx * dx + dy * dy <= radius * radius;
+	}
+
+	void setJumpTargetPressed(boolean pressed) {
+		if (jumpTargetPressed == pressed)
+			return;
+
+		jumpTargetPressed = pressed;
+		reDraw();
+	}
+
+	void moveMouseForJumpTargetCenter(float targetCenterX, float targetCenterY) {
+		float scale = getScale();
+		int pointerX = (int)(absoluteXPosition + targetCenterX / scale);
+		int pointerY = (int)(absoluteYPosition +
+				(targetCenterY - getJumpTargetCursorHeightPx() - getJumpTargetCursorGapPx() - getJumpTargetRadiusPx()) / scale);
+		processMouseEvent(VNCConn.MOUSE_BUTTON_NONE, false, pointerX, pointerY);
+	}
+
+	void dragMouseButtonForJumpTargetCenter(int button, float targetCenterX, float targetCenterY) {
+		float scale = getScale();
+		int pointerX = (int)(absoluteXPosition + targetCenterX / scale);
+		int pointerY = (int)(absoluteYPosition +
+				(targetCenterY - getJumpTargetCursorHeightPx() - getJumpTargetCursorGapPx() - getJumpTargetRadiusPx()) / scale);
+		processMouseEvent(button, true, pointerX, pointerY);
 	}
 
 
@@ -329,6 +354,10 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 					gl.glTranslatex((int)getJumpTargetCenterX(), (int)getJumpTargetCenterY(), 0);
 					float radiusScale = getJumpTargetRadiusPx() / GL_FIXED_ONE;
 					gl.glScalef(radiusScale, radiusScale, 1.0f);
+					if(jumpTargetPressed) {
+						gl.glColor4f(0.3f, 0.55f, 1.0f, 0.35f);
+						circle.draw(gl);
+					}
 					gl.glLineWidth(2.0f);
 					gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 					circle.drawOutline(gl);
@@ -590,6 +619,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 
 
 			if (sX != 0.0 || sY != 0.0) {
+				reDraw();
 				return true;
 			}
 		} catch (Exception ignored) {
@@ -767,6 +797,19 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 
 		} catch (NullPointerException ignored) {
 		}
+	}
+
+	public void clickMouseButton(int button) {
+		processMouseEvent(button, true, mouseX, mouseY);
+		processMouseEvent(button, false, mouseX, mouseY);
+	}
+
+	public void holdMouseButton(int button) {
+		processMouseEvent(button, true, mouseX, mouseY);
+	}
+
+	public void releaseMouseButton(int button) {
+		processMouseEvent(button, false, mouseX, mouseY);
 	}
 
 
