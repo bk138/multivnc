@@ -58,6 +58,14 @@ public class GLShape {
 
 	// Render the shape
 	public void draw(GL10 gl) {
+		draw(gl, false);
+	}
+
+	public void drawOutline(GL10 gl) {
+		draw(gl, true);
+	}
+
+	private void draw(GL10 gl, boolean outline) {
 		// Disable 2d textures, otherwise shape won't show
 		gl.glDisable(GL10.GL_TEXTURE_2D);
 		// Enable vertex-array and define its buffer
@@ -70,7 +78,7 @@ public class GLShape {
 		
 		if(kind == CIRCLE) {
 			gl.glVertexPointer (2, GL10.GL_FLOAT , 0, vertexBuffer); 
-			gl.glDrawArrays (GL10.GL_TRIANGLE_FAN, 0, circleSegments);
+			gl.glDrawArrays (outline ? GL10.GL_LINE_LOOP : GL10.GL_TRIANGLE_FAN, 0, circleSegments);
 		}
 		
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);

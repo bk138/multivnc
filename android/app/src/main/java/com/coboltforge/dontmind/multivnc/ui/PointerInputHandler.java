@@ -106,6 +106,8 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
             this.inputMode = InputMode.DEFAULT;
         else
             this.inputMode = inputMode;
+
+        vncCanvas.reDraw();
     }
 
     public InputMode getInputMode() {

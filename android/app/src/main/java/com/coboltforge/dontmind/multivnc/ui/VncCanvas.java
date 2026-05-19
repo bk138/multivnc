@@ -73,6 +73,10 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
     }
 
 	private final static String TAG = "VncCanvas";
+	private final static float GL_FIXED_ONE = 65536.0f;
+	private final static float JUMP_TARGET_RADIUS_DP = 30.0f;
+	private final static float JUMP_TARGET_CURSOR_HEIGHT_DP = 24.0f;
+	private final static float JUMP_TARGET_CURSOR_GAP_DP = 28.0f;
 
 	ZoomScaling scaling;
 
@@ -121,6 +125,49 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 	 * full-frame coordinates
 	 */
 	int absoluteXPosition = 0, absoluteYPosition = 0;
+
+	private float getJumpTargetRadiusPx() {
+		return JUMP_TARGET_RADIUS_DP * getResources().getDisplayMetrics().density;
+	}
+
+	private float getJumpTargetCursorGapPx() {
+		return JUMP_TARGET_CURSOR_GAP_DP * getResources().getDisplayMetrics().density;
+	}
+
+	private float getJumpTargetCursorHeightPx() {
+		return JUMP_TARGET_CURSOR_HEIGHT_DP * getResources().getDisplayMetrics().density;
+	}
+
+	private boolean shouldShowJumpTarget() {
+		return inputHandler != null && inputHandler.getInputMode() == InputMode.JUMP;
+	}
+
+	private float getMouseXOnScreen() {
+		return getScale() * (mouseX - absoluteXPosition);
+	}
+
+	private float getMouseYOnScreen() {
+		return getScale() * (mouseY - absoluteYPosition);
+	}
+
+	private float getJumpTargetCenterX() {
+		return getMouseXOnScreen();
+	}
+
+	private float getJumpTargetCenterY() {
+		float radius = getJumpTargetRadiusPx();
+		return getMouseYOnScreen() + getJumpTargetCursorHeightPx() + getJumpTargetCursorGapPx() + radius;
+	}
+
+	boolean isJumpTargetHit(float x, float y) {
+		if (!shouldShowJumpTarget())
+			return false;
+
+		float dx = x - getJumpTargetCenterX();
+		float dy = y - getJumpTargetCenterY();
+		float radius = getJumpTargetRadiusPx();
+		return dx * dx + dy * dy <= radius * radius;
+	}
 
 
 	/*
@@ -256,8 +303,8 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 				 */
 				if(doPointerHighLight) {
 					gl.glEnable(GL10.GL_BLEND);
-					int mouseXonScreen = (int)(getScale()*(mouseX-absoluteXPosition));
-					int mouseYonScreen = (int)(getScale()*(mouseY-absoluteYPosition));
+					int mouseXonScreen = (int)getMouseXOnScreen();
+					int mouseYonScreen = (int)getMouseYOnScreen();
 
 					gl.glLoadIdentity();                 // Reset model-view matrix
 					gl.glTranslatex( mouseXonScreen, mouseYonScreen, 0);
@@ -273,6 +320,19 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 					gl.glScalef(0.99f, 0.99f, 0.0f);
 					circle.draw(gl);
 
+					gl.glDisable(GL10.GL_BLEND);
+				}
+
+				if(shouldShowJumpTarget()) {
+					gl.glEnable(GL10.GL_BLEND);
+					gl.glLoadIdentity();
+					gl.glTranslatex((int)getJumpTargetCenterX(), (int)getJumpTargetCenterY(), 0);
+					float radiusScale = getJumpTargetRadiusPx() / GL_FIXED_ONE;
+					gl.glScalef(radiusScale, radiusScale, 1.0f);
+					gl.glLineWidth(2.0f);
+					gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+					circle.drawOutline(gl);
+					gl.glLineWidth(1.0f);
 					gl.glDisable(GL10.GL_BLEND);
 				}
 
@@ -565,7 +625,7 @@ public class VncCanvas extends GLSurfaceView implements VNCConn.OnFramebufferEve
 
 	public void reDraw() {
 
-		if (repaintsEnabled && vncConn.rfbClient != 0) {
+		if (repaintsEnabled && vncConn != null && vncConn.rfbClient != 0) {
 			// request a redraw from GL thread
 			requestRender();
 		}
