@@ -87,6 +87,7 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 	ZoomControls zoomer;
 	TextView zoomLevel;
 	PointerInputHandler inputHandler;
+	InputMode inputMode = InputMode.DEFAULT;
 
 	ViewGroup mousebuttons;
 	TouchPointView touchpoints;
@@ -553,6 +554,15 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 				ed.putBoolean(Constants.PREFS_KEY_MOUSEBUTTONS, true);
 			}
 			ed.commit();
+			return true;
+
+		case R.id.itemToggleJumpInputMode:
+			if(inputMode == InputMode.JUMP)
+				inputMode = InputMode.DEFAULT;
+			else
+				inputMode = InputMode.JUMP;
+
+			inputHandler.setInputMode(inputMode);
 			return true;
 
 		case R.id.itemTogglePointerHighlight:

@@ -17,6 +17,7 @@
 <string name="disconnect">Disconnect</string>
 <string name="toggle_framebuffer_update">Toggle View</string>
 <string name="toggle_mouse_buttons">Toggle Mouse Buttons</string>
+<string name="toggle_jump_input_mode">Toggle Jump-style Touch Mode</string>
 <string name="toggle_pointer_highlight">Toggle Pointer Highlighting</string>
 <string name="toggle_keyboard">Toggle Keyboard</string>
 

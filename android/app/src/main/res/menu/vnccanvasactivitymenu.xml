@@ -24,6 +24,11 @@
     </item>
 
     <item
+        android:id="@+id/itemToggleJumpInputMode"
+        android:title="@string/toggle_jump_input_mode">
+    </item>
+
+    <item
         android:id="@+id/itemTogglePointerHighlight"
         android:title="@string/toggle_pointer_highlight">
     </item>

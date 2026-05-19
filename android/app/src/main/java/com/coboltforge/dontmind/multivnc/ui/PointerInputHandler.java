@@ -38,6 +38,7 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
     private final VncCanvas vncCanvas;
     private final ViewGroup mousebuttons;
     private final Toast notificationToast;
+    private InputMode inputMode = InputMode.DEFAULT;
     protected GestureDetector gestures;
     protected ScaleGestureDetector scaleGestures;
 
@@ -100,6 +101,16 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         Log.d(TAG, "MightyInputHandler " + this +  " shutdown!");
     }
 
+    public void setInputMode(InputMode inputMode) {
+        if (inputMode == null)
+            this.inputMode = InputMode.DEFAULT;
+        else
+            this.inputMode = inputMode;
+    }
+
+    public InputMode getInputMode() {
+        return inputMode;
+    }
 
     protected boolean isTouchEvent(MotionEvent event) {
         return event.getSource() == InputDevice.SOURCE_TOUCHSCREEN ||
