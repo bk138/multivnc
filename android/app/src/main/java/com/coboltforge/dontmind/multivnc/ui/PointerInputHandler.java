@@ -112,6 +112,10 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         return inputMode;
     }
 
+    private boolean isJumpInputMode() {
+        return inputMode == InputMode.JUMP;
+    }
+
     protected boolean isTouchEvent(MotionEvent event) {
         return event.getSource() == InputDevice.SOURCE_TOUCHSCREEN ||
                 event.getSource() == InputDevice.SOURCE_TOUCHPAD;
@@ -224,6 +228,9 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
 
         if(Utils.DEBUG()) Log.d(TAG, "Input: long press");
 
+        if (isJumpInputMode())
+            return;
+
         dragMode = true;
         dragX = e.getX();
         dragY = e.getY();
@@ -320,6 +327,11 @@ public class PointerInputHandler extends GestureDetector.SimpleOnGestureListener
         }
         else
         {
+            if (isJumpInputMode()) {
+                if(Utils.DEBUG()) Log.d(TAG, "Input: Jump-style single touch pan");
+                return vncCanvas.pan((int) distanceX, (int) distanceY);
+            }
+
             // compute the relative movement offset on the remote screen.
             float deltaX = -distanceX;
             float deltaY = -distanceY;
