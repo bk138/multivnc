@@ -628,6 +628,7 @@ void ViewerWindow::adjustCanvasSize()
         canvas->SetInitialSize(dimensions);
         canvas->CentreOnParent();
         Layout();
+        canvas->Refresh();
     }
 }
 
