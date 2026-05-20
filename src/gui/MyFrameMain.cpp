@@ -1121,7 +1121,7 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
   if(listenPort > 0)
     {
       // add to notebook, needs to be after connections list add
-      notebook_connections->AddPage(win, wxEmptyString, true);
+      notebook_connections->AddPage(win, _("About to listen on port") + " " + (wxString() << listenPort) + wxT(" ..."), true);
       wxLogStatus(_("Listening on port") + " " + (wxString() << listenPort) + wxT(" ..."));
       c->Listen(listenPort);
     }
