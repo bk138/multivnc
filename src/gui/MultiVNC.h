@@ -1,0 +1,6 @@
+class MultiVNC : public wxFrame {
+public:
+    // ...
+    void OnShowScreenDimensions(wxCommandEvent& event);
+    // ...
+};
