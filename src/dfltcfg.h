@@ -29,6 +29,8 @@
 // gui stuff
 #define K_SHOWTOOLBAR _T("ShowToolbar")
 #define V_SHOWTOOLBAR true
+#define K_SHOWSTATUSBAR _T("ShowStatusBar")
+#define V_SHOWSTATUSBAR true
 #define K_SHOWDISCOVERED _T("ShowZeroConf")
 #define V_SHOWDISCOVERED true
 #define K_SHOWBOOKMARKS _T("ShowBookmarks")
