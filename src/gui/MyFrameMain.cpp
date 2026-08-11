@@ -795,6 +795,8 @@ void MyFrameMain::onSysColourChanged(wxSysColourChangedEvent& event)
     GetToolBar()->SetToolNormalBitmap(ID_INPUT_REPLAY, bitmapBundleFromSVGResource(prefix + "/" + "replay"));
     GetToolBar()->SetToolNormalBitmap(ID_FULLSCREEN, bitmapBundleFromSVGResource(prefix + "/" + (show_fullscreen ? "restore" : "fullscreen")));
     GetToolBar()->SetToolNormalBitmap(ID_ONE_TO_ONE, bitmapBundleFromSVGResource(prefix + "/" + "one-to-one"));
+
+    event.Skip(); // Allow the event to propagate
 }
 
 
