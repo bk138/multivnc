@@ -88,11 +88,11 @@ public class VNCConn {
 	private String serverCutText;
 
 	// Useful shortcuts for modifier masks.
-    public final static int CTRL_MASK  = KeyEvent.META_SYM_ON;
-    public final static int SHIFT_MASK = KeyEvent.META_SHIFT_ON;
-    public final static int META_MASK  = 0;
-    public final static int ALT_MASK   = KeyEvent.META_ALT_ON;
-	public final static int SUPER_MASK = KeyEvent.META_FUNCTION_ON; // mhm rather sym_on?
+    public final static int CTRL_MASK  = KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_MASK | KeyEvent.META_SYM_ON;
+    public final static int SHIFT_MASK = KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_MASK;
+    public final static int META_MASK  = KeyEvent.META_META_ON | KeyEvent.META_META_MASK;
+    public final static int ALT_MASK   = KeyEvent.META_ALT_ON | KeyEvent.META_ALT_MASK;
+	public final static int SUPER_MASK = KeyEvent.META_FUNCTION_ON;
 
 	public static final int MOUSE_BUTTON_NONE = 0;
     public static final int MOUSE_BUTTON_LEFT = 1;
@@ -353,25 +353,27 @@ public class VNCConn {
 
 			   try {
 
-				   if((evt.metaState & VNCConn.SHIFT_MASK) != 0) {
-					   if(Utils.DEBUG()) Log.d(TAG, "sending key Shift" + (evt.down?" down":" up"));
-					   rfbSendKeyEvent(0xffe1, evt.down);
-				   }
-				   if((evt.metaState & VNCConn.CTRL_MASK) != 0) {
-					   if(Utils.DEBUG()) Log.d(TAG, "sending key Ctrl" + (evt.down?" down":" up"));
-					   rfbSendKeyEvent(0xffe3, evt.down);
-				   }
-				   if((evt.metaState & VNCConn.ALT_MASK) != 0) {
-					   if(Utils.DEBUG()) Log.d(TAG, "sending key Alt" + (evt.down?" down":" up"));
-					   rfbSendKeyEvent(0xffe9, evt.down);
-				   }
-				   if((evt.metaState & VNCConn.SUPER_MASK) != 0) {
-					   if(Utils.DEBUG()) Log.d(TAG, "sending key Super" + (evt.down?" down":" up"));
-					   rfbSendKeyEvent(0xffeb, evt.down);
-				   }
-				   if((evt.metaState & VNCConn.META_MASK) != 0) {
-					   if(Utils.DEBUG()) Log.d(TAG, "sending key Meta" + (evt.down?" down":" up"));
-					   rfbSendKeyEvent(0xffe7, evt.down);
+				   if(evt.down) {
+					   if((evt.metaState & VNCConn.SHIFT_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Shift down");
+						   rfbSendKeyEvent(0xffe1, true);
+					   }
+					   if((evt.metaState & VNCConn.CTRL_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Ctrl down");
+						   rfbSendKeyEvent(0xffe3, true);
+					   }
+					   if((evt.metaState & VNCConn.ALT_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Alt down");
+						   rfbSendKeyEvent(0xffe9, true);
+					   }
+					   if((evt.metaState & VNCConn.SUPER_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Super down");
+						   rfbSendKeyEvent(0xffeb, true);
+					   }
+					   if((evt.metaState & VNCConn.META_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Meta down");
+						   rfbSendKeyEvent(0xffe7, true);
+					   }
 				   }
 
 				   if(Utils.DEBUG()) Log.d(TAG, "sending key " + evt.keyCode + (evt.down?" down":" up"));
@@ -384,6 +386,29 @@ public class VNCConn {
 				   } else {
 					   // Fallback to standard key event
 					   rfbSendKeyEvent(evt.keyCode, evt.down);
+				   }
+
+				   if(!evt.down) {
+					   if((evt.metaState & VNCConn.META_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Meta up");
+						   rfbSendKeyEvent(0xffe7, false);
+					   }
+					   if((evt.metaState & VNCConn.SUPER_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Super up");
+						   rfbSendKeyEvent(0xffeb, false);
+					   }
+					   if((evt.metaState & VNCConn.ALT_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Alt up");
+						   rfbSendKeyEvent(0xffe9, false);
+					   }
+					   if((evt.metaState & VNCConn.CTRL_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Ctrl up");
+						   rfbSendKeyEvent(0xffe3, false);
+					   }
+					   if((evt.metaState & VNCConn.SHIFT_MASK) != 0) {
+						   if(Utils.DEBUG()) Log.d(TAG, "sending key Shift up");
+						   rfbSendKeyEvent(0xffe1, false);
+					   }
 				   }
 
 				   return true;
@@ -628,7 +653,30 @@ public class VNCConn {
 							keyCode = tmp.getUnicodeChar(metaState);
 						}
 
-						metaState = 0;
+						// If control character (1-26) was produced by OSK for Ctrl+[a-z], map back to keysym
+						if (keyCode >= 1 && keyCode <= 26 && (evt.getMetaState() & (KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_MASK | KeyEvent.META_SYM_ON)) != 0) {
+							keyCode = keyCode + ('a' - 1);
+						}
+
+						// Preserve active modifier masks for RFB client-to-server dispatch (fixes issue #309)
+						int preservedModifiers = 0;
+						if ((evt.getMetaState() & (KeyEvent.META_CTRL_ON | KeyEvent.META_CTRL_MASK | KeyEvent.META_SYM_ON)) != 0) {
+							preservedModifiers |= VNCConn.CTRL_MASK;
+						}
+						if ((evt.getMetaState() & (KeyEvent.META_ALT_ON | KeyEvent.META_ALT_MASK)) != 0) {
+							preservedModifiers |= VNCConn.ALT_MASK;
+						}
+						if ((evt.getMetaState() & (KeyEvent.META_SHIFT_ON | KeyEvent.META_SHIFT_MASK)) != 0) {
+							preservedModifiers |= VNCConn.SHIFT_MASK;
+						}
+						if ((evt.getMetaState() & (KeyEvent.META_META_ON | KeyEvent.META_META_MASK)) != 0) {
+							preservedModifiers |= VNCConn.META_MASK;
+						}
+						if ((evt.getMetaState() & KeyEvent.META_FUNCTION_ON) != 0) {
+							preservedModifiers |= VNCConn.SUPER_MASK;
+						}
+
+						metaState = preservedModifiers;
 						break;
 
 					}
