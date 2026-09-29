@@ -163,7 +163,14 @@ public:
 
   // cuttext
   const wxString& getCuttext() const { const wxString& ref = cuttext; return ref; };
-  void setCuttext(const wxString& text) { wxCriticalSectionLocker lock(mutex_cuttext); cuttext = text; };
+  void setCuttext(const wxString& text) {
+    wxCriticalSectionLocker lock(mutex_cuttext);
+    cuttext = text;
+    // Some apps put a UTF-16 BOM on the clipboard which wx passes through verbatim.
+    // Don't send it to the server.
+    if(cuttext.StartsWith(wxUniChar(0xFEFF)))
+      cuttext.erase(0, 1);
+  };
 
   // returns a wxBitmap (this uses COW, so is okay)
   wxBitmap getFrameBufferRegion(const wxRect& region);
