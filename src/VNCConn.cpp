@@ -33,6 +33,9 @@
 #else
 #include <arpa/inet.h>
 #endif
+#if defined __APPLE__
+#include <Carbon/Carbon.h>
+#endif
 #include "VNCConn.h"
 
 bool VNCConn::libsshtunnel_initialized = false;
@@ -1529,6 +1532,38 @@ void VNCConn::sendPointerEvent(wxMouseEvent &event)
 }
 
 
+#if defined __APPLE__
+// translate a raw macOS hardware key code to the character it produces
+// with Shift held, using the currently active keyboard layout, so this
+// works for any input source (not just US).
+static int MacShiftedCharForRawKeyCode(wxUint32 rawKeyCode)
+{
+  TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardInputSource();
+  if(!currentKeyboard)
+    return 0;
+  CFDataRef layoutData = (CFDataRef)TISGetInputSourceProperty(currentKeyboard, kTISPropertyUnicodeKeyLayoutData);
+  CFRelease(currentKeyboard);
+  if(!layoutData)
+    return 0;
+  const UCKeyboardLayout *layout = (const UCKeyboardLayout*)CFDataGetBytePtr(layoutData);
+  if(!layout)
+    return 0;
+
+  UInt32 deadKeyState = 0;
+  UniCharCount actualLength = 0;
+  UniChar chars[4];
+  OSStatus status = UCKeyTranslate(layout, (UInt16)rawKeyCode, kUCKeyActionDown,
+				    shiftKey >> 8, LMGetKbdType(),
+				    kUCKeyTranslateNoDeadKeysMask,
+				    &deadKeyState, 4, &actualLength, chars);
+  if(status != noErr || actualLength != 1)
+    return 0;
+
+  return chars[0];
+}
+#endif
+
+
 // because of the possible wxKeyEvent.Skip(), this posts the found keysym + down
 bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
 {
@@ -1551,14 +1586,32 @@ bool VNCConn::sendKeyEvent(wxKeyEvent &event, bool down, bool isChar)
       if(kev.keysym==0) 
 	kev.keysym = event.GetUnicodeKey();
 
-      // if wxwidgets translates a key combination into a
-      // value below 32, revert this here.
-      // we dont't send ASCII 0x03, but ctrl and then a 'c'!
+      // wxwidgets (or the underlying toolkit) translates a Ctrl-held key
+      // combination into its ASCII C0 control code (0..31), revert this
+      // here: we dont't send ASCII 0x03, but ctrl and then a 'c'!
+      // codes 1..26 are Ctrl+'a'..'z', while 0 and 27..31 are
+      // Ctrl+one of '@ [ \ ] ^ _', so the two ranges revert differently.
       if(kev.keysym <= 32)
 	{
-	  kev.keysym += 96;
+	  kev.keysym += (kev.keysym >= 1 && kev.keysym <= 26) ? 96 : 64;
 	  wxLogDebug(wxT("VNCConn %p: translating key to: %d"), this, kev.keysym);
 	}
+
+#if defined __APPLE__
+      // on Mac, wx's char translation loses the Shift state when Ctrl is
+      // held at the same time (it then routes the key through Cocoa's
+      // doCommandBySelector: instead of insertText:, falling back to a
+      // wx-internal helper that queries the keyboard layout without the
+      // Shift modifier). Reconstruct the shifted character ourselves from
+      // the currently active keyboard layout so this also works correctly
+      // for non-US layouts.
+      if(event.ShiftDown() && (event.RawControlDown() || event.ControlDown()))
+	{
+	  int shifted = MacShiftedCharForRawKeyCode(event.GetRawKeyCode());
+	  if(shifted)
+	    kev.keysym = shifted;
+	}
+#endif
 
       wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x down"), this, kev.keysym);
       wxLogDebug(wxT("VNCConn %p: sending rfbkeysym: 0x%.3x  up"), this, kev.keysym);
