@@ -4,6 +4,7 @@
 enum
   {
     ID_TOOLBAR = wxID_HIGHEST + 42,
+    ID_STATUSBAR,
     ID_DISCOVERED,
     ID_BOOKMARKS,
     ID_STATISTICS,

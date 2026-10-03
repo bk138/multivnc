@@ -44,6 +44,7 @@ class MyFrameMain: public FrameMain
 
   // gui layout stuff
   bool show_toolbar;
+  bool show_statusbar;
   bool show_discovered;
   bool show_bookmarks;
   bool show_stats;
@@ -116,6 +117,7 @@ class MyFrameMain: public FrameMain
   // multi-sync input
   bool multi_sync_enabled;
   void updateMultiSyncTargets();
+  void applyStatusBarVisibility();
 
 
 protected:
@@ -155,6 +157,7 @@ public:
   void machine_exit(wxCommandEvent &event);
 
   void view_toggletoolbar(wxCommandEvent &event);
+  void view_togglestatusbar(wxCommandEvent &event);
   void view_togglediscovered(wxCommandEvent &event);
   void view_togglebookmarks(wxCommandEvent &event);
   void view_togglestatistics(wxCommandEvent &event);

@@ -55,6 +55,8 @@ FrameMain::FrameMain(wxWindow* parent, wxWindowID id, const wxString& title, con
     wxglade_tmp_menu = new wxMenu();
     wxglade_tmp_menu->Append(ID_TOOLBAR, _("Toolbar"), wxEmptyString, wxITEM_CHECK);
     Bind(wxEVT_MENU, &FrameMain::view_toggletoolbar, this, ID_TOOLBAR);
+    wxglade_tmp_menu->Append(ID_STATUSBAR, _("Status Bar"), wxEmptyString, wxITEM_CHECK);
+    Bind(wxEVT_MENU, &FrameMain::view_togglestatusbar, this, ID_STATUSBAR);
     wxglade_tmp_menu->Append(ID_DISCOVERED, _("Discovered Servers"), wxEmptyString, wxITEM_CHECK);
     Bind(wxEVT_MENU, &FrameMain::view_togglediscovered, this, ID_DISCOVERED);
     wxglade_tmp_menu->Append(ID_BOOKMARKS, _("Bookmarks"), wxEmptyString, wxITEM_CHECK);
@@ -273,6 +275,13 @@ void FrameMain::view_toggletoolbar(wxCommandEvent &event)  // wxGlade: FrameMain
     event.Skip();
     // notify the user that he hasn't implemented the event handler yet
     wxLogDebug(wxT("Event handler (FrameMain::view_toggletoolbar) not implemented yet"));
+}
+
+void FrameMain::view_togglestatusbar(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>
+{
+    event.Skip();
+    // notify the user that he hasn't implemented the event handler yet
+    wxLogDebug(wxT("Event handler (FrameMain::view_togglestatusbar) not implemented yet"));
 }
 
 void FrameMain::view_togglediscovered(wxCommandEvent &event)  // wxGlade: FrameMain.<event_handler>

@@ -74,6 +74,7 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   // get default config object, created on demand if not exist
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Read(K_SHOWTOOLBAR, &show_toolbar, V_SHOWTOOLBAR);
+  pConfig->Read(K_SHOWSTATUSBAR, &show_statusbar, V_SHOWSTATUSBAR);
   pConfig->Read(K_SHOWDISCOVERED, &show_discovered, V_SHOWDISCOVERED);
   pConfig->Read(K_SHOWBOOKMARKS, &show_bookmarks, V_SHOWBOOKMARKS);
   pConfig->Read(K_SHOWSTATS, &show_stats, V_SHOWSTATS);
@@ -179,6 +180,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
     frame_main_menubar->Check(ID_BOOKMARKS, true);
   if(show_stats)
     frame_main_menubar->Check(ID_STATISTICS, true);
+  if(show_statusbar)
+    frame_main_menubar->Check(ID_STATUSBAR, true);
 
   if (VNCSeamlessConnector::isSupportedByCurrentPlatform()) {
       switch (show_seamless) {
@@ -218,6 +221,8 @@ MyFrameMain::MyFrameMain(wxWindow* parent, int id, const wxString& title,
   Bind(wxEVT_AUINOTEBOOK_PAGE_CLOSE, &MyFrameMain::notebook_connections_pageclose, this, wxID_ANY);
   Bind(wxEVT_AUINOTEBOOK_TAB_RIGHT_DOWN, &MyFrameMain::notebook_connections_tab_right_down, this, wxID_ANY);
   Bind(wxEVT_AUINOTEBOOK_DRAG_DONE, &MyFrameMain::notebook_connections_drag_done, this, wxID_ANY);
+
+  applyStatusBarVisibility();
 }
 
 
@@ -257,6 +262,23 @@ MyFrameMain::~MyFrameMain()
 #endif 
 	entry->m_callbackUserData = 0;
       }
+}
+
+
+void MyFrameMain::applyStatusBarVisibility()
+{
+  if(show_fullscreen || !show_statusbar)
+    {
+      if(GetStatusBar() == frame_main_statusbar)
+        SetStatusBar(nullptr);
+      frame_main_statusbar->Hide();
+    }
+  else
+    {
+      if(GetStatusBar() != frame_main_statusbar)
+        SetStatusBar(frame_main_statusbar);
+      frame_main_statusbar->Show();
+    }
 }
 
 
@@ -752,9 +774,7 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 	splitwinlayout();
         // hide toolbar labels
         GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() & ~wxTB_TEXT);
-        // hide and unlink status bar
-        GetStatusBar()->Hide();
-        SetStatusBar(nullptr);
+  applyStatusBarVisibility();
     } else {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
@@ -774,9 +794,7 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 	splitwinlayout();
         // show toolbar labels
         GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() | wxTB_TEXT);
-        // reattach and status bar
-        SetStatusBar(frame_main_statusbar);
-        GetStatusBar()->Show();
+  applyStatusBarVisibility();
   }
     // needed at least on MacOS to let the status bar re-appear correctly on restore
     SendSizeEvent();
@@ -2119,6 +2137,20 @@ void MyFrameMain::view_toggletoolbar(wxCommandEvent &event)
 
   wxConfigBase *pConfig = wxConfigBase::Get();
   pConfig->Write(K_SHOWTOOLBAR, show_toolbar);
+}
+
+
+void MyFrameMain::view_togglestatusbar(wxCommandEvent &event)
+{
+  show_statusbar = !show_statusbar;
+
+  applyStatusBarVisibility();
+
+  // this does more than Layout() which only deals with sizers
+  SendSizeEvent();
+
+  wxConfigBase *pConfig = wxConfigBase::Get();
+  pConfig->Write(K_SHOWSTATUSBAR, show_statusbar);
 }
 
 
