@@ -752,9 +752,6 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 	splitwinlayout();
         // hide toolbar labels
         GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() & ~wxTB_TEXT);
-        // hide and unlink status bar
-        GetStatusBar()->Hide();
-        SetStatusBar(nullptr);
     } else {
 	// untick menu item
 	frame_main_menubar->Check(ID_FULLSCREEN, false);
@@ -774,9 +771,6 @@ void MyFrameMain::onFullScreenChanged(wxFullScreenEvent &event) {
 	splitwinlayout();
         // show toolbar labels
         GetToolBar()->SetWindowStyle(GetToolBar()->GetWindowStyle() | wxTB_TEXT);
-        // reattach and status bar
-        SetStatusBar(frame_main_statusbar);
-        GetStatusBar()->Show();
   }
     // needed at least on MacOS to let the status bar re-appear correctly on restore
     SendSizeEvent();
