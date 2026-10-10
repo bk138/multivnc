@@ -78,6 +78,8 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
 {
   { wxCMD_LINE_SWITCH, "h", "help", "show this help message and exit",
     wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+  { wxCMD_LINE_SWITCH, "v", "version", "show version information and exit",
+    wxCMD_LINE_VAL_NONE, 0 },
   { wxCMD_LINE_OPTION, "listen", "listen",
     "listen for incoming (reverse) VNC connections on the given port",
     wxCMD_LINE_VAL_NUMBER, 0 },
@@ -171,6 +173,13 @@ bool MultiVNCApp::OnInit()
                  "MultiVNC is free software, licensed unter the GPL.\n");
   if (parser.Parse() != 0)
       return false;
+
+  // "--version" just prints the version and quits
+  if (parser.FoundSwitch("version"))
+    {
+      cout << PACKAGE_NAME << " " << VERSION << "\n";
+      return false;
+    }
 
   // the main frame
   MyFrameMain* frame_main = new MyFrameMain(NULL, wxID_ANY, wxEmptyString);
