@@ -216,6 +216,7 @@ public:
   static const wxArrayString& getLog() { const wxArrayString& ref = log; return ref; };
   static void clearLog();
   static void doLogfile(bool yesno) { do_logfile = yesno; };
+  static void doMulticastFallback(bool yesno) { do_multicast_fallback = yesno; };
 
   static int getMaxSocketRecvBufSize();
 
@@ -325,6 +326,10 @@ private:
   static wxArrayString log;
   static wxCriticalSection mutex_log;
   static bool do_logfile;
+
+  // whether to fall back to unicast when the multicast loss ratio gets
+  // too high; can be turned off from the command line, defaults to true
+  static bool do_multicast_fallback;
 
   // utility functions
   static int hexToBytes(const char *hex_str, uint8_t *bytes, size_t max_bytes);

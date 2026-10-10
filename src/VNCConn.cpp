@@ -543,7 +543,7 @@ wxThread::ExitCode VNCConn::Entry()
 	      */
 	      if(multicastLossRatios.size() >= MULTICAST_RATIO_SAMPLES/2)
 		{
-		  if(getMCLossRatio() > 0.5)
+		  if(do_multicast_fallback && getMCLossRatio() > 0.5)
 		    {
 		      rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
 		      wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), this);
@@ -1101,6 +1101,7 @@ void VNCConn::thread_handle_xvp(rfbClient *cl, uint8_t ver, uint8_t code)
 wxArrayString VNCConn::log;
 wxCriticalSection VNCConn::mutex_log;
 bool VNCConn::do_logfile;
+bool VNCConn::do_multicast_fallback = true;
 
 void VNCConn::thread_logger(const char *format, ...)
 {
