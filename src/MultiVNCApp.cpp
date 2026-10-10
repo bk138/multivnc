@@ -80,6 +80,9 @@ static const wxCmdLineEntryDesc cmdLineDesc[] =
     wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
   { wxCMD_LINE_SWITCH, "v", "version", "show version information and exit",
     wxCMD_LINE_VAL_NONE, 0 },
+  { wxCMD_LINE_SWITCH, NULL, "no-multicast-fallback",
+    "do not fall back to unicast when multicast packet loss is high",
+    wxCMD_LINE_VAL_NONE, 0 },
   { wxCMD_LINE_OPTION, "listen", "listen",
     "listen for incoming (reverse) VNC connections on the given port",
     wxCMD_LINE_VAL_NUMBER, 0 },
@@ -180,6 +183,11 @@ bool MultiVNCApp::OnInit()
       cout << PACKAGE_NAME << " " << VERSION << "\n";
       return false;
     }
+
+  // "--no-multicast-fallback" disables falling back to unicast when the
+  // multicast loss ratio gets too high
+  if (parser.FoundSwitch("no-multicast-fallback"))
+      VNCConn::doMulticastFallback(false);
 
   // the main frame
   MyFrameMain* frame_main = new MyFrameMain(NULL, wxID_ANY, wxEmptyString);
