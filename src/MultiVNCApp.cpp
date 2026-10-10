@@ -159,11 +159,6 @@ bool MultiVNCApp::OnInit()
   if(wxGetEnv("FLATPAK_ID", NULL) || !wxFile::Exists(wxFileName::GetHomeDir() + wxFileName::GetPathSeparator() + ".multivnc"))
       wxStandardPaths::Get().SetFileLayout(wxStandardPaths::FileLayout_XDG);
 
-  // greetings to anyone who made it...
-  cout << "\n:::  this is MultiVNC  :::\n\n";
-  cout << COPYRIGHT << ".\n";
-  cout << "MultiVNC is free software, licensed unter the GPL.\n\n";
-
 
   // wx stuff
   wxInitAllImageHandlers();
@@ -171,6 +166,9 @@ bool MultiVNCApp::OnInit()
   // parse the command line; on "--help" or a syntax error the parser has
   // already printed the usage message or the error, so just quit
   wxCmdLineParser parser(cmdLineDesc, wxApp::argc, wxApp::argv);
+  // the greeting banner is shown as the logo at the top of the usage text
+  parser.SetLogo("\n:::  this is MultiVNC  :::\n\n" COPYRIGHT ".\n"
+                 "MultiVNC is free software, licensed unter the GPL.\n");
   if (parser.Parse() != 0)
       return false;
 
