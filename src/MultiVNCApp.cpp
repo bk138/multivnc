@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <csignal>
+#include <wx/cmdline.h>
 #include <wx/wfstream.h>
 #ifdef __WXMAC__
 #include <ApplicationServices/ApplicationServices.h>
@@ -65,6 +66,29 @@ static void handle_sig(int s)
 
 // this also sets up main()
 IMPLEMENT_APP(MultiVNCApp);
+
+
+
+/*
+  Command line description: "-listen" starts listening for reverse VNC
+  connections, everything else is a server to connect to, given as
+  [user@]host[:port] or as a vnc:// URI (RFC 7869).
+*/
+static const wxCmdLineEntryDesc cmdLineDesc[] =
+{
+  { wxCMD_LINE_SWITCH, "h", "help", "show this help message and exit",
+    wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+  { wxCMD_LINE_OPTION, "listen", "listen",
+    "listen for incoming (reverse) VNC connections on the given port",
+    wxCMD_LINE_VAL_NUMBER, 0 },
+  { wxCMD_LINE_PARAM, NULL, NULL,
+    "server to connect to ([user@]host[:port] or vnc:// URI)",
+    wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
+  { wxCMD_LINE_USAGE_TEXT, NULL, NULL,
+    "Examples: multivnc host:5901   multivnc -listen 5500   multivnc vnc://user@host?SshHost=gateway",
+    wxCMD_LINE_VAL_NONE, 0 },
+  wxCMD_LINE_DESC_END
+};
 
 
 
@@ -144,22 +168,23 @@ bool MultiVNCApp::OnInit()
   // wx stuff
   wxInitAllImageHandlers();
 
+  // parse the command line; on "--help" or a syntax error the parser has
+  // already printed the usage message or the error, so just quit
+  wxCmdLineParser parser(cmdLineDesc, wxApp::argc, wxApp::argv);
+  if (parser.Parse() != 0)
+      return false;
+
   // the main frame
   MyFrameMain* frame_main = new MyFrameMain(NULL, wxID_ANY, wxEmptyString);
 
-  for(int i=1; i < wxApp::argc; ++i)
+  // spawn a connection or listener for every argument, in the order given
+  for (wxCmdLineArgs::const_iterator it = parser.GetArguments().begin();
+       it != parser.GetArguments().end(); ++it)
     {
-      wxString arg(wxApp::argv[i]);
-      if (arg.IsSameAs("-listen")) {
-          if (i < wxApp::argc - 1) {
-              int listenPort = -1;
-              wxApp::argv[i+1].ToInt(&listenPort);
-              frame_main->cmdline_conn_spawn(wxEmptyString, listenPort);
-          }
-          ++i;
-      } else {
-          frame_main->cmdline_conn_spawn(arg, -1);
-      }
+      if (it->GetKind() == wxCMD_LINE_OPTION && it->GetLongName() == "listen")
+          frame_main->cmdline_conn_spawn(wxEmptyString, it->GetLongVal());
+      else if (it->GetKind() == wxCMD_LINE_PARAM)
+          frame_main->cmdline_conn_spawn(it->GetStrVal(), -1);
     }
 
   SetTopWindow(frame_main);
