@@ -2604,7 +2604,8 @@ void MyFrameMain::help_about(wxCommandEvent &event)
   info.AddDeveloper("Evgeny Zinoviev");
   info.AddDeveloper("Audrey Dutcher");
   info.AddDeveloper("Sashank Bhamidi");
-  
+  info.AddDeveloper("Michael Adler");
+
   wxAboutBox(info); 
 }
 
