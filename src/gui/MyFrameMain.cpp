@@ -2403,9 +2403,11 @@ void MyFrameMain::bookmarks_secrets_save(const wxString& bookmarkName,
                               const wxSecretValue& password,
                               const wxSecretValue& sshPassword,
                               const wxSecretValue& sshPrivKeyPassword) {
+    bool haveStore = false;
 #if wxUSE_SECRETSTORE
     wxSecretStore store = wxSecretStore::GetDefault();
-    if (store.IsOk()) {
+    haveStore = store.IsOk();
+    if (haveStore) {
         if(password.IsOk()) {
             if(!store.Save("MultiVNC/Bookmarks/" + bookmarkName + " VncPassword", wxEmptyString, password)) {
                 wxLogWarning(_("Failed to save credentials to the system secret store."));
@@ -2425,6 +2427,14 @@ void MyFrameMain::bookmarks_secrets_save(const wxString& bookmarkName,
         }
     }
 #endif
+    // haveStore is false when no secret store is available at runtime or
+    // none is compiled in, in which case credentials cannot be saved.
+    // Only warn if there are credentials to save: a default-constructed
+    // wxSecretValue is not ok, so connections without passwords do not
+    // trigger a warning on every bookmark save.
+    if (!haveStore && (password.IsOk() || sshPassword.IsOk() || sshPrivKeyPassword.IsOk())) {
+        wxLogWarning(_("No system secret store available. Credentials will not be saved with this bookmark."));
+    }
 }
 
 
