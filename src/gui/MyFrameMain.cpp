@@ -294,7 +294,6 @@ void MyFrameMain::onVNCConnListenNotify(wxCommandEvent& event)
         }
     } else {
 	// listen error
-        wxLogStatus(_("Listening failed."));
         // We want a modal dialog here so that the viewer window closes after the dialog.
         // The title is translated in wx itself.
         wxRichMessageDialog dialog (this,
@@ -365,9 +364,8 @@ void MyFrameMain::onVNCConnInitNotify(wxCommandEvent& event)
         // error. only show error if this was not a auth case with empty password, i.e. a canceled ones
         if (c->getRequireAuth()
             && !c->getPassword().IsOk()) {
-            wxLogStatus(_("Authentication canceled."));
+            // no error dialog in this case, the user canceled authentication themselves
         } else {
-            wxLogStatus(_("Connection failed."));
             // We want a modal dialog here so that the viewer window closes after the dialog.
             // The title is translated in wx itself.
             wxRichMessageDialog dialog (this,
@@ -442,7 +440,6 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
       // update icon
       if(c->isMulticast())
 	{
-	  wxLogStatus( _("Connection to %s is now multicast."), c->getServerHost().c_str());
 	  notebook_connections->SetPageImage(index, 1);
 	}
       else
@@ -453,7 +450,6 @@ void MyFrameMain::onVNCConnUniMultiChangedNotify(wxCommandEvent& event)
 	    wxLogMessage(log[i]);
 	  wxLogMessage( _("Connection to %s switched to unicast."), c->getServerHost().c_str());
 
-	  wxLogStatus( _("Connection to %s is now unicast."), c->getServerHost().c_str());
 	  notebook_connections->SetPageImage(index, 0);
 	}
     }
@@ -488,7 +484,6 @@ void MyFrameMain::onVNCConnReplayFinishedNotify(wxCommandEvent& event)
       frame_main_menubar->Enable(ID_INPUT_RECORD, true);
 
       wxLogMessage( _("Replay finished!"));
-      wxLogStatus(_("Replay finished!"));
     }
 }
 
@@ -588,7 +583,6 @@ void MyFrameMain::onVNCConnDisconnectNotify(wxCommandEvent& event)
 
 void MyFrameMain::onVNCConnIncomingConnectionNotify(wxCommandEvent& event)
 { 
-  wxLogStatus(_("Incoming Connection."));
 
   // get sender
   VNCConn* c = static_cast<VNCConn*>(event.GetEventObject());
@@ -703,14 +697,14 @@ void MyFrameMain::onWindowshareTerminate(wxProcessEvent& event)
     {
       wxString msg = wxString::Format(_("Window sharing with %s stopped. Either the other side does not support receiving windows or the window was closed there."), cb->conn->getDesktopName());
       wxLogMessage(msg);
-      SetStatusText(msg);
     }
   else
     if(status == -1 || status == 1)
-       SetStatusText( _("Window sharing stopped. Shared window was closed."));
+      {
+	wxLogMessage(_("Window sharing stopped. Shared window was closed."));
+      }
     else
       {
-	SetStatusText(_("Could not run window share helper."));
 	wxLogError(_("Could not run window share helper."));
       }
    
@@ -1118,7 +1112,6 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
     {
       // add to notebook, needs to be after connections list add
       notebook_connections->AddPage(win, _("About to listen on port") + " " + (wxString() << listenPort) + wxT(" ..."), true);
-      wxLogStatus(_("Listening on port") + " " + (wxString() << listenPort) + wxT(" ..."));
       c->Listen(listenPort);
     }
   else // normal init without previous listen
@@ -1192,7 +1185,6 @@ void MyFrameMain::conn_spawn(const wxString& service, int listenPort)
 
       // add to notebook, needs to be after connections list add
       notebook_connections->AddPage(win, wxString::Format(_("Connecting to %s..."), host), true);
-      wxLogStatus(_("Connecting to %s..."), host);
 
       if(!c->Init(host,
                   port,
@@ -1421,7 +1413,6 @@ void MyFrameMain::conn_terminate(int which)
 	}
     }
 
-  wxLogStatus( _("Connection terminated."));
 }
 
 
@@ -1859,7 +1850,6 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
 	  
 	  if(c->recordUserInputStop(recorded_input))
 	    {
-	      wxLogStatus(_("Stopped recording user input!"));
 	      frame_main_menubar->SetLabel(ID_INPUT_RECORD,_("Record Input"));
 
 	      // re-enable replay buttons
@@ -1915,7 +1905,6 @@ void MyFrameMain::machine_input_record(wxCommandEvent &event)
               frame_main_toolbar->FindById(ID_INPUT_RECORD)->SetLabel(_("Stop"));
 	      frame_main_menubar->SetLabel(ID_INPUT_RECORD, _("Stop Recording"));
 
-	      wxLogStatus(_("Recording user input..."));
 
 	      // disable replay buttons
 	      GetToolBar()->EnableTool(ID_INPUT_REPLAY, false);
@@ -1949,7 +1938,6 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
           frame_main_toolbar->FindById(ID_INPUT_REPLAY)->SetLabel(_("Replay Input"));
 	  frame_main_menubar->SetLabel(ID_INPUT_REPLAY,_("Replay Input"));
 
-	  wxLogStatus(_("Stopped replaying user input!"));
 
 	  // re-enable record buttons
 	  GetToolBar()->EnableTool(ID_INPUT_RECORD, true);
@@ -1996,11 +1984,6 @@ void MyFrameMain::machine_input_replay(wxCommandEvent &event)
 	      frame_main_menubar->SetLabel(ID_INPUT_REPLAY, _("Stop Replaying"));
               frame_main_toolbar->FindById(ID_INPUT_REPLAY)->SetLabel(_("Stop"));
 
-	      if(shift_was_down)
-		wxLogStatus(_("Replaying user input in loop..."));
-	      else
-		wxLogStatus(_("Replaying user input..."));
-
 	      // disable record buttons
 	      GetToolBar()->EnableTool(ID_INPUT_RECORD, false);
 	      frame_main_menubar->Enable(ID_INPUT_RECORD, false);
@@ -2015,11 +1998,6 @@ void MyFrameMain::machine_multisync(wxCommandEvent &event)
 {
   multi_sync_enabled = event.IsChecked();
   updateMultiSyncTargets();
-
-  if (multi_sync_enabled)
-    wxLogStatus(_("Multi-Sync Input enabled: input is replicated to all connections."));
-  else
-    wxLogStatus(_("Multi-Sync Input disabled."));
 
   // Sync both menu and toolbar states
   frame_main_menubar->Check(ID_INPUT_MULTISYNC, multi_sync_enabled);
@@ -2641,7 +2619,6 @@ void MyFrameMain::help_issue_list(wxCommandEvent &e)
 void MyFrameMain::listbox_services_select(wxCommandEvent &event)
 {
     // intentionally empty
-    wxLogStatus(_("VNC Server") + " " + list_box_services->GetStringSelection());
 }
 
 
@@ -2654,7 +2631,6 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
   if(sel < 0) // seems this happens when we update the list
     return;
 
-  wxLogStatus(_("Looking up host address..."));
  
 
   // lookup hostname and port
@@ -2670,7 +2646,6 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
     if(timeout <= 0)
       {
 	wxLogError(_("Timeout looking up hostname."));
-	wxLogStatus(_("Timeout looking up hostname."));
 	services_hostname = services_addr = services_port = wxEmptyString;
 	return;
       }
@@ -2709,7 +2684,6 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
     if(timeout <= 0)
       {
 	wxLogError(_("Timeout looking up IP address."));
-	wxLogStatus(_("Timeout looking up IP address."));
 	services_hostname = services_addr = services_port = wxEmptyString;
 	return;
       }
@@ -2718,7 +2692,6 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
   else
       services_addr = services_hostname; // system resolves mDNS
 
-  wxLogStatus(services_hostname + wxT(" (") + services_addr + wxT(":") + services_port + wxT(")"));
 
 
   conn_spawn(services_addr + wxT(":") + services_port);
@@ -2728,12 +2701,7 @@ void MyFrameMain::listbox_services_dclick(wxCommandEvent &event)
 
 void MyFrameMain::listbox_bookmarks_select(wxCommandEvent &event)
 {
-  int sel = event.GetInt();
-
-  if(sel >= 0) // something selected
-    {
-      wxLogStatus(_("Bookmark %s"), list_box_bookmarks->GetString(sel));
-    }
+  // intentionally empty
 }
 
 
@@ -2952,7 +2920,6 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
 
   if(cb->windowshare_proc_pid == 0)
     {
-      SetStatusText(_("Window sharing helper execution failed."));
       wxLogError( _("Could not share window, external program execution failed."));
 
       delete cb->windowshare_proc;
@@ -2961,8 +2928,6 @@ void MyFrameMain::windowshare_start(wxCommandEvent &event)
       return;
     }
 
-  SetStatusText(wxString::Format(_("Sharing window with %s"), cb->conn->getDesktopName()));
-		
   // this is "share window"
   frame_main_menubar->Enable(wxID_UP, false);
   // this is "stop share window"
@@ -3001,8 +2966,6 @@ void MyFrameMain::windowshare_stop(wxCommandEvent &event)
       wxLogDebug(wxT("windowshare_stop(): successfully killed %d."), cb->windowshare_proc_pid);
       cb->windowshare_proc = 0; // obj deleted itself because of Detach()!
       cb->windowshare_proc_pid = 0;
-      
-      wxLogStatus(_("Stopped sharing window with %s"), cb->conn->getDesktopName());
 
       // this is "share window"
       frame_main_menubar->Enable(wxID_UP, true);
