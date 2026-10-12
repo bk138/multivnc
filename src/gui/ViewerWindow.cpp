@@ -1,5 +1,6 @@
 
 
+#include <cmath>
 #include <vector>
 #include <wx/gdicmn.h>
 #include <wx/log.h>
@@ -8,6 +9,7 @@
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/dcclient.h>
+#include <wx/dcmemory.h>
 #include <wx/tokenzr.h>
 #include "keyboardgrab/KeyboardGrabber.h"
 #include "res/vnccursor.xbm"
@@ -54,9 +56,16 @@ public:
   VNCCanvas(wxWindow* parent, VNCConn* c);
   void grab_keyboard();
   void ungrab_keyboard();
+  // called on the GUI thread as update notifications for `conn` arrive
+  void updateCache(const wxRect& rect);
 
   VNCConn* conn;
-  wxRegion updated_area;
+
+  // Native-resolution framebuffer copy, kept current by updateCache() and
+  // always blitted whole in onPaint() -- see onUpdateTimer for why.
+  wxBitmap fb_cache;
+  bool dirty = false;
+
   double scale_factor = 1.0;
   bool do_keyboard_grab;
   std::vector<VNCConn*> sync_targets;
@@ -137,39 +146,51 @@ void VNCCanvas::ungrab_keyboard()
 
 
 
-void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
+void VNCCanvas::updateCache(const wxRect& rect)
 {
-  // get the update rect list
-  wxRegionIterator upd(updated_area); 
-  while(upd)
+#ifndef NDEBUG
+  wxLongLong t0 = wxGetLocalTimeMillis();
+#endif
+
+  wxSize fb_size(conn->getFrameBufferWidth(), conn->getFrameBufferHeight());
+  if(fb_size.GetWidth() <= 0 || fb_size.GetHeight() <= 0)
+    return;
+
+  // (re)allocate on first use or framebuffer resize
+  if(!fb_cache.IsOk() || fb_cache.GetSize() != fb_size)
+    fb_cache = wxBitmap(fb_size, 32);
+
+  // scope the expensive per-pixel copy to just what changed
+  const wxBitmap& changed = conn->getFrameBufferRegion(rect);
+  if(changed.IsOk())
     {
-      wxRect update_rect(upd.GetRect());
-
-      if(scale_factor != 1.0) {
-          update_rect.x *= scale_factor;
-          update_rect.y *= scale_factor;
-          update_rect.width *= scale_factor;
-          update_rect.height *= scale_factor;
-
-          // fixes artifacts. +2 because double->int cuttofs can happen for x,y _and_ w,h scaling
-          update_rect.width += 2;
-          update_rect.height += 2;
-      }
-
-      wxLogDebug(wxT("VNCCanvas %p: invalidating updated rect: (%i,%i,%i,%i)"),
-		 this,
-		 update_rect.x,
-		 update_rect.y,
-		 update_rect.width,
-		 update_rect.height);
-
-      // triggers onPaint()
-      Refresh(false, &update_rect);
-      ++upd;
+      wxMemoryDC dc(fb_cache);
+      dc.DrawBitmap(changed, rect.x, rect.y);
     }
 
-  updated_area.Clear();
+  dirty = true;
 
+#ifndef NDEBUG
+  wxLongLong t1 = wxGetLocalTimeMillis();
+  wxLogDebug(wxT("VNCCanvas %p: updateCache rect (%i,%i,%i,%i), %f megapixels, took %lld ms"),
+	     this,
+	     rect.x, rect.y, rect.width, rect.height,
+	     (double)(rect.width * rect.height)/(1024.0*1024.0),
+	     (t1-t0).GetValue());
+#endif
+}
+
+
+void VNCCanvas::onUpdateTimer(wxTimerEvent& event)
+{
+  // Partial-rect invalidation is unreliable on this wx port -- some
+  // changed rects never get repainted. Always invalidate the whole
+  // canvas instead; fb_cache keeps that cheap.
+  if(dirty)
+    {
+      Refresh(false);
+      dirty = false;
+    }
 }
 
 
@@ -177,8 +198,6 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
 {
 #ifndef NDEBUG
   wxLongLong t0 = wxGetLocalTimeMillis();
-  size_t nr_rects = 0;
-  size_t nr_pixels = 0;
 #endif
 
   // this happens on GTK even if our size is (0,0)
@@ -188,56 +207,14 @@ void VNCCanvas::onPaint(wxPaintEvent &WXUNUSED(event))
   wxPaintDC dc(this);
   dc.SetUserScale(scale_factor, scale_factor);
 
-  // get the update rect list
-  wxRegionIterator upd(GetUpdateRegion()); 
-  while(upd)
-    {
-      wxRect update_rect(upd.GetRect());
-
-      if(scale_factor != 1.0) {
-          update_rect.x /= scale_factor;
-          update_rect.y /= scale_factor;
-          update_rect.width /= scale_factor;
-          update_rect.height /= scale_factor;
-
-          // fixes artifacts. +2 because double->int cuttofs can happen for x,y _and_ w,h scaling
-          update_rect.width += 2;
-          update_rect.height += 2;
-
-          // make sure this is always within the framebuffer boudaries;
-          // might not always be due to the artifact fix above, would not be drawn then
-          update_rect.Intersect(wxRect(0,
-                                       0,
-                                       conn->getFrameBufferWidth(),
-                                       conn->getFrameBufferHeight()));
-      }
-
-      wxLogDebug(wxT("VNCCanvas %p: got repaint event: (%i,%i,%i,%i)"),
-		 this,
-		 update_rect.x,
-		 update_rect.y,
-		 update_rect.width,
-		 update_rect.height);
-
-#ifndef NDEBUG
-      ++nr_rects;
-      nr_pixels += update_rect.width * update_rect.height;
-#endif
-    
-      const wxBitmap& region = conn->getFrameBufferRegion(update_rect);
-      if(region.IsOk())
-	dc.DrawBitmap(region, update_rect.x, update_rect.y);
-	
-      ++upd;
-    }
+  // fb_cache is already fully up to date -- just blit it, no per-pixel
+  // fetch here, and no per-rect tiling that could leave seams
+  if(fb_cache.IsOk())
+    dc.DrawBitmap(fb_cache, 0, 0);
 
 #ifndef NDEBUG
   wxLongLong t1 = wxGetLocalTimeMillis();
-  wxLogDebug(wxT("VNCCanvas %p: updating %zu rects (%f megapixels) took %lld ms"),
-	     this,
-	     nr_rects,
-	     (double)nr_pixels/(1024.0*1024.0),
-	     (t1-t0).GetValue());
+  wxLogDebug(wxT("VNCCanvas %p: paint blit took %lld ms"), this, (t1-t0).GetValue());
 #endif
 }
 
@@ -502,7 +479,7 @@ void ViewerWindow::onVNCConnUpdateNotify(VNCConnUpdateNotifyEvent& event)
 
   // only do something if this is our VNCConn
   if(sending_conn == canvas->conn)
-    canvas->updated_area.Union(event.rect);
+    canvas->updateCache(event.rect);
 }
 
 
