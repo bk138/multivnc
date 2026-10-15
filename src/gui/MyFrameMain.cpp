@@ -2768,8 +2768,9 @@ void MyFrameMain::notebook_connections_pageclose(wxAuiNotebookEvent &event)
 void MyFrameMain::notebook_connections_pagechanged(wxAuiNotebookEvent &event)
 {
   ConnBlob* cb;
-  if(connections.size())
-    cb = &connections.at(notebook_connections->GetSelection());
+  int sel = notebook_connections->GetSelection();
+  if(sel != wxNOT_FOUND && static_cast<size_t>(sel) < connections.size())
+    cb = &connections.at(sel);
   else
     return;
 
