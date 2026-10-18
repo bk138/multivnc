@@ -1149,4 +1149,49 @@
             </object>
         </object>
     </object>
+    <object class="DialogHelp" name="dialog_help" base="EditDialog">
+        <title>MultiVNC Help</title>
+        <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+        <affirmative>button_CLOSE</affirmative>
+        <escape>button_CLOSE</escape>
+        <!-- pages are added programmatically by MyDialogHelp -->
+        <extracode_post>\n</extracode_post>
+        <object class="wxBoxSizer" name="sizer_top" base="EditBoxSizer">
+            <orient>wxVERTICAL</orient>
+            <object class="sizeritem">
+                <option>1</option>
+                <border>3</border>
+                <flag>wxALL|wxEXPAND</flag>
+                <object class="wxToolbook" name="notebook_help" base="CustomWidget">
+                    <extracode>#include &lt;wx/toolbook.h&gt;\n</extracode>
+                    <extracode_post>\n</extracode_post>
+                    <arguments>
+                        <argument>$parent</argument>
+                        <argument>$id</argument>
+                        <argument>wxDefaultPosition</argument>
+                        <argument>wxDefaultSize</argument>
+                        <argument>wxBK_LEFT|wxTBK_HORZ_LAYOUT</argument>
+                    </arguments>
+                </object>
+            </object>
+            <object class="sizeritem">
+                <option>0</option>
+                <border>0</border>
+                <flag>wxALIGN_RIGHT</flag>
+                <object class="wxBoxSizer" name="sizer_help_buttons" base="EditBoxSizer">
+                    <orient>wxHORIZONTAL</orient>
+                    <object class="sizeritem">
+                        <option>0</option>
+                        <border>3</border>
+                        <flag>wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND</flag>
+                        <object class="wxButton" name="button_CLOSE" base="EditButton">
+                            <label>Close</label>
+                            <default>1</default>
+                            <stockitem>CLOSE</stockitem>
+                        </object>
+                    </object>
+                </object>
+            </object>
+        </object>
+    </object>
 </application>
