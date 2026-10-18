@@ -63,8 +63,10 @@ object AndroidKeyToXt {
             KeyEvent.KEYCODE_SHIFT_RIGHT -> 0x36   // Right Shift
             KeyEvent.KEYCODE_CTRL_LEFT -> 0x1d     // Left Ctrl
             KeyEvent.KEYCODE_CTRL_RIGHT -> 0xe01d  // Right Ctrl: 0xe0 0x1d
+            KeyEvent.KEYCODE_META_LEFT, KeyEvent.KEYCODE_CTRL_LEFT -> 0x1d // Fallback for some OSKs
             KeyEvent.KEYCODE_ALT_LEFT -> 0x38      // Left Alt
             KeyEvent.KEYCODE_ALT_RIGHT -> 0xe038   // Right Alt (AltGr): 0xe0 0x38
+            KeyEvent.KEYCODE_META_RIGHT, KeyEvent.KEYCODE_ALT_LEFT -> 0x38 // Fallback for some OSKs
 
             // Alphanumeric keys
             KeyEvent.KEYCODE_A -> 0x1e
