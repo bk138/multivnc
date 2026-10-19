@@ -327,8 +327,9 @@ private:
   static wxCriticalSection mutex_log;
   static bool do_logfile;
 
-  // whether to fall back to unicast when the multicast loss ratio gets
-  // too high; can be turned off from the command line, defaults to true
+  // whether to react to high multicast packet loss (fall back to unicast or
+  // request full updates); can be turned off from the command line, defaults
+  // to true
   static bool do_multicast_fallback;
 
   // utility functions

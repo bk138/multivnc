@@ -543,18 +543,21 @@ wxThread::ExitCode VNCConn::Entry()
 	      */
 	      if(multicastLossRatios.size() >= MULTICAST_RATIO_SAMPLES/2)
 		{
-		  if(do_multicast_fallback && getMCLossRatio() > 0.5)
+		  if(do_multicast_fallback)
 		    {
-		      rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
-		      wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), this);
-		      cl->multicastDisabled = TRUE;
-		      SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
-		    }
-		  else if(getMCLossRatio() > 0.2)
-		    {
-		      rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full multicast framebuffer update\n");
-		      SendMulticastFramebufferUpdateRequest(cl, FALSE);
-		      cl->multicastPktsLost /= 2;
+		      if(getMCLossRatio() > 0.5)
+			{
+			  rfbClientLog("MultiVNC: loss ratio > 0.5, falling back to unicast\n");
+			  wxLogDebug(wxT("VNCConn %p: multicast loss ratio > 0.5, falling back to unicast"), this);
+			  cl->multicastDisabled = TRUE;
+			  SendFramebufferUpdateRequest(cl, 0, 0, cl->width, cl->height, FALSE);
+			}
+		      else if(getMCLossRatio() > 0.2)
+			{
+			  rfbClientLog("MultiVNC: loss ratio > 0.2, requesting a full multicast framebuffer update\n");
+			  SendMulticastFramebufferUpdateRequest(cl, FALSE);
+			  cl->multicastPktsLost /= 2;
+			}
 		    }
 		}
 	    }
