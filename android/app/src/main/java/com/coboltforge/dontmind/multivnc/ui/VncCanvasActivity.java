@@ -58,6 +58,7 @@ import android.widget.Toast;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -99,11 +100,30 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 
 	private ClipboardManager mClipboardManager;
 
+	private AlertDialog disconnectDialog;
+	// the right mouse button arrives as KEYCODE_BACK; with targetSdk 36 Android 16 cancels its
+	// key up and runs the back callback, which must not ask to disconnect
+	private boolean skipBackCallback;
+
 	@SuppressLint("ShowToast")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+
+		// With targetSdk 36, Android 16 finishes the activity on Back even when onKeyDown()
+		// handled it, so ask from the dispatcher as well.
+		getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+			@Override
+			public void handleOnBackPressed() {
+				if(Utils.DEBUG()) Log.d(TAG, "Input: back callback, skip=" + skipBackCallback);
+				if (skipBackCallback) {
+					skipBackCallback = false;
+					return;
+				}
+				showDisconnectQuestion();
+			}
+		});
 
 		// hide title bar, status bar
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -679,6 +699,8 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
 
+			skipBackCallback = false;
+
 			// handle right mouse button of USB-OTG devices
 			// Also, https://fossies.org/linux/SDL2/android-project/app/src/main/java/org/libsdl/app/SDLActivity.java line 1943 states:
 			// 12290 = Samsung DeX mode desktop mouse
@@ -693,24 +715,15 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 						0
 						);
 				vncCanvas.processPointerEvent(e, true, true);
+				// the back callback can run before the cancelled key up arrives
+				skipBackCallback = true;
 				return true;
 			}
 
 			if(evt.getFlags() == KeyEvent.FLAG_FROM_SYSTEM) // from hardware keyboard
 				keyCode = KeyEvent.KEYCODE_ESCAPE;
 			else {
-				new AlertDialog.Builder(this)
-				.setMessage(getString(R.string.disconnect_question))
-				.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						vncCanvas.vncConn.shutdown();
-						finish();
-					}
-				}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						// Do nothing.
-					}
-				}).show();
+				showDisconnectQuestion();
 				return true;
 			}
 		}
@@ -724,11 +737,33 @@ public class VncCanvasActivity extends AppCompatActivity implements PopupMenu.On
 		return super.onKeyDown(keyCode, evt);
 	}
 
+	private void showDisconnectQuestion() {
+		if (disconnectDialog != null && disconnectDialog.isShowing())
+			return;
+
+		disconnectDialog = new AlertDialog.Builder(this)
+		.setMessage(getString(R.string.disconnect_question))
+		.setPositiveButton(getString(android.R.string.yes), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				vncCanvas.vncConn.shutdown();
+				finish();
+			}
+		}).setNegativeButton(getString(android.R.string.no), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				// Do nothing.
+			}
+		}).show();
+	}
+
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent evt) {
 		if(Utils.DEBUG()) Log.d(TAG, "Input: key up: " + evt.toString());
 
 		if(keyCode == KeyEvent.KEYCODE_BACK) {
+			// no back callback follows a key up that was not cancelled
+			if (!evt.isCanceled())
+				skipBackCallback = false;
+
 			// handle right mouse button of USB-OTG devices
 			if (evt.getSource() == InputDevice.SOURCE_MOUSE) {
 				MotionEvent e = MotionEvent.obtain(
