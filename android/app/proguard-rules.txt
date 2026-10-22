@@ -1,4 +1,8 @@
 -dontobfuscate
+# AGP 9 refuses proguard-android.txt, which set -dontoptimize. Keep release builds
+# unoptimized: with optimization, R8 inlines and removes VNCConn.lockFramebuffer()
+# and unlockFramebuffer(), which native code looks up by name.
+-dontoptimize
 -keep class com.antlersoft.** { *; }
 
 
