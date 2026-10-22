@@ -51,6 +51,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -129,6 +130,17 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		}
 
 		setContentView(R.layout.mainmenu_activity);
+
+		// With targetSdk 36, Android 16 no longer calls onBackPressed(), so stop the service from a callback.
+		getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+			@Override
+			public void handleOnBackPressed() {
+				setEnabled(false);
+				getOnBackPressedDispatcher().onBackPressed();
+				setEnabled(true);
+				stopService(new Intent(Intent.ACTION_VIEW, null, MainMenuActivity.this, MDNSService.class));
+			}
+		});
 
 		// start the MDNS service
 		startMDNSService();
@@ -307,12 +319,6 @@ public class MainMenuActivity extends AppCompatActivity implements MDNSService.O
 		super.onDestroy();
 
 		unbindFromMDNSService();
-	}
-
-	@Override
-	public void onBackPressed() {
-		super.onBackPressed();
-		stopService(new Intent(Intent.ACTION_VIEW, null, this, MDNSService.class));
 	}
 
 	/* (non-Javadoc)
